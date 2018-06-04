@@ -10,7 +10,7 @@ class Storage:
     # 设置默认路径
     @staticmethod
     def home(g, name='.storage'):
-        Storage.__HOME = os.path.dirname(os.path.abspath(g['__file__'])) + '/' + name
+        Storage.__HOME = os.path.dirname(os.path.abspath(g['__file__'])) + '/' + name + '/'
 
     def __init__(self, path):
         if path.startswith('~/'):
