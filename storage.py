@@ -52,4 +52,6 @@ class Storage:
         self._reader[key] = value
 
     def __del__(self):
-        self._writer.close()
+        if hasattr(self, '_writer'):
+            self._writer.close()
+            del self._writer
