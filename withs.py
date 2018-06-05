@@ -14,18 +14,18 @@ def _with2(parent, child):
             try:
                 _child = child(torch)
                 torch = _child.__enter__()
-                self.parent = _parent
-                self.child = _child
+                self._parent = _parent
+                self._child = _child
                 return torch
             except BaseException as e:
                 _parent.__exit__(e.__class__, e, e.__traceback__)
                 raise e
 
         def __exit__(self, type, value, traceback):
-            _child = self.child
-            del self.child
-            _parent = self.parent
-            del self.parent
+            _child = self._child
+            del self._child
+            _parent = self._parent
+            del self._parent
             try:
                 _child.__exit__(type, value, traceback)
             except BaseException as e:
