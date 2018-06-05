@@ -8,37 +8,37 @@ class Connect:
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
+        self.__connect = []
 
     def __enter__(self):
-        _connect = pymysql.connect(*self.args, **self.kwargs)
-        self._connect = _connect
-        return _connect
+        connect = pymysql.connect(*self.args, **self.kwargs)
+        self.__connect.append(connect)
+        return connect
 
     def __exit__(self, type, value, traceback):
-        _connect = self._connect
-        del self._connect
-        _connect.close()
+        connect = self.__connect.pop(-1)
+        connect.close()
 
 
 class Cursor:
     def __init__(self, connect):
         self.connect = connect
+        self.__cursor = []
 
     def __enter__(self):
-        _cursor = self.connect.cursor(cursor=pymysql.cursors.DictCursor)
-        self._cursor = _cursor
-        return _cursor
+        cursor = self.connect.cursor(cursor=pymysql.cursors.DictCursor)
+        self.__cursor.append(cursor)
+        return cursor
 
     def __exit__(self, type, value, traceback):
-        _cursor = self._cursor
-        del self._cursor
+        cursor = self.__cursor.pop(-1)
         try:
             if type is None:
                 self.connect.commit()
             else:
                 self.connect.rollback()
         finally:
-            _cursor.close()
+            cursor.close()
 
 
 Database = withs(Connect, Cursor)
