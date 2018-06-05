@@ -9,22 +9,29 @@ def _with2(parent, child):
             self.kwargs = kwargs
 
         def __enter__(self):
-            self.parent = parent(*self.args, **self.kwargs)
-            placenta = self.parent.__enter__()
+            _parent = parent(*self.args, **self.kwargs)
+            torch = _parent.__enter__()
             try:
-                self.child = child(placenta)
-                return self.child.__enter__()
+                _child = child(torch)
+                torch = _child.__enter__()
+                self.parent = _parent
+                self.child = _child
+                return torch
             except BaseException as e:
-                self.parent.__exit__(e.__class__, e, e.__traceback__)
+                _parent.__exit__(e.__class__, e, e.__traceback__)
                 raise e
 
         def __exit__(self, type, value, traceback):
+            _child = self.child
+            del self.child
+            _parent = self.parent
+            del self.parent
             try:
-                self.child.__exit__(type, value, traceback)
+                _child.__exit__(type, value, traceback)
             except BaseException as e:
-                self.parent.__exit__(e.__class__, e, e.__traceback__)
+                _parent.__exit__(e.__class__, e, e.__traceback__)
                 raise e
-            self.parent.__exit__(type, value, traceback)
+            _parent.__exit__(type, value, traceback)
     return family
 
 
