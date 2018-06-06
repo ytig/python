@@ -25,7 +25,7 @@ class Log:
         if color is not None:
             Log.PRINT('\033[0;%d;48m' % (color,), end='')
         if tag is not None:
-            args = [arg for arg in args]
+            args = list(args)
             args.insert(0, Log.__tag(level, tag))
         Log.PRINT(*args)
         if color is not None:
