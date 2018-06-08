@@ -5,14 +5,13 @@
 # 单次调用（装饰器）
 def once(crash=False):
     def decorator(function):
-        rets = []
-
-        def wrapper(*args, **kwargs):
-            if not getattr(function, 'called', False):
-                setattr(function, 'called', True)
-                rets.append(function(*args, **kwargs))
+        def wrapper(self, *args, **kwargs):
+            ret = None
+            if not getattr(self, function.__qualname__, False):
+                setattr(self, function.__qualname__, True)
+                ret = function(self, *args, **kwargs)
             elif crash:
                 raise Exception('this method can only be used once.')
-            return rets[-1] if len(rets) > 0 else None
+            return ret
         return wrapper
     return decorator
