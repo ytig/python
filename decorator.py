@@ -27,7 +27,7 @@ def synchronized():
 
 
 # 单次调用函数
-def once(crash=False):
+def disposable(crash=False):
     def decorator(function):
         name = function.__qualname__
 
