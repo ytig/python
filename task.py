@@ -17,8 +17,8 @@ class Task:
         try:
             self.handle(self.target)
         except BaseException as e:
-            self.result = False
             Log.e(e, tag=TAG)
+            self.result = False
         else:
             self.result = True
 
