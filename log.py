@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 # coding:utf-8
+from decorator import synchronized, LOCK_CLASS
 
 
 class Log:
@@ -18,6 +19,7 @@ class Log:
 
     # 打印日志
     @staticmethod
+    @synchronized(LOCK_CLASS)
     def log(level, *args, tag=None, **kwargs):
         if level < Log.LEVEL:
             return False
