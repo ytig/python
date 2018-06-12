@@ -21,6 +21,7 @@ class Task:
             self.result = False
         else:
             self.result = True
+        return self.result
 
 
 class Tasks:
