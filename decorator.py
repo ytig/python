@@ -2,11 +2,22 @@
 # coding:utf-8
 import inspect
 import threading
+_LOCK = threading.Lock()  # 全局锁
+_CLASSES = {}  # 伪类
+
+
+# 获取伪类
+def classOf(function):
+    className = inspect.getmodule(function).__name__ + '.' + function.__qualname__.split('.<locals>', 1)[0].rsplit('.', 1)[0]
+    if className not in _CLASSES:
+        _LOCK.acquire()
+        if className not in _CLASSES:
+            _CLASSES[className] = lambda: None
+        _LOCK.release()
+    return _CLASSES[className]
 
 
 class Lock:
-    LOCK = threading.Lock()  # 全局锁
-
     def __init__(self, object):
         self.object = object
         self.name = '__LOCK__' if inspect.isclass(object) else '__lock__'
@@ -14,12 +25,12 @@ class Lock:
     def __enter__(self):
         lock = getattr(self.object, self.name, None)
         if lock is None:
-            Lock.LOCK.acquire()
+            _LOCK.acquire()
             lock = getattr(self.object, self.name, None)
             if lock is None:
                 lock = (threading.Lock(), [],)
                 setattr(self.object, self.name, lock)
-            Lock.LOCK.release()
+            _LOCK.release()
         tn = threading.current_thread().name
         if tn not in lock[1]:
             lock[0].acquire()
@@ -35,7 +46,6 @@ class Lock:
 
 LOCK_CLASS = 0b1  # 类锁
 LOCK_INSTANCE = 0b10  # 实例锁
-_CLASSES = {}  # 伪类
 
 
 # 加锁同步函数
@@ -44,13 +54,11 @@ def synchronized(lock=LOCK_INSTANCE):
     li = True if lock & LOCK_INSTANCE else False
 
     def decorator(function):
-        cn = inspect.getmodule(function).__name__ + '.' + function.__qualname__.split('.<locals>', 1)[0].rsplit('.', 1)[0]
-        if cn not in _CLASSES:
-            _CLASSES[cn] = lambda: None
+        cls = classOf(function)
         if li:
             if lc:
                 def wrapper(self, *args, **kwargs):
-                    with Lock(_CLASSES[cn]) as n:
+                    with Lock(cls) as n:
                         with Lock(self) as n:
                             return function(self, *args, **kwargs)
             else:
@@ -60,7 +68,7 @@ def synchronized(lock=LOCK_INSTANCE):
         else:
             if lc:
                 def wrapper(*args, **kwargs):
-                    with Lock(_CLASSES[cn]) as n:
+                    with Lock(cls) as n:
                         return function(*args, **kwargs)
             else:
                 def wrapper(*args, **kwargs):
