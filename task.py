@@ -7,15 +7,15 @@ TAG = 'task'
 
 
 class Task:
-    def __init__(self, handler, target):
-        self.handler = handler
+    def __init__(self, handle, target):
+        self.handle = handle
         self.target = target
         self.result = None
 
-    # 处理任务
-    def handle(self):
+    # 执行任务
+    def execute(self):
         try:
-            self.handler(self.target)
+            self.handle(self.target)
         except BaseException as e:
             self.result = False
             Log.e(e, tag=TAG)
@@ -24,29 +24,10 @@ class Task:
 
 
 class Tasks:
-    def __init__(self, handler, *targets):
-        self.tasks = [Task(handler, target) for target in targets]
+    def __init__(self, handle, *targets):
+        self.tasks = [Task(handle, target) for target in targets]
 
-    # 批量处理任务
-    def handle(self, t=1):
-        self.__reset()
-        pop = self.__pop
-
-        class Thread(threading.Thread):
-            def run(self):
-                while True:
-                    task = pop()
-                    if task is None:
-                        break
-                    task.handle()
-        threads = [Thread() for i in range(t)]
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join()
-        return [task.result for task in self.tasks].count(True)
-
-    def __reset(self):
+    def __push(self):
         self.__tasks = []
         for task in self.tasks:
             if not task.result:
@@ -57,3 +38,22 @@ class Tasks:
         if self.__tasks:
             return self.__tasks.pop()
         return None
+
+    # 批量执行任务
+    def execute(self, t=1):
+        self.__push()
+        pop = self.__pop
+
+        class Thread(threading.Thread):
+            def run(self):
+                while True:
+                    task = pop()
+                    if task is None:
+                        break
+                    task.execute()
+        threads = [Thread() for i in range(t)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        return [task.result for task in self.tasks].count(True)
