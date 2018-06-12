@@ -1,27 +1,70 @@
 #!/usr/local/bin/python3
 # coding:utf-8
+import inspect
 import threading
-LOCK = threading.Lock()
+
+
+class Lock:
+    LOCK = threading.Lock()  # 全局锁
+
+    def __init__(self, object):
+        self.object = object
+        self.name = '__LOCK__' if inspect.isclass(object) else '__lock__'
+
+    def __enter__(self):
+        lock = getattr(self.object, self.name, None)
+        if lock is None:
+            Lock.LOCK.acquire()
+            lock = getattr(self.object, self.name, None)
+            if lock is None:
+                lock = (threading.Lock(), [],)
+                setattr(self.object, self.name, lock)
+            Lock.LOCK.release()
+        tn = threading.current_thread().name
+        if tn not in lock[1]:
+            lock[0].acquire()
+        lock[1].append(tn)
+
+    def __exit__(self, type, value, traceback):
+        lock = getattr(self.object, self.name)
+        tn = threading.current_thread().name
+        lock[1].remove(tn)
+        if tn not in lock[1]:
+            lock[0].release()
+
+
+LOCK_CLASS = 0b1  # 类锁
+LOCK_INSTANCE = 0b10  # 实例锁
+_CLASSES = {}  # 伪类
 
 
 # 加锁同步函数
-def synchronized():
-    def decorator(function):
-        name = '__lock__'
+def synchronized(lock=LOCK_INSTANCE):
+    lc = True if lock & LOCK_CLASS else False
+    li = True if lock & LOCK_INSTANCE else False
 
-        def wrapper(self, *args, **kwargs):
-            lock = getattr(self, name, None)
-            if not lock:
-                LOCK.acquire()
-                lock = getattr(self, name, None)
-                if not lock:
-                    lock = threading.Lock()
-                    setattr(self, name, lock)
-                LOCK.release()
-            lock.acquire()
-            ret = function(self, *args, **kwargs)
-            lock.release()
-            return ret
+    def decorator(function):
+        cn = inspect.getmodule(function).__name__ + '.' + function.__qualname__.split('.<locals>', 1)[0].rsplit('.', 1)[0]
+        if cn not in _CLASSES:
+            _CLASSES[cn] = lambda: None
+        if li:
+            if lc:
+                def wrapper(self, *args, **kwargs):
+                    with Lock(_CLASSES[cn]) as n:
+                        with Lock(self) as n:
+                            return function(self, *args, **kwargs)
+            else:
+                def wrapper(self, *args, **kwargs):
+                    with Lock(self) as n:
+                        return function(self, *args, **kwargs)
+        else:
+            if lc:
+                def wrapper(*args, **kwargs):
+                    with Lock(_CLASSES[cn]) as n:
+                        return function(*args, **kwargs)
+            else:
+                def wrapper(*args, **kwargs):
+                    return function(*args, **kwargs)
         return wrapper
     return decorator
 
