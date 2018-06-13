@@ -28,11 +28,11 @@ class Storage:
         with open(path, mode='r') as reader:
             key = None
             for line in reader:
-                line = line.strip('\n')
+                line = decode(line.strip('\n'))
                 if key is None:
                     key = line
                 else:
-                    self._reader[key] = decode(line)
+                    self._reader[key] = line
                     key = None
 
     # 轮询
@@ -47,7 +47,7 @@ class Storage:
     def set(self, key, value):
         if not isinstance(key, str):
             raise Exception('key must be str.')
-        self._writer.write(key + '\n' + encode(value) + '\n')
+        self._writer.write(encode(key) + '\n' + encode(value) + '\n')
         self._writer.flush()
         self._reader[key] = value
 
