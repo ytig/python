@@ -2,7 +2,18 @@
 # coding:utf-8
 import os
 import sys
-import codecs
+import json
+from urllib.parse import quote, unquote
+
+
+# 数据加密
+def encode(value):
+    return quote(json.dumps(value))
+
+
+# 数据解密
+def decode(value):
+    return json.loads(unquote(value))
 
 
 class Storage:
@@ -13,33 +24,30 @@ class Storage:
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         self._reader = {}
-        self._writer = codecs.open(path, 'a', encoding='utf-8')
-        reader = codecs.open(path, 'r', encoding='utf-8')
-        key = None
-        for line in reader:
-            line = line.strip('\n')
-            if key is None:
-                key = line
-            else:
-                self._reader[key] = line
-                key = None
-        reader.close()
+        self._writer = open(path, mode='a')
+        with open(path, mode='r') as reader:
+            key = None
+            for line in reader:
+                line = line.strip('\n')
+                if key is None:
+                    key = line
+                else:
+                    self._reader[key] = decode(line)
+                    key = None
 
     # 轮询
     def keys(self):
-        return self._reader.keys()
+        return list(self._reader.keys())
 
     # 读取
-    def read(self, key, defaultValue=None):
-        value = self._reader.get(key)
-        return value if value is not None else defaultValue
+    def get(self, key, defaultValue=None):
+        return self._reader.get(key, defaultValue)
 
     # 写入
-    def write(self, key, value):
-        self._writer.write(key)
-        self._writer.write('\n')
-        self._writer.write(value)
-        self._writer.write('\n')
+    def set(self, key, value):
+        if not isinstance(key, str):
+            raise Exception('key must be str.')
+        self._writer.write(key + '\n' + encode(value) + '\n')
         self._writer.flush()
         self._reader[key] = value
 
