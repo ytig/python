@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # coding:utf-8
 import threading
-from decorator import synchronized
+from decorator import synchronized, disposable
 from log import Log
 TAG = 'task'
 
@@ -42,6 +42,7 @@ class _Executor:
         self.backs += 1
 
     # 批量执行任务
+    @disposable()
     def execute(self, t):
         e = self
 
