@@ -9,12 +9,10 @@ _CLASSES = {}  # 伪类
 # 获取伪类
 def classOf(function):
     className = inspect.getmodule(function).__name__ + '.' + function.__qualname__.split('.<locals>', 1)[0].rsplit('.', 1)[0]
-    if className not in _CLASSES:
-        _LOCK.acquire()
+    with _LOCK:
         if className not in _CLASSES:
             _CLASSES[className] = lambda: None
-        _LOCK.release()
-    return _CLASSES[className]
+        return _CLASSES[className]
 
 
 class Lock:
@@ -23,25 +21,26 @@ class Lock:
         self.name = '__LOCK__' if inspect.isclass(object) else '__lock__'
 
     def __enter__(self):
-        lock = getattr(self.object, self.name, None)
-        if lock is None:
-            _LOCK.acquire()
-            lock = getattr(self.object, self.name, None)
-            if lock is None:
-                lock = (threading.Lock(), [],)
-                setattr(self.object, self.name, lock)
-            _LOCK.release()
         tn = threading.current_thread().name
-        if tn not in lock[1]:
-            lock[0].acquire()
-        lock[1].append(tn)
+        with _LOCK:
+            if not hasattr(self.object, self.name):
+                setattr(self.object, self.name, (threading.Lock(), [],))
+            lock, stack = getattr(self.object, self.name)
+            a = tn not in stack
+            if not a:
+                stack.append(tn)
+        if a:
+            lock.acquire()
+            with _LOCK:
+                stack.append(tn)
 
     def __exit__(self, type, value, traceback):
-        lock = getattr(self.object, self.name)
-        tn = threading.current_thread().name
-        lock[1].remove(tn)
-        if tn not in lock[1]:
-            lock[0].release()
+        with _LOCK:
+            lock, stack = getattr(self.object, self.name)
+            stack.pop()
+            r = len(stack) == 0
+        if r:
+            lock.release()
 
 
 LOCK_CLASS = 0b1  # 类锁
@@ -58,17 +57,17 @@ def synchronized(lock=LOCK_INSTANCE):
         if li:
             if lc:
                 def wrapper(self, *args, **kwargs):
-                    with Lock(cls) as n:
-                        with Lock(self) as n:
+                    with Lock(cls):
+                        with Lock(self):
                             return function(self, *args, **kwargs)
             else:
                 def wrapper(self, *args, **kwargs):
-                    with Lock(self) as n:
+                    with Lock(self):
                         return function(self, *args, **kwargs)
         else:
             if lc:
                 def wrapper(*args, **kwargs):
-                    with Lock(cls) as n:
+                    with Lock(cls):
                         return function(*args, **kwargs)
             else:
                 def wrapper(*args, **kwargs):
