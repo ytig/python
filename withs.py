@@ -1,33 +1,29 @@
 #!/usr/local/bin/python3
 # coding:utf-8
 import threading
+from decorator import synchronized
 
 
 class Stack:
     def __init__(self):
-        self.stacks = {}
-
-    # 线程标识
-    @staticmethod
-    def tid():
-        return threading.currentThread().name
+        self.values = {}
 
     # 入栈
+    @synchronized()
     def push(self, data):
-        k = Stack.tid()
-        stack = self.stacks.get(k)
-        if not stack:
-            stack = []
-            self.stacks[k] = stack
-        stack.append(data)
+        key = threading.currentThread().name
+        value = self.values.get(key)
+        if value is None:
+            value = []
+            self.values[key] = value
+        value.append(data)
 
     # 出栈
+    @synchronized()
     def pop(self):
-        k = Stack.tid()
-        stack = self.stacks.get(k)
-        if not stack or len(stack) <= 0:
-            raise Exception('stack is empty.')
-        return stack.pop(-1)
+        key = threading.currentThread().name
+        value = self.values.get(key)
+        return value.pop()
 
 
 def _with2(Parent, Child):
