@@ -124,7 +124,7 @@ class _Class:
             cls = cls.output(lambda o: o[0] + (o[1],))
         return cls
 
-    # 分叉流程
+    # 分支流程
     @classmethod
     def branch(cls, child, pipe=None, log=lambda e: Log.e(e, tag=TAG)):
         """
