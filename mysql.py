@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # coding:utf-8
 import pymysql
-from withs import *
+from wa import Stack, extends
 
 
 class Connect:
@@ -41,4 +41,4 @@ class Cursor:
             cursor.close()
 
 
-Database = withs(Connect, Cursor)
+Database = extends(Connect).series(Cursor)
