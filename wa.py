@@ -122,6 +122,15 @@ class _Class:
             cls = cls.output(lambda o: o[0] + (o[1],))
         return cls
 
+    # 分叉流程
+    @classmethod
+    def branch(cls, child, pipe=None):
+        """
+        pipe: object -> Arguments
+        """
+        pipe = pipe if pipe is not None else lambda o: Arguments(o)
+        return _branch(cls, child, pipe)
+
 
 def _series(Parent, Child, Pipe):
     class Series(_Class):
@@ -188,6 +197,49 @@ def _parallel(Husband, Wife, Pipe):
                 raise e
             husband.__exit__(type, value, traceback)
     return Parallel
+
+
+def _branch(Parent, Child, Pipe):
+    class Branch(_Class):
+        def __init__(self, *args, **kwargs):
+            self.args = args
+            self.kwargs = kwargs
+            self.__parent = Stack()
+            self.__children = Stack()
+
+        def __enter__(self):
+            parent = Parent(*self.args, **self.kwargs)
+            ps = parent.__enter__()
+            children = []
+            cs = []
+            try:
+                for p in ps:
+                    try:
+                        child = Pipe(p)(Child)
+                        c = child.__enter__()
+                        cs.append(c)
+                        children.append(child)
+                    except BaseException:
+                        pass
+            except BaseException:
+                pass
+            self.__parent.push(parent)
+            self.__children.push(children)
+            return tuple(cs)
+
+        def __exit__(self, type, value, traceback):
+            children = self.__children.pop()
+            parent = self.__parent.pop()
+            try:
+                for child in children:
+                    try:
+                        child.__exit__(type, value, traceback)
+                    except BaseException:
+                        pass
+            except BaseException:
+                pass
+            parent.__exit__(type, value, traceback)
+    return Branch
 
 
 # 追加（装饰器）
