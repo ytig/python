@@ -102,25 +102,23 @@ class _Class:
         """
         pipe: *args, **kwargs -> Arguments[]
         """
-        pipe = pipe if pipe is not None else lambda *args, **kwargs: [Arguments(*args, **kwargs) for i in range(len(wives) + 1)]
+        l = len(wives)
+        pipe = pipe if pipe is not None else lambda *args, **kwargs: [Arguments(*args, **kwargs) for i in range(l + 1)]
 
-        class Pipes:
-            def __init__(self, pipe):
-                self.pipe = pipe
-
-            def __call__(self, i, l):
-                def pipe(*args, **kwargs):
-                    if i == l - 1:
-                        self.result = self.pipe(*args, **kwargs)
-                    r = (self.result[i], self.result[i + 1],)
-                    if i == 0:
-                        del self.result
-                    return r
-                return pipe
-        pipes = Pipes(pipe)
+        def pipes(i):
+            def p(*args, **kwargs):
+                if i == l - 1:
+                    result = pipe(*args, **kwargs)
+                else:
+                    result = args[0]
+                if i == 0:
+                    return (result[i], result[i + 1],)
+                else:
+                    return (Arguments(result), result[i + 1],)
+            return p
         cls = cls.output(lambda o: (o,))
-        for i in range(len(wives)):
-            cls = _parallel(cls, wives[i], pipes(i, len(wives)))
+        for i in range(l):
+            cls = _parallel(cls, wives[i], pipes(i))
             cls = cls.output(lambda o: o[0] + (o[1],))
         return cls
 
@@ -194,6 +192,19 @@ def _parallel(Husband, Wife, Pipe):
 
 # 继承
 def extends(Class):
-    class Extends(Class, _Class):
-        pass
+    class Extends(_Class):
+        def __init__(self, *args, **kwargs):
+            self.args = args
+            self.kwargs = kwargs
+            self.__object = Stack()
+
+        def __enter__(self):
+            object = Class(*self.args, **self.kwargs)
+            o = object.__enter__()
+            self.__object.push(object)
+            return o
+
+        def __exit__(self, type, value, traceback):
+            object = self.__object.pop()
+            object.__exit__(type, value, traceback)
     return Extends
