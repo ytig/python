@@ -47,7 +47,7 @@ class Arguments:
 
 
 class _Class:
-     # 输入转换
+    # 输入转换
     @classmethod
     def input(cls, pipe=None):
         """
@@ -87,7 +87,7 @@ class _Class:
                 pass
         return _series(cls, child, lambda o: Arguments(o))
 
-    # 串联
+    # 串联流程
     @classmethod
     def series(cls, child, pipe=None):
         """
@@ -96,7 +96,7 @@ class _Class:
         pipe = pipe if pipe is not None else lambda o: Arguments(o)
         return _series(cls, child, pipe)
 
-    # 并联
+    # 并联流程
     @classmethod
     def parallel(cls, *wives, pipe=None):
         """
@@ -190,7 +190,7 @@ def _parallel(Husband, Wife, Pipe):
     return Parallel
 
 
-# 继承
+# 追加
 def extends(Class):
     class Extends(_Class):
         def __init__(self, *args, **kwargs):
@@ -208,3 +208,18 @@ def extends(Class):
             object = self.__object.pop()
             object.__exit__(type, value, traceback)
     return Extends
+
+
+# 更新
+def updates(Def):
+    class Updates(_Class):
+        def __init__(self, *args, **kwargs):
+            self.args = args
+            self.kwargs = kwargs
+
+        def __enter__(self):
+            return Def(*self.args, **self.kwargs)
+
+        def __exit__(self, type, value, traceback):
+            pass
+    return Updates
