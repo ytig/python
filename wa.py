@@ -2,6 +2,8 @@
 # coding:utf-8
 import threading
 from decorator import synchronized
+from log import Log
+TAG = 'wa'
 
 
 class Stack:
@@ -124,12 +126,12 @@ class _Class:
 
     # 分叉流程
     @classmethod
-    def branch(cls, child, pipe=None):
+    def branch(cls, child, pipe=None, log=lambda e: Log.e(e, tag=TAG)):
         """
         pipe: object -> Arguments
         """
         pipe = pipe if pipe is not None else lambda o: Arguments(o)
-        return _branch(cls, child, pipe)
+        return _branch(cls, child, pipe, log)
 
 
 def _series(Parent, Child, Pipe):
@@ -199,7 +201,13 @@ def _parallel(Husband, Wife, Pipe):
     return Parallel
 
 
-def _branch(Parent, Child, Pipe):
+def _branch(Parent, Child, Pipe, Log):
+    def log(e):
+        try:
+            Log(e)
+        except BaseException:
+            pass
+
     class Branch(_Class):
         def __init__(self, *args, **kwargs):
             self.args = args
@@ -219,10 +227,10 @@ def _branch(Parent, Child, Pipe):
                         c = child.__enter__()
                         cs.append(c)
                         children.append(child)
-                    except BaseException:
-                        pass
-            except BaseException:
-                pass
+                    except BaseException as e:
+                        log(e)
+            except BaseException as e:
+                log(e)
             self.__parent.push(parent)
             self.__children.push(children)
             return tuple(cs)
@@ -234,10 +242,10 @@ def _branch(Parent, Child, Pipe):
                 for child in children:
                     try:
                         child.__exit__(type, value, traceback)
-                    except BaseException:
-                        pass
-            except BaseException:
-                pass
+                    except BaseException as e:
+                        log(e)
+            except BaseException as e:
+                log(e)
             parent.__exit__(type, value, traceback)
     return Branch
 
