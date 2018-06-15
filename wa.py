@@ -190,7 +190,7 @@ def _parallel(Husband, Wife, Pipe):
     return Parallel
 
 
-# 追加
+# 追加（装饰器）
 def extends(Class):
     class Extends(_Class):
         def __init__(self, *args, **kwargs):
@@ -210,7 +210,7 @@ def extends(Class):
     return Extends
 
 
-# 更新
+# 更新（装饰器）
 def updates(Def):
     class Updates(_Class):
         def __init__(self, *args, **kwargs):
