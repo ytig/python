@@ -4,6 +4,7 @@ import pymysql
 from wa import Stack, extends
 
 
+@extends
 class Connect:
     def __init__(self, *args, **kwargs):
         self.args = args
@@ -20,6 +21,7 @@ class Connect:
         connect.close()
 
 
+@extends
 class Cursor:
     def __init__(self, connect):
         self.connect = connect
@@ -41,4 +43,4 @@ class Cursor:
             cursor.close()
 
 
-Database = extends(Connect).series(Cursor)
+Database = Connect.series(Cursor)
