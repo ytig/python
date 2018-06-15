@@ -46,7 +46,7 @@ class Arguments:
         return callable(*self.args, **self.kwargs)
 
 
-class _Base:
+class _Class:
      # 输入转换
     @classmethod
     def input(cls, pipe=None):
@@ -126,7 +126,7 @@ class _Base:
 
 
 def _series(Parent, Child, Pipe):
-    class Series(_Base):
+    class Series(_Class):
         def __init__(self, *args, **kwargs):
             self.args = args
             self.kwargs = kwargs
@@ -159,7 +159,7 @@ def _series(Parent, Child, Pipe):
 
 
 def _parallel(Husband, Wife, Pipe):
-    class Parallel(_Base):
+    class Parallel(_Class):
         def __init__(self, *args, **kwargs):
             self.args = args
             self.kwargs = kwargs
@@ -194,6 +194,6 @@ def _parallel(Husband, Wife, Pipe):
 
 # 继承
 def extends(Class):
-    class Extends(Class, _Base):
+    class Extends(Class, _Class):
         pass
     return Extends
