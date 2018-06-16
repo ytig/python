@@ -133,6 +133,15 @@ class _Class:
         pipe = pipe if pipe is not None else lambda o: Arguments(o)
         return _branch(cls, child, pipe, log)
 
+    # 合并流程
+    @classmethod
+    def merge(cls, wife, pipe=None):
+        """
+        pipe: *args, **kwargs -> bool
+        """
+        pipe = pipe if pipe is not None else lambda *args, **kwargs: False
+        return _merge(cls, wife, pipe)
+
 
 def _series(Parent, Child, Pipe):
     class Series(_Class):
@@ -248,6 +257,25 @@ def _branch(Parent, Child, Pipe, Log):
                 log(e)
             parent.__exit__(type, value, traceback)
     return Branch
+
+
+def _merge(Husband, Wife, Pipe):
+    class Merge(_Class):
+        def __init__(self, *args, **kwargs):
+            self.args = args
+            self.kwargs = kwargs
+            self.__object = Stack()
+
+        def __enter__(self):
+            object = (Wife if Pipe(*self.args, **self.kwargs) else Husband)(*self.args, **self.kwargs)
+            o = object.__enter__()
+            self.__object.push(object)
+            return o
+
+        def __exit__(self, type, value, traceback):
+            object = self.__object.pop()
+            object.__exit__(type, value, traceback)
+    return Merge
 
 
 # 追加（装饰器）
