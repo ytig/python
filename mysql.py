@@ -1,46 +1,38 @@
 #!/usr/local/bin/python3
 # coding:utf-8
 import pymysql
-from wa import Stack, extends
+from wa import extends
 
 
 @extends
 class Connect:
     def __init__(self, *args, **kwargs):
-        self.args = args
-        self.kwargs = kwargs
-        self.__connect = Stack()
+        self.connect = pymysql.connect(*args, **kwargs)
 
     def __enter__(self):
-        connect = pymysql.connect(*self.args, **self.kwargs)
-        self.__connect.push(connect)
-        return connect
+        return self.connect
 
     def __exit__(self, type, value, traceback):
-        connect = self.__connect.pop()
-        connect.close()
+        self.connect.close()
 
 
 @extends
 class Cursor:
     def __init__(self, connect):
         self.connect = connect
-        self.__cursor = Stack()
+        self.cursor = connect.cursor(cursor=pymysql.cursors.DictCursor)
 
     def __enter__(self):
-        cursor = self.connect.cursor(cursor=pymysql.cursors.DictCursor)
-        self.__cursor.push(cursor)
-        return cursor
+        return self.cursor
 
     def __exit__(self, type, value, traceback):
-        cursor = self.__cursor.pop()
         try:
             if type is None:
                 self.connect.commit()
             else:
                 self.connect.rollback()
         finally:
-            cursor.close()
+            self.cursor.close()
 
 
 Database = Connect.series(Cursor)
