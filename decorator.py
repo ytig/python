@@ -77,36 +77,28 @@ def synchronized(lock=LOCK_INSTANCE):
 
 
 # 单次调用函数
-def disposable(static=False, crash=False):
+def disposable(static=False):
     def decorator(function):
         name = function.__qualname__
         if not static:
             def wrapper(self, *args, **kwargs):
-                ret = None
                 if not getattr(self, name, False):
                     try:
-                        ret = function(self, *args, **kwargs)
+                        function(self, *args, **kwargs)
                     except BaseException as e:
                         raise e
                     else:
                         setattr(self, name, True)
-                elif crash:
-                    raise Exception('this method can only be used once.')
-                return ret
         else:
             cls = classOf(function)
 
             def wrapper(*args, **kwargs):
-                ret = None
                 if not getattr(cls, name, False):
                     try:
-                        ret = function(*args, **kwargs)
+                        function(*args, **kwargs)
                     except BaseException as e:
                         raise e
                     else:
                         setattr(cls, name, True)
-                elif crash:
-                    raise Exception('this function can only be used once.')
-                return ret
         return wrapper
     return decorator
