@@ -84,8 +84,12 @@ def disposable(static=False, crash=False):
             def wrapper(self, *args, **kwargs):
                 ret = None
                 if not getattr(self, name, False):
-                    setattr(self, name, True)
-                    ret = function(self, *args, **kwargs)
+                    try:
+                        ret = function(self, *args, **kwargs)
+                    except BaseException as e:
+                        raise e
+                    else:
+                        setattr(self, name, True)
                 elif crash:
                     raise Exception('this method can only be used once.')
                 return ret
@@ -95,8 +99,12 @@ def disposable(static=False, crash=False):
             def wrapper(*args, **kwargs):
                 ret = None
                 if not getattr(cls, name, False):
-                    setattr(cls, name, True)
-                    ret = function(*args, **kwargs)
+                    try:
+                        ret = function(*args, **kwargs)
+                    except BaseException as e:
+                        raise e
+                    else:
+                        setattr(cls, name, True)
                 elif crash:
                     raise Exception('this function can only be used once.')
                 return ret
