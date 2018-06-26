@@ -86,6 +86,7 @@ class Queue:
             self.queues = []
             self.running = 0
 
+    # 分派任务
     def push(self):
         mutex = Queue.Mutex.instance(classOf(self)())
         with Lock(mutex):
@@ -108,5 +109,6 @@ class Queue:
                                 Log.e(e, tag=TAG)
                 Thread().start()
 
+    # 执行任务
     def pop(self):
         raise NotImplementedError()
