@@ -11,7 +11,7 @@ def classOf(function):
     className = inspect.getmodule(function).__name__ + '.' + function.__qualname__.split('.<locals>', 1)[0].rsplit('.', 1)[0]
     with _LOCK:
         if className not in _CLASSES:
-            _CLASSES[className] = lambda: None
+            _CLASSES[className] = lambda: className
         return _CLASSES[className]
 
 
