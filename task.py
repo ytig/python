@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # coding:utf-8
 import threading
-from decorator import synchronized, disposable
+from decorator import classOf, Lock, LOCK_CLASS, synchronized, disposable
 from log import Log
 TAG = 'task'
 
@@ -69,3 +69,44 @@ class Tasks:
     # 批量执行任务
     def execute(self, t=1):
         return _Executor(*self.tasks).execute(t)
+
+
+class Queue:
+    class Mutex:
+        MUTEXS = {}  # 互斥
+
+        @staticmethod
+        @synchronized(LOCK_CLASS)
+        def instance(key):
+            if key not in Queue.Mutex.MUTEXS:
+                Queue.Mutex.MUTEXS[key] = Queue.Mutex()
+            return Queue.Mutex.MUTEXS[key]
+
+        def __init__(self):
+            self.queues = []
+            self.running = 0
+
+    def push(self):
+        mutex = Queue.Mutex.instance(classOf(self)())
+        with Lock(mutex):
+            mutex.queues.append(self)
+            if mutex.running < 1:
+                mutex.running += 1
+
+                class Thread(threading.Thread):
+                    def run(self):
+                        while True:
+                            with Lock(mutex):
+                                if mutex.queues:
+                                    queue = mutex.queues.pop(0)
+                                else:
+                                    mutex.running -= 1
+                                    break
+                            try:
+                                queue.pop()
+                            except BaseException as e:
+                                Log.e(e, tag=TAG)
+                Thread().start()
+
+    def pop(self):
+        raise NotImplementedError()
