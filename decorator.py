@@ -8,18 +8,19 @@ _CLASSES = {}  # 伪类
 
 # 获取伪类
 def classOf(generics):
-    if inspect.ismodule(generics):
-        className = generics.__name__
+    if isinstance(generics, str):
+        with _LOCK:
+            if generics not in _CLASSES:
+                _CLASSES[generics] = lambda: generics
+            return _CLASSES[generics]
+    elif inspect.ismodule(generics):
+        return classOf(generics.__name__)
     elif inspect.isclass(generics):
-        className = inspect.getmodule(generics).__name__ + '.' + generics.__qualname__
+        return classOf(generics.__module__ + '.' + generics.__qualname__)
     elif inspect.isfunction(generics) or inspect.ismethod(generics):
-        className = inspect.getmodule(generics).__name__ + '.' + generics.__qualname__.rsplit('.', 1)[0]
+        return classOf(generics.__module__ + '.' + generics.__qualname__.rsplit('.', 1)[0])
     else:
-        className = inspect.getmodule(generics).__name__ + '.' + generics.__class__.__qualname__
-    with _LOCK:
-        if className not in _CLASSES:
-            _CLASSES[className] = lambda: className
-        return _CLASSES[className]
+        return classOf(generics.__class__)
 
 
 class Lock:
