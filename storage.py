@@ -1,9 +1,9 @@
 #!/usr/local/bin/python3
 # coding:utf-8
 import os
-import sys
 import json
 from urllib.parse import quote, unquote
+from kit import workspace
 
 
 # 数据加密
@@ -19,7 +19,7 @@ def decode(value):
 class Storage:
     def __init__(self, path):
         if path.startswith('~/'):
-            path = os.path.dirname(os.path.abspath(sys.argv[0])) + '/.storage/' + path[2:]
+            path = workspace() + '/.storage/' + path[2:]
         dirname = os.path.dirname(path)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
