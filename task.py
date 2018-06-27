@@ -2,7 +2,6 @@
 # coding:utf-8
 import threading
 from decorator import classOf, Lock, LOCK_CLASS, synchronized, disposable
-from log import Log
 TAG = 'task'
 
 
@@ -22,7 +21,7 @@ class Task:
                 del self.__target
                 del self.__handle
         except BaseException as e:
-            Log.e(e, tag=TAG)
+            __import__('log').Log.e(e, tag=TAG)
         return self.result
 
 
@@ -106,9 +105,9 @@ class Queue:
                             try:
                                 queue.pop()
                             except BaseException as e:
-                                Log.e(e, tag=TAG)
+                                __import__('log').Log.e(e, tag=TAG)
                 Thread().start()
 
     # 执行任务
     def pop(self):
-        raise NotImplementedError()
+        pass

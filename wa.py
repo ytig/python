@@ -2,7 +2,6 @@
 # coding:utf-8
 import threading
 from decorator import synchronized
-from log import Log
 TAG = 'wa'
 
 
@@ -126,7 +125,7 @@ class _Class:
 
     # 分支流程
     @classmethod
-    def branch(cls, child, pipe=None, log=lambda e: Log.e(e, tag=TAG)):
+    def branch(cls, child, pipe=None, log=lambda e: __import__('log').Log.e(e, tag=TAG)):
         """
         pipe: object -> Arguments
         """
