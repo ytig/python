@@ -1,6 +1,32 @@
 #!/usr/local/bin/python3
 # coding:utf-8
+import os
+import datetime
+from kit import workspace
 from decorator import synchronized, LOCK_CLASS
+from task import Queue
+
+
+class Print(Queue):
+    KEEP = False  # 持久化
+
+    def __init__(self, *args, **kwargs):
+        print(*args, **kwargs)
+        if Print.KEEP and not kwargs:
+            iso = datetime.datetime.now().isoformat()
+            self.path = workspace() + '/.log/' + iso.split('T')[0]
+            self.text = ' '.join([iso.split('T')[1]] + [str(i) for i in args])
+            self.push()
+
+    def pop(self):
+        try:
+            dirname = os.path.dirname(self.path)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+            with open(self.path, mode='a') as f:
+                f.write(self.text + '\n')
+        except BaseException:
+            pass
 
 
 class Log:
@@ -11,7 +37,7 @@ class Log:
     ERROR = 6  # 异常
     ASSERT = 7  # 断言
     LEVEL = INFO  # 日志级别
-    PRINT = print  # 日志打印
+    PRINT = Print  # 日志打印
 
     @staticmethod
     def __tag(level, tag):
