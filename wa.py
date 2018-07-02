@@ -125,12 +125,12 @@ class _Class:
 
     # 分支流程
     @classmethod
-    def branch(cls, child, pipe=None, log=lambda e: __import__('log').Log.e(e, tag=TAG)):
+    def branch(cls, child, pipe=None):
         """
         pipe: object -> Arguments
         """
         pipe = pipe if pipe is not None else lambda o: Arguments(o)
-        return _branch(cls, child, pipe, log)
+        return _branch(cls, child, pipe)
 
     # 合并流程
     @classmethod
@@ -209,12 +209,16 @@ def _parallel(Husband, Wife, Pipe):
     return Parallel
 
 
-def _branch(Parent, Child, Pipe, Log):
-    def log(e):
-        try:
-            Log(e)
-        except BaseException:
-            pass
+def _branch(Parent, Child, Pipe):
+    def exits(queue, type, value, traceback):
+        if queue:
+            exit = queue.pop()
+            try:
+                exit.__exit__(type, value, traceback)
+            except BaseException as e:
+                exits(queue, e.__class__, e, e.__traceback__)
+                raise e
+            exits(queue, type, value, traceback)
 
     class Branch(_Class):
         def __init__(self, *args, **kwargs):
@@ -230,15 +234,12 @@ def _branch(Parent, Child, Pipe, Log):
             cs = []
             try:
                 for p in ps:
-                    try:
-                        child = Pipe(p)(Child)
-                        c = child.__enter__()
-                        cs.append(c)
-                        children.append(child)
-                    except BaseException as e:
-                        log(e)
+                    child = Pipe(p)(Child)
+                    cs.append(child.__enter__())
+                    children.append(child)
             except BaseException as e:
-                log(e)
+                exits([parent] + children, e.__class__, e, e.__traceback__)
+                raise e
             self.__parent.push(parent)
             self.__children.push(children)
             return tuple(cs)
@@ -246,15 +247,7 @@ def _branch(Parent, Child, Pipe, Log):
         def __exit__(self, type, value, traceback):
             children = self.__children.pop()
             parent = self.__parent.pop()
-            try:
-                for child in children:
-                    try:
-                        child.__exit__(type, value, traceback)
-                    except BaseException as e:
-                        log(e)
-            except BaseException as e:
-                log(e)
-            parent.__exit__(type, value, traceback)
+            exits([parent] + children, type, value, traceback)
     return Branch
 
 
