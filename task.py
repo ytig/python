@@ -21,6 +21,7 @@ class Task:
                 self.result = True
                 del self.__target
                 del self.__handle
+                del self.__log
         except BaseException as e:
             try:
                 self.__log(e)
