@@ -91,7 +91,7 @@ class Queue:
             self.running = 0
 
     # 分派任务
-    def push(self):
+    def push(self, log=lambda e: __import__('log').Log.e(e, tag=TAG)):
         mutex = Queue.Mutex.instance(classOf(self)())
         with Lock(mutex):
             mutex.queues.append(self)
@@ -110,7 +110,10 @@ class Queue:
                             try:
                                 queue.pop()
                             except BaseException as e:
-                                __import__('log').Log.e(e, tag=TAG)
+                                try:
+                                    log(e)
+                                except BaseException:
+                                    pass
                 Thread().start()
 
     # 执行任务
