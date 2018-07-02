@@ -6,17 +6,17 @@ PASS = object()  # 跳过
 
 
 # 绑定参数
-def bind(call, *binds, **kwbinds):
+def bind(call, *extends, **updates):
     def bound(*args, **kwargs):
         args = list(args)
-        for i in range(len(binds)):
-            arg = binds[i]
+        for i in range(len(extends)):
+            arg = extends[i]
             if arg is PASS:
                 if i >= len(args):
                     raise Exception('pass argument missing.')
             else:
                 args.insert(i, arg)
-        kwargs.update(kwbinds)
+        kwargs.update(updates)
         return call(*args, **kwargs)
     return bound
 
