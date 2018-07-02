@@ -5,9 +5,9 @@ import sys
 PASS = object()  # 跳过
 
 
-# 绑定关键字参数
-def bind(function, *binds, **kwbinds):
-    def method(*args, **kwargs):
+# 绑定参数
+def bind(call, *binds, **kwbinds):
+    def bound(*args, **kwargs):
         args = list(args)
         for i in range(len(binds)):
             arg = binds[i]
@@ -17,8 +17,8 @@ def bind(function, *binds, **kwbinds):
             else:
                 args.insert(i, arg)
         kwargs.update(kwbinds)
-        return function(*args, **kwargs)
-    return method
+        return call(*args, **kwargs)
+    return bound
 
 
 # 工作区目录
