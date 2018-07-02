@@ -6,9 +6,10 @@ TAG = 'task'
 
 
 class Task:
-    def __init__(self, handle, target):
+    def __init__(self, handle, target, log=lambda e: __import__('log').Log.e(e, tag=TAG)):
         self.__handle = handle
         self.__target = target
+        self.__log = log
         self.result = False
 
     # 执行任务
@@ -21,7 +22,10 @@ class Task:
                 del self.__target
                 del self.__handle
         except BaseException as e:
-            __import__('log').Log.e(e, tag=TAG)
+            try:
+                self.__log(e)
+            except BaseException:
+                pass
         return self.result
 
 
@@ -62,8 +66,8 @@ class _Executor:
 
 
 class Tasks:
-    def __init__(self, handle, *targets):
-        self.tasks = [Task(handle, target) for target in targets]
+    def __init__(self, handle, *targets, **kwargs):
+        self.tasks = [Task(handle, target, **kwargs) for target in targets]
 
     # 批量执行任务
     def execute(self, t=1):
