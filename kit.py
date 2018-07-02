@@ -2,7 +2,20 @@
 # coding:utf-8
 import os
 import sys
+import inspect
 PASS = object()  # 跳过
+
+
+# 异常追溯
+def trace():
+    try:
+        file = inspect.trace()[-1][1]
+        for module in sys.modules.values():
+            if getattr(module, '__file__', '') == file:
+                return module
+    except BaseException:
+        pass
+    return None
 
 
 # 绑定参数
