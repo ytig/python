@@ -85,34 +85,73 @@ def synchronized(lock=LOCK_INSTANCE):
 
 
 # 单次调用函数
-def disposable(static=False, repeat=lambda *args, **kwargs: None):
-    def decorator(function):
-        name = function.__qualname__
-        if not static:
-            def wrapper(self, *args, **kwargs):
-                if not getattr(self, name, False):
-                    try:
-                        r = function(self, *args, **kwargs)
-                    except BaseException as e:
-                        raise e
-                    else:
-                        setattr(self, name, True)
-                        return r
-                else:
-                    return repeat(self, *args, **kwargs)
-        else:
-            cls = classOf(function)
+def disposable(static=False, repeat=None):
+    if isinstance(repeat, str):
+        def decorator(function):
+            name = function.__qualname__
+            if not static:
+                def wrapper(self, *args, **kwargs):
 
-            def wrapper(*args, **kwargs):
-                if not getattr(cls, name, False):
-                    try:
-                        r = function(*args, **kwargs)
-                    except BaseException as e:
-                        raise e
+                    if not getattr(self, name, False):
+                        kwargs.update({repeat: False, })
+                        try:
+                            r = function(self, *args, **kwargs)
+                        except BaseException as e:
+                            raise e
+                        else:
+                            setattr(self, name, True)
+                            return r
                     else:
-                        setattr(cls, name, True)
-                        return r
-                else:
-                    return repeat(*args, **kwargs)
-        return wrapper
+                        kwargs.update({repeat: True, })
+                        return function(self, *args, **kwargs)
+            else:
+                cls = classOf(function)
+
+                def wrapper(*args, **kwargs):
+                    if not getattr(cls, name, False):
+                        kwargs.update({repeat: False, })
+                        try:
+                            r = function(*args, **kwargs)
+                        except BaseException as e:
+                            raise e
+                        else:
+                            setattr(cls, name, True)
+                            return r
+                    else:
+                        kwargs.update({repeat: True, })
+                        return function(*args, **kwargs)
+            return wrapper
+    else:
+        if not callable(repeat):
+            repeat = lambda *args, **kwargs: None
+
+        def decorator(function):
+            name = function.__qualname__
+            if not static:
+                def wrapper(self, *args, **kwargs):
+                    if not getattr(self, name, False):
+                        try:
+                            r = function(self, *args, **kwargs)
+                        except BaseException as e:
+                            raise e
+                        else:
+                            setattr(self, name, True)
+                            return r
+                    else:
+                        return repeat(self, *args, **kwargs)
+            else:
+                cls = classOf(function)
+
+                def wrapper(*args, **kwargs):
+                    if not getattr(cls, name, False):
+                        try:
+                            r = function(*args, **kwargs)
+                        except BaseException as e:
+                            raise e
+                        else:
+                            setattr(cls, name, True)
+                            return r
+                    else:
+                        return repeat(*args, **kwargs)
+            return wrapper
     return decorator
