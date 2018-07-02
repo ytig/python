@@ -2,6 +2,23 @@
 # coding:utf-8
 import os
 import sys
+PASS = object()  # 跳过
+
+
+# 绑定关键字参数
+def bind(function, *binds, **kwbinds):
+    def method(*args, **kwargs):
+        args = list(args)
+        for i in range(len(binds)):
+            arg = binds[i]
+            if arg is PASS:
+                if i >= len(args):
+                    raise Exception('pass argument missing.')
+            else:
+                args.insert(i, arg)
+        kwargs.update(kwbinds)
+        return function(*args, **kwargs)
+    return method
 
 
 # 工作区目录
