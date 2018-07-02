@@ -90,8 +90,14 @@ class Queue:
             self.queues = []
             self.running = 0
 
+    # 打印日志
+    @staticmethod
+    def log(e):
+        __import__('log').Log.e(e, tag=TAG)
+
     # 分派任务
-    def push(self, log=lambda e: __import__('log').Log.e(e, tag=TAG)):
+    def push(self):
+        log = getattr(self.__class__, 'log', None)
         mutex = Queue.Mutex.instance(classOf(self)())
         with Lock(mutex):
             mutex.queues.append(self)
