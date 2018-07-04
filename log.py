@@ -3,7 +3,7 @@
 import os
 import datetime
 from kit import workspace
-from decorator import synchronized, LOCK_CLASS
+from decorator import LOCK_CLASS, synchronized
 from task import Queue
 
 
