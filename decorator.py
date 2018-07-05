@@ -124,18 +124,18 @@ def throwaway(static=False, throw=None):
             setattr(object, name, [])
         return getattr(object, name)
     if isinstance(throw, str):
-        def call(function, called, *args, **kwargs):
-            kwargs.update({throw: called, })
-            return function(*args, **kwargs)
+        def call(*args, **kwargs):
+            kwargs.update({throw: args[1], })
+            return args[0](*args[2:], **kwargs)
     else:
         if not callable(throw):
             throw = lambda *args, **kwargs: None
 
-        def call(function, called, *args, **kwargs):
-            if not called:
-                return function(*args, **kwargs)
+        def call(*args, **kwargs):
+            if not args[1]:
+                return args[0](*args[2:], **kwargs)
             else:
-                return throw(*args, **kwargs)
+                return throw(*args[2:], **kwargs)
 
     def decorator(function):
         qualname = function.__qualname__
