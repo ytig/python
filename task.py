@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # coding:utf-8
 import threading
-from decorator import classOf, Lock, LOCK_CLASS, synchronized, throwaway, instance
+from decorator import classOf, Lock, synchronized, throwaway, instance
 TAG = __name__
 
 
