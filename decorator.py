@@ -102,49 +102,52 @@ def synchronized(lock=LOCK_INSTANCE):
 
 
 # 单次调用函数
-def disposable(static=False, repeat=None):
-    if isinstance(repeat, str):
-        def call(function, object, name, *args, **kwargs):
-            if not getattr(object, name, False):
-                kwargs.update({repeat: False, })
-                try:
-                    r = function(*args, **kwargs)
-                except BaseException as e:
-                    raise e
-                else:
-                    setattr(object, name, True)
-                    return r
-            else:
-                kwargs.update({repeat: True, })
-                return function(*args, **kwargs)
+def throwaway(static=False, throw=None):
+    def calledOf(object):
+        if inspect.ismodule(object):
+            name = '__CALLED__'
+        elif inspect.isclass(object):
+            name = '__Called__'
+        else:
+            name = '__called__'
+        if not hasattr(object, name):
+            setattr(object, name, [])
+        return getattr(object, name)
+    if isinstance(throw, str):
+        def call(function, called, *args, **kwargs):
+            kwargs.update({throw: called, })
+            return function(*args, **kwargs)
     else:
-        if not callable(repeat):
-            repeat = lambda *args, **kwargs: None
+        if not callable(throw):
+            throw = lambda *args, **kwargs: None
 
-        def call(function, object, name, *args, **kwargs):
-            if not getattr(object, name, False):
-                try:
-                    r = function(*args, **kwargs)
-                except BaseException as e:
-                    raise e
-                else:
-                    setattr(object, name, True)
-                return r
+        def call(function, called, *args, **kwargs):
+            if not called:
+                return function(*args, **kwargs)
             else:
-                return repeat(*args, **kwargs)
+                return throw(*args, **kwargs)
 
     def decorator(function):
-        name = function.__qualname__
+        qualname = function.__qualname__
         if static:
             module = moduleOf(function)
 
         def wrapper(*args, **kwargs):
             if static:
-                object = module
+                called = calledOf(module)
             else:
                 if len(args) <= 0:
                     raise Exception('no self.')
-                object = args[0]
-            return call(function, object, name, *args, **kwargs)
+                called = calledOf(args[0])
+            if qualname not in called:
+                try:
+                    r = call(function, False, *args, **kwargs)
+                except BaseException as e:
+                    raise e
+                else:
+                    called.append(qualname)
+                return r
+            else:
+                return call(function, True, *args, **kwargs)
         return wrapper
     return decorator

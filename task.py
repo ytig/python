@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # coding:utf-8
 import threading
-from decorator import classOf, Lock, LOCK_CLASS, synchronized, disposable
+from decorator import classOf, Lock, LOCK_CLASS, synchronized, throwaway
 TAG = 'task'
 
 
@@ -46,7 +46,7 @@ class _Executor:
         self.backs += 1
 
     # 批量执行任务
-    @disposable()
+    @throwaway()
     def execute(self, t):
         e = self
 
