@@ -2,7 +2,7 @@
 # coding:utf-8
 import threading
 from decorator import classOf, Lock, LOCK_CLASS, synchronized, throwaway, instance
-TAG = 'task'
+TAG = __name__
 
 
 class Task:

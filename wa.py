@@ -2,7 +2,6 @@
 # coding:utf-8
 import threading
 from decorator import synchronized
-TAG = 'wa'
 
 
 class Stack:
