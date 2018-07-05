@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # coding:utf-8
 import threading
-from decorator import classOf, Lock, LOCK_CLASS, synchronized, throwaway
+from decorator import classOf, Lock, LOCK_CLASS, synchronized, throwaway, instance
 TAG = 'task'
 
 
@@ -76,17 +76,9 @@ class Tasks:
 
 
 class Queue:
+    @instance()
     class Mutex:
-        MUTEXS = {}  # 互斥
-
-        @staticmethod
-        @synchronized(lock=LOCK_CLASS)
-        def instance(key):
-            if key not in Queue.Mutex.MUTEXS:
-                Queue.Mutex.MUTEXS[key] = Queue.Mutex()
-            return Queue.Mutex.MUTEXS[key]
-
-        def __init__(self):
+        def __init__(self, cn):
             self.queues = []
             self.running = 0
 
@@ -98,7 +90,7 @@ class Queue:
     # 分派任务
     def push(self):
         log = getattr(self.__class__, 'log', None)
-        mutex = Queue.Mutex.instance(classOf(self)())
+        mutex = Queue.Mutex.instanceOf(classOf(self)())
         with Lock(mutex):
             mutex.queues.append(self)
             if mutex.running < 1:

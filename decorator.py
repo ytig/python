@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 # coding:utf-8
+import json
 import inspect
 import threading
 _LOCK = threading.Lock()  # 全局锁
@@ -160,4 +161,19 @@ def throwaway(static=False, throw=None):
             else:
                 return call(function, True, *args, **kwargs)
         return wrapper
+    return decorator
+
+
+# 主键单例类型
+def instance(fn='instanceOf'):
+    def decorator(cls):
+        instances = {}
+
+        @synchronized(classOf(cls))
+        def instance(*args, **kwargs):
+            if args[0] not in instances:
+                instances[args[0]] = cls(*args[1:], **kwargs)
+            return instances[args[0]]
+        setattr(cls, fn, lambda *args, **kwargs: instance(json.dumps((args, kwargs,)), *args, **kwargs))
+        return cls
     return decorator
