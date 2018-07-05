@@ -63,24 +63,24 @@ class Log:
 
     @staticmethod
     def v(*args, **kwargs):
-        return Log.log(*(Log.VERBOSE,) + args, **kwargs)
+        return Log.log(Log.VERBOSE, *args, **kwargs)
 
     @staticmethod
     def d(*args, **kwargs):
-        return Log.log(*(Log.DEBUG,) + args, **kwargs)
+        return Log.log(Log.DEBUG, *args, **kwargs)
 
     @staticmethod
     def i(*args, **kwargs):
-        return Log.log(*(Log.INFO,) + args, **kwargs)
+        return Log.log(Log.INFO, *args, **kwargs)
 
     @staticmethod
     def w(*args, **kwargs):
-        return Log.log(*(Log.WARN,) + args, **kwargs)
+        return Log.log(Log.WARN, *args, **kwargs)
 
     @staticmethod
     def e(*args, **kwargs):
-        return Log.log(*(Log.ERROR,) + args, **kwargs)
+        return Log.log(Log.ERROR, *args, **kwargs)
 
     @staticmethod
     def a(*args, **kwargs):
-        return Log.log(*(Log.ASSERT,) + args, **kwargs)
+        return Log.log(Log.ASSERT, *args, **kwargs)
