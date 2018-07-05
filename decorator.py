@@ -103,11 +103,8 @@ def synchronized(lock=LOCK_INSTANCE):
 
 # 单次调用函数
 def disposable(static=False, repeat=None):
-    if not isinstance(repeat, str) and not callable(repeat):
-        repeat = lambda *args, **kwargs: None
-
-    def call(function, object, name, *args, **kwargs):
-        if isinstance(repeat, str):
+    if isinstance(repeat, str):
+        def call(function, object, name, *args, **kwargs):
             if not getattr(object, name, False):
                 kwargs.update({repeat: False, })
                 try:
@@ -120,7 +117,11 @@ def disposable(static=False, repeat=None):
             else:
                 kwargs.update({repeat: True, })
                 return function(*args, **kwargs)
-        else:
+    else:
+        if not callable(repeat):
+            repeat = lambda *args, **kwargs: None
+
+        def call(function, object, name, *args, **kwargs):
             if not getattr(object, name, False):
                 try:
                     r = function(*args, **kwargs)
