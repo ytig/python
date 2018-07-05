@@ -45,7 +45,7 @@ class Log:
 
     # 打印日志
     @staticmethod
-    @synchronized(LOCK_CLASS)
+    @synchronized(lock=LOCK_CLASS)
     def log(level, *args, tag=None, **kwargs):
         if level < Log.LEVEL:
             return False

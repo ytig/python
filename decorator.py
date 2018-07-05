@@ -81,24 +81,34 @@ LOCK_MODULE = 0b100  # 模块锁
 
 # 加锁同步函数
 def synchronized(lock=LOCK_INSTANCE):
-    i = True if lock & LOCK_INSTANCE else False
-    c = True if lock & LOCK_CLASS else False
-    m = True if lock & LOCK_MODULE else False
+    if isinstance(lock, int):
+        i = True if lock & LOCK_INSTANCE else False
+        c = True if lock & LOCK_CLASS else False
+        m = True if lock & LOCK_MODULE else False
 
-    def decorator(function):
-        lm = Lock(moduleOf(function) if m else None)
-        lc = Lock(classOf(function) if c else None)
+        def decorator(function):
+            lm = Lock(moduleOf(function) if m else None)
+            lc = Lock(classOf(function) if c else None)
 
-        def wrapper(*args, **kwargs):
-            if i and len(args) <= 0:
-                raise Exception('no self.')
-            li = Lock(args[0] if i else None)
-            with lm:
-                with lc:
-                    with li:
-                        return function(*args, **kwargs)
-        return wrapper
-    return decorator
+            def wrapper(*args, **kwargs):
+                if i and len(args) <= 0:
+                    raise Exception('no self.')
+                li = Lock(args[0] if i else None)
+                with lm:
+                    with lc:
+                        with li:
+                            return function(*args, **kwargs)
+            return wrapper
+        return decorator
+    else:
+        l = Lock(lock)
+
+        def decorator(function):
+            def wrapper(*args, **kwargs):
+                with l:
+                    return function(*args, **kwargs)
+            return wrapper
+        return decorator
 
 
 # 单次调用函数

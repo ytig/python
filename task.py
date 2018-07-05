@@ -80,7 +80,7 @@ class Queue:
         MUTEXS = {}  # 互斥
 
         @staticmethod
-        @synchronized(LOCK_CLASS)
+        @synchronized(lock=LOCK_CLASS)
         def instance(key):
             if key not in Queue.Mutex.MUTEXS:
                 Queue.Mutex.MUTEXS[key] = Queue.Mutex()
