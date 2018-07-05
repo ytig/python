@@ -26,7 +26,7 @@ def classOf(generics):
                 _CLASSES[generics] = lambda: generics
             return _CLASSES[generics]
     elif inspect.ismodule(generics):
-        return classOf(generics.__name__)
+        return None
     elif inspect.isclass(generics):
         return classOf(generics.__module__ + '.' + generics.__qualname__)
     elif inspect.isfunction(generics) or inspect.ismethod(generics):
