@@ -164,7 +164,7 @@ def throwaway(static=False, throw=None):
     return decorator
 
 
-# 主键单例类型
+# 参数单例类型
 def instance(fn='instanceOf'):
     def decorator(cls):
         instances = {}
