@@ -46,14 +46,15 @@ class Log:
     # 打印日志
     @staticmethod
     @synchronized(lock=LOCK_CLASS)
-    def log(level, *args, tag=None, **kwargs):
+    def log(*args, tag=None, **kwargs):
+        level = args[0]
+        args = [args[i + 1] for i in range(len(args) - 1)]
         if level < Log.LEVEL:
             return False
         color = {Log.WARN: 34, Log.ERROR: 31, }.get(level)
         if color is not None:
             Log.PRINT('\033[0;%d;48m' % (color,), end='')
         if tag is not None:
-            args = list(args)
             args.insert(0, Log.__tag(level, tag))
         Log.PRINT(*args)
         if color is not None:
@@ -62,24 +63,24 @@ class Log:
 
     @staticmethod
     def v(*args, **kwargs):
-        return Log.log(Log.VERBOSE, *args, **kwargs)
+        return Log.log(*(Log.VERBOSE,) + args, **kwargs)
 
     @staticmethod
     def d(*args, **kwargs):
-        return Log.log(Log.DEBUG, *args, **kwargs)
+        return Log.log(*(Log.DEBUG,) + args, **kwargs)
 
     @staticmethod
     def i(*args, **kwargs):
-        return Log.log(Log.INFO, *args, **kwargs)
+        return Log.log(*(Log.INFO,) + args, **kwargs)
 
     @staticmethod
     def w(*args, **kwargs):
-        return Log.log(Log.WARN, *args, **kwargs)
+        return Log.log(*(Log.WARN,) + args, **kwargs)
 
     @staticmethod
     def e(*args, **kwargs):
-        return Log.log(Log.ERROR, *args, **kwargs)
+        return Log.log(*(Log.ERROR,) + args, **kwargs)
 
     @staticmethod
     def a(*args, **kwargs):
-        return Log.log(Log.ASSERT, *args, **kwargs)
+        return Log.log(*(Log.ASSERT,) + args, **kwargs)
