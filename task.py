@@ -5,7 +5,6 @@ from decorator import classOf, Lock, synchronized, throwaway, instance
 TAG = __name__
 
 
-# 异步化
 def Pair(function):
     def wrapper(*args, **kwargs):
         threading.Thread(target=function, args=args, kwargs=kwargs).start()
@@ -65,23 +64,19 @@ class Tree:
             self.__cpu = cpu
             self.__mem = mem
             self.__log = log
-            self.seed = False
+            self.__ret = (False, None,)
 
         @synchronized()
         def plant(self):
             try:
-                if not self.seed:
-                    self.__cpu(self.__mem)
-                    self.seed = True
-                    del self.__cpu
-                    del self.__mem
-                    del self.__log
+                if not self.__ret[0]:
+                    self.__ret = (True, self.__cpu(self.__mem),)
             except BaseException as e:
                 try:
                     self.__log(e)
                 except BaseException:
                     pass
-            return self.seed
+            return self.__ret
 
     class Gardener:
         class Executor(threading.Thread):
@@ -94,12 +89,13 @@ class Tree:
                     twig = self.queue.pop()
                     if twig is None:
                         break
-                    if twig.plant():
-                        self.queue.push()
+                    ret = twig.plant()
+                    if ret[0]:
+                        self.queue.push(ret[1])
 
         def __init__(self, *twigs):
             self.twigs = list(twigs)
-            self.seeds = 0
+            self.seeds = []
 
         @synchronized()
         def pop(self):
@@ -108,8 +104,8 @@ class Tree:
             return None
 
         @synchronized()
-        def push(self):
-            self.seeds += 1
+        def push(self, seed):
+            self.seeds.append(seed)
 
         @throwaway()
         def plant(self, t):
