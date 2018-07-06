@@ -60,7 +60,7 @@ class Queue:
 
 class Tree:
     class Twig:
-        def __init__(self, cpu, mem, log=lambda e: log.Log.e(e, tag=TAG)):
+        def __init__(self, cpu, mem, log):
             self.__cpu = cpu
             self.__mem = mem
             self.__log = log
@@ -116,8 +116,8 @@ class Tree:
                 thread.join()
             return self.seeds
 
-    def __init__(self, cpu, *mems, **kwargs):
-        self.twigs = [Tree.Twig(cpu, mem, **kwargs) for mem in mems]
+    def __init__(self, cpu, *mems, log=lambda e: log.Log.e(e, tag=TAG)):
+        self.twigs = [Tree.Twig(cpu, mem, log) for mem in mems]
 
     # 任务并发
     def plant(self, t=1):
