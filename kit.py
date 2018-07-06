@@ -19,14 +19,20 @@ def trace():
 
 
 # 绑定参数
-def bind(call, *extends, **updates):
+def bind(*args, **kwargs):
+    call = args[0] if len(args) else None
+    if not callable(call):
+        raise Exception('callable missing.')
+    extends = args[1:]
+    updates = kwargs
+
     def bound(*args, **kwargs):
         args = list(args)
         for i in range(len(extends)):
             arg = extends[i]
             if arg is PASS:
                 if i >= len(args):
-                    raise Exception('pass argument missing.')
+                    raise Exception('argument missing.')
             else:
                 args.insert(i, arg)
         kwargs.update(updates)
