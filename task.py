@@ -5,72 +5,10 @@ from decorator import classOf, Lock, synchronized, throwaway, instance
 TAG = __name__
 
 
-class Task:
-    def __init__(self, handle, target, log=lambda e: log.Log.e(e, tag=TAG)):
-        self.__handle = handle
-        self.__target = target
-        self.__log = log
-        self.result = False
-
-    # 执行任务
-    @synchronized()
-    def execute(self):
-        try:
-            if not self.result:
-                self.__handle(self.__target)
-                self.result = True
-                del self.__target
-                del self.__handle
-                del self.__log
-        except BaseException as e:
-            try:
-                self.__log(e)
-            except BaseException:
-                pass
-        return self.result
-
-
-class Tasks:
-    class Executor:
-        def __init__(self, *tasks):
-            self.tasks = list(tasks)
-            self.backs = 0
-
-        @synchronized()
-        def pop(self):
-            if self.tasks:
-                return self.tasks.pop()
-            return None
-
-        @synchronized()
-        def push(self):
-            self.backs += 1
-
-        @throwaway()
-        def execute(self, t):
-            e = self
-
-            class Thread(threading.Thread):
-                def run(self):
-                    while True:
-                        task = e.pop()
-                        if task is None:
-                            break
-                        if task.execute():
-                            e.push()
-            threads = [Thread() for i in range(t)]
-            for thread in threads:
-                thread.start()
-            for thread in threads:
-                thread.join()
-            return self.backs
-
-    def __init__(self, handle, *targets, **kwargs):
-        self.tasks = [Task(handle, target, **kwargs) for target in targets]
-
-    # 批量执行任务
-    def execute(self, t=1):
-        return Tasks.Executor(*self.tasks).execute(t)
+def Pair(function):
+    def wrapper(*args, **kwargs):
+        threading.Thread(target=function, args=args, kwargs=kwargs).start()
+    return wrapper
 
 
 class Queue:
@@ -106,7 +44,7 @@ class Queue:
     def log(e):
         log.Log.e(e, tag=TAG)
 
-    # 分派任务
+    # 任务分发
     def push(self):
         mutex = Queue.Mutex.instanceOf(classOf(self)())
         with Lock(mutex):
@@ -115,9 +53,78 @@ class Queue:
                 mutex.running += 1
                 Queue.Executor(mutex).start()
 
-    # 执行任务
+    # 任务处理
     def pop(self):
         pass
+
+
+class Tree:
+    class Twig:
+        def __init__(self, cpu, mem, log=lambda e: log.Log.e(e, tag=TAG)):
+            self.__cpu = cpu
+            self.__mem = mem
+            self.__log = log
+            self.seed = False
+
+        @synchronized()
+        def plant(self):
+            try:
+                if not self.seed:
+                    self.__cpu(self.__mem)
+                    self.seed = True
+                    del self.__cpu
+                    del self.__mem
+                    del self.__log
+            except BaseException as e:
+                try:
+                    self.__log(e)
+                except BaseException:
+                    pass
+            return self.seed
+
+    class Gardener:
+        class Executor(threading.Thread):
+            def __init__(self, queue):
+                super().__init__()
+                self.queue = queue
+
+            def run(self):
+                while True:
+                    twig = self.queue.pop()
+                    if twig is None:
+                        break
+                    if twig.plant():
+                        self.queue.push()
+
+        def __init__(self, *twigs):
+            self.twigs = list(twigs)
+            self.seeds = 0
+
+        @synchronized()
+        def pop(self):
+            if self.twigs:
+                return self.twigs.pop()
+            return None
+
+        @synchronized()
+        def push(self):
+            self.seeds += 1
+
+        @throwaway()
+        def plant(self, t):
+            threads = [Tree.Gardener.Executor(self) for i in range(t)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+            return self.seeds
+
+    def __init__(self, cpu, *mems, **kwargs):
+        self.twigs = [Tree.Twig(cpu, mem, **kwargs) for mem in mems]
+
+    # 任务并发
+    def plant(self, t=1):
+        return Tree.Gardener(*self.twigs).plant(t)
 
 
 import log
