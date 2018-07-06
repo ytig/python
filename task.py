@@ -5,6 +5,7 @@ from decorator import classOf, Lock, synchronized, throwaway, instance
 TAG = __name__
 
 
+# 异步化
 def Pair(function):
     def wrapper(*args, **kwargs):
         threading.Thread(target=function, args=args, kwargs=kwargs).start()
