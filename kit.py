@@ -29,10 +29,10 @@ def bind(*args, **kwargs):
 
 
 # 注入参数（装饰器）
-def inject(segment=None, argv=sys.argv):
+def inject(argv=sys.argv, segm=None, exec=False):
     args = []
     if argv:
-        if segment is None:
+        if segm is None:
             for arg in argv:
                 if not args:
                     args.append(arg)
@@ -41,12 +41,12 @@ def inject(segment=None, argv=sys.argv):
                         break
                     else:
                         args.append(arg)
-        elif segment:
+        elif segm:
             for arg in argv[1:]:
                 if not args:
                     if arg == '-':
                         break
-                    elif arg == '-' + segment:
+                    elif arg == '-' + segm:
                         args.append(arg)
                 else:
                     if arg.startswith('-'):
@@ -68,6 +68,8 @@ def inject(segment=None, argv=sys.argv):
                 return call(*args)
             else:
                 return call(*args[:-d])
+        if exec:
+            wrapper()
         return wrapper
     return decorator
 
