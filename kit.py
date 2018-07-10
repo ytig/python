@@ -74,8 +74,20 @@ def inject(segm=None, argv=sys.argv):
 
 # 注入参数（装饰器）
 def injects(*segms, argv=sys.argv):
+    def parse(generics):
+        if isinstance(generics, str):
+            kv = generics.split('@')
+            k = {'^': None, '$': '', }.get(kv[0], kv[0])
+            v = int(kv[1]) if 1 < len(kv) and kv[1] else -1
+        else:
+            kv = generics
+            k = kv[0]
+            v = kv[1] if 1 < len(kv) else -1
+        return k, v,
     args = []
-    for segm, argc, in segms:
+    for s in segms:
+        segm, argc, = parse(s)
+
         @inject(segm=segm, argv=argv)
         def _(*args):
             return args
