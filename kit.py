@@ -7,19 +7,15 @@ PASS = object()  # 跳过
 
 
 # 脚本参数
-def arguments(segment, *strict):
-    if not segment:
-        segment = sys.argv[0]
-    else:
-        segment = '-' + segment
-    args = None
-    for arg in sys.argv:
+def arguments(segment, *strict, argv=sys.argv[1:]):
+    args = None if segment else []
+    for arg in argv:
         if args is not None:
             if arg.startswith('-'):
                 break
             else:
                 args.append(arg)
-        elif arg == segment:
+        elif arg == '-' + segment:
             args = []
     if strict:
         if args is None:
