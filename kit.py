@@ -6,16 +6,36 @@ import inspect
 PASS = object()  # 跳过
 
 
-# 异常追溯
-def trace():
-    try:
-        file = inspect.trace()[-1][1]
-        for module in sys.modules.values():
-            if getattr(module, '__file__', '') == file:
-                return module
-    except BaseException:
-        pass
-    return None
+# 脚本参数
+def arguments(segment, *strict):
+    if not segment:
+        segment = sys.argv[0]
+    else:
+        segment = '-' + segment
+    args = None
+    for arg in sys.argv:
+        if args is not None:
+            if arg.startswith('-'):
+                break
+            else:
+                args.append(arg)
+        elif arg == segment:
+            args = []
+    if strict:
+        if args is None:
+            args = []
+        args = [strict[i](args[i] if i < len(args) else None) for i in range(len(strict))]
+    return args
+
+
+# 空值处理
+def ifnone(generics):
+    def d():
+        if callable(generics):
+            return generics()
+        else:
+            return generics
+    return lambda arg: arg if arg is not None else d()
 
 
 # 绑定参数
@@ -48,3 +68,15 @@ def workspace():
                 return os.path.dirname(os.path.abspath(module.__file__))
             else:
                 return os.path.abspath('')
+
+
+# 异常追溯
+def trace():
+    try:
+        file = inspect.trace()[-1][1]
+        for module in sys.modules.values():
+            if getattr(module, '__file__', '') == file:
+                return module
+    except BaseException:
+        pass
+    return None
