@@ -29,7 +29,7 @@ def bind(*args, **kwargs):
 
 
 # 注入参数（装饰器）
-def inject(argv=sys.argv, segm=None, exec=False):
+def inject(argv=sys.argv, segm=None):
     args = []
     if argv:
         if segm is None:
@@ -58,18 +58,16 @@ def inject(argv=sys.argv, segm=None, exec=False):
             if '-' in a:
                 args = a[a.index('-'):]
 
-    def decorator(call):
+    def decorator(function):
         def wrapper():
-            spec = inspect.getfullargspec(call)
+            spec = inspect.getfullargspec(function)
             d = len(args) - len(spec.args)
             if d < 0:
-                return call(*args + [None for i in range(-d)])
+                return function(*args + [None for i in range(-d)])
             elif d == 0 or spec.varargs is not None:
-                return call(*args)
+                return function(*args)
             else:
-                return call(*args[:-d])
-        if exec:
-            wrapper()
+                return function(*args[:-d])
         return wrapper
     return decorator
 
