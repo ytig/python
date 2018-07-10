@@ -6,34 +6,6 @@ import inspect
 PASS = object()  # 跳过
 
 
-# 脚本参数
-def arguments(segment, *strict, argv=sys.argv[1:]):
-    args = None if segment else []
-    for arg in argv:
-        if args is not None:
-            if arg.startswith('-'):
-                break
-            else:
-                args.append(arg)
-        elif arg == '-' + segment:
-            args = []
-    if strict:
-        if args is None:
-            args = []
-        args = [strict[i](args[i] if i < len(args) else None) for i in range(len(strict))]
-    return args
-
-
-# 空值处理
-def ifnone(generics):
-    def d():
-        if callable(generics):
-            return generics()
-        else:
-            return generics
-    return lambda arg: arg if arg is not None else d()
-
-
 # 绑定参数
 def bind(*args, **kwargs):
     call = args[0] if len(args) else None
@@ -54,6 +26,50 @@ def bind(*args, **kwargs):
         kwargs.update(updates)
         return call(*args, **kwargs)
     return bound
+
+
+# 注入参数（装饰器）
+def inject(segment, argv=sys.argv):
+    args = []
+    if argv:
+        if segment is None:
+            for arg in argv:
+                if not args:
+                    args.append(arg)
+                else:
+                    if arg.startswith('-'):
+                        break
+                    else:
+                        args.append(arg)
+        elif segment:
+            for arg in argv[1:]:
+                if not args:
+                    if arg == '-':
+                        break
+                    elif arg == '-' + segment:
+                        args.append(arg)
+                else:
+                    if arg.startswith('-'):
+                        break
+                    else:
+                        args.append(arg)
+        else:
+            a = argv[1:]
+            if '-' in a:
+                args = a[a.index('-'):]
+
+    def decorator(call):
+        def wrapper():
+            spec = inspect.getfullargspec(call)
+            d = len(args) - len(spec.args)
+            if d < 0:
+                return call(*args + [None for i in range(-d)])
+            elif d == 0 or spec.varargs is not None:
+                return call(*args)
+            else:
+                return call(*args[:-d])
+        return wrapper
+    return decorator
 
 
 # 工作区目录
