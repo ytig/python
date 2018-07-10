@@ -112,9 +112,9 @@ def workspace():
     for module in sys.modules.values():
         if getattr(module, '__name__', '') == '__main__':
             if hasattr(module, '__file__'):
-                return os.path.dirname(os.path.abspath(module.__file__))
+                return os.path.dirname(os.path.realpath(module.__file__))
             else:
-                return os.path.abspath('')
+                return os.path.realpath('')
 
 
 # 异常追溯
