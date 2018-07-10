@@ -72,6 +72,29 @@ def inject(segm=None, argv=sys.argv):
     return decorator
 
 
+# 注入参数（装饰器）
+def injects(*segms, argv=sys.argv):
+    args = []
+    for segm, argc, in segms:
+        @inject(segm=segm, argv=argv)
+        def _(*args):
+            return args
+        _argv = _()
+        if argc == 0:
+            args.append(len(_argv) > 0)
+        elif argc > 0:
+            for i in range(argc):
+                args.append(_argv[i + 1] if i < len(_argv) - 1 else None)
+        else:
+            args.append(_argv[1:])
+
+    def decorator(function):
+        def wrapper():
+            return function(*args)
+        return wrapper
+    return decorator
+
+
 # 工作区目录
 def workspace():
     for module in sys.modules.values():
