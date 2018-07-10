@@ -29,7 +29,7 @@ def bind(*args, **kwargs):
 
 
 # 注入参数（装饰器）
-def inject(argv=sys.argv, segm=None):
+def inject(segm=None, argv=sys.argv):
     args = []
     if argv:
         if segm is None:
