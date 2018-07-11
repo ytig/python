@@ -75,7 +75,7 @@ def inject(segm=None, argv=sys.argv):
 def injects(*segms, argv=sys.argv):
     def parse(generics):
         if isinstance(generics, str):
-            kv = generics.split('@')
+            kv = generics.split('#')
             k = {'^': None, '$': '', }.get(kv[0], kv[0])
             v = int(kv[1]) if 1 < len(kv) and kv[1] else -1
         else:
