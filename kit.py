@@ -30,36 +30,35 @@ def bind(*args, **kwargs):
 
 # 注入参数（装饰器）
 def inject(segm=None, argv=sys.argv):
-    args = []
-    if argv:
-        if segm is None:
-            for arg in argv:
-                if not args:
-                    args.append(arg)
-                else:
-                    if arg.startswith('-'):
-                        break
-                    else:
-                        args.append(arg)
-        elif segm:
-            for arg in argv[1:]:
-                if not args:
-                    if arg == '-':
-                        break
-                    elif arg == '-' + segm:
-                        args.append(arg)
-                else:
-                    if arg.startswith('-'):
-                        break
-                    else:
-                        args.append(arg)
-        else:
-            a = argv[1:]
-            if '-' in a:
-                args = a[a.index('-'):]
-
     def decorator(function):
         def wrapper():
+            args = []
+            if argv:
+                if segm is None:
+                    for arg in argv:
+                        if not args:
+                            args.append(arg)
+                        else:
+                            if arg.startswith('-'):
+                                break
+                            else:
+                                args.append(arg)
+                elif segm:
+                    for arg in argv[1:]:
+                        if not args:
+                            if arg == '-':
+                                break
+                            elif arg == '-' + segm:
+                                args.append(arg)
+                        else:
+                            if arg.startswith('-'):
+                                break
+                            else:
+                                args.append(arg)
+                else:
+                    a = argv[1:]
+                    if '-' in a:
+                        args = a[a.index('-'):]
             spec = inspect.getfullargspec(function)
             d = len(args) - len(spec.args)
             if d < 0:
@@ -84,24 +83,23 @@ def injects(*segms, argv=sys.argv):
             k = kv[0]
             v = kv[1] if 1 < len(kv) else -1
         return k, v,
-    args = []
-    for s in segms:
-        segm, argc, = parse(s)
-
-        @inject(segm=segm, argv=argv)
-        def _(*args):
-            return args
-        _argv = _()
-        if argc == 0:
-            args.append(len(_argv) > 0)
-        elif argc > 0:
-            for i in range(argc):
-                args.append(_argv[i + 1] if i < len(_argv) - 1 else None)
-        else:
-            args.append(_argv[1:])
+    segms = [parse(g) for g in segms]
 
     def decorator(function):
         def wrapper():
+            args = []
+            for segm, argc, in segms:
+                @inject(segm=segm, argv=argv)
+                def f(*args):
+                    return args
+                _argv = f()
+                if argc == 0:
+                    args.append(len(_argv) > 0)
+                elif argc > 0:
+                    for i in range(argc):
+                        args.append(_argv[i + 1] if i < len(_argv) - 1 else None)
+                else:
+                    args.append(_argv[1:])
             return function(*args)
         return wrapper
     return decorator
