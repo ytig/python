@@ -38,7 +38,7 @@ def workspace():
 
 
 # 守护进程
-def daemon(dirname=None, stdin=None, stdout=None, stderr=None, g=vars(sys)):
+def daemon(dirname=None, stdin=None, stdout=None, stderr=None):
     def touch(dirname, file):
         if not os.path.isabs(file):
             file = os.path.join(dirname, file)
@@ -63,15 +63,12 @@ def daemon(dirname=None, stdin=None, stdout=None, stderr=None, g=vars(sys)):
     os.umask(0)
     if os.fork() != 0:
         exit()
-    stdin = open(touch(dirname, stdin), 'r')
-    stdout = open(touch(dirname, stdout), 'a')
-    stderr = open(touch(dirname, stderr), 'a')
-    os.dup2(stdin.fileno(), sys.stdin.fileno())
-    os.dup2(stdout.fileno(), sys.stdout.fileno())
-    os.dup2(stderr.fileno(), sys.stderr.fileno())
-    g['stdin2'] = stdin
-    g['stdout2'] = stdout
-    g['stderr2'] = stderr
+    sys.stdin = open(touch(dirname, stdin), 'r')
+    sys.stdout = open(touch(dirname, stdout), 'a', 1)
+    sys.stderr = open(touch(dirname, stderr), 'a', 1)
+    os.dup2(sys.stdin.fileno(), sys.__stdin__.fileno())
+    os.dup2(sys.stdout.fileno(), sys.__stdout__.fileno())
+    os.dup2(sys.stderr.fileno(), sys.__stderr__.fileno())
 
 
 # 绑定参数
