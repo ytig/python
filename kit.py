@@ -50,13 +50,13 @@ def daemon(dirname=None, stdin=None, stdout=None, stderr=None, g=vars(sys)):
             open(file, 'w').close()
         return file
     if dirname is None:
-        dirname = workspace() + '/.daemon'
+        dirname = workspace() + '/.daemon/' + (os.path.basename(sys.argv[0]).split('.', 1)[0] if sys.argv and sys.argv[0] else '') + '.std'
     if stdin is None:
-        stdin = 'stdin'
+        stdin = '0'
     if stdout is None:
-        stdout = 'stdout'
+        stdout = '1'
     if stderr is None:
-        stderr = 'stderr'
+        stderr = '2'
     if os.fork() != 0:
         exit()
     chdir('/')
