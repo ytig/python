@@ -151,12 +151,8 @@ def throwaway(static=False, throw=None):
                     raise Exception('no self.')
                 called = calledOf(args[0])
             if qualname not in called:
-                try:
-                    r = call(function, False, *args, **kwargs)
-                except BaseException as e:
-                    raise e
-                else:
-                    called.append(qualname)
+                r = call(function, False, *args, **kwargs)
+                called.append(qualname)
                 return r
             else:
                 return call(function, True, *args, **kwargs)

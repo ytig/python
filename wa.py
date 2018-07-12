@@ -160,7 +160,7 @@ def _series(Parent, Child, Pipe):
                 return c
             except BaseException as e:
                 parent.__exit__(e.__class__, e, e.__traceback__)
-                raise e
+                raise
 
         def __exit__(self, type, value, traceback):
             child = self.__child.pop()
@@ -169,7 +169,7 @@ def _series(Parent, Child, Pipe):
                 child.__exit__(type, value, traceback)
             except BaseException as e:
                 parent.__exit__(e.__class__, e, e.__traceback__)
-                raise e
+                raise
             parent.__exit__(type, value, traceback)
     return Series
 
@@ -194,7 +194,7 @@ def _parallel(Husband, Wife, Pipe):
                 return (h, w,)
             except BaseException as e:
                 husband.__exit__(e.__class__, e, e.__traceback__)
-                raise e
+                raise
 
         def __exit__(self, type, value, traceback):
             wife = self.__wife.pop()
@@ -203,7 +203,7 @@ def _parallel(Husband, Wife, Pipe):
                 wife.__exit__(type, value, traceback)
             except BaseException as e:
                 husband.__exit__(e.__class__, e, e.__traceback__)
-                raise e
+                raise
             husband.__exit__(type, value, traceback)
     return Parallel
 
@@ -216,7 +216,7 @@ def _branch(Parent, Child, Pipe):
                 exit.__exit__(type, value, traceback)
             except BaseException as e:
                 exits(queue, e.__class__, e, e.__traceback__)
-                raise e
+                raise
             exits(queue, type, value, traceback)
 
     class Branch(_Class):
@@ -238,7 +238,7 @@ def _branch(Parent, Child, Pipe):
                     children.append(child)
             except BaseException as e:
                 exits([parent] + children, e.__class__, e, e.__traceback__)
-                raise e
+                raise
             self.__parent.push(parent)
             self.__children.push(children)
             return tuple(cs)
