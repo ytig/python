@@ -40,10 +40,9 @@ def workspace():
 # 守护进程
 def daemon(dirname=None, stdin=None, stdout=None, stderr=None, g=vars(sys)):
     def touch(dirname, file):
-        if os.path.isabs(file):
-            dirname = os.path.dirname(file)
-        else:
+        if not os.path.isabs(file):
             file = os.path.join(dirname, file)
+        dirname = os.path.dirname(file)
         if not os.path.exists(file):
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
