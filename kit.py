@@ -64,8 +64,8 @@ def daemon(dirname=None, stdin=None, stdout=None, stderr=None, g=vars(sys)):
     if os.fork() != 0:
         exit()
     stdin = open(touch(dirname, stdin), 'r')
-    stdout = open(touch(dirname, stdout), 'a+')
-    stderr = open(touch(dirname, stderr), 'a+')
+    stdout = open(touch(dirname, stdout), 'a')
+    stderr = open(touch(dirname, stderr), 'a')
     os.dup2(stdin.fileno(), sys.stdin.fileno())
     os.dup2(stdout.fileno(), sys.stdout.fileno())
     os.dup2(stderr.fileno(), sys.stderr.fileno())
