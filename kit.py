@@ -3,7 +3,76 @@
 import os
 import sys
 import inspect
-PASS = object()  # 跳过
+import threading
+_LOCK = threading.Lock()  # 目录锁
+CWDS = []  # 历史目录
+WORKSPACE = None  # 工作区目录
+PASS = object()  # 跳过参数绑定
+
+
+# 切换目录
+def chdir(path):
+    with _LOCK:
+        dirname = os.getcwd()
+        ret = os.chdir(path)
+        CWDS.append(dirname)
+        return ret
+
+
+# 工作区目录
+def workspace():
+    global WORKSPACE
+    if WORKSPACE is None:
+        with _LOCK:
+            if sys.argv and sys.argv[0]:
+                if CWDS and not os.path.isabs(sys.argv[0]):
+                    WORKSPACE = os.path.dirname(os.path.realpath(os.path.join(CWDS[0], sys.argv[0])))
+                else:
+                    WORKSPACE = os.path.dirname(os.path.realpath(sys.argv[0]))
+            else:
+                if CWDS:
+                    WORKSPACE = CWDS[0]
+                else:
+                    WORKSPACE = os.getcwd()
+    return WORKSPACE
+
+
+# 守护进程
+def daemon(dirname=None, stdin=None, stdout=None, stderr=None, g=vars(sys)):
+    def touch(dirname, file):
+        if os.path.isabs(file):
+            dirname = os.path.dirname(file)
+        else:
+            file = os.path.join(dirname, file)
+        if not os.path.exists(file):
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+            open(file, 'w').close()
+        return file
+    if dirname is None:
+        dirname = workspace() + '/.daemon'
+    if stdin is None:
+        stdin = 'stdin'
+    if stdout is None:
+        stdout = 'stdout'
+    if stderr is None:
+        stderr = 'stderr'
+    if os.fork() != 0:
+        exit()
+    chdir('/')
+    os.setsid()
+    os.umask(0)
+    if os.fork() != 0:
+        exit()
+    stdin = open(touch(dirname, stdin), 'r')
+    stdout = open(touch(dirname, stdout), 'a+')
+    stderr = open(touch(dirname, stderr), 'a+')
+    os.dup2(stdin.fileno(), sys.stdin.fileno())
+    os.dup2(stdout.fileno(), sys.stdout.fileno())
+    os.dup2(stderr.fileno(), sys.stderr.fileno())
+    g['stdin2'] = stdin
+    g['stdout2'] = stdout
+    g['stderr2'] = stderr
 
 
 # 绑定参数
@@ -28,8 +97,7 @@ def bind(*args, **kwargs):
     return bound
 
 
-# 注入参数（装饰器）
-def inject(segm=None, argv=sys.argv):
+def _inject(segm=None, argv=sys.argv):
     def decorator(function):
         def wrapper():
             args = []
@@ -89,7 +157,7 @@ def injects(*segms, argv=sys.argv):
         def wrapper():
             args = []
             for segm, argc, in segms:
-                @inject(segm=segm, argv=argv)
+                @_inject(segm=segm, argv=argv)
                 def f(*args):
                     return args
                 _argv = f()
@@ -103,16 +171,6 @@ def injects(*segms, argv=sys.argv):
             return function(*args)
         return wrapper
     return decorator
-
-
-# 工作区目录
-def workspace():
-    for module in sys.modules.values():
-        if getattr(module, '__name__', '') == '__main__':
-            if hasattr(module, '__file__'):
-                return os.path.dirname(os.path.realpath(module.__file__))
-            else:
-                return os.path.realpath('')
 
 
 # 异常追溯
