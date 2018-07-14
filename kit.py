@@ -63,12 +63,15 @@ def daemon(dirname=None, stdin=None, stdout=None, stderr=None):
     os.umask(0)
     if os.fork() != 0:
         exit()
-    sys.stdin = open(touch(dirname, stdin), 'r')
-    sys.stdout = open(touch(dirname, stdout), 'a', 1)
-    sys.stderr = open(touch(dirname, stderr), 'a', 1)
-    os.dup2(sys.stdin.fileno(), sys.__stdin__.fileno())
-    os.dup2(sys.stdout.fileno(), sys.__stdout__.fileno())
-    os.dup2(sys.stderr.fileno(), sys.__stderr__.fileno())
+    e = open(touch(dirname, stderr), 'a', 1)
+    os.dup2(e.fileno(), sys.__stderr__.fileno())
+    sys.stderr = e
+    o = open(touch(dirname, stdout), 'a', 1)
+    os.dup2(o.fileno(), sys.__stdout__.fileno())
+    sys.stdout = o
+    i = open(touch(dirname, stdin), 'r')
+    os.dup2(i.fileno(), sys.__stdin__.fileno())
+    sys.stdin = i
 
 
 # 绑定参数
