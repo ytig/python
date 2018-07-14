@@ -11,11 +11,23 @@ class Print(Queue):
     KEEP = False  # 持久化
 
     def __init__(self, *args, **kwargs):
-        print(*args, **kwargs)
-        if Print.KEEP and not kwargs:
+        sep = kwargs.get('sep')
+        if not isinstance(sep, str):
+            sep = ' '
+        end = kwargs.get('end')
+        if not isinstance(end, str):
+            end = '\n'
+        flush = kwargs.get('flush')
+        if not isinstance(flush, bool):
+            flush = False
+        skip = kwargs.get('skip')
+        if not isinstance(skip, bool):
+            skip = False
+        print(*args, sep=sep, end=end, flush=flush)
+        if Print.KEEP and not skip:
             iso = datetime.datetime.now().isoformat()
             self.path = workspace() + '/.log/' + iso.split('T')[0]
-            self.text = ' '.join([iso.split('T')[1]] + [str(i) for i in args])
+            self.text = sep.join([iso.split('T')[1]] + [str(i) for i in args]) + end
             self.push()
 
     def pop(self):
@@ -24,7 +36,7 @@ class Print(Queue):
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
             with open(self.path, mode='a') as f:
-                f.write(self.text + '\n')
+                f.write(self.text)
         except BaseException:
             pass
 
@@ -53,12 +65,12 @@ class Log:
             return False
         color = {Log.WARN: 34, Log.ERROR: 31, }.get(level)
         if color is not None:
-            Log.PRINT('\033[0;%d;48m' % (color,), end='')
+            Log.PRINT('\033[0;%d;48m' % (color,), end='', flush=True, skip=True)
         if tag is not None:
             args.insert(0, Log.__tag(level, tag))
-        Log.PRINT(*args)
+        Log.PRINT(*args, flush=True)
         if color is not None:
-            Log.PRINT('\033[0m', end='')
+            Log.PRINT('\033[0m', end='', flush=True, skip=True)
         return True
 
     @staticmethod
