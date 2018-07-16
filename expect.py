@@ -7,22 +7,16 @@ _spawn = spawn
 
 def spawn(*args, **kwargs):
     if 'logfile' not in kwargs:
-        kwargs['logfile'] = _sys.stdout.buffer
+        logfile = _sys.stdout.buffer
+    else:
+        logfile = kwargs['logfile']
+        del kwargs['logfile']
     self = _spawn(*args, **kwargs)
-    _logfile = self.logfile
-    _expect = self.expect
+    self.logfile_read = logfile
     _interact = self.interact
 
-    def expect(*args, **kwargs):
-        self.logfile = _logfile
-        ret = _expect(*args, **kwargs)
-        self.logfile = None
-        return ret
-
     def interact(*args, **kwargs):
-        self.expect(['[\s\S]*'])
+        self.logfile_read = None
         return _interact(*args, **kwargs)
     self.interact = interact
-    self.expect = expect
-    self.logfile = None
     return self
