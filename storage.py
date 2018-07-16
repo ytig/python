@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3
-# coding:utf-8
 import os
 import json
 from urllib.parse import quote, unquote

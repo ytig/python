@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3
-# coding:utf-8
 from pexpect import *
 import sys as _sys
 _spawn = spawn

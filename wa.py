@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3
-# coding:utf-8
 import threading
 from decorator import synchronized
 
