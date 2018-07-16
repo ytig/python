@@ -10,6 +10,12 @@ WORKSPACE = None  # 工作区目录
 PASS = object()  # 跳过参数绑定
 
 
+# 标准输入
+def input(prompt):
+    print(prompt, end='', flush=True)
+    return os.popen('read -e input;echo ${input};').read()
+
+
 # 切换目录
 def chdir(path):
     with _LOCK:
