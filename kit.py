@@ -101,7 +101,7 @@ def bind(*args, **kwargs):
     return bound
 
 
-def _inject(segm=None, argv=sys.argv):
+def _inject(segm, argv):
     def decorator(function):
         def wrapper():
             args = []
@@ -161,7 +161,7 @@ def injects(*segms, argv=sys.argv):
         def wrapper():
             args = []
             for segm, argc, in segms:
-                @_inject(segm=segm, argv=argv)
+                @_inject(segm, argv)
                 def f(*args):
                     return args
                 _argv = f()
