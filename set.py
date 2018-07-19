@@ -165,3 +165,11 @@ def export(generics):
     elif inspect.isfunction(generics):
         generics.__export__ = generics
         return generics
+
+
+# 复原
+def deport(cls, dep=1):
+    if dep != 0 and hasattr(cls, '__cls__'):
+        return deport(getattr(cls, '__cls__'), dep=dep - 1)
+    else:
+        return cls
