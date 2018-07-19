@@ -59,6 +59,10 @@ def export(generics):
     class: export Set class, the original class is Set.__cls__.
     staticmethod, classmethod: export Set class constructor.
     function: export Set class forin method.
+
+    Set.setting and Set.getting are used to define configure.
+    log: exception handler, default @error.
+    t: thread count, default 0.
     """
     if inspect.isclass(generics):
         def imports(l):
