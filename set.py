@@ -133,6 +133,7 @@ def export(generics):
             # 写设置
             def setting(self, **setting):
                 self.__setting.update(setting)
+                return self
 
             # 读设置
             def getting(self, name=None):
