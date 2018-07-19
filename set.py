@@ -65,11 +65,27 @@ def export(generics):
     t: thread count, default 0.
     """
     if inspect.isclass(generics):
+        def decorator(function):
+            def wrapper(self, *args, **kwargs):
+                objects = getattr(self, '_Set__objects')
+                log = self.getting(name='log')
+                t = self.getting(name='t')
+
+                def call(obj):
+                    try:
+                        return function(obj, *args, **kwargs)
+                    except BaseException as e:
+                        try:
+                            with Lock(self):
+                                objects.remove(obj)
+                            log(obj, e)
+                        except BaseException:
+                            pass
+                        raise
+                return _exec(call, *objects, t=t)
+            return wrapper
+
         def imports(l):
-            def decorator(function):
-                def wrapper(self, *args, **kwargs):
-                    return self.__forin__(function, *args, **kwargs)
-                return wrapper
             cls = l['__cls__']
             a = list(l.keys())
             b = []
@@ -105,11 +121,14 @@ def export(generics):
                     if isinstance(obj, generics):
                         self.__objects.append(obj)
                 self.__setting = {}
-                self.setting(**setting)
                 self.__getting = {
                     'log': lambda log: log if callable(log) else error,
                     't': lambda t: t if isinstance(t, int) and t >= 0 else 0,
                 }
+                self.setting(**setting)
+
+            def __len__(self):
+                return len(self.__objects)
 
             # 写设置
             def setting(self, **setting):
@@ -128,28 +147,6 @@ def export(generics):
                         if n:
                             g[n] = self.getting(name=n)
                     return g
-
-            def __len__(self):
-                return len(self.__objects)
-
-            def __forin__(self, *args, **kwargs):
-                function = args[0] if len(args) else None
-                args = args[1:]
-                log = self.getting(name='log')
-                t = self.getting(name='t')
-
-                def call(obj):
-                    try:
-                        return function(obj, *args, **kwargs)
-                    except BaseException as e:
-                        try:
-                            with Lock(self):
-                                self.__objects.remove(obj)
-                            log(obj, e)
-                        except BaseException:
-                            pass
-                        raise
-                return _exec(call, *self.__objects, t=t)
             imports(locals())
         return Set
     elif isinstance(generics, staticmethod):
