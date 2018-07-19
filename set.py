@@ -61,15 +61,14 @@ def export(generics):
     function: export Set class forin method.
 
     Set.setting and Set.getting are used to define configure.
-    log: exception handler, default @error.
+    e: exception handler, default @error.
     t: thread count, default 0.
     """
     if inspect.isclass(generics):
         def decorator(function):
             def wrapper(self, *args, **kwargs):
                 objects = getattr(self, '_Set__objects')
-                log = self.getting(name='log')
-                t = self.getting(name='t')
+                setting = self.getting()
 
                 def call(obj):
                     try:
@@ -78,11 +77,11 @@ def export(generics):
                         try:
                             with Lock(self):
                                 objects.remove(obj)
-                            log(obj, e)
+                            setting['e'](obj, e)
                         except BaseException:
                             pass
                         raise
-                return _exec(call, *objects, t=t)
+                return _exec(call, *objects, t=setting['t'])
             return wrapper
 
         def imports(l):
@@ -122,7 +121,7 @@ def export(generics):
                         self.__objects.append(obj)
                 self.__setting = {}
                 self.__getting = {
-                    'log': lambda log: log if callable(log) else error,
+                    'e': lambda e: e if callable(e) else error,
                     't': lambda t: t if isinstance(t, int) and t >= 0 else 0,
                 }
                 self.setting(**setting)
