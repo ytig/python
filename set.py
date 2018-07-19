@@ -169,7 +169,9 @@ def export(generics):
 
 # 复原
 def deport(cls, dep=1):
-    if dep != 0 and hasattr(cls, '__cls__'):
-        return deport(getattr(cls, '__cls__'), dep=dep - 1)
-    else:
-        return cls
+    if dep != 0:
+        if inspect.isclass(cls):
+            if inspect.getmodule(cls) is inspect.getmodule(deport):
+                if hasattr(cls, '__cls__'):
+                    return deport(getattr(cls, '__cls__'), dep=dep - 1)
+    return cls
