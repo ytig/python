@@ -8,33 +8,36 @@ from log import Log
 
 # 执行
 def _exec(cpu, *mems, t=0):
-    l = len(mems)
+    total = len(mems)
+
+    def outline(rets):
+        ret = {}
+        success = len(rets)
+        if success > 0:
+            ret['success'] = {}
+            for r in rets:
+                r = str(r)
+                if r not in ret['success']:
+                    ret['success'][r] = 1
+                else:
+                    ret['success'][r] += 1
+        failure = total - success
+        if failure > 0:
+            ret['failure'] = {}
+            if t == 0:
+                ret['failure']['raise'] = 1
+                if failure > 1:
+                    ret['failure']['pass'] = failure - 1
+            else:
+                ret['failure']['raise'] = failure
+        return str(ret)
 
     class List(list):
         def __str__(self):
-            r = {}
-            s = len(self)
-            if s > 0:
-                r['success'] = {}
-                for i in self:
-                    i = str(i)
-                    if i not in r['success']:
-                        r['success'][i] = 1
-                    else:
-                        r['success'][i] += 1
-            f = l - s
-            if f > 0:
-                r['failure'] = {}
-                if t == 0:
-                    r['failure']['raise'] = 1
-                    if f > 1:
-                        r['failure']['pass'] = f - 1
-                else:
-                    r['failure']['raise'] = f
-            return str(r)
+            return outline(self)
 
         def __repr__(self):
-            return self.__str__()
+            return outline(self)
     if isinstance(t, int) and t > 0:
         return List(Tree(cpu, *mems, log=None).plant(t=t))
     else:
