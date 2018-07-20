@@ -1,9 +1,7 @@
 #!/usr/local/bin/python3
 import inspect
-from kit import trace
-from decorator import Lock
+from decorator import Lock, synchronized
 from task import Tree
-from log import Log
 
 
 # 执行
@@ -50,9 +48,28 @@ def _exec(cpu, *mems, t=0):
         return ret
 
 
-# 异常
-def error(obj, e):
-    Log.e(e, tag=getattr(trace(), '__name__', ''))
+# 捕获
+def _except(fn):
+    def decorator(function):
+        def wrapper(self, *args, **kwargs):
+            try:
+                return function(self, *args, **kwargs)
+            except BaseException as e:
+                try:
+                    cf = inspect.currentframe()
+                    fb = cf.f_back
+                    while fb:
+                        if cf.f_code is fb.f_code:
+                            break
+                        fb = fb.f_back
+                    if not fb:
+                        if hasattr(self, fn):
+                            getattr(self, fn)(e)
+                except BaseException:
+                    pass
+                raise
+        return wrapper
+    return decorator
 
 
 # 导出
@@ -60,34 +77,19 @@ def export(generics):
     """
     generics must be class, staticmethod, classmethod, function.
     class: export Set class, the original class is Set.__cls__.
-    staticmethod, classmethod: export Set class constructor.
-    function: export Set class forin method.
+    staticmethod: not useful.
+    classmethod: export Set class constructor.
+    function: export Set class forinmethod which would not raise any exception, exception will be catch to __except__.
 
     Set.setting and Set.getting are used to define configure.
-    e: exception handler, default @error.
     t: thread count, default 0.
     """
     if inspect.isclass(generics):
-        def decorator(function):
-            def wrapper(self, *args, **kwargs):
-                objects = getattr(self, '_Set__objects')
-                setting = self.getting()
-
-                def call(obj):
-                    try:
-                        return function(obj, *args, **kwargs)
-                    except BaseException as e:
-                        try:
-                            with Lock(self):
-                                objects.remove(obj)
-                            setting['e'](obj, e)
-                        except BaseException:
-                            pass
-                        raise
-                return _exec(call, *objects, t=setting['t'])
-            return wrapper
-
         def imports(l):
+            def decorator(function):
+                def wrapper(self, *args, **kwargs):
+                    return self.exec(function, *args, **kwargs)
+                return wrapper
             cls = l['__cls__']
             a = list(l.keys())
             b = []
@@ -124,20 +126,22 @@ def export(generics):
                         self.__objects.append(obj)
                 self.__setting = {}
                 self.__getting = {
-                    'e': lambda e: e if callable(e) else error,
                     't': lambda t: t if isinstance(t, int) and t >= 0 else 0,
                 }
                 self.setting(**setting)
 
+            @synchronized()
             def __len__(self):
                 return len(self.__objects)
 
             # 写设置
+            @synchronized()
             def setting(self, **setting):
                 self.__setting.update(setting)
                 return self
 
             # 读设置
+            @synchronized()
             def getting(self, name=None):
                 if name:
                     if name in self.__getting:
@@ -150,6 +154,24 @@ def export(generics):
                         if n:
                             g[n] = self.getting(name=n)
                     return g
+
+            def exec(self, *args, **kwargs):
+                if args:
+                    function = args[0]
+                    args = args[1:]
+                    with Lock(self):
+                        mems = self.__objects.copy()
+                        t = self.getting(name='t')
+
+                    def cpu(obj):
+                        try:
+                            return function(obj, *args, **kwargs)
+                        except BaseException as e:
+                            with Lock(self):
+                                if obj in self.__objects:
+                                    self.__objects.remove(obj)
+                            raise
+                    return _exec(cpu, *mems, t=t)
             imports(locals())
         return Set
     elif isinstance(generics, staticmethod):
@@ -163,6 +185,7 @@ def export(generics):
         cm.__export__ = generics.__func__
         return classmethod(cm)
     elif inspect.isfunction(generics):
+        generics = _except('__except__')(generics)
         generics.__export__ = generics
         return generics
 
