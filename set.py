@@ -166,7 +166,7 @@ def export(generics):
                     def cpu(obj):
                         try:
                             return function(obj, *args, **kwargs)
-                        except BaseException as e:
+                        except BaseException:
                             with Lock(self):
                                 if obj in self.__objects:
                                     self.__objects.remove(obj)
