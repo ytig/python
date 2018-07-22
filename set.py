@@ -191,6 +191,10 @@ class _base:
             't': lambda t: t if isinstance(t, int) and t >= 0 else 0,
         }
 
+    @synchronized()
+    def __len__(self):
+        return len(self.__objects)
+
     # 写设置
     @synchronized()
     def setting(self, **setting):
