@@ -128,7 +128,7 @@ def _exec(fn='__exec__'):
 class _property:
     @staticmethod
     def set(o, b):
-        r = property(fget=_except()(o.fget), fset=_except()(o.fset), fdel=_except()(o.fdel))
+        r = property(fget=_except()(o.fget) if o.fget else None, fset=_except()(o.fset) if o.fset else None, fdel=_except()(o.fdel) if o.fdel else None)
         if b:
             __class__._set(r, '__export__', property(fget=_exec()(r.fget) if r.fget else None, fset=_exec()(r.fset) if r.fset else None, fdel=_exec()(r.fdel) if r.fdel else None))
         return r
