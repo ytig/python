@@ -191,10 +191,6 @@ class _base:
             't': lambda t: t if isinstance(t, int) and t >= 0 else 0,
         }
 
-    @synchronized()
-    def __len__(self):
-        return len(self.__objects)
-
     # 写设置
     @synchronized()
     def setting(self, **setting):
@@ -284,8 +280,8 @@ class _class(type):
                 for obj in objects:
                     c = getattr(obj, '__class__', None)
                     if c is not __class__.__cls__:
-                        n = getattr(c, '__name__', '')
-                        raise Exception('cannot append instance of ' + n + '.')
+                        n = getattr(c, '__name__', None)
+                        raise Exception('cannot append instance of ' + str(n) + '.')
                 super().__init__(*objects, **setting)
         return classes
 
