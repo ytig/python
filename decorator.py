@@ -164,11 +164,13 @@ def instance(fn='instanceOf'):
     def decorator(cls):
         instances = {}
 
+        @staticmethod
         @synchronized(classOf(cls))
-        def instance(*args, **kwargs):
-            if args[0] not in instances:
-                instances[args[0]] = cls(*args[1:], **kwargs)
-            return instances[args[0]]
-        setattr(cls, fn, lambda *args, **kwargs: instance(json.dumps((args, kwargs,)), *args, **kwargs))
+        def instanceOf(*args, **kwargs):
+            key = json.dumps((args, kwargs,))
+            if key not in instances:
+                instances[key] = cls(*args, **kwargs)
+            return instances[key]
+        setattr(cls, fn, instanceOf)
         return cls
     return decorator
