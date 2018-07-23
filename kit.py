@@ -10,24 +10,33 @@ WORKSPACE = None  # 工作区目录
 PASS = object()  # 跳过参数绑定
 
 
-# 帮助信息
-def help(info=None):
-    if info is None:
-        for module in sys.modules.values():
+# 文件描述
+def doc(module=None):
+    if module is None:
+        for m in sys.modules.values():
             if getattr(module, '__name__', '') == '__main__':
-                file = getattr(module, '__file__', '')
-                if file:
-                    with open(file) as f:
-                        string = f.read()
-                        for pattern in (r'(?<=""")[\s\S]*(?=""")', r"(?<=''')[\s\S]*(?=''')",):
-                            match = re.search(pattern, string)
-                            if match:
-                                info = match.group().strip('\n')
-                                break
+                module = m
                 break
-    if info is not None:
-        print(info)
-    exit()
+    if module is not None:
+        file = getattr(module, '__file__', '')
+        if file:
+            with open(file) as f:
+                string = f.read()
+                for pattern in (r'(?<=""")[\s\S]*?(?=""")', r"(?<=''')[\s\S]*?(?=''')",):
+                    match = re.search(pattern, string)
+                    if match:
+                        return match.group().strip('\n')
+    return None
+
+
+# 帮助信息
+def hlp(key, value=None):
+    if '-' + key in sys.argv[1:]:
+        if value is None:
+            value = doc()
+        if value is not None:
+            print(value)
+        exit()
 
 
 # 标准输入
