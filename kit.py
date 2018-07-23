@@ -14,7 +14,7 @@ PASS = object()  # 跳过参数绑定
 def doc(module=None):
     if module is None:
         for m in sys.modules.values():
-            if getattr(module, '__name__', '') == '__main__':
+            if getattr(m, '__name__', '') == '__main__':
                 module = m
                 break
     if module is not None:
