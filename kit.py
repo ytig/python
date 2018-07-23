@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import re
 import os
 import sys
 import inspect
@@ -7,6 +8,26 @@ _LOCK = threading.Lock()  # 目录锁
 CWDS = []  # 历史目录
 WORKSPACE = None  # 工作区目录
 PASS = object()  # 跳过参数绑定
+
+
+# 帮助信息
+def help(info=None):
+    if info is None:
+        for module in sys.modules.values():
+            if getattr(module, '__name__', '') == '__main__':
+                file = getattr(module, '__file__', '')
+                if file:
+                    with open(file) as f:
+                        string = f.read()
+                        for pattern in (r'(?<=""")[\s\S]*(?=""")', r"(?<=''')[\s\S]*(?=''')",):
+                            match = re.search(pattern, string)
+                            if match:
+                                info = match.group().strip('\n')
+                                break
+                break
+    if info is not None:
+        print(info)
+    exit()
 
 
 # 标准输入
