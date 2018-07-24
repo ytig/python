@@ -81,7 +81,7 @@ def daemon(dirname=None, stdin=None, stdout=None, stderr=None):
         if not os.path.exists(file):
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
-            open(file, 'w').close()
+            open(file, mode='w').close()
         return file
     if dirname is None:
         dirname = workspace() + '/.daemon/' + (os.path.basename(sys.argv[0]).split('.', 1)[0] if sys.argv and sys.argv[0] else '') + '.std'
@@ -98,13 +98,13 @@ def daemon(dirname=None, stdin=None, stdout=None, stderr=None):
     os.umask(0)
     if os.fork() != 0:
         exit()
-    e = open(touch(dirname, stderr), 'a', 1)
+    e = open(touch(dirname, stderr), mode='a', buffering=1)
     os.dup2(e.fileno(), sys.__stderr__.fileno())
     sys.stderr = e
-    o = open(touch(dirname, stdout), 'a', 1)
+    o = open(touch(dirname, stdout), mode='a', buffering=1)
     os.dup2(o.fileno(), sys.__stdout__.fileno())
     sys.stdout = o
-    i = open(touch(dirname, stdin), 'r')
+    i = open(touch(dirname, stdin), mode='r')
     os.dup2(i.fileno(), sys.__stdin__.fileno())
     sys.stdin = i
 

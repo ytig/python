@@ -24,7 +24,7 @@ class Storage:
             os.makedirs(dirname)
         self._reader = {}
         self._writer = open(path, mode='a')
-        with open(path, mode='r') as reader:
+        with open(path) as reader:
             key = None
             for line in reader:
                 line = decode(line.strip('\n'))
