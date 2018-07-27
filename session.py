@@ -51,7 +51,7 @@ def string2cookies(string):
                     for name, cookie, in names.items():
                         cookies._cookies[domain][path][name] = Cookie(**cookie)
         except BaseException:
-            pass
+            cookies._cookies = {}
     return cookies
 
 
