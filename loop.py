@@ -3,6 +3,8 @@ import time
 import threading
 import subprocess
 from decorator import Lock
+from log import Log
+TAG = __name__
 
 
 class Loop(threading.Thread):
@@ -13,7 +15,7 @@ class Loop(threading.Thread):
         self.__process = None
 
     # 执行
-    def do(self, runnable, delay, tag=''):
+    def do(self, runnable, delay, tag='', log=lambda e: Log.e(e, tag=TAG)):
         if not isinstance(tag, str):
             raise Exception('tag must be str.')
         t = time.time() + delay
@@ -27,7 +29,7 @@ class Loop(threading.Thread):
                     except BaseException:
                         pass
                     self.__process = None
-            self.__pool.append((t, runnable, pid, tag,))
+            self.__pool.append((t, runnable, pid, tag, log,))
             self.__pool.sort(key=lambda t: t[0])
         if not self.is_alive():
             self.start()
@@ -36,45 +38,35 @@ class Loop(threading.Thread):
     # 取消执行
     def undo(self, generics):
         r = 0
-        if generics is None:
-            with Lock(self):
-                r += len(self.__pool)
-                self.__pool.clear()
-        if callable(generics):
-            with Lock(self):
-                i = len(self.__pool) - 1
-                while i >= 0:
-                    if self.__pool[i][1] is generics:
-                        self.__pool.pop(i)
-                        r += 1
-                    i -= 1
-        elif isinstance(generics, int):
-            with Lock(self):
-                for i in range(len(self.__pool)):
-                    if self.__pool[i][2] == generics:
-                        self.__pool.pop(i)
-                        r += 1
-                        break
-        elif isinstance(generics, str):
-            with Lock(self):
-                i = len(self.__pool) - 1
-                while i >= 0:
-                    if self.__pool[i][3] == generics:
-                        self.__pool.pop(i)
-                        r += 1
-                    i -= 1
+        with Lock(self):
+            i = len(self.__pool) - 1
+            while i >= 0:
+                p = False
+                if generics is None:
+                    p = True
+                elif callable(generics):
+                    p = self.__pool[i][1] is generics
+                elif isinstance(generics, int):
+                    p = self.__pool[i][2] == generics
+                elif isinstance(generics, str):
+                    p = self.__pool[i][3] == generics
+                if p:
+                    self.__pool.pop(i)
+                    if i == 0:
+                        if self.__process is not None:
+                            try:
+                                self.__process.kill()
+                            except BaseException:
+                                pass
+                            self.__process = None
+                    r += 1
+                i -= 1
         return r
 
     def run(self):
-        process = None
         while True:
-            if process is not None:
-                try:
-                    process.wait()
-                except BaseException:
-                    pass
-                process = None
-            runnable = None
+            process = None
+            pop = None
             with Lock(self):
                 self.__process = None
                 if self.__pool:
@@ -90,12 +82,20 @@ class Loop(threading.Thread):
                     process = subprocess.Popen(['sleep', str(t)])
                     self.__process = process
                 else:
-                    runnable = self.__pool.pop(0)[1]
-            if runnable is not None:
+                    pop = self.__pool.pop(0)
+            if process is not None:
                 try:
-                    runnable()
+                    process.wait()
                 except BaseException:
                     pass
+            if pop is not None:
+                try:
+                    pop[1]()
+                except BaseException as e:
+                    try:
+                        pop[-1](e)
+                    except BaseException:
+                        pass
 
 
 main_loop = Loop()  # 主循环
