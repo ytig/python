@@ -1,18 +1,17 @@
 #!/usr/local/bin/python3
 import os
-import json
-from urllib.parse import quote, unquote
+import pickle
 from kit import workspace
 
 
-# 数据加密
+# 数据编码
 def encode(value):
-    return quote(json.dumps(value))
+    return pickle.dumps(value).hex()
 
 
-# 数据解密
+# 数据解码
 def decode(value):
-    return json.loads(unquote(value))
+    return pickle.loads(bytes.fromhex(value))
 
 
 class Storage:
