@@ -35,8 +35,10 @@ class Loop(threading.Thread):
 
     # 取消执行
     def undo(self, generics):
+        r = 0
         if generics is None:
             with Lock(self):
+                r += len(self.__pool)
                 self.__pool.clear()
         if callable(generics):
             with Lock(self):
@@ -44,12 +46,14 @@ class Loop(threading.Thread):
                 while i >= 0:
                     if self.__pool[i][1] is generics:
                         self.__pool.pop(i)
+                        r += 1
                     i -= 1
         elif isinstance(generics, int):
             with Lock(self):
                 for i in range(len(self.__pool)):
                     if self.__pool[i][2] == generics:
                         self.__pool.pop(i)
+                        r += 1
                         break
         elif isinstance(generics, str):
             with Lock(self):
@@ -57,7 +61,9 @@ class Loop(threading.Thread):
                 while i >= 0:
                     if self.__pool[i][3] == generics:
                         self.__pool.pop(i)
+                        r += 1
                     i -= 1
+        return r
 
     def run(self):
         process = None
