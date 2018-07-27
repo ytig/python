@@ -1,7 +1,8 @@
 #!/usr/local/bin/python3
 import json
-import requests
-from http.cookiejar import Cookie
+import http.cookiejar
+import requests.cookies
+import requests.sessions
 from decorator import Lock, synchronized, throwaway
 
 
@@ -49,7 +50,7 @@ def string2cookies(string):
                 for path, names, in paths.items():
                     cookies._cookies[domain][path] = {}
                     for name, cookie, in names.items():
-                        cookies._cookies[domain][path][name] = Cookie(**cookie)
+                        cookies._cookies[domain][path][name] = http.cookiejar.Cookie(**cookie)
         except BaseException:
             cookies._cookies = {}
     return cookies
