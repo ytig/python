@@ -324,4 +324,4 @@ class _class(type):
                             raise Exception('cannot export keyword ' + k + '.')
                         attrs[k] = v
             base = base.__base__
-        return type.__new__(cls, name, bases, attrs)
+        return super().__new__(cls, name, bases, attrs)
