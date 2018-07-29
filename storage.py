@@ -3,6 +3,8 @@ import os
 import random
 import pickle
 from kit import workspace
+from decorator import instance
+from shutdown import aregister
 
 
 # 数据编码
@@ -41,10 +43,9 @@ def rf(path):
             return path
 
 
-class Storage:
+@instance()
+class _Storage:
     def __init__(self, path):
-        if path.startswith('~/'):
-            path = workspace() + '/.storage/' + path[2:]
         dirname = os.path.dirname(path)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
@@ -57,16 +58,14 @@ class Storage:
                 if item[0] in self._reader:
                     self._dirty = True
                 self._reader[item[0]] = item[1]
+        aregister(self.__del)
 
-    # 轮询
     def keys(self):
         return list(self._reader.keys())
 
-    # 读取
     def get(self, key, defaultValue=None):
         return self._reader.get(key, defaultValue)
 
-    # 写入
     def set(self, key, value):
         if not isinstance(key, str):
             raise Exception('key must be str.')
@@ -76,7 +75,7 @@ class Storage:
             self._dirty = True
         self._reader[key] = value
 
-    def __del__(self):
+    def __del(self):
         self._writer.close()
         if self._dirty:
             path = self._writer.name
@@ -87,3 +86,23 @@ class Storage:
                     file.write(encode((key, value,)) + '\n')
             os.remove(_path)
         del self._writer
+
+
+class Storage:
+    def __init__(self, path):
+        if path.startswith('~/'):
+            path = workspace() + '/.storage/' + path[2:]
+        path = os.path.realpath(path)
+        self._storage = _Storage.instanceOf(path)
+
+    # 轮询
+    def keys(self):
+        return self._storage.keys()
+
+    # 读取
+    def get(self, key, defaultValue=None):
+        return self._storage.get(key, defaultValue=defaultValue)
+
+    # 写入
+    def set(self, key, value):
+        return self._storage.set(key, value)
