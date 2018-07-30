@@ -274,36 +274,16 @@ class _base:
                 return _list(Tree(cpu, *mems, log=None).plant(t=t))
 
 
-class _class(type):
-    @staticmethod
-    def set(o):
-        class classes(_base, metaclass=__class__):
-            __cls__ = o
-
-            def __init__(self, *objects, **setting):
-                for obj in objects:
-                    c = getattr(obj, '__class__', None)
-                    if c is not __class__.__cls__:
-                        n = getattr(c, '__name__', None)
-                        raise Exception('cannot append instance of ' + str(n) + '.')
-                super().__init__(*objects, **setting)
-        return classes
-
-    @staticmethod
-    def get(o):
-        while inspect.isclass(o) and issubclass(o, _base):
-            o = getattr(o, '__cls__', None)
-        return o
-
-    def __new__(cls, name, bases, attrs):
+class _metaclass(type):
+    def __new__(mcls, name, bases, namespace, **kwargs):
         final = []
-        final.extend(attrs.keys())
+        final.extend(namespace.keys())
         for b in bases:
             while b is not object:
                 final.extend(vars(b).keys())
                 b = b.__base__
         override = []
-        base = attrs['__cls__']
+        base = namespace['__cls__']
         name = base.__name__
         while base is not object:
             for k, v in vars(base).items():
@@ -322,6 +302,28 @@ class _class(type):
                     if v:
                         if k in final:
                             raise Exception('cannot export keyword ' + k + '.')
-                        attrs[k] = v
+                        namespace[k] = v
             base = base.__base__
-        return super().__new__(cls, name, bases, attrs)
+        return super().__new__(mcls, name, bases, namespace, **kwargs)
+
+
+class _class:
+    @staticmethod
+    def set(o):
+        class classes(_base, metaclass=_metaclass):
+            __cls__ = o
+
+            def __init__(self, *objects, **setting):
+                for obj in objects:
+                    c = getattr(obj, '__class__', None)
+                    if c is not __class__.__cls__:
+                        n = getattr(c, '__name__', None)
+                        raise Exception('cannot append instance of ' + str(n) + '.')
+                super().__init__(*objects, **setting)
+        return classes
+
+    @staticmethod
+    def get(o):
+        while inspect.isclass(o) and issubclass(o, _base):
+            o = getattr(o, '__cls__', None)
+        return o
