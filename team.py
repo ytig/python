@@ -276,11 +276,11 @@ class _base:
 
 class _metaclass(type):
     def __new__(mcls, name, bases, namespace, **kwargs):
-        final = []
-        final.extend(namespace.keys())
+        final = set()
+        final.update(namespace.keys())
         for b in bases:
             while b is not object:
-                final.extend(vars(b).keys())
+                final.update(vars(b).keys())
                 b = b.__base__
         override = []
         base = namespace['__cls__']
