@@ -3,8 +3,17 @@ import time
 import threading
 import subprocess
 from decorator import Lock
+from shutdown import bregister
 from log import Log
 TAG = __name__
+
+
+# 睡眠进程
+def sleep(seconds):
+    if seconds < 0:
+        return subprocess.Popen(['python3', '-c', 'while True:pass'])
+    else:
+        return subprocess.Popen(['sleep', '%s' % (seconds,)])
 
 
 class Loop(threading.Thread):
@@ -13,6 +22,8 @@ class Loop(threading.Thread):
         self.__pid = 0
         self.__pool = []
         self.__process = None
+        self.__shutdown = False
+        bregister(self._shutdown)
 
     # 执行
     def do(self, runnable, delay, tag='', log=lambda e: Log.e(e, tag=TAG)):
@@ -63,6 +74,16 @@ class Loop(threading.Thread):
                 i -= 1
         return r
 
+    def _shutdown(self):
+        with Lock(self):
+            self.__shutdown = True
+            if self.__process is not None:
+                try:
+                    self.__process.kill()
+                except BaseException:
+                    pass
+                self.__process = None
+
     def run(self):
         while True:
             process = None
@@ -71,15 +92,13 @@ class Loop(threading.Thread):
                 self.__process = None
                 if self.__pool:
                     t = self.__pool[0][0] - time.time()
+                    t = t if t > 0 else None
+                elif self.__shutdown:
+                    return
                 else:
-                    if not self.daemon:
-                        if not threading.main_thread().is_alive():
-                            return
-                        t = 2
-                    else:
-                        t = 24
-                if t > 0:
-                    process = subprocess.Popen(['sleep', str(t)])
+                    t = -1
+                if t is not None:
+                    process = sleep(t)
                     self.__process = process
                 else:
                     pop = self.__pool.pop(0)
