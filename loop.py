@@ -63,6 +63,13 @@ class Loop(threading.Thread):
                     p = self.__pool[i][3] == generics
                 if p:
                     self.__pool.pop(i)
+                    if i == 0:
+                        if self.__process is not None:
+                            try:
+                                self.__process.kill()
+                            except BaseException:
+                                pass
+                            self.__process = None
                     r += 1
                 i -= 1
         return r
