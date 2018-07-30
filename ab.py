@@ -3,7 +3,7 @@ import gc
 import weakref
 import inspect
 from decorator import synchronized, throwaway
-from shutdown import aregister, unregister
+from shutdown import bregister, aregister, unregister
 
 
 class weakmethod:
@@ -68,26 +68,43 @@ class attribute:
             self.namespace[name] = value
 
 
-class DMeta(type):
+class ABMeta(type):
     def __new__(mcls, name, bases, namespace, **kwargs):
         attr = attribute(bases, namespace)
-        if attr.hasattr('__del__'):
-            def __init__(self, *args, **kwargs):
-                setattr(self, '__weakdel__', weakmethod(self, '__del__'))
-                aregister(getattr(self, '__weakdel__'))
-                func = args[0]
-                args = args[1:]
-                if callable(func):
-                    func(self, *args, **kwargs)
-            attr.setattr('__init__', __init__)
 
-            @synchronized()
-            @throwaway()
-            def __del__(self, *args, **kwargs):
-                func = args[0]
-                args = args[1:]
-                if callable(func):
-                    func(self, *args, **kwargs)
-                unregister(getattr(self, '__weakdel__'))
-            attr.setattr('__del__', __del__)
+        def __init__(self, *args, **kwargs):
+            setattr(self, '__weakbef__', weakmethod(self, '__bef__'))
+            bregister(getattr(self, '__weakbef__'))
+            setattr(self, '__weakaft__', weakmethod(self, '__aft__'))
+            aregister(getattr(self, '__weakaft__'))
+            func = args[0]
+            args = args[1:]
+            if callable(func):
+                func(self, *args, **kwargs)
+        attr.setattr('__init__', __init__)
+
+        def __bef__(self, *args, **kwargs):
+            func = args[0]
+            args = args[1:]
+            if callable(func):
+                func(self, *args, **kwargs)
+        attr.setattr('__bef__', __bef__)
+
+        def __aft__(self, *args, **kwargs):
+            func = args[0]
+            args = args[1:]
+            if callable(func):
+                func(self, *args, **kwargs)
+        attr.setattr('__aft__', __aft__)
+
+        @synchronized()
+        @throwaway()
+        def __del__(self, *args, **kwargs):
+            func = args[0]
+            args = args[1:]
+            if callable(func):
+                func(self, *args, **kwargs)
+            unregister(getattr(self, '__weakaft__'))
+            unregister(getattr(self, '__weakbef__'))
+        attr.setattr('__del__', __del__)
         return super().__new__(mcls, name, bases, namespace, **kwargs)
