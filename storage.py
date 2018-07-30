@@ -8,11 +8,11 @@ from shutdown import aregister
 
 
 # 数据编码
-def encode(object, catch=False):
+def encode(obj, catch=False):
     hex = ''
-    if object is not None:
+    if obj is not None:
         try:
-            hex = pickle.dumps(object).hex()
+            hex = pickle.dumps(obj).hex()
         except BaseException:
             hex = ''
             if not catch:
@@ -22,15 +22,15 @@ def encode(object, catch=False):
 
 # 数据解码
 def decode(hex, catch=False):
-    object = None
+    obj = None
     if hex:
         try:
-            object = pickle.loads(bytes.fromhex(hex))
+            obj = pickle.loads(bytes.fromhex(hex))
         except BaseException:
-            object = None
+            obj = None
             if not catch:
                 raise
-    return object
+    return obj
 
 
 # 文件备份

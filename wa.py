@@ -254,17 +254,17 @@ def _merge(Husband, Wife, Pipe):
         def __init__(self, *args, **kwargs):
             self.args = args
             self.kwargs = kwargs
-            self.__object = Stack()
+            self.__obj = Stack()
 
         def __enter__(self):
-            object = (Wife if Pipe(*self.args, **self.kwargs) else Husband)(*self.args, **self.kwargs)
-            o = object.__enter__()
-            self.__object.push(object)
+            obj = (Wife if Pipe(*self.args, **self.kwargs) else Husband)(*self.args, **self.kwargs)
+            o = obj.__enter__()
+            self.__obj.push(obj)
             return o
 
         def __exit__(self, type, value, traceback):
-            object = self.__object.pop()
-            object.__exit__(type, value, traceback)
+            obj = self.__obj.pop()
+            obj.__exit__(type, value, traceback)
     return Merge
 
 
@@ -274,17 +274,17 @@ def extends(Class):
         def __init__(self, *args, **kwargs):
             self.args = args
             self.kwargs = kwargs
-            self.__object = Stack()
+            self.__obj = Stack()
 
         def __enter__(self):
-            object = Class(*self.args, **self.kwargs)
-            o = object.__enter__()
-            self.__object.push(object)
+            obj = Class(*self.args, **self.kwargs)
+            o = obj.__enter__()
+            self.__obj.push(obj)
             return o
 
         def __exit__(self, type, value, traceback):
-            object = self.__object.pop()
-            object.__exit__(type, value, traceback)
+            obj = self.__obj.pop()
+            obj.__exit__(type, value, traceback)
     return Extends
 
 

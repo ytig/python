@@ -36,42 +36,40 @@ def classOf(generics):
 
 
 class Lock:
-    def __init__(self, object):
-        self.object = object
+    def __init__(self, obj):
+        self.obj = obj
 
     @staticmethod
-    def __lockOf(object):
-        if inspect.ismodule(object):
+    def __lockOf(obj):
+        if inspect.ismodule(obj):
             name = '__LOCK__'
-        elif inspect.isclass(object):
+        elif inspect.isclass(obj):
             name = '__Lock__'
         else:
             name = '__lock__'
-        if not hasattr(object, name):
-            setattr(object, name, (threading.Lock(), [],))
-        return getattr(object, name)
+        if not hasattr(obj, name):
+            setattr(obj, name, (threading.Lock(), [],))
+        return getattr(obj, name)
 
     def __enter__(self):
-        if self.object is not None:
-            tn = threading.current_thread().name
+        tn = threading.current_thread().name
+        with _LOCK:
+            lock, stack = Lock.__lockOf(self.obj)
+            a = tn not in stack
+            if not a:
+                stack.append(tn)
+        if a:
+            lock.acquire()
             with _LOCK:
-                lock, stack = Lock.__lockOf(self.object)
-                a = tn not in stack
-                if not a:
-                    stack.append(tn)
-            if a:
-                lock.acquire()
-                with _LOCK:
-                    stack.append(tn)
+                stack.append(tn)
 
     def __exit__(self, type, value, traceback):
-        if self.object is not None:
-            with _LOCK:
-                lock, stack = Lock.__lockOf(self.object)
-                stack.pop()
-                r = len(stack) == 0
-            if r:
-                lock.release()
+        with _LOCK:
+            lock, stack = Lock.__lockOf(self.obj)
+            stack.pop()
+            r = len(stack) == 0
+        if r:
+            lock.release()
 
 
 LOCK_INSTANCE = 0b1  # 实例锁
@@ -113,16 +111,16 @@ def synchronized(lock=LOCK_INSTANCE):
 
 # 单次调用函数
 def throwaway(static=False, throw=None):
-    def calledOf(object):
-        if inspect.ismodule(object):
+    def calledOf(obj):
+        if inspect.ismodule(obj):
             name = '__CALLED__'
-        elif inspect.isclass(object):
+        elif inspect.isclass(obj):
             name = '__Called__'
         else:
             name = '__called__'
-        if not hasattr(object, name):
-            setattr(object, name, [])
-        return getattr(object, name)
+        if not hasattr(obj, name):
+            setattr(obj, name, [])
+        return getattr(obj, name)
     if isinstance(throw, str):
         def call(*args, **kwargs):
             kwargs.update({throw: args[1], })
