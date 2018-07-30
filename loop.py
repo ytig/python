@@ -102,8 +102,8 @@ main_loop = Loop()  # 主循环
 
 
 # 执行
-def do(runnable, delay, tag=''):
-    return main_loop.do(runnable, delay, tag=tag)
+def do(runnable, delay, **kwargs):
+    return main_loop.do(runnable, delay, **kwargs)
 
 
 # 取消执行
