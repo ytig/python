@@ -23,9 +23,7 @@ class weakmethod:
 
 
 class attribute:
-    def __init__(self, mcls, name, bases, namespace):
-        self.mcls = mcls
-        self.name = name
+    def __init__(self, bases, namespace):
         self.bases = bases
         self.namespace = namespace
 
@@ -72,7 +70,7 @@ class attribute:
 
 class DMeta(type):
     def __new__(mcls, name, bases, namespace, **kwargs):
-        attr = attribute(mcls, name, bases, namespace)
+        attr = attribute(bases, namespace)
         if attr.hasattr('__del__'):
             def __init__(self, *args, **kwargs):
                 setattr(self, '__weakdel__', weakmethod(self, '__del__'))
