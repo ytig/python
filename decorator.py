@@ -52,24 +52,26 @@ class Lock:
         return getattr(obj, name)
 
     def __enter__(self):
-        tn = threading.current_thread().name
-        with _LOCK:
-            lock, stack = Lock.__lockOf(self.obj)
-            a = tn not in stack
-            if not a:
-                stack.append(tn)
-        if a:
-            lock.acquire()
+        if self.obj is not None:
+            tn = threading.current_thread().name
             with _LOCK:
-                stack.append(tn)
+                lock, stack = Lock.__lockOf(self.obj)
+                a = tn not in stack
+                if not a:
+                    stack.append(tn)
+            if a:
+                lock.acquire()
+                with _LOCK:
+                    stack.append(tn)
 
     def __exit__(self, type, value, traceback):
-        with _LOCK:
-            lock, stack = Lock.__lockOf(self.obj)
-            stack.pop()
-            r = len(stack) == 0
-        if r:
-            lock.release()
+        if self.obj is not None:
+            with _LOCK:
+                lock, stack = Lock.__lockOf(self.obj)
+                stack.pop()
+                r = len(stack) == 0
+            if r:
+                lock.release()
 
 
 LOCK_INSTANCE = 0b1  # 实例锁
