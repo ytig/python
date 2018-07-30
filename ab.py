@@ -74,13 +74,13 @@ class ABMeta(type):
 
         def __init__(self, *args, **kwargs):
             setattr(self, '__weakbef__', weakmethod(self, '__bef__'))
-            bregister(getattr(self, '__weakbef__'))
             setattr(self, '__weakaft__', weakmethod(self, '__aft__'))
-            aregister(getattr(self, '__weakaft__'))
             func = args[0]
             args = args[1:]
             if callable(func):
                 func(self, *args, **kwargs)
+            bregister(getattr(self, '__weakbef__'))
+            aregister(getattr(self, '__weakaft__'))
         attr.setattr('__init__', __init__)
 
         def __bef__(self, *args, **kwargs):
@@ -100,11 +100,11 @@ class ABMeta(type):
         @synchronized()
         @throwaway()
         def __del__(self, *args, **kwargs):
+            unregister(getattr(self, '__weakaft__'))
+            unregister(getattr(self, '__weakbef__'))
             func = args[0]
             args = args[1:]
             if callable(func):
                 func(self, *args, **kwargs)
-            unregister(getattr(self, '__weakaft__'))
-            unregister(getattr(self, '__weakbef__'))
         attr.setattr('__del__', __del__)
         return super().__new__(mcls, name, bases, namespace, **kwargs)
