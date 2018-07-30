@@ -11,7 +11,7 @@ TAG = __name__
 # 睡眠进程
 def sleep(seconds):
     if seconds < 0:
-        return subprocess.Popen(['python3', '-c', 'while True:pass'])
+        return subprocess.Popen(['sleep', '224'])
     else:
         return subprocess.Popen(['sleep', '%s' % (seconds,)])
 
@@ -63,13 +63,6 @@ class Loop(threading.Thread):
                     p = self.__pool[i][3] == generics
                 if p:
                     self.__pool.pop(i)
-                    if i == 0:
-                        if self.__process is not None:
-                            try:
-                                self.__process.kill()
-                            except BaseException:
-                                pass
-                            self.__process = None
                     r += 1
                 i -= 1
         return r
