@@ -7,42 +7,6 @@ from loop import Loop
 from ab import attribute, ABMeta
 
 
-class runnable:
-    def __init__(self, *args, **kwargs):
-        if len(args) <= 0:
-            raise Exception('no func.')
-        func = args[0]
-        args = args[1:]
-        self.func = func
-        self.args = args
-        self.kwargs = kwargs
-
-    # 执行
-    def __call__(self):
-        return self.func(*self.args, **self.kwargs)
-
-    # 延时
-    def delay(self, time, v=None):
-        def generator():
-            yield time
-            self()
-        g = generator()
-        if v is not None:
-            v.do(g, important=True)
-        return g
-
-    # 循环
-    def circle(self, time, v=None):
-        def generator():
-            while True:
-                yield time
-                self()
-        g = generator()
-        if v is not None:
-            v.do(g, important=False)
-        return g
-
-
 class _weakrunnable:
     def __init__(self, obj):
         self.ref = weakref.ref(obj)
@@ -103,7 +67,29 @@ class View(ABMeta):
                         pid = self.__class__.DO(weakrunnable, delay)
                         self.__loop__.append((weakrunnable, generator, important, pid,))
                         return pid
+        assert not attr.hasattr('do')
         namespace['do'] = do
+
+        # 延时执行
+        def doDelay(self, time, func, args=(), kwargs={}):
+            def g():
+                obj = yield time
+                func(obj, *args, **kwargs)
+                del obj
+            return self.do(g(), True)
+        assert not attr.hasattr('doDelay')
+        namespace['doDelay'] = doDelay
+
+        # 循环执行
+        def doCircle(self, time, func, args=(), kwargs={}):
+            def g():
+                while True:
+                    obj = yield time
+                    func(obj, *args, **kwargs)
+                    del obj
+            return self.do(g(), False)
+        assert not attr.hasattr('doCircle')
+        namespace['doCircle'] = doCircle
 
         # 取消执行
         def undo(self, generics):
@@ -122,6 +108,7 @@ class View(ABMeta):
                         self.__loop__.pop(i)
                         r += 1
             return r
+        assert not attr.hasattr('undo')
         namespace['undo'] = undo
 
         def __bef__(self, *args, **kwargs):
