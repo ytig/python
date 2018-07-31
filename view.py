@@ -101,13 +101,11 @@ class View(ABMeta):
         @synchronized()
         def undo(self, generator):
             r = 0
-            i = len(self.__loop__) - 1
-            while i >= 0:
+            for i in range(len(self.__loop__) - 1, -1, -1):
                 if self.__loop__[i][0] is generator:
                     self.__class__.UNDO(self.__loop__[i][1])
                     self.__loop__.pop(i)
                     r += 1
-                i -= 1
             return r
         namespace['undo'] = undo
 
@@ -118,12 +116,10 @@ class View(ABMeta):
                 func(self, *args, **kwargs)
             with Lock(self):
                 self.__shutdown__ = True
-                i = len(self.__loop__) - 1
-                while i >= 0:
+                for i in range(len(self.__loop__) - 1, -1, -1):
                     if not self.__loop__[i][2]:
                         self.__class__.UNDO(self.__loop__[i][1])
                         self.__loop__.pop(i)
-                    i -= 1
         attr.setattr('__bef__', __bef__)
 
         def __aft__(self, *args, **kwargs):

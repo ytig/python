@@ -50,8 +50,7 @@ class Loop(threading.Thread):
     def undo(self, generics):
         r = 0
         with Lock(self):
-            i = len(self.__pool) - 1
-            while i >= 0:
+            for i in range(len(self.__pool) - 1, -1, -1):
                 p = False
                 if generics is None:
                     p = True
@@ -71,7 +70,6 @@ class Loop(threading.Thread):
                                 pass
                             self.__process = None
                     r += 1
-                i -= 1
         return r
 
     def _shutdown(self):
