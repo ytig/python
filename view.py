@@ -52,7 +52,7 @@ class _weakrunnable:
         if obj is not None:
             generator = None
             with Lock(obj):
-                for w, g, i, in obj.__loop__:
+                for w, g, i, p, in obj.__loop__:
                     if w is self:
                         generator = g
                         break
@@ -68,7 +68,7 @@ class _weakrunnable:
                                 break
                 else:
                     with Lock(obj):
-                        for w, g, i, in obj.__loop__:
+                        for w, g, i, p, in obj.__loop__:
                             if w is self:
                                 obj.__class__.DO(self, delay)
                                 break
@@ -100,16 +100,24 @@ class View(ABMeta):
                 with Lock(self):
                     if important or not self.__shutdown__:
                         weakrunnable = _weakrunnable(self)
-                        self.__loop__.append((weakrunnable, generator, important,))
-                        self.__class__.DO(weakrunnable, delay)
+                        pid = self.__class__.DO(weakrunnable, delay)
+                        self.__loop__.append((weakrunnable, generator, important, pid,))
+                        return pid
         namespace['do'] = do
 
         # 取消执行
-        def undo(self, generator):
+        def undo(self, generics):
             r = 0
             with Lock(self):
                 for i in range(len(self.__loop__) - 1, -1, -1):
-                    if self.__loop__[i][1] is generator:
+                    p = False
+                    if generics is None:
+                        p = True
+                    elif inspect.isgenerator(generics):
+                        p = self.__loop__[i][1] is generics
+                    elif isinstance(generics, int):
+                        p = self.__loop__[i][3] == generics
+                    if p:
                         self.__class__.UNDO(self.__loop__[i][0])
                         self.__loop__.pop(i)
                         r += 1
