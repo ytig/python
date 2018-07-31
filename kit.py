@@ -208,19 +208,9 @@ def injects(*segms, argv=sys.argv):
     return decorator
 
 
-# 异常追溯
-def trace():
-    try:
-        file = inspect.trace()[-1][1]
-        for module in sys.modules.values():
-            if getattr(module, '__file__', '') == file:
-                return module
-    except BaseException:
-        pass
-    return None
-
-
 # 异常信息
 def loge(e):
     if isinstance(e, BaseException):
         return ''.join(traceback.format_exception(e.__class__, e, e.__traceback__)).strip('\n')
+    else:
+        return ''
