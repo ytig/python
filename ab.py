@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3
-import gc
 import weakref
 import inspect
 from decorator import synchronized, throwaway
@@ -14,7 +13,6 @@ class weakmethod:
         self.name = name
 
     def __call__(self, *args, **kwargs):
-        gc.collect()
         obj = self.ref()
         if obj is not None:
             return getattr(obj, self.name)(*args, **kwargs)
