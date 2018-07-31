@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import numbers
 import weakref
 from decorator import classOf, Lock
 from loop import Loop
@@ -56,6 +57,7 @@ def _weakrunnable(self):
             if generator is not None:
                 try:
                     delay = next(generator)
+                    assert isinstance(delay, numbers.Real)
                 except BaseException:
                     with Lock(self):
                         for i in range(len(self.__loop__)):
@@ -88,6 +90,7 @@ class View(ABMeta):
         def do(self, generator, important):
             try:
                 delay = next(generator)
+                assert isinstance(delay, numbers.Real)
             except BaseException:
                 pass
             else:
