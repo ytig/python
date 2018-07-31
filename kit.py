@@ -4,6 +4,7 @@ import os
 import sys
 import inspect
 import threading
+import traceback
 _LOCK = threading.Lock()  # 目录锁
 CWDS = []  # 历史目录
 WORKSPACE = None  # 工作区目录
@@ -217,3 +218,9 @@ def trace():
     except BaseException:
         pass
     return None
+
+
+# 异常信息
+def loge(e):
+    if isinstance(e, BaseException):
+        return ''.join(traceback.format_exception(e.__class__, e, e.__traceback__)).strip('\n')
