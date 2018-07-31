@@ -16,7 +16,7 @@ if threading.main_thread().is_alive():
                 _current_state += 1
                 for i in range(len(_events) - 1, -1, -1):
                     if _current_state >= _events[i][0]:
-                        events.append(_events.pop(i))
+                        events.insert(0, _events.pop(i))
             for type, func, args, kwargs, in events:
                 try:
                     func(*args, **kwargs)
