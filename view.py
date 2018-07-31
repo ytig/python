@@ -84,7 +84,7 @@ class View(ABMeta):
                 func(self, *args, **kwargs)
         attr.setattr('__init__', __init__)
 
-        # 执行
+        # 执行（异常中断）
         def do(self, generator, important):
             try:
                 delay = next(generator)
