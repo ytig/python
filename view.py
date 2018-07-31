@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import numbers
+import inspect
 import weakref
 from decorator import classOf, Lock
 from loop import Loop
@@ -89,6 +90,7 @@ class View(ABMeta):
         # 执行（异常中断）
         def do(self, generator, important):
             try:
+                assert inspect.getgeneratorstate(generator) == inspect.GEN_CREATED
                 delay = generator.send(None)
                 assert isinstance(delay, numbers.Real)
             except BaseException:
