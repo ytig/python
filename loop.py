@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import time
+import numbers
 import threading
 import subprocess
 from kit import loge
@@ -27,9 +28,10 @@ class Loop(threading.Thread):
 
     # 执行
     def do(self, runnable, delay, tag='', log=lambda e: Log.e(loge(e))):
-        if not isinstance(tag, str):
-            raise Exception('tag must be str.')
-        t = time.time() + delay
+        assert callable(runnable)
+        assert isinstance(delay, numbers.Real)
+        assert isinstance(tag, str)
+        t = time.time() + max(0, delay)
         with Lock(self):
             self.__pid += 1
             pid = self.__pid
