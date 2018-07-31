@@ -42,15 +42,16 @@ class runnable:
         return g
 
 
-def _weakrunnable(self):
-    ref = weakref.ref(self)
+class _weakrunnable:
+    def __init__(self, obj):
+        self.ref = weakref.ref(obj)
 
-    def runnable():
-        self = ref()
-        if self is not None:
+    def __call__(self):
+        obj = self.ref()
+        if obj is not None:
             generator = None
-            with Lock(self):
-                for g, r, i, in self.__loop__:
+            with Lock(obj):
+                for g, r, i, in obj.__loop__:
                     if r is runnable:
                         generator = g
                         break
@@ -59,18 +60,17 @@ def _weakrunnable(self):
                     delay = next(generator)
                     assert isinstance(delay, numbers.Real)
                 except BaseException:
-                    with Lock(self):
-                        for i in range(len(self.__loop__)):
-                            if self.__loop__[i][1] is runnable:
-                                self.__loop__.pop(i)
+                    with Lock(obj):
+                        for i in range(len(obj.__loop__)):
+                            if obj.__loop__[i][1] is runnable:
+                                obj.__loop__.pop(i)
                                 break
                 else:
-                    with Lock(self):
-                        for g, r, i, in self.__loop__:
+                    with Lock(obj):
+                        for g, r, i, in obj.__loop__:
                             if r is runnable:
-                                self.__class__.DO(runnable, delay)
+                                obj.__class__.DO(runnable, delay)
                                 break
-    return runnable
 
 
 class View(ABMeta):
