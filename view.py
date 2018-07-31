@@ -51,8 +51,8 @@ class _weakrunnable:
         if obj is not None:
             generator = None
             with Lock(obj):
-                for g, r, i, in obj.__loop__:
-                    if r is runnable:
+                for w, g, i, in obj.__loop__:
+                    if w is self:
                         generator = g
                         break
             if generator is not None:
@@ -62,14 +62,14 @@ class _weakrunnable:
                 except BaseException:
                     with Lock(obj):
                         for i in range(len(obj.__loop__)):
-                            if obj.__loop__[i][1] is runnable:
+                            if obj.__loop__[i][0] is self:
                                 obj.__loop__.pop(i)
                                 break
                 else:
                     with Lock(obj):
-                        for g, r, i, in obj.__loop__:
-                            if r is runnable:
-                                obj.__class__.DO(runnable, delay)
+                        for w, g, i, in obj.__loop__:
+                            if w is self:
+                                obj.__class__.DO(self, delay)
                                 break
 
 
@@ -96,9 +96,9 @@ class View(ABMeta):
             else:
                 with Lock(self):
                     if important or not self.__shutdown__:
-                        runnable = _weakrunnable(self)
-                        self.__loop__.append((generator, runnable, important,))
-                        self.__class__.DO(runnable, delay)
+                        weakrunnable = _weakrunnable(self)
+                        self.__loop__.append((weakrunnable, generator, important,))
+                        self.__class__.DO(weakrunnable, delay)
         namespace['do'] = do
 
         # 取消执行
@@ -106,8 +106,8 @@ class View(ABMeta):
             r = 0
             with Lock(self):
                 for i in range(len(self.__loop__) - 1, -1, -1):
-                    if self.__loop__[i][0] is generator:
-                        self.__class__.UNDO(self.__loop__[i][1])
+                    if self.__loop__[i][1] is generator:
+                        self.__class__.UNDO(self.__loop__[i][0])
                         self.__loop__.pop(i)
                         r += 1
             return r
@@ -122,7 +122,7 @@ class View(ABMeta):
                 self.__shutdown__ = True
                 for i in range(len(self.__loop__) - 1, -1, -1):
                     if not self.__loop__[i][2]:
-                        self.__class__.UNDO(self.__loop__[i][1])
+                        self.__class__.UNDO(self.__loop__[i][0])
                         self.__loop__.pop(i)
         attr.setattr('__bef__', __bef__)
 
@@ -140,7 +140,7 @@ class View(ABMeta):
             if callable(func):
                 func(self, *args, **kwargs)
             for i in self.__loop__:
-                self.__class__.UNDO(i[1])
+                self.__class__.UNDO(i[0])
             self.__loop__.clear()
         attr.setattr('__del__', __del__)
         return super().__new__(mcls, name, bases, namespace, **kwargs)
