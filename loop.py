@@ -6,7 +6,6 @@ from kit import loge
 from decorator import Lock
 from shutdown import bregister
 from log import Log
-TAG = __name__
 
 
 # 睡眠进程
@@ -27,7 +26,7 @@ class Loop(threading.Thread):
         bregister(self._shutdown)
 
     # 执行
-    def do(self, runnable, delay, tag='', log=lambda e: Log.e(loge(e), tag=TAG)):
+    def do(self, runnable, delay, tag='', log=lambda e: Log.e(loge(e))):
         if not isinstance(tag, str):
             raise Exception('tag must be str.')
         t = time.time() + delay

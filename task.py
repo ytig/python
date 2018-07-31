@@ -2,7 +2,6 @@
 import threading
 from kit import loge
 from decorator import classOf, Lock, synchronized, throwaway, instance
-TAG = __name__
 
 
 def Pair(function):
@@ -42,7 +41,7 @@ class Queue:
     # 打印日志
     @staticmethod
     def log(e):
-        logging.Log.e(loge(e), tag=TAG)
+        logging.Log.e(loge(e))
 
     # 任务分发
     def push(self):
@@ -116,7 +115,7 @@ class Tree:
                 thread.join()
             return self.seeds
 
-    def __init__(self, cpu, *mems, log=lambda e: logging.Log.e(loge(e), tag=TAG)):
+    def __init__(self, cpu, *mems, log=lambda e: logging.Log.e(loge(e))):
         self.twigs = [Tree.Twig(cpu, mem, log) for mem in mems]
 
     # 任务并发
