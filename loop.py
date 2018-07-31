@@ -2,6 +2,7 @@
 import time
 import threading
 import subprocess
+from kit import loge
 from decorator import Lock
 from shutdown import bregister
 from log import Log
@@ -26,7 +27,7 @@ class Loop(threading.Thread):
         bregister(self._shutdown)
 
     # 执行
-    def do(self, runnable, delay, tag='', log=lambda e: Log.e(e, tag=TAG)):
+    def do(self, runnable, delay, tag='', log=lambda e: Log.e(loge(e), tag=TAG)):
         if not isinstance(tag, str):
             raise Exception('tag must be str.')
         t = time.time() + delay

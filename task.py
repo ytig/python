@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import threading
+from kit import loge
 from decorator import classOf, Lock, synchronized, throwaway, instance
 TAG = __name__
 
@@ -41,7 +42,7 @@ class Queue:
     # 打印日志
     @staticmethod
     def log(e):
-        logging.Log.e(e, tag=TAG)
+        logging.Log.e(loge(e), tag=TAG)
 
     # 任务分发
     def push(self):
@@ -115,7 +116,7 @@ class Tree:
                 thread.join()
             return self.seeds
 
-    def __init__(self, cpu, *mems, log=lambda e: logging.Log.e(e, tag=TAG)):
+    def __init__(self, cpu, *mems, log=lambda e: logging.Log.e(loge(e), tag=TAG)):
         self.twigs = [Tree.Twig(cpu, mem, log) for mem in mems]
 
     # 任务并发
