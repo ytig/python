@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import traceback
 import threading
 _LOCK = threading.Lock()  # 全局锁
 if threading.current_thread() is not threading.main_thread():
@@ -17,7 +18,10 @@ if threading.main_thread().is_alive():
                     if _current_state >= _events[i][0]:
                         events.append(_events.pop(i))
             for type, func, args, kwargs, in events:
-                func(*args, **kwargs)
+                try:
+                    func(*args, **kwargs)
+                except BaseException:
+                    traceback.print_exc()
 
         def wrapper():
             step()
@@ -42,7 +46,10 @@ def bregister(*args, **kwargs):
         if _current_state in range(1):
             _events.append((1, func, args, kwargs,))
             return
-    func(*args, **kwargs)
+    try:
+        func(*args, **kwargs)
+    except BaseException:
+        traceback.print_exc()
 
 
 # 注册（关闭后）
@@ -55,7 +62,10 @@ def aregister(*args, **kwargs):
         if _current_state in range(2):
             _events.append((2, func, args, kwargs,))
             return
-    func(*args, **kwargs)
+    try:
+        func(*args, **kwargs)
+    except BaseException:
+        traceback.print_exc()
 
 
 # 注销
