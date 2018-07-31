@@ -2,7 +2,7 @@
 import numbers
 import inspect
 import weakref
-from decorator import classOf, Lock
+from decorator import moduleOf, classOf, Lock
 from loop import Loop
 from ab import attribute, ABMeta
 
@@ -90,9 +90,10 @@ class View(ABMeta):
         # 执行（异常中断）
         def do(self, generator, important):
             try:
-                assert inspect.getgeneratorstate(generator) == inspect.GEN_CREATED
-                delay = generator.send(None)
-                assert isinstance(delay, numbers.Real)
+                with Lock(moduleOf(__class__)):
+                    assert inspect.getgeneratorstate(generator) == inspect.GEN_CREATED
+                    delay = generator.send(None)
+                    assert isinstance(delay, numbers.Real)
             except BaseException:
                 pass
             else:
@@ -141,9 +142,10 @@ class View(ABMeta):
             args = args[1:]
             if callable(func):
                 func(self, *args, **kwargs)
-            for i in self.__loop__:
-                self.__class__.UNDO(i[0])
-            self.__loop__.clear()
+            with Lock(self):
+                for i in self.__loop__:
+                    self.__class__.UNDO(i[0])
+                self.__loop__.clear()
         attr.setattr('__del__', __del__)
         return super().__new__(mcls, name, bases, namespace, **kwargs)
 
