@@ -57,7 +57,7 @@ class _weakrunnable:
                         break
             if generator is not None:
                 try:
-                    delay = next(generator)
+                    delay = generator.send(obj)
                     assert isinstance(delay, numbers.Real)
                 except BaseException:
                     with Lock(obj):
@@ -89,7 +89,7 @@ class View(ABMeta):
         # 执行（异常中断）
         def do(self, generator, important):
             try:
-                delay = next(generator)
+                delay = generator.send(None)
                 assert isinstance(delay, numbers.Real)
             except BaseException:
                 pass
