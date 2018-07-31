@@ -11,7 +11,7 @@ class Connect:
     def __enter__(self):
         return self.connect
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, t, v, tb):
         self.connect.close()
 
 
@@ -24,9 +24,9 @@ class Cursor:
     def __enter__(self):
         return self.cursor
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, t, v, tb):
         try:
-            if type is None:
+            if t is None:
                 self.connect.commit()
             else:
                 self.connect.rollback()

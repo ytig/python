@@ -62,7 +62,7 @@ class _Class:
             def __enter__(self):
                 return self
 
-            def __exit__(self, type, value, traceback):
+            def __exit__(self, t, v, tb):
                 pass
         return _series(parent, cls, lambda self: pipe(*self.args, **self.kwargs))
 
@@ -82,7 +82,7 @@ class _Class:
             def __enter__(self):
                 return pipe(self.args[0])
 
-            def __exit__(self, type, value, traceback):
+            def __exit__(self, t, v, tb):
                 pass
         return _series(cls, child, lambda o: Arguments(o))
 
@@ -161,15 +161,15 @@ def _series(Parent, Child, Pipe):
                 parent.__exit__(e.__class__, e, e.__traceback__)
                 raise
 
-        def __exit__(self, type, value, traceback):
+        def __exit__(self, t, v, tb):
             child = self.__child.pop()
             parent = self.__parent.pop()
             try:
-                child.__exit__(type, value, traceback)
+                child.__exit__(t, v, tb)
             except BaseException as e:
                 parent.__exit__(e.__class__, e, e.__traceback__)
                 raise
-            parent.__exit__(type, value, traceback)
+            parent.__exit__(t, v, tb)
     return Series
 
 
@@ -195,28 +195,28 @@ def _parallel(Husband, Wife, Pipe):
                 husband.__exit__(e.__class__, e, e.__traceback__)
                 raise
 
-        def __exit__(self, type, value, traceback):
+        def __exit__(self, t, v, tb):
             wife = self.__wife.pop()
             husband = self.__husband.pop()
             try:
-                wife.__exit__(type, value, traceback)
+                wife.__exit__(t, v, tb)
             except BaseException as e:
                 husband.__exit__(e.__class__, e, e.__traceback__)
                 raise
-            husband.__exit__(type, value, traceback)
+            husband.__exit__(t, v, tb)
     return Parallel
 
 
 def _branch(Parent, Child, Pipe):
-    def exits(queue, type, value, traceback):
+    def exits(queue, t, v, tb):
         if queue:
             exit = queue.pop()
             try:
-                exit.__exit__(type, value, traceback)
+                exit.__exit__(t, v, tb)
             except BaseException as e:
                 exits(queue, e.__class__, e, e.__traceback__)
                 raise
-            exits(queue, type, value, traceback)
+            exits(queue, t, v, tb)
 
     class Branch(_Class):
         def __init__(self, *args, **kwargs):
@@ -242,10 +242,10 @@ def _branch(Parent, Child, Pipe):
             self.__children.push(children)
             return tuple(cs)
 
-        def __exit__(self, type, value, traceback):
+        def __exit__(self, t, v, tb):
             children = self.__children.pop()
             parent = self.__parent.pop()
-            exits([parent] + children, type, value, traceback)
+            exits([parent] + children, t, v, tb)
     return Branch
 
 
@@ -262,9 +262,9 @@ def _merge(Husband, Wife, Pipe):
             self.__obj.push(obj)
             return o
 
-        def __exit__(self, type, value, traceback):
+        def __exit__(self, t, v, tb):
             obj = self.__obj.pop()
-            obj.__exit__(type, value, traceback)
+            obj.__exit__(t, v, tb)
     return Merge
 
 
@@ -282,9 +282,9 @@ def extends(Class):
             self.__obj.push(obj)
             return o
 
-        def __exit__(self, type, value, traceback):
+        def __exit__(self, t, v, tb):
             obj = self.__obj.pop()
-            obj.__exit__(type, value, traceback)
+            obj.__exit__(t, v, tb)
     return Extends
 
 
@@ -298,6 +298,6 @@ def updates(Def):
         def __enter__(self):
             return Def(*self.args, **self.kwargs)
 
-        def __exit__(self, type, value, traceback):
+        def __exit__(self, t, v, tb):
             pass
     return Updates

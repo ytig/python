@@ -64,7 +64,7 @@ class Lock:
                 with _LOCK:
                     stack.append(tn)
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, t, v, tb):
         if self.obj is not None:
             with _LOCK:
                 lock, stack = Lock.__lockOf(self.obj)
