@@ -1,38 +1,38 @@
 #!/usr/local/bin/python3
 import threading
 _LOCK = threading.Lock()  # 全局锁
-_EVENT_TYPE_BEFORE_SHUTDOWN = 'b'  # 关闭前
-_EVENT_TYPE_AFTER_SHUTDOWN = 'a'  # 关闭后
 if threading.current_thread() is not threading.main_thread():
     raise Exception('cannot import at thread.')
 if threading.main_thread().is_alive():
+    _current_state = 0
     _events = []
 
     def decorator(function):
-        def wrapper():
+        def step():
+            global _current_state
+            events = []
             with _LOCK:
-                global _events
-                events = _events.copy()
-                _events = None
+                _current_state += 1
+                for i in range(len(_events) - 1, -1, -1):
+                    if _current_state >= _events[i][0]:
+                        events.append(_events.pop(i))
             for type, func, args, kwargs, in events:
-                if type == _EVENT_TYPE_BEFORE_SHUTDOWN:
-                    try:
-                        func(*args, **kwargs)
-                    except BaseException:
-                        pass
+                try:
+                    func(*args, **kwargs)
+                except BaseException:
+                    pass
+
+        def wrapper():
+            step()
             ret = function()
-            for type, func, args, kwargs, in events:
-                if type == _EVENT_TYPE_AFTER_SHUTDOWN:
-                    try:
-                        func(*args, **kwargs)
-                    except BaseException:
-                        pass
+            step()
             return ret
         return wrapper
     threading._shutdown = decorator(threading._shutdown)
     del decorator
 else:
-    _events = None
+    _current_state = -1
+    _events = []
 
 
 # 注册（关闭前）
@@ -42,8 +42,8 @@ def bregister(*args, **kwargs):
     func = args[0]
     args = args[1:]
     with _LOCK:
-        if isinstance(_events, list):
-            _events.append((_EVENT_TYPE_BEFORE_SHUTDOWN, func, args, kwargs,))
+        if _current_state in range(1):
+            _events.append((1, func, args, kwargs,))
             return
     try:
         func(*args, **kwargs)
@@ -58,8 +58,8 @@ def aregister(*args, **kwargs):
     func = args[0]
     args = args[1:]
     with _LOCK:
-        if isinstance(_events, list):
-            _events.append((_EVENT_TYPE_AFTER_SHUTDOWN, func, args, kwargs,))
+        if _current_state in range(2):
+            _events.append((2, func, args, kwargs,))
             return
     try:
         func(*args, **kwargs)
@@ -71,11 +71,8 @@ def aregister(*args, **kwargs):
 def unregister(func):
     with _LOCK:
         r = 0
-        if isinstance(_events, list):
-            i = len(_events) - 1
-            while i >= 0:
-                if _events[i][1] is func:
-                    _events.pop(i)
-                    r += 1
-                i -= 1
+        for i in range(len(_events) - 1, -1, -1):
+            if _events[i][1] is func:
+                _events.pop(i)
+                r += 1
         return r
