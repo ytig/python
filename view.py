@@ -55,7 +55,7 @@ def _weakrunnable(self):
                         break
             if generator is not None:
                 try:
-                    delay = generator.send(None)
+                    delay = next(generator)
                 except BaseException:
                     with Lock(self):
                         for i in range(len(self.__loop__)):
