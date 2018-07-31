@@ -1,11 +1,8 @@
 #!/usr/local/bin/python3
-import gc
 import weakref
-from decorator import classOf, Lock, synchronized
+from decorator import classOf, Lock
 from loop import Loop
 from ab import attribute, ABMeta
-from shutdown import bregister
-bregister(gc.collect)
 
 
 class runnable:
@@ -48,7 +45,6 @@ def _weakrunnable(self):
     ref = weakref.ref(self)
 
     def runnable():
-        gc.collect()
         self = ref()
         if self is not None:
             generator = None
@@ -60,7 +56,7 @@ def _weakrunnable(self):
             if generator is not None:
                 try:
                     delay = generator.send(None)
-                except StopIteration:
+                except BaseException:
                     with Lock(self):
                         for i in range(len(self.__loop__)):
                             if self.__loop__[i][1] is runnable:
@@ -89,23 +85,28 @@ class View(ABMeta):
         attr.setattr('__init__', __init__)
 
         # 执行
-        @synchronized()
         def do(self, generator, important):
-            if important or not self.__shutdown__:
-                runnable = _weakrunnable(self)
-                self.__loop__.append((generator, runnable, important,))
-                self.__class__.DO(runnable, 0)
+            try:
+                delay = next(generator)
+            except BaseException:
+                pass
+            else:
+                with Lock(self):
+                    if important or not self.__shutdown__:
+                        runnable = _weakrunnable(self)
+                        self.__loop__.append((generator, runnable, important,))
+                        self.__class__.DO(runnable, delay)
         namespace['do'] = do
 
         # 取消执行
-        @synchronized()
         def undo(self, generator):
             r = 0
-            for i in range(len(self.__loop__) - 1, -1, -1):
-                if self.__loop__[i][0] is generator:
-                    self.__class__.UNDO(self.__loop__[i][1])
-                    self.__loop__.pop(i)
-                    r += 1
+            with Lock(self):
+                for i in range(len(self.__loop__) - 1, -1, -1):
+                    if self.__loop__[i][0] is generator:
+                        self.__class__.UNDO(self.__loop__[i][1])
+                        self.__loop__.pop(i)
+                        r += 1
             return r
         namespace['undo'] = undo
 
