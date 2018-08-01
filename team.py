@@ -178,7 +178,7 @@ class _function:
         return getattr(obj, name, default)
 
 
-class _base:
+class _baseclass:
     def __init__(self, *objects, **setting):
         self.__objects = list(objects)
         self.__setting = dict(setting)
@@ -271,8 +271,8 @@ class _base:
 
 class _metaclass(type):
     def __new__(mcls, name, bases, namespace, **kwargs):
-        searcher = search(lambda cls: [base for base in cls.__bases__ if base is not object])
-        if _base in bases and len(bases) == 1:
+        searcher = search(lambda cls: [b for b in cls.__bases__ if b is not object])
+        if _baseclass in bases and len(bases) == 1:
             final = set()
             final.update(namespace.keys())
             for b in searcher.depth(*bases):
@@ -300,15 +300,15 @@ class _metaclass(type):
                             namespace[k] = v
             return super().__new__(mcls, name, bases, namespace, **kwargs)
         else:
-            bases = tuple([getattr(b, '__cls__', b) if issubclass(b, _base) else b for b in bases])
+            bases = tuple([getattr(b, '__cls__', b) if issubclass(b, _baseclass) else b for b in bases])
             return type.__new__(type, name, bases, namespace, **kwargs)
 
 
 class _class:
     @staticmethod
     def set(o):
-        class classes(_base, metaclass=_metaclass):
-            __cls__ = o
+        class classes(_baseclass, metaclass=_metaclass):
+            __cls__ = o  # 原类
 
             def __init__(self, *objects, **setting):
                 for obj in objects:
@@ -321,6 +321,6 @@ class _class:
 
     @staticmethod
     def get(o):
-        while inspect.isclass(o) and issubclass(o, _base):
+        while inspect.isclass(o) and issubclass(o, _baseclass):
             o = getattr(o, '__cls__', None)
         return o
