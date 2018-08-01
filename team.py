@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import inspect
+from kit import search, depth
 from decorator import Lock, synchronized
 from task import Tree
 
@@ -100,13 +101,7 @@ def _except(fn='__except__'):
                 return function(self, *args, **kwargs)
             except BaseException as e:
                 try:
-                    cf = inspect.currentframe()
-                    fb = cf.f_back
-                    while fb:
-                        if cf.f_code is fb.f_code:
-                            break
-                        fb = fb.f_back
-                    if not fb:
+                    if not depth():
                         if hasattr(self, fn):
                             getattr(self, fn)(e)
                 except BaseException:
@@ -276,35 +271,37 @@ class _base:
 
 class _metaclass(type):
     def __new__(mcls, name, bases, namespace, **kwargs):
-        final = set()
-        final.update(namespace.keys())
-        for b in bases:
-            while b is not object:
+        searcher = search(lambda cls: [base for base in cls.__bases__ if base is not object])
+        if _base in bases and len(bases) == 1:
+            final = set()
+            final.update(namespace.keys())
+            for b in searcher.depth(*bases):
                 final.update(vars(b).keys())
-                b = b.__base__
-        override = []
-        base = namespace['__cls__']
-        name = base.__name__
-        while base is not object:
-            for k, v in vars(base).items():
-                if k not in override:
-                    override.append(k)
-                    if isinstance(v, staticmethod):
-                        v = _staticmethod.get(v)
-                    elif isinstance(v, classmethod):
-                        v = _classmethod.get(v)
-                    elif isinstance(v, property):
-                        v = _property.get(v)
-                    elif inspect.isfunction(v):
-                        v = _function.get(v)
-                    else:
-                        v = None
-                    if v:
-                        if k in final:
-                            raise Exception('cannot export keyword ' + k + '.')
-                        namespace[k] = v
-            base = base.__base__
-        return super().__new__(mcls, name, bases, namespace, **kwargs)
+            override = []
+            base = namespace['__cls__']
+            name = base.__name__
+            for b in searcher.depth(base):
+                for k, v in vars(b).items():
+                    if k not in override:
+                        override.append(k)
+                        if isinstance(v, staticmethod):
+                            v = _staticmethod.get(v)
+                        elif isinstance(v, classmethod):
+                            v = _classmethod.get(v)
+                        elif isinstance(v, property):
+                            v = _property.get(v)
+                        elif inspect.isfunction(v):
+                            v = _function.get(v)
+                        else:
+                            v = None
+                        if v:
+                            if k in final:
+                                raise Exception('cannot export keyword ' + k + '.')
+                            namespace[k] = v
+            return super().__new__(mcls, name, bases, namespace, **kwargs)
+        else:
+            bases = tuple([getattr(b, '__cls__', b) if issubclass(b, _base) else b for b in bases])
+            return type.__new__(type, name, bases, namespace, **kwargs)
 
 
 class _class:
