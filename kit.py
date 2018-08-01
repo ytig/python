@@ -210,28 +210,27 @@ def injects(*segms, argv=sys.argv):
 
 # 搜索
 class search:
-    def __init__(self, gc, *nodes):
-        self.gc = gc
-        self.nodes = nodes
+    def __init__(self, find):
+        self.find = find
 
     # 深度优先
-    def depth(self):
-        for node in self.nodes:
+    def depth(self, *nodes):
+        for node in nodes:
             yield node
-            gc = self.gc(node)
-            if gc:
-                yield from search(self.gc, *gc).depth()
+            child = self.find(node)
+            if child:
+                yield from self.depth(*child)
 
     # 广度优先
-    def breadth(self):
-        gcs = []
-        for node in self.nodes:
+    def breadth(self, *nodes):
+        children = []
+        for node in nodes:
             yield node
-            gc = self.gc(node)
-            if gc:
-                gcs.extend(gc)
-        if gcs:
-            yield from search(self.gc, *gcs).breadth()
+            child = self.find(node)
+            if child:
+                children.extend(child)
+        if children:
+            yield from self.breadth(*children)
 
 
 # 迭代深度
