@@ -2,161 +2,185 @@
 import json
 import inspect
 import threading
-_LOCK = threading.Lock()  # 全局锁
-_MODULES = {}  # 伪模块
-_CLASSES = {}  # 伪类型
+from kit import module
 
 
-# 获取伪模块
-def moduleOf(generics):
-    if isinstance(generics, str):
-        with _LOCK:
-            if generics not in _MODULES:
-                _MODULES[generics] = lambda: generics
-            return _MODULES[generics]
-    else:
-        return moduleOf(inspect.getmodule(generics).__name__)
+class Closure:
+    def __init__(self, closure):
+        self.closure = closure
 
-
-# 获取伪类型
-def classOf(generics):
-    if isinstance(generics, str):
-        with _LOCK:
-            if generics not in _CLASSES:
-                _CLASSES[generics] = lambda: generics
-            return _CLASSES[generics]
-    elif inspect.ismodule(generics):
-        return None
-    elif inspect.isclass(generics):
-        return classOf(generics.__module__ + '.' + generics.__qualname__)
-    elif inspect.isfunction(generics) or inspect.ismethod(generics):
-        return classOf(generics.__module__ + '.' + generics.__qualname__.rsplit('.', 1)[0])
-    else:
-        return classOf(generics.__class__)
+    # 解闭包
+    def __call__(self):
+        return self.closure()
 
 
 class Lock:
-    def __init__(self, obj):
-        self.obj = obj
+    LOCK = threading.Lock()  # 全局锁
 
-    @staticmethod
-    def __lockOf(obj):
-        if inspect.ismodule(obj):
+    def __init__(self, generics):
+        self.generics = generics
+
+    @property
+    def __lock(self):
+        generics = self.generics
+        while isinstance(generics, Closure):
+            generics = generics()
+        if inspect.ismodule(generics):
             name = '__LOCK__'
-        elif inspect.isclass(obj):
+        elif inspect.isclass(generics):
             name = '__Lock__'
         else:
             name = '__lock__'
-        if not hasattr(obj, name):
-            setattr(obj, name, (threading.Lock(), [],))
-        return getattr(obj, name)
+        if not hasattr(generics, name):
+            setattr(generics, name, (threading.Lock(), [],))
+        return getattr(generics, name)
 
     def __enter__(self):
-        if self.obj is not None:
-            tn = threading.current_thread().name
-            with _LOCK:
-                lock, stack = Lock.__lockOf(self.obj)
-                a = tn not in stack
-                if not a:
-                    stack.append(tn)
-            if a:
-                lock.acquire()
-                with _LOCK:
-                    stack.append(tn)
+        tn = threading.current_thread().name
+        with __class__.LOCK:
+            lock, stack, = self.__lock
+            a = tn not in stack
+            if not a:
+                stack.append(tn)
+        if a:
+            lock.acquire()
+            with __class__.LOCK:
+                stack.append(tn)
 
     def __exit__(self, t, v, tb):
-        if self.obj is not None:
-            with _LOCK:
-                lock, stack = Lock.__lockOf(self.obj)
-                stack.pop()
-                r = len(stack) == 0
-            if r:
-                lock.release()
+        with __class__.LOCK:
+            lock, stack, = self.__lock
+            stack.pop()
+            r = len(stack) == 0
+        if r:
+            lock.release()
 
-
-LOCK_INSTANCE = 0b1  # 实例锁
-LOCK_CLASS = 0b10  # 类型锁
-LOCK_MODULE = 0b100  # 模块锁
-
-
-# 加锁同步函数
-def synchronized(lock=LOCK_INSTANCE):
-    if isinstance(lock, int):
-        i = True if lock & LOCK_INSTANCE else False
-        c = True if lock & LOCK_CLASS else False
-        m = True if lock & LOCK_MODULE else False
-
-        def decorator(function):
-            lm = Lock(moduleOf(function) if m else None)
-            lc = Lock(classOf(function) if c else None)
-
+    def __call__(self, generics):
+        if isinstance(generics, staticmethod):
+            return staticmethod(self(generics.__func__))
+        elif isinstance(generics, classmethod):
+            return classmethod(self(generics.__func__))
+        elif isinstance(generics, property):
+            return property(fget=self(generics.fget), fset=self(generics.fset), fdel=self(generics.fdel))
+        elif callable(generics):
             def wrapper(*args, **kwargs):
-                if i and len(args) <= 0:
-                    raise Exception('no self.')
-                li = Lock(args[0] if i else None)
-                with lm:
-                    with lc:
-                        with li:
-                            return function(*args, **kwargs)
+                with self:
+                    return generics(*args, **kwargs)
             return wrapper
-        return decorator
-    else:
-        l = Lock(lock)
-
-        def decorator(function):
-            def wrapper(*args, **kwargs):
-                with l:
-                    return function(*args, **kwargs)
-            return wrapper
-        return decorator
 
 
-# 单次调用函数
-def throwaway(static=False, throw=None):
-    def calledOf(obj):
-        if inspect.ismodule(obj):
-            name = '__CALLED__'
-        elif inspect.isclass(obj):
-            name = '__Called__'
+# 实例锁（栈帧回溯）
+def ilock():
+    i = Closure(lambda: inspect.currentframe().f_back.f_back.f_back.f_back.f_locals['args'][0])
+
+    def lock(generics):
+        return Lock(i)(generics)
+    return lock
+
+
+# 类型锁（闭包传值）
+def clock(closure):
+    c = Closure(closure)
+
+    def lock(generics):
+        return Lock(c)(generics)
+    return lock
+
+
+# 模块锁
+def mlock():
+    m = module(ios=2)
+
+    def lock(generics):
+        return Lock(m)(generics)
+    return lock
+
+
+class Throw:
+    LOCK = threading.Lock()  # 全局锁
+    QUAL = 0  # 唯一码
+
+    def __init__(self, generics):
+        self.generics = generics
+
+    @property
+    def __throw(self):
+        generics = self.generics
+        while isinstance(generics, Closure):
+            generics = generics()
+        if inspect.ismodule(generics):
+            name = '__THROW__'
+        elif inspect.isclass(generics):
+            name = '__Throw__'
         else:
-            name = '__called__'
-        if not hasattr(obj, name):
-            setattr(obj, name, [])
-        return getattr(obj, name)
-    if isinstance(throw, str):
-        def call(*args, **kwargs):
-            kwargs.update({throw: args[1], })
-            return args[0](*args[2:], **kwargs)
-    else:
-        if not callable(throw):
-            throw = lambda *args, **kwargs: None
+            name = '__throw__'
+        if not hasattr(generics, name):
+            setattr(generics, name, set())
+        return getattr(generics, name)
 
-        def call(*args, **kwargs):
-            if not args[1]:
-                return args[0](*args[2:], **kwargs)
-            else:
-                return throw(*args[2:], **kwargs)
+    @staticmethod
+    def __compile(a, b):
+        if isinstance(b, str):
+            def _a(*args, **kwargs):
+                kwargs.update({b: False, })
+                return a(*args, **kwargs)
 
-    def decorator(function):
-        qualname = function.__qualname__
-        if static:
-            module = moduleOf(function)
+            def _b(*args, **kwargs):
+                kwargs.update({b: True, })
+                return a(*args, **kwargs)
+            return _a, _b
+        else:
+            if not callable(b):
+                b = lambda *args, **kwargs: None
+            return a, b
 
-        def wrapper(*args, **kwargs):
-            if static:
-                called = calledOf(module)
-            else:
-                if len(args) <= 0:
-                    raise Exception('no self.')
-                called = calledOf(args[0])
-            if qualname not in called:
-                r = call(function, False, *args, **kwargs)
-                called.append(qualname)
-                return r
-            else:
-                return call(function, True, *args, **kwargs)
-        return wrapper
-    return decorator
+    def __call__(self, generics, repeat):
+        if isinstance(generics, staticmethod):
+            return staticmethod(self(generics.__func__, repeat))
+        elif isinstance(generics, classmethod):
+            return classmethod(self(generics.__func__, repeat))
+        elif callable(generics):
+            with __class__.LOCK:
+                __class__.QUAL += 1
+                qual = __class__.QUAL
+            a, b, = __class__.__compile(generics, repeat)
+
+            def wrapper(*args, **kwargs):
+                throw = self.__throw
+                if qual not in throw:
+                    r = a(*args, **kwargs)
+                    throw.add(qual)
+                    return r
+                else:
+                    return b(*args, **kwargs)
+            return wrapper
+
+
+# 实例单次（栈帧回溯）
+def ithrow(repeat=None):
+    i = Closure(lambda: inspect.currentframe().f_back.f_back.f_back.f_back.f_locals['args'][0])
+
+    def throw(generics):
+        return Throw(i)(generics, repeat)
+    return throw
+
+
+# 类型单次（闭包传值）
+def cthrow(closure, repeat=None):
+    c = Closure(closure)
+
+    def throw(generics):
+        return Throw(c)(generics, repeat)
+    return throw
+
+
+# 模块单次
+def mthrow(repeat=None):
+    m = module(ios=2)
+
+    def throw(generics):
+        return Throw(m)(generics, repeat)
+    return throw
 
 
 # 参数单例类型
@@ -165,7 +189,7 @@ def instance(fn='instanceOf'):
         instances = {}
 
         @staticmethod
-        @synchronized(classOf(cls))
+        @Lock(cls)
         def instanceOf(*args, **kwargs):
             key = json.dumps((args, kwargs,))
             if key not in instances:
