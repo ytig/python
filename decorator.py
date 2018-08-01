@@ -183,7 +183,7 @@ def mthrow(repeat=None):
     return throw
 
 
-# 参数单例类型
+# 单例类型（同参）
 def instance(fn='instanceOf'):
     def decorator(cls):
         instances = {}
