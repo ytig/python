@@ -234,16 +234,16 @@ class search:
 
 
 # 模块检索
-def module(name=None):
-    if name is not None:
-        return sys.modules.get(name)
-    else:
-        f = inspect.currentframe().f_back
-        if f:
+def module(ios=1):
+    if isinstance(ios, int):
+        fs = tuple(search(lambda f: [b for b in [f.f_back] if b]).depth(inspect.currentframe()))
+        if (lambda a, b: a >= -b and a < b)(ios, len(fs)):
             for m in sys.modules.values():
-                if vars(m) is f.f_globals:
+                if vars(m) is fs[ios].f_globals:
                     return m
         return None
+    elif isinstance(ios, str):
+        return sys.modules.get(ios)
 
 
 # 迭代深度
