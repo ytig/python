@@ -208,6 +208,19 @@ def injects(*segms, argv=sys.argv):
     return decorator
 
 
+# 迭代深度
+def depth():
+    d = 0
+    f = inspect.currentframe().f_back
+    if f:
+        b = f.f_back
+        while b:
+            if f.f_code is b.f_code:
+                d += 1
+            b = b.f_back
+    return d
+
+
 # 异常信息
 def loge(e):
     if isinstance(e, BaseException):
