@@ -208,6 +208,32 @@ def injects(*segms, argv=sys.argv):
     return decorator
 
 
+# 搜索
+class search:
+    def __init__(self, gc, *nodes):
+        self.gc = gc
+        self.nodes = nodes
+
+    # 深度优先
+    def depth(self):
+        for node in self.nodes:
+            yield node
+            gc = self.gc(node)
+            if gc:
+                yield from search(self.gc, *gc).depth()
+
+    # 广度优先
+    def breadth(self):
+        gcs = []
+        for node in self.nodes:
+            yield node
+            gc = self.gc(node)
+            if gc:
+                gcs.extend(gc)
+        if gcs:
+            yield from search(self.gc, *gcs).breadth()
+
+
 # 迭代深度
 def depth():
     d = 0
