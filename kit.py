@@ -233,6 +233,19 @@ class search:
             yield from self.breadth(*children)
 
 
+# 模块检索
+def module(name=None):
+    if name is not None:
+        return sys.modules.get(name)
+    else:
+        f = inspect.currentframe().f_back
+        if f:
+            for m in sys.modules.values():
+                if vars(m) is f.f_globals:
+                    return m
+        return None
+
+
 # 迭代深度
 def depth():
     d = 0
