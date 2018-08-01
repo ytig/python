@@ -158,7 +158,7 @@ class Throw:
 
 # 实例单次（栈帧回溯）
 def ithrow(repeat=None):
-    i = Closure(lambda: inspect.currentframe().f_back.f_back.f_back.f_back.f_locals['args'][0])
+    i = Closure(lambda: inspect.currentframe().f_back.f_back.f_back.f_locals['args'][0])
 
     def throw(generics):
         return Throw(i)(generics, repeat)
