@@ -70,7 +70,14 @@ class Lock:
         elif isinstance(generics, classmethod):
             return classmethod(self(generics.__func__))
         elif isinstance(generics, property):
-            return property(fget=self(generics.fget), fset=self(generics.fset), fdel=self(generics.fdel))
+            if generics.fdel:
+                return property(fget=generics.fget, fset=generics.fset, fdel=self(generics.fdel))
+            elif generics.fset:
+                return property(fget=generics.fget, fset=self(generics.fset), fdel=generics.fdel)
+            elif generics.fget:
+                return property(fget=self(generics.fget), fset=generics.fset, fdel=generics.fdel)
+            else:
+                return generics
 
 
 # 实例锁（栈帧回溯）
@@ -161,9 +168,11 @@ class Throw:
             if generics.fdel:
                 return property(fget=generics.fget, fset=generics.fset, fdel=self(generics.fdel, r=r))
             elif generics.fset:
-                return property(fget=generics.fget, fset=self(generics.fset, r=r), fdel=self(generics.fdel, r=r))
+                return property(fget=generics.fget, fset=self(generics.fset, r=r), fdel=generics.fdel)
+            elif generics.fget:
+                return property(fget=self(generics.fget, r=r), fset=generics.fset, fdel=generics.fdel)
             else:
-                return property(fget=self(generics.fget, r=r), fset=self(generics.fset, r=r), fdel=self(generics.fdel, r=r))
+                return generics
 
 
 # 实例单次（栈帧回溯）
