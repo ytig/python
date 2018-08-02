@@ -233,6 +233,39 @@ class search:
             yield from self.breadth(*children)
 
 
+# 检查成员
+def hasvar(o, k):
+    return hasattr(o, '__dict__') and k in o.__dict__
+
+
+# 获取成员
+def getvar(o, k, d=None):
+    return o.__dict__.get(k, d) if hasattr(o, '__dict__') else d
+
+
+# 设置成员
+def setvar(o, k, v):
+    if hasattr(o, '__dict__'):
+        if isinstance(o.__dict__, dict):
+            o.__dict__[k] = v
+            return True
+        else:
+            b = True
+            if hasattr(o, k):
+                for base in search(lambda cls: cls.__bases__).depth(o.__class__):
+                    var = getvar(base, k)
+                    if var is not None and hasattr(var, '__set__'):
+                        b = False
+                        break
+            if b:
+                try:
+                    setattr(o, k, v)
+                except TypeError:
+                    b = False
+            return b
+    return False
+
+
 # 模块检索
 def module(ios=1):
     if isinstance(ios, int):
