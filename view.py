@@ -2,7 +2,7 @@
 import numbers
 import inspect
 import weakref
-from kit import module
+from kit import hasvar, getvar, setvar, module
 from decorator import Lock
 from loop import Loop
 from ab import attribute, ABMeta
@@ -149,14 +149,12 @@ class View(ABMeta):
     def DO(cls, *args, **kwargs):
         name = '__LOOP__'
         with Lock(cls):
-            if name not in vars(cls):
-                setattr(cls, name, Loop())
-        return getattr(cls, name).do(*args, **kwargs)
+            assert hasvar(cls, name) or setvar(cls, name, Loop())
+        return getvar(cls, name).do(*args, **kwargs)
 
     # 取消执行
     def UNDO(cls, *args, **kwargs):
         name = '__LOOP__'
         with Lock(cls):
-            if name not in vars(cls):
-                setattr(cls, name, Loop())
-        return getattr(cls, name).undo(*args, **kwargs)
+            assert hasvar(cls, name) or setvar(cls, name, Loop())
+        return getvar(cls, name).undo(*args, **kwargs)

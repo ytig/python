@@ -2,7 +2,7 @@
 import json
 import inspect
 import threading
-from kit import module
+from kit import hasvar, getvar, setvar, module
 
 
 class Closure:
@@ -33,12 +33,11 @@ class Lock:
             name = '__Lock__'
         else:
             name = '__lock__'
-        if name not in vars(generics):
-            setattr(generics, name, dict())
-        attr = getattr(generics, name)
-        if k not in attr:
-            attr[k] = (threading.Lock(), [],)
-        return attr[k]
+        assert hasvar(generics, name) or setvar(generics, name, dict())
+        var = getvar(generics, name)
+        if k not in var:
+            var[k] = (threading.Lock(), [],)
+        return var[k]
 
     def __enter__(self):
         tn = threading.current_thread().name
@@ -119,9 +118,8 @@ class Throw:
             name = '__Throw__'
         else:
             name = '__throw__'
-        if name not in vars(generics):
-            setattr(generics, name, set())
-        return getattr(generics, name)
+        assert hasvar(generics, name) or setvar(generics, name, set())
+        return getvar(generics, name)
 
     @staticmethod
     def __compile(a, b):
@@ -200,6 +198,6 @@ def instance(fn='instanceOf'):
             if key not in instances:
                 instances[key] = cls(*args, **kwargs)
             return instances[key]
-        setattr(cls, fn, instanceOf)
+        assert not hasvar(cls, fn) and setvar(cls, fn, instanceOf)
         return cls
     return decorator

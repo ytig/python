@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 import threading
-from kit import loge
+from kit import hasvar, getvar, setvar, loge
 from decorator import Lock, ilock, ithrow, instance
 
 
@@ -21,7 +21,7 @@ class Queue:
         name = '__mutex__'
         while True:
             with Lock(cls):
-                mutex = getattr(cls, name)
+                mutex = getvar(cls, name)
                 if mutex['q']:
                     queue = mutex['q'].pop(0)
                 else:
@@ -31,7 +31,7 @@ class Queue:
                 queue.pop()
             except BaseException as e:
                 try:
-                    getattr(queue.__class__, 'log', None)(e)
+                    getattr(cls, 'log')(e)
                 except BaseException:
                     pass
 
@@ -40,9 +40,8 @@ class Queue:
         cls = self.__class__
         name = '__mutex__'
         with Lock(cls):
-            if name not in vars(cls):
-                setattr(cls, name, {'q': [], 'r': 0, })
-            mutex = getattr(cls, name)
+            assert hasvar(cls, name) or setvar(cls, name, {'q': [], 'r': 0, })
+            mutex = getvar(cls, name)
             mutex['q'].append(self)
             if mutex['r'] < 1:
                 threading.Thread(target=cls.__run).start()
