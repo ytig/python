@@ -33,12 +33,12 @@ class Lock:
             name = '__Lock__'
         else:
             name = '__lock__'
-        if not hasattr(generics, name):
+        if name not in vars(generics):
             setattr(generics, name, dict())
         attr = getattr(generics, name)
         if k not in attr:
             attr[k] = (threading.Lock(), [],)
-        return attr.get(k)
+        return attr[k]
 
     def __enter__(self):
         tn = threading.current_thread().name
@@ -119,7 +119,7 @@ class Throw:
             name = '__Throw__'
         else:
             name = '__throw__'
-        if not hasattr(generics, name):
+        if name not in vars(generics):
             setattr(generics, name, set())
         return getattr(generics, name)
 

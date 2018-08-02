@@ -40,7 +40,7 @@ class Queue:
         cls = self.__class__
         name = '__mutex__'
         with Lock(cls):
-            if not hasattr(cls, name):
+            if name not in vars(cls):
                 setattr(cls, name, {'q': [], 'r': 0, })
             mutex = getattr(cls, name)
             mutex['q'].append(self)

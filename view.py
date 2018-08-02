@@ -149,7 +149,7 @@ class View(ABMeta):
     def DO(cls, *args, **kwargs):
         name = '__LOOP__'
         with Lock(cls):
-            if not hasattr(cls, name):
+            if name not in vars(cls):
                 setattr(cls, name, Loop())
         return getattr(cls, name).do(*args, **kwargs)
 
@@ -157,6 +157,6 @@ class View(ABMeta):
     def UNDO(cls, *args, **kwargs):
         name = '__LOOP__'
         with Lock(cls):
-            if not hasattr(cls, name):
+            if name not in vars(cls):
                 setattr(cls, name, Loop())
         return getattr(cls, name).undo(*args, **kwargs)
