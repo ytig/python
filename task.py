@@ -31,7 +31,7 @@ class Queue:
                 queue.pop()
             except BaseException as e:
                 try:
-                    getattr(cls, 'log')(e)
+                    cls.log(e)
                 except BaseException:
                     pass
 
