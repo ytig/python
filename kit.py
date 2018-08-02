@@ -233,17 +233,17 @@ class search:
             yield from self.breadth(*children)
 
 
-# 检查成员
+# 检查变量
 def hasvar(o, k):
     return hasattr(o, '__dict__') and k in o.__dict__
 
 
-# 获取成员
+# 获取变量
 def getvar(o, k, d=None):
     return o.__dict__.get(k, d) if hasattr(o, '__dict__') else d
 
 
-# 设置成员
+# 设置变量
 def setvar(o, k, v):
     if hasattr(o, '__dict__'):
         if isinstance(o.__dict__, dict):
