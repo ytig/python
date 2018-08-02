@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 import inspect
-from kit import search, depth
+from kit import search, setvar, getvar, depth
 from decorator import Lock, ilock
 from task import Tree
 
@@ -55,20 +55,12 @@ class _staticmethod:
         def r(*args, **kwargs):
             raise Exception('staticmethod has been exported.')
         if b:
-            __class__._set(r, '__export__', o)
+            setvar(r, '__export__', o)
         return r
 
     @staticmethod
-    def _set(obj, name, value):
-        setattr(obj, name, value)
-
-    @staticmethod
     def get(o):
-        return __class__._get(o, '__export__', None)
-
-    @staticmethod
-    def _get(obj, name, default):
-        return getattr(obj, name, default)
+        return getvar(o, '__export__')
 
 
 class _classmethod:
@@ -78,20 +70,12 @@ class _classmethod:
         def r(*args, **kwargs):
             raise Exception('classmethod has been exported.')
         if b:
-            __class__._set(r, '__export__', o)
+            setvar(r, '__export__', o)
         return r
 
     @staticmethod
-    def _set(obj, name, value):
-        setattr(obj, name, value)
-
-    @staticmethod
     def get(o):
-        return __class__._get(o, '__export__', None)
-
-    @staticmethod
-    def _get(obj, name, default):
-        return getattr(obj, name, default)
+        return getvar(o, '__export__')
 
 
 def _except(fn='__except__'):
@@ -125,36 +109,12 @@ class _property:
     def set(o, b):
         r = property(fget=_except()(o.fget) if o.fget else None, fset=_except()(o.fset) if o.fset else None, fdel=_except()(o.fdel) if o.fdel else None)
         if b:
-            __class__._set(r, '__export__', property(fget=_exec()(r.fget) if r.fget else None, fset=_exec()(r.fset) if r.fset else None, fdel=_exec()(r.fdel) if r.fdel else None))
+            setvar(r.fget or r.fset or r.fdel, '__export__', property(fget=_exec()(r.fget) if r.fget else None, fset=_exec()(r.fset) if r.fset else None, fdel=_exec()(r.fdel) if r.fdel else None))
         return r
 
     @staticmethod
-    def _set(obj, name, value):
-        if obj.fget:
-            obj = obj.fget
-        elif obj.fset:
-            obj = obj.fset
-        elif obj.fdel:
-            obj = obj.fdel
-        else:
-            return
-        setattr(obj, name, value)
-
-    @staticmethod
     def get(o):
-        return __class__._get(o, '__export__', None)
-
-    @staticmethod
-    def _get(obj, name, default):
-        if obj.fget:
-            obj = obj.fget
-        elif obj.fset:
-            obj = obj.fset
-        elif obj.fdel:
-            obj = obj.fdel
-        else:
-            return default
-        return getattr(obj, name, default)
+        return getvar(o.fget or o.fset or o.fdel, '__export__')
 
 
 class _function:
@@ -162,20 +122,12 @@ class _function:
     def set(o, b):
         r = _except()(o)
         if b:
-            __class__._set(r, '__export__', _exec()(r))
+            setvar(r, '__export__', _exec()(r))
         return r
 
     @staticmethod
-    def _set(obj, name, value):
-        setattr(obj, name, value)
-
-    @staticmethod
     def get(o):
-        return __class__._get(o, '__export__', None)
-
-    @staticmethod
-    def _get(obj, name, default):
-        return getattr(obj, name, default)
+        return getvar(o, '__export__')
 
 
 class _baseclass:
@@ -300,7 +252,7 @@ class _metaclass(type):
                             namespace[k] = v
             return super().__new__(mcls, name, bases, namespace, **kwargs)
         else:
-            bases = tuple([getattr(b, '__cls__', b) if issubclass(b, _baseclass) else b for b in bases])
+            bases = tuple([getvar(b, '__cls__', d=b) if issubclass(b, _baseclass) else b for b in bases])
             return type.__new__(type, name, bases, namespace, **kwargs)
 
 
@@ -321,5 +273,5 @@ class _class:
     @staticmethod
     def get(o):
         while inspect.isclass(o) and issubclass(o, _baseclass):
-            o = getattr(o, '__cls__', None)
+            o = getvar(o, '__cls__')
         return o
