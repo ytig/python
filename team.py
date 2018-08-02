@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 import inspect
-from kit import search, setvar, getvar, depth
+from kit import search, getvar, setvar, depth
 from decorator import Lock, ilock
 from task import Tree
 
