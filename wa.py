@@ -54,7 +54,7 @@ class _Class:
         """
         pipe = pipe if pipe is not None else lambda *args, **kwargs: Arguments(*args, **kwargs)
 
-        class parent:
+        class Parent:
             def __init__(self, *args, **kwargs):
                 self.args = args
                 self.kwargs = kwargs
@@ -64,7 +64,7 @@ class _Class:
 
             def __exit__(self, t, v, tb):
                 pass
-        return _series(parent, cls, lambda self: pipe(*self.args, **self.kwargs))
+        return _series(Parent, cls, lambda self: pipe(*self.args, **self.kwargs))
 
     # 输出转换
     @classmethod
@@ -74,7 +74,7 @@ class _Class:
         """
         pipe = pipe if pipe is not None else lambda o: o
 
-        class child:
+        class Child:
             def __init__(self, *args, **kwargs):
                 self.args = args
                 self.kwargs = kwargs
@@ -84,7 +84,7 @@ class _Class:
 
             def __exit__(self, t, v, tb):
                 pass
-        return _series(cls, child, lambda o: Arguments(o))
+        return _series(cls, Child, lambda o: Arguments(o))
 
     # 串联流程
     @classmethod
