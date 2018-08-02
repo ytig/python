@@ -130,6 +130,41 @@ class _function:
         return getvar(o, '__export__')
 
 
+class _list(list):
+    def __init__(self, total, sync):
+        super().__init__()
+        self.__t = total
+        self.__s = sync
+
+    def __sum__(self):
+        form = {}
+        success = len(self)
+        if success > 0:
+            form['success'] = {}
+            for r in self:
+                r = str(r)
+                if r not in form['success']:
+                    form['success'][r] = 1
+                else:
+                    form['success'][r] += 1
+        failure = self.__t - success
+        if failure > 0:
+            form['failure'] = {}
+            if self.__s:
+                form['failure']['raise'] = 1
+                if failure > 1:
+                    form['failure']['pass'] = failure - 1
+            else:
+                form['failure']['raise'] = failure
+        return str(form)
+
+    def __str__(self):
+        return self.__sum__()
+
+    def __repr__(self):
+        return self.__sum__()
+
+
 class _baseclass:
     def __init__(self, *objects, **setting):
         self.__objects = list(objects)
@@ -180,45 +215,16 @@ class _baseclass:
                         if mem in self.__objects:
                             self.__objects.remove(mem)
                     raise
-
-            def sum(data, total=len(mems), sync=t <= 0):
-                form = {}
-                success = len(data)
-                if success > 0:
-                    form['success'] = {}
-                    for r in data:
-                        r = str(r)
-                        if r not in form['success']:
-                            form['success'][r] = 1
-                        else:
-                            form['success'][r] += 1
-                failure = total - success
-                if failure > 0:
-                    form['failure'] = {}
-                    if sync:
-                        form['failure']['raise'] = 1
-                        if failure > 1:
-                            form['failure']['pass'] = failure - 1
-                    else:
-                        form['failure']['raise'] = failure
-                return str(form)
-
-            class _list(list):
-                def __str__(self):
-                    return sum(self)
-
-                def __repr__(self):
-                    return sum(self)
+            ret = _list(len(mems), t <= 0)
             if t <= 0:
-                ret = _list()
                 try:
                     for mem in mems:
                         ret.append(cpu(mem))
                 except BaseException:
                     pass
-                return ret
             else:
-                return _list(Tree(cpu, *mems, log=None).plant(t=t))
+                ret.append(Tree(cpu, *mems, log=None).plant(t=t))
+            return ret
 
 
 class _metaclass(type):
@@ -264,7 +270,7 @@ class _class:
 
             def __init__(self, *objects, **setting):
                 for obj in objects:
-                    if obj.__class__ is not __class__.__cls__:
+                    if obj.__class__ is not classes.__cls__:
                         name = str(getattr(obj.__class__, '__name__', None))
                         raise Exception('cannot append instance of ' + name + '.')
                 super().__init__(*objects, **setting)

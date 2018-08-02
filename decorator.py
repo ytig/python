@@ -41,18 +41,18 @@ class Lock:
 
     def __enter__(self):
         tn = threading.current_thread().name
-        with __class__.LOCK:
+        with Lock.LOCK:
             lock, stack, = self.__lock
             a = tn not in stack
             if not a:
                 stack.append(tn)
         if a:
             lock.acquire()
-            with __class__.LOCK:
+            with Lock.LOCK:
                 stack.append(tn)
 
     def __exit__(self, t, v, tb):
-        with __class__.LOCK:
+        with Lock.LOCK:
             lock, stack, = self.__lock
             stack.pop()
             r = len(stack) == 0
@@ -146,10 +146,10 @@ class Throw:
 
     def __call__(self, generics, r=None):
         if callable(generics):
-            with __class__.LOCK:
-                __class__.QUAL += 1
-                qual = __class__.QUAL
-            a, b, = __class__.__compile(generics, r)
+            with Throw.LOCK:
+                Throw.QUAL += 1
+                qual = Throw.QUAL
+            a, b, = Throw.__compile(generics, r)
 
             def wrapper(*args, **kwargs):
                 throw = self.__throw
