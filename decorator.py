@@ -17,12 +17,14 @@ class Closure:
 class Lock:
     LOCK = threading.Lock()  # 全局锁
 
-    def __init__(self, generics):
+    def __init__(self, generics, k=None):
         self.generics = generics
+        self.k = k if isinstance(k, str) else ''
 
     @property
     def __lock(self):
         generics = self.generics
+        k = self.k
         while isinstance(generics, Closure):
             generics = generics()
         if inspect.ismodule(generics):
@@ -32,8 +34,11 @@ class Lock:
         else:
             name = '__lock__'
         if not hasattr(generics, name):
-            setattr(generics, name, (threading.Lock(), [],))
-        return getattr(generics, name)
+            setattr(generics, name, dict())
+        attr = getattr(generics, name)
+        if k not in attr:
+            attr[k] = (threading.Lock(), [],)
+        return attr.get(k)
 
     def __enter__(self):
         tn = threading.current_thread().name
@@ -70,29 +75,29 @@ class Lock:
 
 
 # 实例锁（栈帧回溯）
-def ilock():
+def ilock(k=None):
     i = Closure(lambda: inspect.currentframe().f_back.f_back.f_back.f_back.f_locals['args'][0])
 
     def lock(generics):
-        return Lock(i)(generics)
+        return Lock(i, k=k)(generics)
     return lock
 
 
 # 类型锁（闭包传值）
-def clock(closure):
+def clock(closure, k=None):
     c = Closure(closure)
 
     def lock(generics):
-        return Lock(c)(generics)
+        return Lock(c, k=k)(generics)
     return lock
 
 
 # 模块锁
-def mlock():
+def mlock(k=None):
     m = module(ios=2)
 
     def lock(generics):
-        return Lock(m)(generics)
+        return Lock(m, k=k)(generics)
     return lock
 
 
@@ -134,16 +139,16 @@ class Throw:
                 b = lambda *args, **kwargs: None
             return a, b
 
-    def __call__(self, generics, repeat):
+    def __call__(self, generics, r=None):
         if isinstance(generics, staticmethod):
-            return staticmethod(self(generics.__func__, repeat))
+            return staticmethod(self(generics.__func__, r=r))
         elif isinstance(generics, classmethod):
-            return classmethod(self(generics.__func__, repeat))
+            return classmethod(self(generics.__func__, r=r))
         elif callable(generics):
             with __class__.LOCK:
                 __class__.QUAL += 1
                 qual = __class__.QUAL
-            a, b, = __class__.__compile(generics, repeat)
+            a, b, = __class__.__compile(generics, r)
 
             def wrapper(*args, **kwargs):
                 throw = self.__throw
@@ -157,29 +162,29 @@ class Throw:
 
 
 # 实例单次（栈帧回溯）
-def ithrow(repeat=None):
+def ithrow(r=None):
     i = Closure(lambda: inspect.currentframe().f_back.f_back.f_back.f_locals['args'][0])
 
     def throw(generics):
-        return Throw(i)(generics, repeat)
+        return Throw(i)(generics, r=r)
     return throw
 
 
 # 类型单次（闭包传值）
-def cthrow(closure, repeat=None):
+def cthrow(closure, r=None):
     c = Closure(closure)
 
     def throw(generics):
-        return Throw(c)(generics, repeat)
+        return Throw(c)(generics, r=r)
     return throw
 
 
 # 模块单次
-def mthrow(repeat=None):
+def mthrow(r=None):
     m = module(ios=2)
 
     def throw(generics):
-        return Throw(m)(generics, repeat)
+        return Throw(m)(generics, r=r)
     return throw
 
 
