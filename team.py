@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import inspect
 from kit import search, depth
-from decorator import Lock, synchronized
+from decorator import Lock, ilock
 from task import Tree
 
 
@@ -186,18 +186,18 @@ class _baseclass:
             't': lambda t: t if isinstance(t, int) and t >= 0 else 0,
         }
 
-    @synchronized()
+    @ilock()
     def __len__(self):
         return len(self.__objects)
 
     # 写设置
-    @synchronized()
+    @ilock()
     def setting(self, **setting):
         self.__setting.update(setting)
         return self
 
     # 读设置
-    @synchronized()
+    @ilock()
     def getting(self, name=None):
         if name:
             if name in self.__getting:

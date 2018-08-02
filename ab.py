@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import weakref
 import inspect
-from decorator import synchronized, throwaway
+from decorator import ilock, ithrow
 from shutdown import bregister, aregister, unregister
 
 
@@ -95,8 +95,8 @@ class ABMeta(type):
                 func(self, *args, **kwargs)
         attr.setattr('__aft__', __aft__)
 
-        @synchronized()
-        @throwaway()
+        @ilock()
+        @ithrow()
         def __del__(self, *args, **kwargs):
             unregister(getattr(self, '__weakaft__'))
             unregister(getattr(self, '__weakbef__'))

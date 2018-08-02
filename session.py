@@ -3,7 +3,7 @@ import json
 import http.cookiejar
 import requests.cookies
 import requests.sessions
-from decorator import Lock, synchronized, throwaway
+from decorator import Lock, ilock, ithrow
 
 
 # 序列化
@@ -72,8 +72,8 @@ class Session(requests.Session):
     def _cookies(self, string):
         pass
 
-    @synchronized()
-    @throwaway()
+    @ilock()
+    @ithrow()
     def __cookies(self):
         cookies = string2cookies(self._cookies(None))
         if cookies:

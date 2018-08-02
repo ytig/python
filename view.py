@@ -2,7 +2,8 @@
 import numbers
 import inspect
 import weakref
-from decorator import moduleOf, classOf, Lock
+from kit import module
+from decorator import Lock
 from loop import Loop
 from ab import attribute, ABMeta
 
@@ -54,7 +55,7 @@ class View(ABMeta):
         # 执行（异常中断）
         def do(self, generator, important):
             try:
-                with Lock(moduleOf(__class__)):
+                with Lock(module()):
                     assert inspect.getgeneratorstate(generator) == inspect.GEN_CREATED
                     delay = generator.send(None)
                     assert isinstance(delay, numbers.Real)
@@ -146,14 +147,16 @@ class View(ABMeta):
 
     # 执行
     def DO(cls, *args, **kwargs):
-        with Lock(classOf(cls)):
-            if not hasattr(cls, '__LOOP__'):
-                cls.__LOOP__ = Loop()
-        return cls.__LOOP__.do(*args, **kwargs)
+        name = '__LOOP__'
+        with Lock(cls):
+            if not hasattr(cls, name):
+                setattr(cls, name, Loop())
+        return getattr(cls, name).do(*args, **kwargs)
 
     # 取消执行
     def UNDO(cls, *args, **kwargs):
-        with Lock(classOf(cls)):
-            if not hasattr(cls, '__LOOP__'):
-                cls.__LOOP__ = Loop()
-        return cls.__LOOP__.undo(*args, **kwargs)
+        name = '__LOOP__'
+        with Lock(cls):
+            if not hasattr(cls, name):
+                setattr(cls, name, Loop())
+        return getattr(cls, name).undo(*args, **kwargs)

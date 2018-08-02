@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import threading
 from kit import loge
-from decorator import classOf, Lock, synchronized, throwaway, instance
+from decorator import Lock, ilock, ithrow, instance
 
 
 def Pair(function):
@@ -11,46 +11,42 @@ def Pair(function):
 
 
 class Queue:
-    @instance()
-    class Mutex:
-        def __init__(self, cn):
-            self.queues = []
-            self.running = 0
-
-    class Executor(threading.Thread):
-        def __init__(self, mutex):
-            super().__init__()
-            self.mutex = mutex
-
-        def run(self):
-            while True:
-                with Lock(self.mutex):
-                    if self.mutex.queues:
-                        queue = self.mutex.queues.pop(0)
-                    else:
-                        self.mutex.running -= 1
-                        break
-                try:
-                    queue.pop()
-                except BaseException as e:
-                    try:
-                        getattr(queue.__class__, 'log', None)(e)
-                    except BaseException:
-                        pass
-
     # 打印日志
     @staticmethod
     def log(e):
         logging.Log.e(loge(e))
 
+    @classmethod
+    def __run(cls):
+        name = '__mutex__'
+        while True:
+            with Lock(cls):
+                mutex = getattr(cls, name)
+                if mutex['q']:
+                    queue = mutex['q'].pop(0)
+                else:
+                    mutex['r'] -= 1
+                    break
+            try:
+                queue.pop()
+            except BaseException as e:
+                try:
+                    getattr(queue.__class__, 'log', None)(e)
+                except BaseException:
+                    pass
+
     # 任务分发
     def push(self):
-        mutex = Queue.Mutex.instanceOf(classOf(self)())
-        with Lock(mutex):
-            mutex.queues.append(self)
-            if mutex.running < 1:
-                mutex.running += 1
-                Queue.Executor(mutex).start()
+        cls = self.__class__
+        name = '__mutex__'
+        with Lock(cls):
+            if not hasattr(cls, name):
+                setattr(cls, name, {'q': [], 'r': 0, })
+            mutex = getattr(cls, name)
+            mutex['q'].append(self)
+            if mutex['r'] < 1:
+                threading.Thread(target=cls.__run).start()
+                mutex['r'] += 1
 
     # 任务处理
     def pop(self):
@@ -65,7 +61,7 @@ class Tree:
             self.__log = log
             self.__ret = (False, None,)
 
-        @synchronized()
+        @ilock()
         def plant(self):
             try:
                 if not self.__ret[0]:
@@ -96,17 +92,17 @@ class Tree:
             self.twigs = list(twigs)
             self.seeds = []
 
-        @synchronized()
+        @ilock()
         def pop(self):
             if self.twigs:
                 return self.twigs.pop()
             return None
 
-        @synchronized()
+        @ilock()
         def push(self, seed):
             self.seeds.append(seed)
 
-        @throwaway()
+        @ithrow()
         def plant(self, t):
             threads = [Tree.Gardener.Executor(self) for i in range(t)]
             for thread in threads:

@@ -2,7 +2,7 @@
 import os
 import datetime
 from kit import workspace
-from decorator import LOCK_CLASS, synchronized
+from decorator import clock
 from task import Queue
 
 
@@ -56,7 +56,7 @@ class Log:
 
     # 打印日志
     @staticmethod
-    @synchronized(lock=LOCK_CLASS)
+    @clock(lambda: __class__)
     def log(*args, tag=None, **kwargs):
         level = args[0]
         args = [args[i + 1] for i in range(len(args) - 1)]

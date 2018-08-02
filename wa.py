@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 import threading
-from decorator import synchronized
+from decorator import ilock
 
 
 class Stack:
@@ -8,7 +8,7 @@ class Stack:
         self.values = {}
 
     # 入栈
-    @synchronized()
+    @ilock()
     def push(self, data):
         key = threading.currentThread().name
         value = self.values.get(key)
@@ -18,7 +18,7 @@ class Stack:
         value.append(data)
 
     # 出栈
-    @synchronized()
+    @ilock()
     def pop(self):
         key = threading.currentThread().name
         value = self.values.get(key)
