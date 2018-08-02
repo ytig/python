@@ -60,17 +60,17 @@ class Lock:
             lock.release()
 
     def __call__(self, generics):
-        if isinstance(generics, staticmethod):
+        if callable(generics):
+            def wrapper(*args, **kwargs):
+                with self:
+                    return generics(*args, **kwargs)
+            return wrapper
+        elif isinstance(generics, staticmethod):
             return staticmethod(self(generics.__func__))
         elif isinstance(generics, classmethod):
             return classmethod(self(generics.__func__))
         elif isinstance(generics, property):
             return property(fget=self(generics.fget), fset=self(generics.fset), fdel=self(generics.fdel))
-        elif callable(generics):
-            def wrapper(*args, **kwargs):
-                with self:
-                    return generics(*args, **kwargs)
-            return wrapper
 
 
 # 实例锁（栈帧回溯）
@@ -138,11 +138,7 @@ class Throw:
             return a, b
 
     def __call__(self, generics, r=None):
-        if isinstance(generics, staticmethod):
-            return staticmethod(self(generics.__func__, r=r))
-        elif isinstance(generics, classmethod):
-            return classmethod(self(generics.__func__, r=r))
-        elif callable(generics):
+        if callable(generics):
             with __class__.LOCK:
                 __class__.QUAL += 1
                 qual = __class__.QUAL
@@ -151,12 +147,16 @@ class Throw:
             def wrapper(*args, **kwargs):
                 throw = self.__throw
                 if qual not in throw:
-                    r = a(*args, **kwargs)
+                    ret = a(*args, **kwargs)
                     throw.add(qual)
-                    return r
+                    return ret
                 else:
                     return b(*args, **kwargs)
             return wrapper
+        elif isinstance(generics, staticmethod):
+            return staticmethod(self(generics.__func__, r=r))
+        elif isinstance(generics, classmethod):
+            return classmethod(self(generics.__func__, r=r))
 
 
 # 实例单次（栈帧回溯）
