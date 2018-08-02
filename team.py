@@ -312,10 +312,9 @@ class _class:
 
             def __init__(self, *objects, **setting):
                 for obj in objects:
-                    c = getattr(obj, '__class__', None)
-                    if c is not __class__.__cls__:
-                        n = getattr(c, '__name__', None)
-                        raise Exception('cannot append instance of ' + str(n) + '.')
+                    if obj.__class__ is not __class__.__cls__:
+                        name = str(getattr(obj.__class__, '__name__', None))
+                        raise Exception('cannot append instance of ' + name + '.')
                 super().__init__(*objects, **setting)
         return classes
 
