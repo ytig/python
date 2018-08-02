@@ -157,6 +157,13 @@ class Throw:
             return staticmethod(self(generics.__func__, r=r))
         elif isinstance(generics, classmethod):
             return classmethod(self(generics.__func__, r=r))
+        elif isinstance(generics, property):
+            if generics.fdel:
+                return property(fget=generics.fget, fset=generics.fset, fdel=self(generics.fdel))
+            elif generics.fset:
+                return property(fget=generics.fget, fset=self(generics.fset), fdel=self(generics.fdel))
+            else:
+                return property(fget=self(generics.fget), fset=self(generics.fset), fdel=self(generics.fdel))
 
 
 # 实例单次（栈帧回溯）
