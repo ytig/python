@@ -55,16 +55,16 @@ def invoke(*d):
     raise Exception('can not invoke.')
 
 
-def _roll(f, i):
-    args = (f.f_locals['cls'], ) + f.f_locals['args']
-    kwargs = f.f_locals['kwargs']
+def _roll(frame, ignore):
+    args = (frame.f_locals['cls'], ) + frame.f_locals['args']
+    kwargs = frame.f_locals['kwargs']
     __dict__ = {}
-    for k in f.f_locals.keys():
-        if k in ['cls', 'args', 'kwargs', '__class__', ]:
+    for key in frame.f_locals.keys():
+        if key in ['cls', 'args', 'kwargs', '__class__', ]:
             continue
-        if k in (i or []):
+        if key in (ignore or []):
             continue
-        __dict__[k] = f.f_locals[k]
+        __dict__[key] = frame.f_locals[key]
     return args, kwargs, __dict__,
 
 
