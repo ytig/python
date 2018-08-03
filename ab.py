@@ -1,8 +1,7 @@
 #!/usr/local/bin/python3
-import gc
 import weakref
 import inspect
-from kit import search, hasvar, getvar, setvar
+from kit import search, hasvar, getvar, setvar, getargs
 from decorator import ilock, ithrow
 from shutdown import bregister, aregister, unregister
 
@@ -56,15 +55,13 @@ def invoke(*d):
 
 
 def _roll(frame, ignore):
-    args = (frame.f_locals['cls'], ) + frame.f_locals['args']
-    kwargs = frame.f_locals['kwargs']
+    args, kwargs, keywords, = getargs(frame, r'__new__')
+    keywords.add('__class__')
+    keywords.update(ignore or [])
     __dict__ = {}
     for key in frame.f_locals.keys():
-        if key in ['cls', 'args', 'kwargs', '__class__', ]:
-            continue
-        if key in (ignore or []):
-            continue
-        __dict__[key] = frame.f_locals[key]
+        if key not in keywords:
+            __dict__[key] = frame.f_locals[key]
     return args, kwargs, __dict__,
 
 

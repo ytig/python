@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import re
+import gc
 import os
 import sys
 import inspect
@@ -264,6 +265,35 @@ def setvar(o, k, v):
                     b = False
             return b
     return False
+
+
+# 获取参数
+def getargs(frame, pattern=r''):
+    args = list()
+    kwargs = dict()
+    keywords = set()
+    for owner in gc.get_referrers(frame.f_code):
+        if not inspect.isfunction(owner):
+            continue
+        if getattr(owner, '__globals__', None) is not frame.f_globals:
+            continue
+        if not re.search(pattern, getattr(owner, '__qualname__', '')):
+            continue
+        fas = inspect.getfullargspec(owner)
+        for arg in fas.args:
+            args.append(frame.f_locals.get(arg))
+            keywords.add(arg)
+        if fas.varargs is not None:
+            args.extend(frame.f_locals.get(fas.varargs))
+            keywords.add(fas.varargs)
+        for arg in fas.kwonlyargs:
+            kwargs[arg] = frame.f_locals.get(arg)
+            keywords.add(arg)
+        if fas.varkw is not None:
+            kwargs.update(frame.f_locals.get(fas.varkw))
+            keywords.add(fas.varkw)
+        break
+    return tuple(args), kwargs, keywords,
 
 
 # 模块检索
