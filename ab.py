@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import gc
 import weakref
 import inspect
 from kit import search, hasvar, getvar, setvar
@@ -7,10 +8,10 @@ from shutdown import bregister, aregister, unregister
 
 
 # 定义类型
-def define(super, ignore=('__class__',)):
+def define(super, ignore=None):
     CLS = lambda *args, **kwargs: args[0] is __class__
     SELF = lambda *args, **kwargs: args[0].__class__ is __class__
-    args, kwargs, __dict__, = _roll(inspect.stack()[1].frame.f_locals, ignore)
+    args, kwargs, __dict__, = _roll(inspect.stack()[1].frame, ignore)
     bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
     namespace = args[3]
     for key, var, in __dict__.items():
@@ -54,16 +55,16 @@ def invoke(*d):
     raise Exception('can not invoke.')
 
 
-def _roll(f_locals, f_ignore):
-    args = (f_locals['cls'], ) + f_locals['args']
-    kwargs = f_locals['kwargs']
+def _roll(f, i):
+    args = (f.f_locals['cls'], ) + f.f_locals['args']
+    kwargs = f.f_locals['kwargs']
     __dict__ = {}
-    for k in f_locals.keys():
-        if k in ['cls', 'args', 'kwargs', ]:
+    for k in f.f_locals.keys():
+        if k in ['cls', 'args', 'kwargs', '__class__', ]:
             continue
-        if k in (f_ignore or []):
+        if k in (i or []):
             continue
-        __dict__[k] = f_locals[k]
+        __dict__[k] = f.f_locals[k]
     return args, kwargs, __dict__,
 
 
