@@ -43,14 +43,17 @@ def define(super, ignore=('__class__',)):
 
 
 # 原始调用
-def invoke():
+def invoke(*d):
     f = inspect.currentframe()
     while f:
         if f.f_code is _f_code:
             if f.f_locals['old'] is not None:
                 return f.f_locals['old'](*f.f_locals['args'], **f.f_locals['kwargs'])
+            elif d:
+                return d[0]
+            break
         f = f.f_back
-    return None
+    raise Exception('can not invoke.')
 
 
 def _roll(f_locals, f_ignore):
@@ -98,21 +101,21 @@ class ABMeta(type):
         def __init__(self, *args, **kwargs):
             setvar(self, '__weakbef__', weakmethod(self, '__bef__'))
             setvar(self, '__weakaft__', weakmethod(self, '__aft__'))
-            ret = invoke()
+            ret = invoke(None)
             bregister(getvar(self, '__weakbef__'))
             aregister(getvar(self, '__weakaft__'))
             return ret
 
         def __bef__(self):
-            return invoke()
+            return invoke(None)
 
         def __aft__(self):
-            return invoke()
+            return invoke(None)
 
         @ilock()
         @ithrow()
         def __del__(self):
             unregister(getvar(self, '__weakaft__'))
             unregister(getvar(self, '__weakbef__'))
-            return invoke()
+            return invoke(None)
         return define(super())
