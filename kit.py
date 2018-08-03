@@ -281,15 +281,8 @@ def module(ios=1):
 
 # 迭代深度
 def depth():
-    d = 0
-    f = inspect.currentframe().f_back
-    if f:
-        b = f.f_back
-        while b:
-            if f.f_code is b.f_code:
-                d += 1
-            b = b.f_back
-    return d
+    codes = [fi.frame.f_code for fi in inspect.stack()]
+    return codes.count(codes[1]) - 1
 
 
 # 异常信息
