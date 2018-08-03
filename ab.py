@@ -10,10 +10,13 @@ from shutdown import bregister, aregister, unregister
 def define(super, ignore=None):
     CLS = lambda *args, **kwargs: args[0] is __class__
     SELF = lambda *args, **kwargs: args[0].__class__ is __class__
-    args, kwargs, __dict__, = _roll(inspect.stack()[1].frame, ignore)
+    frame = inspect.stack()[1].frame
+    args, kwargs, keywords, = getargs(frame, r'__new__')
     bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
     namespace = args[3]
-    for key, var, in __dict__.items():
+    keywords.add('__class__')
+    keywords.update(ignore or [])
+    for key, var, in dict([(key, frame.f_locals[key],) for key in frame.f_locals.keys() if key not in keywords]).items():
         _var = None
         if key in namespace:
             _var = namespace.get(key)
@@ -52,17 +55,6 @@ def invoke(*d):
                 return d[0]
             break
     raise Exception('can not invoke.')
-
-
-def _roll(frame, ignore):
-    args, kwargs, keywords, = getargs(frame, r'__new__')
-    keywords.add('__class__')
-    keywords.update(ignore or [])
-    __dict__ = {}
-    for key in frame.f_locals.keys():
-        if key not in keywords:
-            __dict__[key] = frame.f_locals[key]
-    return args, kwargs, __dict__,
 
 
 def _fork(opt, new, old):
