@@ -269,10 +269,10 @@ def setvar(o, k, v):
 # 模块检索
 def module(ios=1):
     if isinstance(ios, int):
-        fs = tuple(search(lambda f: [b for b in [f.f_back] if b]).depth(inspect.currentframe()))
-        if (lambda a, b: a >= -b and a < b)(ios, len(fs)):
+        s = inspect.stack()
+        if (lambda a, b: a >= -b and a < b)(ios, len(s)):
             for m in sys.modules.values():
-                if vars(m) is fs[ios].f_globals:
+                if vars(m) is s[ios].frame.f_globals:
                     return m
         return None
     elif isinstance(ios, str):
