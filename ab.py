@@ -10,7 +10,7 @@ from shutdown import bregister, aregister, unregister
 def define(super, ignore=('__class__',)):
     CLS = lambda *args, **kwargs: args[0] is __class__
     SELF = lambda *args, **kwargs: args[0].__class__ is __class__
-    args, kwargs, __dict__, = _roll(inspect.currentframe().f_back.f_locals, ignore)
+    args, kwargs, __dict__, = _roll(inspect.stack()[1].frame.f_locals, ignore)
     bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
     namespace = args[3]
     for key, var, in __dict__.items():
@@ -44,15 +44,13 @@ def define(super, ignore=('__class__',)):
 
 # 原始调用
 def invoke(*d):
-    f = inspect.currentframe()
-    while f:
-        if f.f_code is _f_code:
-            if f.f_locals['old'] is not None:
-                return f.f_locals['old'](*f.f_locals['args'], **f.f_locals['kwargs'])
+    for fi in inspect.stack():
+        if fi.frame.f_code is _f_code:
+            if fi.frame.f_locals['old'] is not None:
+                return fi.frame.f_locals['old'](*fi.frame.f_locals['args'], **fi.frame.f_locals['kwargs'])
             elif d:
                 return d[0]
             break
-        f = f.f_back
     raise Exception('can not invoke.')
 
 
