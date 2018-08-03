@@ -284,13 +284,13 @@ def getargs(frame, pattern=r''):
             args.append(frame.f_locals.get(arg))
             keywords.add(arg)
         if fas.varargs is not None:
-            args.extend(frame.f_locals.get(fas.varargs))
+            args.extend(frame.f_locals.get(fas.varargs) or [])
             keywords.add(fas.varargs)
         for arg in fas.kwonlyargs:
             kwargs[arg] = frame.f_locals.get(arg)
             keywords.add(arg)
         if fas.varkw is not None:
-            kwargs.update(frame.f_locals.get(fas.varkw))
+            kwargs.update(frame.f_locals.get(fas.varkw) or {})
             keywords.add(fas.varkw)
         break
     return tuple(args), kwargs, keywords,
