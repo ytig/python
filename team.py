@@ -136,7 +136,7 @@ class _list(list):
         self.__t = total
         self.__s = sync
 
-    def __sum__(self):
+    def __ret__(self):
         form = {}
         success = len(self)
         if success > 0:
@@ -159,10 +159,10 @@ class _list(list):
         return str(form)
 
     def __str__(self):
-        return self.__sum__()
+        return self.__ret__()
 
     def __repr__(self):
-        return self.__sum__()
+        return self.__ret__()
 
 
 class _baseclass:
