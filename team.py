@@ -239,7 +239,7 @@ class _metaclass(type):
             base = namespace['__cls__']
             name = base.__name__
             for b in searcher.depth(base):
-                for k, v in vars(b).items():
+                for k, v, in vars(b).items():
                     if k not in override:
                         override.add(k)
                         if isinstance(v, staticmethod):
