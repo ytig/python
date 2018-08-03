@@ -6,6 +6,92 @@ from decorator import ilock, ithrow
 from shutdown import bregister, aregister, unregister
 
 
+# 定义类
+def define(super, ignore=['__class__']):
+    def parse(f_locals):
+        cls = f_locals['cls']
+        args = f_locals['args']
+        kwargs = f_locals['kwargs']
+        __dict__ = dict((k, v,) for k, v, in f_locals.items() if k not in ['cls', 'args', 'kwargs', ] + ignore)
+        return cls, args, kwargs, __dict__,
+    cls, args, kwargs, __dict__, = parse(inspect.currentframe().f_back.f_locals)
+    bases = tuple(search(lambda cls: cls.__bases__).depth(*args[1]))
+    namespace = args[2]
+
+    def _getvar(key, default=None):
+        if key in namespace:
+            return namespace.get(key)
+        else:
+            for b in bases:
+                if hasvar(b, key):
+                    return getvar(b, key)
+        return default
+
+    def _setvar(key, var):
+        _var = _getvar(key)
+        if isinstance(var, staticmethod):
+            var = var.__func__
+            _var = _var.__func__ if isinstance(_var, staticmethod) else None
+
+            def __var__(*args, **kwargs):
+                # todo
+                pass
+            namespace[key] = staticmethod(__var__)
+        elif isinstance(var, classmethod):
+            var = var.__func__
+            _var = _var.__func__ if isinstance(_var, classmethod) else None
+
+            def __var__(cls, *args, **kwargs):
+                if cls is __class__:
+                    return var(cls, _var, *args, **kwargs)
+                elif _var is not None:
+                    return _var(cls, *args, **kwargs)
+            namespace[key] = classmethod(__var__)
+        elif isinstance(var, property):
+            fget, fset, fdel, = (var.fget, var.fset, var.fdel,)
+            _fget, _fset, _fdel, = (_var.fget, _var.fset, _var.fdel,) if isinstance(_var, property) else (None, None, None,)
+            if fget:
+                def __fget__(self):
+                    if self.__class__ is __class__:
+                        return fget(self, _fget)
+                    elif _fget is not None:
+                        return _fget(self)
+            else:
+                __fget__ = None
+            if fset:
+                def __fset__(self, value):
+                    if self.__class__ is __class__:
+                        return fset(self, _fset, value)
+                    elif _fset is not None:
+                        return _fset(self, value)
+            else:
+                __fset__ = None
+            if fdel:
+                def __fdel__(self):
+                    if self.__class__ is __class__:
+                        return fdel(self, _fdel)
+                    elif _fdel is not None:
+                        return _fdel(self)
+            else:
+                __fdel__ = None
+            namespace[key] = property(fget=__fget__, fset=__fset__, fdel=__fdel__)
+        elif inspect.isfunction(var):
+            _var = _var if inspect.isfunction(_var) else None
+
+            def __var__(self, *args, **kwargs):
+                if self.__class__ is __class__:
+                    return var(self, _var, *args, **kwargs)
+                elif _var is not None:
+                    return _var(self, *args, **kwargs)
+            namespace[key] = __var__
+        else:
+            namespace[key] = var
+    for k, v, in __dict__.items():
+        _setvar(k, v)
+    __class__ = super.__new__(cls, *args, **kwargs)
+    return __class__
+
+
 class weakmethod:
     GC = object()  # 已回收
 
@@ -21,89 +107,41 @@ class weakmethod:
             return weakmethod.GC
 
 
-class build:
-    def __init__(self, bases, namespace):
-        self.bases = tuple(search(lambda cls: cls.__bases__).depth(*bases))
-        self.namespace = namespace
-
-    # 检查变量
-    def hasvar(self, k):
-        if k in self.namespace:
-            return True
-        for b in self.bases:
-            if hasvar(b, k):
-                return True
-        return False
-
-    # 获取变量
-    def getvar(self, k, d=None):
-        if k in self.namespace:
-            return self.namespace.get(k)
-        for b in self.bases:
-            if hasvar(b, k):
-                return getvar(b, k)
-        return d
-
-    # 设置变量
-    def setvar(self, k, v):
-        var = self.getvar(k)
-        if isinstance(v, staticmethod):
-            new = v.__func__
-            old = var.__func__ if isinstance(var, staticmethod) else None
-            self.namespace[k] = staticmethod(lambda *args, **kwargs: new(old, *args, **kwargs))
-        elif isinstance(v, classmethod):
-            new = v.__func__
-            old = var.__func__ if isinstance(var, classmethod) else None
-            self.namespace[k] = classmethod(lambda cls, *args, **kwargs: new(cls, old, *args, **kwargs))
-        elif isinstance(v, property):
-            nget, nset, ndel, = (v.fget, v.fset, v.fdel,)
-            oget, oset, odel, = (var.fget, var.fset, var.fdel,) if isinstance(var, property) else (None, None, None,)
-            self.namespace[k] = property(fget=lambda self: nget(self, oget) if nget else None, fset=lambda self, value: nset(self, oset, value) if nset else None, fdel=lambda self: ndel(self, odel) if ndel else None)
-        elif inspect.isfunction(v):
-            new = v
-            old = var if inspect.isfunction(var) else None
-            self.namespace[k] = lambda self, *args, **kwargs: new(self, old, *args, **kwargs)
-        else:
-            self.namespace[k] = v
-
-
 class ABMeta(type):
-    def __new__(mcls, name, bases, namespace, **kwargs):
-        builder = build(bases, namespace)
-
-        def __init__(self, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):
+        def __init__(*args, **kwargs):
+            ret = None
+            self = args[0]
             setvar(self, '__weakbef__', weakmethod(self, '__bef__'))
             setvar(self, '__weakaft__', weakmethod(self, '__aft__'))
-            func = args[0]
-            args = args[1:]
-            if callable(func):
-                func(self, *args, **kwargs)
+            if args[1] is not None:
+                ret = args[1](self, *args[2:], **kwargs)
             bregister(getvar(self, '__weakbef__'))
             aregister(getvar(self, '__weakaft__'))
-        builder.setvar('__init__', __init__)
+            return ret
 
-        def __bef__(self, *args, **kwargs):
-            func = args[0]
-            args = args[1:]
-            if callable(func):
-                func(self, *args, **kwargs)
-        builder.setvar('__bef__', __bef__)
+        def __bef__(*args, **kwargs):
+            ret = None
+            self = args[0]
+            if args[1] is not None:
+                ret = args[1](self, *args[2:], **kwargs)
+            return ret
 
-        def __aft__(self, *args, **kwargs):
-            func = args[0]
-            args = args[1:]
-            if callable(func):
-                func(self, *args, **kwargs)
-        builder.setvar('__aft__', __aft__)
+        def __aft__(*args, **kwargs):
+            ret = None
+            self = args[0]
+            if args[1] is not None:
+                ret = args[1](self, *args[2:], **kwargs)
+            return ret
 
         @ilock()
         @ithrow()
-        def __del__(self, *args, **kwargs):
+        def __del__(*args, **kwargs):
+            ret = None
+            self = args[0]
             unregister(getvar(self, '__weakaft__'))
             unregister(getvar(self, '__weakbef__'))
-            func = args[0]
-            args = args[1:]
-            if callable(func):
-                func(self, *args, **kwargs)
-        builder.setvar('__del__', __del__)
-        return super().__new__(mcls, name, bases, namespace, **kwargs)
+            if args[1] is not None:
+                ret = args[1](self, *args[2:], **kwargs)
+            return ret
+        return define(super())
