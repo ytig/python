@@ -109,7 +109,7 @@ def mlock(k=None):
 
 class Throw:
     LOCK = threading.Lock()  # 全局锁
-    QUAL = 0  # 唯一码
+    UNIQUE = 0  # 唯一码
 
     def __init__(self, generics):
         self.generics = generics
@@ -147,15 +147,15 @@ class Throw:
     def __call__(self, generics, r=None):
         if callable(generics):
             with Throw.LOCK:
-                Throw.QUAL += 1
-                qual = Throw.QUAL
+                Throw.UNIQUE += 1
+                unique = Throw.UNIQUE
             a, b, = Throw.__compile(generics, r)
 
             def wrapper(*args, **kwargs):
                 throw = self.__throw
-                if qual not in throw:
+                if unique not in throw:
                     ret = a(*args, **kwargs)
-                    throw.add(qual)
+                    throw.add(unique)
                     return ret
                 else:
                     return b(*args, **kwargs)
