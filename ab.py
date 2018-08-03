@@ -54,7 +54,7 @@ def invoke(*d):
             elif d:
                 return d[0]
             break
-    raise Exception('can not invoke.')
+    raise Exception('uninvocable.')
 
 
 def _fork(opt, new, old):
