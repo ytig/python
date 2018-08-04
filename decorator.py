@@ -15,7 +15,7 @@ class Closure:
 
 
 class Lock:
-    LOCK = threading.Lock()  # 全局锁
+    LOCK = threading.Lock()  # 构建锁
 
     def __init__(self, generics, k=None):
         self.generics = generics
