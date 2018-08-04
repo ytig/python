@@ -6,10 +6,12 @@ import sys
 import inspect
 import threading
 import traceback
-_LOCK = threading.Lock()  # 目录锁
+import itertools
+_LOCK = threading.Lock()  # 全局锁
 CWDS = []  # 历史目录
 WORKSPACE = None  # 工作区目录
 PASS = object()  # 跳过参数绑定
+COUNT = itertools.count(1)  # 无限递增迭代
 
 
 # 文件描述
@@ -207,6 +209,12 @@ def injects(*segms, argv=sys.argv):
             return function(*args)
         return wrapper
     return decorator
+
+
+# 唯一编号
+def unique():
+    with _LOCK:
+        return next(COUNT)
 
 
 # 搜索
