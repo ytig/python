@@ -1,13 +1,14 @@
 #!/usr/local/bin/python3
 import weakref
 import inspect
-from kit import search, hasvar, getvar, setvar, getargs
-from decorator import ilock, ithrow
+from kit import unique, search, hasvar, getvar, setvar, getargs, depth
+from decorator import Lock, ilock, ithrow
 from shutdown import bregister, aregister, unregister
 
 
 # 定义类型
 def define(super, ignore=None):
+    ND = lambda *args, **kwargs: not depth(inspect.stack()[1].frame, equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark'])
     CLS = lambda *args, **kwargs: args[0] is __class__
     SELF = lambda *args, **kwargs: args[0].__class__ is __class__
     frame = inspect.stack()[1].frame
@@ -26,8 +27,15 @@ def define(super, ignore=None):
                     _var = getvar(b, key)
                     break
         if isinstance(var, staticmethod):
-            # todo
-            pass
+            assert '__class__' in frame.f_locals
+            __class__ = frame.f_locals['__class__']
+            k = '__unique__'
+            with Lock(__class__):
+                assert hasvar(__class__, k) or setvar(__class__, k, unique())
+            v = getvar(__class__, k)
+            var = var.__func__
+            _var = _var.__func__ if isinstance(_var, staticmethod) else None
+            namespace[key] = staticmethod(_fork(ND, var, _var, mark=str(v) + '.' + key))
         elif isinstance(var, classmethod):
             var = var.__func__
             _var = _var.__func__ if isinstance(_var, classmethod) else None
@@ -57,8 +65,9 @@ def invoke(*d):
     raise Exception('uninvocable.')
 
 
-def _fork(opt, new, old):
+def _fork(opt, new, old, mark=''):
     def wrapper(*args, **kwargs):
+        mark
         if opt(*args, **kwargs):
             return new(*args, **kwargs)
         elif old is not None:
