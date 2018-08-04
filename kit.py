@@ -296,6 +296,17 @@ def getargs(frame, pattern=r''):
     return tuple(args), kwargs, keywords,
 
 
+# 迭代深度
+def depth(frame, equal=lambda b, f: True):
+    ret = 0
+    back = frame.f_back
+    while back:
+        if back.f_code is frame.f_code and equal(back, frame):
+            ret += 1
+        back = back.f_back
+    return ret
+
+
 # 模块检索
 def module(ios=1):
     if isinstance(ios, int):
@@ -307,12 +318,6 @@ def module(ios=1):
         return None
     elif isinstance(ios, str):
         return sys.modules.get(ios)
-
-
-# 迭代深度
-def depth():
-    codes = [fi.frame.f_code for fi in inspect.stack()]
-    return codes.count(codes[1]) - 1
 
 
 # 异常信息
