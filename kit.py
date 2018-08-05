@@ -228,7 +228,7 @@ class search:
             yield node
             child = self.find(node)
             if child:
-                yield from self.depth(*child)
+                yield from search.depth(self, *child)
 
     # 广度优先
     def breadth(self, *nodes):
@@ -239,7 +239,7 @@ class search:
             if child:
                 children.extend(child)
         if children:
-            yield from self.breadth(*children)
+            yield from search.breadth(self, *children)
 
 
 # 检查变量

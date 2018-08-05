@@ -186,17 +186,15 @@ class _baseclass:
     # 读设置
     @ilock()
     def getting(self, name=None):
-        if name:
+        if name is not None:
             if name in self.__getting:
-                return self.__getting[name](self.__setting[name] if name in self.__setting else None)
+                return self.__getting[name](self.__setting.get(name))
             else:
                 return None
         else:
             g = {}
             for n in self.__getting:
-                if not n:
-                    continue
-                g[n] = self.getting(name=n)
+                g[n] = self.__getting[n](self.__setting.get(n))
             return g
 
     def __exec__(self, *args, **kwargs):
