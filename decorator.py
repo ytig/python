@@ -2,7 +2,7 @@
 import json
 import inspect
 import threading
-from kit import unique, hasvar, getvar, setvar, module
+from kit import bind, unique, hasvar, getvar, setvar, module
 
 
 class Closure:
@@ -127,26 +127,15 @@ class Throw:
         assert hasvar(generics, name) or setvar(generics, name, set())
         return getvar(generics, name)
 
-    @staticmethod
-    def __compile(a, b):
-        if isinstance(b, str):
-            def _a(*args, **kwargs):
-                kwargs.update({b: False, })
-                return a(*args, **kwargs)
-
-            def _b(*args, **kwargs):
-                kwargs.update({b: True, })
-                return a(*args, **kwargs)
-            return _a, _b
-        else:
-            if not callable(b):
-                b = lambda *args, **kwargs: None
-            return a, b
-
     def __call__(self, generics, r=None):
         def decorator(call):
             id = unique()
-            a, b, = Throw.__compile(call, r)
+            if isinstance(r, str):
+                a = bind(call, **{r: False, })
+                b = bind(call, **{r: True, })
+            else:
+                a = call
+                b = r if callable(r) else lambda *args, **kwargs: None
 
             def wrapper(*args, **kwargs):
                 throw = self.__throw
