@@ -14,6 +14,32 @@ class Closure:
         return self.closure()
 
 
+class _Lock:
+    LOCK = threading.Lock()  # 构建锁
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.stack = []
+
+    def __enter__(self):
+        tn = threading.current_thread().name
+        with _Lock.LOCK:
+            a = tn not in self.stack
+            if not a:
+                self.stack.append(tn)
+        if a:
+            self.lock.acquire()
+            with _Lock.LOCK:
+                self.stack.append(tn)
+
+    def __exit__(self, t, v, tb):
+        with _Lock.LOCK:
+            self.stack.pop()
+            r = len(self.stack) == 0
+        if r:
+            self.lock.release()
+
+
 class Lock:
     LOCK = threading.Lock()  # 构建锁
 
@@ -33,32 +59,20 @@ class Lock:
             name = '__Lock__'
         else:
             name = '__lock__'
-        assert hasvar(generics, name) or setvar(generics, name, dict())
-        var = getvar(generics, name)
-        if k not in var:
-            var[k] = (threading.Lock(), [],)
-        return var[k]
+        with Lock.LOCK:
+            assert hasvar(generics, name) or setvar(generics, name, dict())
+            var = getvar(generics, name)
+            if k not in var:
+                var[k] = _Lock()
+            return var[k]
 
     def __enter__(self):
-        tn = threading.current_thread().name
-        with Lock.LOCK:
-            lock, stack, = self.__lock
-            a = tn not in stack
-            if not a:
-                stack.append(tn)
-        if a:
-            lock.acquire()
-            with Lock.LOCK:
-                stack.append(tn)
+        self.__lock.__enter__()
 
     def __exit__(self, t, v, tb):
-        with Lock.LOCK:
-            lock, stack, = self.__lock
-            stack.pop()
-            r = len(stack) == 0
-        if r:
-            lock.release()
+        self.__lock.__exit__(t, v, tb)
 
+    # 装饰锁
     def __call__(self, generics):
         def decorator(call):
             def wrapper(*args, **kwargs):
@@ -127,6 +141,7 @@ class Throw:
         assert hasvar(generics, name) or setvar(generics, name, set())
         return getvar(generics, name)
 
+    # 装饰单次
     def __call__(self, generics, r=None):
         def decorator(call):
             id = unique()
