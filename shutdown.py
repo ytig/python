@@ -71,9 +71,9 @@ def aregister(*args, **kwargs):
 # 注销
 def unregister(func):
     with _LOCK:
-        r = 0
+        ret = 0
         for i in range(len(_events) - 1, -1, -1):
             if _events[i][1] is func:
                 _events.pop(i)
-                r += 1
-        return r
+                ret += 1
+        return ret
