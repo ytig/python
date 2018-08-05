@@ -5,7 +5,7 @@ import weakref
 from kit import hasvar, getvar, setvar, module
 from decorator import Lock
 from loop import Loop
-from ab import attribute, ABMeta
+from ab import define, invoke, ABMeta
 
 
 class _weakrunnable:
@@ -40,17 +40,11 @@ class _weakrunnable:
 
 
 class View(ABMeta):
-    def __new__(mcls, name, bases, namespace, **kwargs):
-        attr = attribute(bases, namespace)
-
+    def __new__(cls, *args, **kwargs):
         def __init__(self, *args, **kwargs):
             self.__loop__ = []
             self.__shutdown__ = False
-            func = args[0]
-            args = args[1:]
-            if callable(func):
-                func(self, *args, **kwargs)
-        attr.setattr('__init__', __init__)
+            return invoke(None)
 
         # 执行（异常中断）
         def do(self, generator, important):
@@ -68,8 +62,6 @@ class View(ABMeta):
                         pid = self.__class__.DO(weakrunnable, delay)
                         self.__loop__.append((weakrunnable, generator, important, pid,))
                         return pid
-        assert not attr.hasattr('do')
-        namespace['do'] = do
 
         # 延时执行
         def doDelay(self, time, func, args=(), kwargs={}):
@@ -78,8 +70,6 @@ class View(ABMeta):
                 func(obj, *args, **kwargs)
                 del obj
             return self.do(g(), True)
-        assert not attr.hasattr('doDelay')
-        namespace['doDelay'] = doDelay
 
         # 循环执行
         def doCircle(self, time, func, args=(), kwargs={}):
@@ -89,8 +79,6 @@ class View(ABMeta):
                     func(obj, *args, **kwargs)
                     del obj
             return self.do(g(), False)
-        assert not attr.hasattr('doCircle')
-        namespace['doCircle'] = doCircle
 
         # 取消执行
         def undo(self, generics):
@@ -109,41 +97,29 @@ class View(ABMeta):
                         self.__loop__.pop(i)
                         ret += 1
             return ret
-        assert not attr.hasattr('undo')
-        namespace['undo'] = undo
 
-        def __bef__(self, *args, **kwargs):
-            func = args[0]
-            args = args[1:]
-            if callable(func):
-                func(self, *args, **kwargs)
+        def __bef__(self):
             with Lock(self):
                 self.__shutdown__ = True
                 for i in range(len(self.__loop__) - 1, -1, -1):
                     if not self.__loop__[i][2]:
                         self.__class__.UNDO(self.__loop__[i][0])
                         self.__loop__.pop(i)
-        attr.setattr('__bef__', __bef__)
+            return invoke(None)
 
-        def __aft__(self, *args, **kwargs):
-            func = args[0]
-            args = args[1:]
-            if callable(func):
-                func(self, *args, **kwargs)
+        def __aft__(self):
+            ret = invoke(None)
             self.__del__()
-        attr.setattr('__aft__', __aft__)
+            return ret
 
-        def __del__(self, *args, **kwargs):
-            func = args[0]
-            args = args[1:]
-            if callable(func):
-                func(self, *args, **kwargs)
+        def __del__(self):
+            ret = invoke(None)
             with Lock(self):
                 for i in self.__loop__:
                     self.__class__.UNDO(i[0])
                 self.__loop__.clear()
-        attr.setattr('__del__', __del__)
-        return super().__new__(mcls, name, bases, namespace, **kwargs)
+            return ret
+        return define(super())
 
     # 执行
     def DO(cls, *args, **kwargs):
