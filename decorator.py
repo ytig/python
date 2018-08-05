@@ -60,22 +60,24 @@ class Lock:
             lock.release()
 
     def __call__(self, generics):
-        if callable(generics):
+        def decorator(call):
             def wrapper(*args, **kwargs):
                 with self:
-                    return generics(*args, **kwargs)
+                    return call(*args, **kwargs)
             return wrapper
+        if callable(generics):
+            return decorator(generics)
         elif isinstance(generics, staticmethod):
-            return staticmethod(self(generics.__func__))
+            return staticmethod(decorator(generics.__func__))
         elif isinstance(generics, classmethod):
-            return classmethod(self(generics.__func__))
+            return classmethod(decorator(generics.__func__))
         elif isinstance(generics, property):
             if generics.fdel:
-                return property(fget=generics.fget, fset=generics.fset, fdel=self(generics.fdel))
+                return property(fget=generics.fget, fset=generics.fset, fdel=decorator(generics.fdel))
             elif generics.fset:
-                return property(fget=generics.fget, fset=self(generics.fset), fdel=generics.fdel)
+                return property(fget=generics.fget, fset=decorator(generics.fset), fdel=generics.fdel)
             elif generics.fget:
-                return property(fget=self(generics.fget), fset=generics.fset, fdel=generics.fdel)
+                return property(fget=decorator(generics.fget), fset=generics.fset, fdel=generics.fdel)
             else:
                 return generics
 
@@ -142,9 +144,9 @@ class Throw:
             return a, b
 
     def __call__(self, generics, r=None):
-        if callable(generics):
+        def decorator(call):
             id = unique()
-            a, b, = Throw.__compile(generics, r)
+            a, b, = Throw.__compile(call, r)
 
             def wrapper(*args, **kwargs):
                 throw = self.__throw
@@ -155,17 +157,19 @@ class Throw:
                 else:
                     return b(*args, **kwargs)
             return wrapper
+        if callable(generics):
+            return decorator(generics)
         elif isinstance(generics, staticmethod):
-            return staticmethod(self(generics.__func__, r=r))
+            return staticmethod(decorator(generics.__func__))
         elif isinstance(generics, classmethod):
-            return classmethod(self(generics.__func__, r=r))
+            return classmethod(decorator(generics.__func__))
         elif isinstance(generics, property):
             if generics.fdel:
-                return property(fget=generics.fget, fset=generics.fset, fdel=self(generics.fdel, r=r))
+                return property(fget=generics.fget, fset=generics.fset, fdel=decorator(generics.fdel))
             elif generics.fset:
-                return property(fget=generics.fget, fset=self(generics.fset, r=r), fdel=generics.fdel)
+                return property(fget=generics.fget, fset=decorator(generics.fset), fdel=generics.fdel)
             elif generics.fget:
-                return property(fget=self(generics.fget, r=r), fset=generics.fset, fdel=generics.fdel)
+                return property(fget=decorator(generics.fget), fset=generics.fset, fdel=generics.fdel)
             else:
                 return generics
 
