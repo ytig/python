@@ -8,10 +8,12 @@ from shutdown import bregister, aregister, unregister
 
 # 定义类型
 def define(super, ignore=None):
-    ND = lambda *args, **kwargs: not depth(inspect.stack()[1].frame, equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark'])
-    CLS = lambda *args, **kwargs: args[0] is __class__
-    SELF = lambda *args, **kwargs: args[0].__class__ is __class__
     frame = inspect.stack()[1].frame
+    assert '__class__' in frame.f_locals
+    __class__ = frame.f_locals['__class__']
+    with Lock(__class__):
+        assert hasvar(__class__, '__unique__') or setvar(__class__, '__unique__', unique())
+        __unique__ = getvar(__class__, '__unique__')
     args, kwargs, keywords, = getargs(frame, r'__new__')
     bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
     namespace = args[3]
@@ -27,30 +29,23 @@ def define(super, ignore=None):
                     _var = getvar(b, key)
                     break
         if isinstance(var, staticmethod):
-            assert '__class__' in frame.f_locals
-            __class__ = frame.f_locals['__class__']
-            k = '__unique__'
-            with Lock(__class__):
-                assert hasvar(__class__, k) or setvar(__class__, k, unique())
-                v = getvar(__class__, k)
             var = var.__func__
             _var = _var.__func__ if isinstance(_var, staticmethod) else None
-            namespace[key] = staticmethod(_fork(ND, var, _var, mark=str(v) + '.' + key))
+            namespace[key] = staticmethod(_fork(var, _var, str(__unique__) + '/staticmethod/' + key))
         elif isinstance(var, classmethod):
             var = var.__func__
             _var = _var.__func__ if isinstance(_var, classmethod) else None
-            namespace[key] = classmethod(_fork(CLS, var, _var))
+            namespace[key] = classmethod(_fork(var, _var, str(__unique__) + '/classmethod/' + key))
         elif isinstance(var, property):
             fget, fset, fdel, = (var.fget, var.fset, var.fdel,)
             _fget, _fset, _fdel, = (_var.fget, _var.fset, _var.fdel,) if isinstance(_var, property) else (None, None, None,)
-            namespace[key] = property(fget=_fork(SELF, fget, _fget) if fget else None, fset=_fork(SELF, fset, _fset) if fset else None, fdel=_fork(SELF, fdel, _fdel) if fdel else None)
+            namespace[key] = property(fget=_fork(fget, _fget, str(__unique__) + '/property.fget/' + key) if fget else None, fset=_fork(fset, _fset, str(__unique__) + '/property.fset/' + key) if fset else None, fdel=_fork(fdel, _fdel, str(__unique__) + '/property.fdel/' + key) if fdel else None)
         elif inspect.isfunction(var):
             _var = _var if inspect.isfunction(_var) else None
-            namespace[key] = _fork(SELF, var, _var)
+            namespace[key] = _fork(var, _var, str(__unique__) + '/function/' + key)
         else:
             namespace[key] = var
-    __class__ = super.__new__(*args, **kwargs)
-    return __class__
+    return super.__new__(*args, **kwargs)
 
 
 # 原始调用
@@ -65,10 +60,10 @@ def invoke(*d):
     raise Exception('uninvocable.')
 
 
-def _fork(opt, new, old, mark=''):
+def _fork(new, old, mark):
     def wrapper(*args, **kwargs):
         mark
-        if opt(*args, **kwargs):
+        if not depth(inspect.currentframe(), equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark']):
             return new(*args, **kwargs)
         elif old is not None:
             return old(*args, **kwargs)
