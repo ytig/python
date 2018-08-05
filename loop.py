@@ -44,8 +44,8 @@ class Loop(threading.Thread):
                     self.__process = None
             self.__pool.append((t, runnable, pid, tag, log,))
             self.__pool.sort(key=lambda t: t[0])
-        if not self.is_alive():
-            self.start()
+            if not self.is_alive():
+                self.start()
         return pid
 
     # 取消执行

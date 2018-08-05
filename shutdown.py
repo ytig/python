@@ -70,10 +70,10 @@ def aregister(*args, **kwargs):
 
 # 注销
 def unregister(func):
+    ret = 0
     with _LOCK:
-        ret = 0
         for i in range(len(_events) - 1, -1, -1):
             if _events[i][1] is func:
                 _events.pop(i)
                 ret += 1
-        return ret
+    return ret

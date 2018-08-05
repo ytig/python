@@ -32,7 +32,7 @@ def define(super, ignore=None):
             k = '__unique__'
             with Lock(__class__):
                 assert hasvar(__class__, k) or setvar(__class__, k, unique())
-            v = getvar(__class__, k)
+                v = getvar(__class__, k)
             var = var.__func__
             _var = _var.__func__ if isinstance(_var, staticmethod) else None
             namespace[key] = staticmethod(_fork(ND, var, _var, mark=str(v) + '.' + key))

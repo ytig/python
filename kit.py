@@ -55,14 +55,14 @@ def chdir(path):
         dirname = os.getcwd()
         ret = os.chdir(path)
         CWDS.append(dirname)
-        return ret
+    return ret
 
 
 # 工作区目录
 def workspace():
-    global WORKSPACE
-    if WORKSPACE is None:
-        with _LOCK:
+    with _LOCK:
+        global WORKSPACE
+        if WORKSPACE is None:
             if sys.argv and sys.argv[0]:
                 if CWDS and not os.path.isabs(sys.argv[0]):
                     WORKSPACE = os.path.dirname(os.path.realpath(os.path.join(CWDS[0], sys.argv[0])))
@@ -73,7 +73,7 @@ def workspace():
                     WORKSPACE = CWDS[0]
                 else:
                     WORKSPACE = os.getcwd()
-    return WORKSPACE
+        return WORKSPACE
 
 
 # 守护进程

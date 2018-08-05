@@ -150,11 +150,13 @@ class View(ABMeta):
         name = '__LOOP__'
         with Lock(cls):
             assert hasvar(cls, name) or setvar(cls, name, Loop())
-        return getvar(cls, name).do(*args, **kwargs)
+            var = getvar(cls, name)
+        return var.do(*args, **kwargs)
 
     # 取消执行
     def UNDO(cls, *args, **kwargs):
         name = '__LOOP__'
         with Lock(cls):
             assert hasvar(cls, name) or setvar(cls, name, Loop())
-        return getvar(cls, name).undo(*args, **kwargs)
+            var = getvar(cls, name)
+        return var.undo(*args, **kwargs)

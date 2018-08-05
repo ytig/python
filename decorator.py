@@ -211,12 +211,12 @@ def instance(fn='instanceOf'):
         instances = {}
 
         @staticmethod
-        @Lock(cls)
         def instanceOf(*args, **kwargs):
-            key = json.dumps((args, kwargs,))
-            if key not in instances:
-                instances[key] = cls(*args, **kwargs)
-            return instances[key]
+            key = json.dumps((args, sorted(kwargs.items(), key=lambda i: i[0]),))
+            with Lock(cls):
+                if key not in instances:
+                    instances[key] = cls(*args, **kwargs)
+                return instances[key]
         assert not hasvar(cls, fn) and setvar(cls, fn, instanceOf)
         return cls
     return decorator
