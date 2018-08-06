@@ -8,19 +8,22 @@ from shutdown import bregister, aregister, unregister
 
 # 定义类型
 def define(super, ignore=None):
-    fi = 1
-    args, kwargs, keywords, = getargs(fi=fi, pattern=r'__new__')
+    args, kwargs, keywords, = getargs(fi=1, pattern=r'__new__')
     bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
     namespace = args[3]
     keywords.add('__class__')
     keywords.update(ignore or [])
-    with frames() as f:
-        assert '__class__' in f[fi].f_locals
-        __class__ = f[fi].f_locals['__class__']
+    with frames(back=1) as f:
+        assert f.has(0)
+        assert '__class__' in f[0].f_locals
+        __class__ = f[0].f_locals['__class__']
         with Lock(__class__):
             assert hasvar(__class__, '__unique__') or setvar(__class__, '__unique__', unique())
             __unique__ = getvar(__class__, '__unique__')
-        for key, var, in dict([(key, f[fi].f_locals[key],) for key in f[fi].f_locals.keys() if key not in keywords]).items():
+        for key in f[0].f_locals.keys():
+            if key in keywords:
+                continue
+            var = f[0].f_locals[key]
             _var = None
             if key in namespace:
                 _var = namespace.get(key)
@@ -52,12 +55,12 @@ def define(super, ignore=None):
 # 原始调用
 def invoke(*d):
     with frames(filter=lambda f: f.f_code is _f_code) as f:
-        if f.has(0):
-            if f[0].f_locals['old'] is not None:
-                return f[0].f_locals['old'](*f[0].f_locals['args'], **f[0].f_locals['kwargs'])
-            elif d:
-                return d[0]
-    raise Exception('uninvocable.')
+        assert f.has(0)
+        if f[0].f_locals['old'] is not None:
+            return f[0].f_locals['old'](*f[0].f_locals['args'], **f[0].f_locals['kwargs'])
+        else:
+            assert len(d) == 1
+            return d[0]
 
 
 def _fork(new, old, mark):
