@@ -59,7 +59,7 @@ def invoke(*d):
         if f[0].f_locals['old'] is not None:
             return f[0].f_locals['old'](*f[0].f_locals['args'], **f[0].f_locals['kwargs'])
         else:
-            assert len(d) == 1
+            assert d
             return d[0]
 
 
