@@ -62,7 +62,7 @@ class View(ABMeta):
                     return pid
 
         # 延时执行
-        def doDelay(self, time, func, args=(), kwargs={}):
+        def doDelay(self, func, time, args=(), kwargs={}):
             def g():
                 obj = yield time
                 func(obj, *args, **kwargs)
@@ -70,7 +70,7 @@ class View(ABMeta):
             return self.do(g(), True)
 
         # 循环执行
-        def doCircle(self, time, func, args=(), kwargs={}):
+        def doCircle(self, func, time, args=(), kwargs={}):
             def g():
                 while True:
                     obj = yield time
