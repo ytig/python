@@ -98,7 +98,7 @@ class Lock:
 
 # 实例锁（栈帧回溯）
 def ilock(k=None):
-    i = Closure(lambda: frames()[4].f_locals['args'][0])
+    i = Closure(lambda: frames(back=4)[0].f_locals['args'][0])
 
     def lock(generics):
         return Lock(i, k=k)(generics)
@@ -180,7 +180,7 @@ class Throw:
 
 # 实例单次（栈帧回溯）
 def ithrow(r=None):
-    i = Closure(lambda: frames()[3].f_locals['args'][0])
+    i = Closure(lambda: frames(back=3)[0].f_locals['args'][0])
 
     def throw(generics):
         return Throw(i)(generics, r=r)
