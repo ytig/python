@@ -50,20 +50,16 @@ class View(ABMeta):
 
         # 执行（异常中断）
         def do(self, generator, important):
-            try:
-                with Lock(module()):
-                    assert inspect.getgeneratorstate(generator) == inspect.GEN_CREATED
-                    delay = generator.send(None)
-                    assert isinstance(delay, numbers.Real)
-            except BaseException:
-                raise
-            else:
-                with Lock(self):
-                    if important or not self.__shutdown__:
-                        weakrunnable = _weakrunnable(self)
-                        pid = self.__class__.DO(weakrunnable, delay)
-                        self.__loop__.append((weakrunnable, generator, important, pid,))
-                        return pid
+            with Lock(module()):
+                assert inspect.getgeneratorstate(generator) == inspect.GEN_CREATED
+                delay = generator.send(None)
+                assert isinstance(delay, numbers.Real)
+            with Lock(self):
+                if important or not self.__shutdown__:
+                    weakrunnable = _weakrunnable(self)
+                    pid = self.__class__.DO(weakrunnable, delay)
+                    self.__loop__.append((weakrunnable, generator, important, pid,))
+                    return pid
 
         # 延时执行
         def doDelay(self, time, func, args=(), kwargs={}):
