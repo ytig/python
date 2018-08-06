@@ -295,9 +295,9 @@ class frames(list):
 
 
 # 获取参数
-def getargs(pattern=r'', **kwargs):
-    kwargs['back'] = 1 + kwargs.get('back', 0)
-    with frames(**kwargs) as f:
+def getargs(pattern=r'', **fi):
+    fi['back'] = 1 + fi.get('back', 0)
+    with frames(**fi) as f:
         assert f.has(0)
         try:
             for owner in gc.get_referrers(f[0].f_code):
@@ -330,10 +330,10 @@ def getargs(pattern=r'', **kwargs):
 
 
 # 迭代深度
-def depth(equal=lambda b, f: True, **kwargs):
-    kwargs['back'] = 1 + kwargs.get('back', 0)
+def depth(equal=lambda b, f: True, **fi):
+    fi['back'] = 1 + fi.get('back', 0)
     ret = 0
-    with frames(**kwargs) as f:
+    with frames(**fi) as f:
         assert f.has(0)
         try:
             back = f[0].f_back
@@ -347,9 +347,9 @@ def depth(equal=lambda b, f: True, **kwargs):
 
 
 # 模块检索
-def module(**kwargs):
-    kwargs['back'] = 1 + kwargs.get('back', 0)
-    with frames(**kwargs) as f:
+def module(**fi):
+    fi['back'] = 1 + fi.get('back', 0)
+    with frames(**fi) as f:
         assert f.has(0)
         for m in sys.modules.values():
             if vars(m) is f[0].f_globals:
