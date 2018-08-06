@@ -278,7 +278,8 @@ def setvar(o, k, v):
 # 栈帧
 class frames(list):
     def __init__(self, fi=0, filter=lambda f: True):
-        super().__init__(i.frame for i in inspect.stack()[max(fi, 0) + 1:] if filter(i.frame))
+        assert fi >= 0
+        super().__init__(i.frame for i in inspect.stack()[fi + 1:] if filter(i.frame))
 
     # 检查
     def has(self, index):
