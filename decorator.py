@@ -116,7 +116,7 @@ def clock(closure, k=None):
 
 # 模块锁
 def mlock(k=None):
-    m = module(fi=1)
+    m = module(back=1)
 
     def lock(generics):
         return Lock(m, k=k)(generics)
@@ -198,7 +198,7 @@ def cthrow(closure, r=None):
 
 # 模块单次
 def mthrow(r=None):
-    m = module(fi=1)
+    m = module(back=1)
 
     def throw(generics):
         return Throw(m)(generics, r=r)
