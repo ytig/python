@@ -296,7 +296,7 @@ class frames(list):
 
 # 获取参数
 def getargs(pattern=r'', **kwargs):
-    kwargs['back'] = 1 + kwargs.get('back', d=0)
+    kwargs['back'] = 1 + kwargs.get('back', 0)
     with frames(**kwargs) as f:
         assert f.has(0)
         try:
@@ -331,7 +331,7 @@ def getargs(pattern=r'', **kwargs):
 
 # 迭代深度
 def depth(equal=lambda b, f: True, **kwargs):
-    kwargs['back'] = 1 + kwargs.get('back', d=0)
+    kwargs['back'] = 1 + kwargs.get('back', 0)
     ret = 0
     with frames(**kwargs) as f:
         assert f.has(0)
@@ -348,7 +348,7 @@ def depth(equal=lambda b, f: True, **kwargs):
 
 # 模块检索
 def module(**kwargs):
-    kwargs['back'] = 1 + kwargs.get('back', d=0)
+    kwargs['back'] = 1 + kwargs.get('back', 0)
     with frames(**kwargs) as f:
         assert f.has(0)
         for m in sys.modules.values():
