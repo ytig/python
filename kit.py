@@ -275,6 +275,23 @@ def setvar(o, k, v):
     return False
 
 
+# 栈帧
+class frames(list):
+    def __init__(self):
+        super().__init__(fi.frame for fi in inspect.stack()[1:])
+
+    # 检查
+    def has(self, index):
+        length = len(self)
+        return index >= -length and index < length
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, t, v, tb):
+        self.clear()
+
+
 # 获取参数
 def getargs(frame, pattern=r''):
     args = list()
@@ -318,12 +335,12 @@ def depth(frame, equal=lambda b, f: True):
 # 模块检索
 def module(ios=1):
     if isinstance(ios, int):
-        s = inspect.stack()
-        if (lambda a, b: a >= -b and a < b)(ios, len(s)):
-            for m in sys.modules.values():
-                if vars(m) is s[ios].frame.f_globals:
-                    return m
-        return None
+        with frames() as f:
+            if f.has(ios):
+                for m in sys.modules.values():
+                    if vars(m) is f[ios].f_globals:
+                        return m
+            return None
     elif isinstance(ios, str):
         return sys.modules.get(ios)
 
