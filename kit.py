@@ -295,9 +295,6 @@ class frames(list):
 
 # 获取参数
 def getargs(fi=0, pattern=r''):
-    args = list()
-    kwargs = dict()
-    keywords = set()
     with frames(back=1) as f:
         assert f.has(fi)
         try:
@@ -308,6 +305,9 @@ def getargs(fi=0, pattern=r''):
                     continue
                 if not re.search(pattern, getattr(owner, '__qualname__', '')):
                     continue
+                args = list()
+                kwargs = dict()
+                keywords = set()
                 fas = inspect.getfullargspec(owner)
                 for arg in fas.args:
                     args.append(f[fi].f_locals.get(arg))
@@ -321,10 +321,10 @@ def getargs(fi=0, pattern=r''):
                 if fas.varkw is not None:
                     kwargs.update(f[fi].f_locals.get(fas.varkw) or {})
                     keywords.add(fas.varkw)
-                break
+                return tuple(args), kwargs, keywords,
         finally:
             owner = None
-    return tuple(args), kwargs, keywords,
+    return None, None, None,
 
 
 # 迭代深度
@@ -345,14 +345,12 @@ def depth(fi=0, equal=lambda b, f: True):
 
 # 模块检索
 def module(fi=0):
-    ret = None
     with frames(back=1) as f:
         assert f.has(fi)
         for m in sys.modules.values():
             if vars(m) is f[fi].f_globals:
-                ret = m
-                break
-    return ret
+                return m
+    return None
 
 
 # 异常信息

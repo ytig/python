@@ -9,6 +9,7 @@ from shutdown import bregister, aregister, unregister
 # 定义类型
 def define(super, ignore=None):
     args, kwargs, keywords, = getargs(fi=1, pattern=r'__new__')
+    assert None not in (args, kwargs, keywords,)
     bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
     namespace = args[3]
     keywords.add('__class__')
