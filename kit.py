@@ -277,8 +277,8 @@ def setvar(o, k, v):
 
 # 栈帧
 class frames(list):
-    def __init__(self):
-        super().__init__(fi.frame for fi in inspect.stack()[1:])
+    def __init__(self, filter=lambda f: True):
+        super().__init__(i.frame for i in inspect.stack()[1:] if filter(i.frame))
 
     # 检查
     def has(self, index):
@@ -293,56 +293,65 @@ class frames(list):
 
 
 # 获取参数
-def getargs(frame, pattern=r''):
+def getargs(fi=1, pattern=r''):
     args = list()
     kwargs = dict()
     keywords = set()
-    for owner in gc.get_referrers(frame.f_code):
-        if not inspect.isfunction(owner):
-            continue
-        if getattr(owner, '__globals__', None) is not frame.f_globals:
-            continue
-        if not re.search(pattern, getattr(owner, '__qualname__', '')):
-            continue
-        fas = inspect.getfullargspec(owner)
-        for arg in fas.args:
-            args.append(frame.f_locals.get(arg))
-            keywords.add(arg)
-        if fas.varargs is not None:
-            args.extend(frame.f_locals.get(fas.varargs) or [])
-            keywords.add(fas.varargs)
-        for arg in fas.kwonlyargs:
-            kwargs[arg] = frame.f_locals.get(arg)
-            keywords.add(arg)
-        if fas.varkw is not None:
-            kwargs.update(frame.f_locals.get(fas.varkw) or {})
-            keywords.add(fas.varkw)
-        break
+    with frames() as f:
+        assert f.has(fi)
+        try:
+            for owner in gc.get_referrers(f[fi].f_code):
+                if not inspect.isfunction(owner):
+                    continue
+                if getattr(owner, '__globals__', None) is not f[fi].f_globals:
+                    continue
+                if not re.search(pattern, getattr(owner, '__qualname__', '')):
+                    continue
+                fas = inspect.getfullargspec(owner)
+                for arg in fas.args:
+                    args.append(f[fi].f_locals.get(arg))
+                    keywords.add(arg)
+                if fas.varargs is not None:
+                    args.extend(f[fi].f_locals.get(fas.varargs) or [])
+                    keywords.add(fas.varargs)
+                for arg in fas.kwonlyargs:
+                    kwargs[arg] = f[fi].f_locals.get(arg)
+                    keywords.add(arg)
+                if fas.varkw is not None:
+                    kwargs.update(f[fi].f_locals.get(fas.varkw) or {})
+                    keywords.add(fas.varkw)
+                break
+        finally:
+            owner = None
     return tuple(args), kwargs, keywords,
 
 
 # 迭代深度
-def depth(frame, equal=lambda b, f: True):
+def depth(fi=1, equal=lambda b, f: True):
     ret = 0
-    back = frame.f_back
-    while back:
-        if back.f_code is frame.f_code and equal(back, frame):
-            ret += 1
-        back = back.f_back
+    with frames() as f:
+        assert f.has(fi)
+        try:
+            back = f[fi].f_back
+            while back:
+                if back.f_code is f[fi].f_code and equal(back, f[fi]):
+                    ret += 1
+                back = back.f_back
+        finally:
+            back = None
     return ret
 
 
 # 模块检索
-def module(ios=1):
-    if isinstance(ios, int):
-        with frames() as f:
-            if f.has(ios):
-                for m in sys.modules.values():
-                    if vars(m) is f[ios].f_globals:
-                        return m
-            return None
-    elif isinstance(ios, str):
-        return sys.modules.get(ios)
+def module(fi=1):
+    ret = None
+    with frames() as f:
+        assert f.has(fi)
+        for m in sys.modules.values():
+            if vars(m) is f[fi].f_globals:
+                ret = m
+                break
+    return ret
 
 
 # 异常信息

@@ -85,7 +85,7 @@ def _except(fn='__except__'):
                 return function(self, *args, **kwargs)
             except BaseException as e:
                 try:
-                    if not depth(inspect.currentframe(), equal=lambda f1, f2: f1.f_locals['self'] is f2.f_locals['self']):
+                    if not depth(equal=lambda f1, f2: f1.f_locals['self'] is f2.f_locals['self']):
                         if hasattr(self, fn):
                             getattr(self, fn)(e)
                 except BaseException:
