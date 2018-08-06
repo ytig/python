@@ -25,12 +25,14 @@ class _weakrunnable:
                 try:
                     delay = generator.send(obj)
                     assert isinstance(delay, numbers.Real)
-                except BaseException:
+                except BaseException as e:
                     with Lock(obj):
                         for i in range(len(obj.__loop__)):
                             if obj.__loop__[i][0] is self:
                                 obj.__loop__.pop(i)
                                 break
+                    if not isinstance(e, StopIteration):
+                        raise
                 else:
                     with Lock(obj):
                         for w, g, i, p, in obj.__loop__:
@@ -54,7 +56,7 @@ class View(ABMeta):
                     delay = generator.send(None)
                     assert isinstance(delay, numbers.Real)
             except BaseException:
-                pass
+                raise
             else:
                 with Lock(self):
                     if important or not self.__shutdown__:
