@@ -277,8 +277,8 @@ def setvar(o, k, v):
 
 # 栈帧
 class frames(list):
-    def __init__(self, filter=lambda f: True):
-        super().__init__(i.frame for i in inspect.stack()[1:] if filter(i.frame))
+    def __init__(self, fi=0, filter=lambda f: True):
+        super().__init__(i.frame for i in inspect.stack()[max(fi, 0) + 1:] if filter(i.frame))
 
     # 检查
     def has(self, index):
@@ -293,11 +293,11 @@ class frames(list):
 
 
 # 获取参数
-def getargs(fi=1, pattern=r''):
+def getargs(fi=0, pattern=r''):
     args = list()
     kwargs = dict()
     keywords = set()
-    with frames() as f:
+    with frames(fi=1) as f:
         assert f.has(fi)
         try:
             for owner in gc.get_referrers(f[fi].f_code):
@@ -327,9 +327,9 @@ def getargs(fi=1, pattern=r''):
 
 
 # 迭代深度
-def depth(fi=1, equal=lambda b, f: True):
+def depth(fi=0, equal=lambda b, f: True):
     ret = 0
-    with frames() as f:
+    with frames(fi=1) as f:
         assert f.has(fi)
         try:
             back = f[fi].f_back
@@ -343,9 +343,9 @@ def depth(fi=1, equal=lambda b, f: True):
 
 
 # 模块检索
-def module(fi=1):
+def module(fi=0):
     ret = None
-    with frames() as f:
+    with frames(fi=1) as f:
         assert f.has(fi)
         for m in sys.modules.values():
             if vars(m) is f[fi].f_globals:
