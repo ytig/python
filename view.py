@@ -4,8 +4,9 @@ import inspect
 import weakref
 from kit import hasvar, getvar, setvar, module
 from decorator import Lock
+from meta import define, invoke
+from ab import ABMeta
 from loop import Loop
-from ab import define, invoke, ABMeta
 
 
 class _weakrunnable:
