@@ -281,7 +281,7 @@ class frames(list):
     def __init__(self, back=0, filter=None):
         assert back >= 0
         assert not filter or callable(filter)
-        super().__init__(i.frame for i in inspect.stack()[1 + back:] if not filter or filter(i.frame))
+        super().__init__([i.frame for i in inspect.stack()[1 + back:] if not filter or filter(i.frame)])
 
     # 检查
     def has(self, index):
