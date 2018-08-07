@@ -117,7 +117,7 @@ class View(ABMeta):
                     self.__class__.UNDO(i[0])
                 self.__loop__.clear()
             return ret
-        return define(super())
+        return define(__class__)
 
     # 执行
     def DO(cls, *args, **kwargs):

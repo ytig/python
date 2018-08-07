@@ -7,19 +7,19 @@ from shutdown import bregister, aregister, unregister
 
 
 # 定义类型
-def define(super, ignore=None):
-    args, kwargs, keywords, = getargs(pattern=r'__new__', back=1)
-    assert None not in (args, kwargs, keywords,)
-    bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
-    namespace = args[3]
-    keywords.update(ignore or [])
+def define(__class__, __new__=None):
     with frames(back=1) as f:
         assert f.has(0)
-        assert '__class__' in f[0].f_code.co_freevars and '__class__' in f[0].f_locals
-        __class__ = f[0].f_locals['__class__']
+        assert '__class__' in f[0].f_code.co_freevars
+        args, kwargs, keywords, = getargs(pattern=r'__new__', back=1)
+        assert None not in (args, kwargs, keywords,)
         with Lock(__class__):
             assert hasvar(__class__, '__unique__') or setvar(__class__, '__unique__', unique())
             __unique__ = getvar(__class__, '__unique__')
+        if not callable(__new__):
+            __new__ = super(__class__, args[0]).__new__
+        bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
+        namespace = args[3]
         for key in f[0].f_code.co_varnames + f[0].f_code.co_cellvars:
             if key in keywords or key not in f[0].f_locals:
                 continue
@@ -62,7 +62,7 @@ def define(super, ignore=None):
                 namespace[key] = decorator(var, _var)
             else:
                 namespace[key] = var
-        return super.__new__(*args, **kwargs)
+        return __new__(*args, **kwargs)
 
 
 # 原始调用
@@ -138,4 +138,4 @@ class ABMeta(type):
             unregister(getvar(self, '__weakaft__'))
             unregister(getvar(self, '__weakbef__'))
             return invoke(None)
-        return define(super())
+        return define(__class__)
