@@ -15,7 +15,7 @@ def define(super, ignore=None):
     keywords.update(ignore or [])
     with frames(back=1) as f:
         assert f.has(0)
-        assert '__class__' in f[0].f_code.co_freevars
+        assert '__class__' in f[0].f_code.co_freevars and '__class__' in f[0].f_locals
         __class__ = f[0].f_locals['__class__']
         with Lock(__class__):
             assert hasvar(__class__, '__unique__') or setvar(__class__, '__unique__', unique())
