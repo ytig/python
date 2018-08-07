@@ -23,6 +23,20 @@ def define(super, ignore=None):
         for key in f[0].f_code.co_varnames + f[0].f_code.co_cellvars:
             if key in keywords:
                 continue
+
+            def decorator(new, old, name=''):
+                if inspect.isfunction(new):
+                    mark = '/'.join((__unique__, key, name,))
+                    if inspect.isgeneratorfunction(new):
+                        if not inspect.isgeneratorfunction(old):
+                            old = None
+                        return _generatorfunction(new, old, mark)
+                    else:
+                        if not inspect.isfunction(old):
+                            old = None
+                        return _function(new, old, mark)
+                else:
+                    return old
             var = f[0].f_locals[key]
             _var = None
             if key in namespace:
@@ -35,18 +49,17 @@ def define(super, ignore=None):
             if isinstance(var, staticmethod):
                 var = var.__func__
                 _var = _var.__func__ if isinstance(_var, staticmethod) else None
-                namespace[key] = staticmethod(_fork(var, _var, __unique__ + '/staticmethod/' + key))
+                namespace[key] = staticmethod(decorator(var, _var))
             elif isinstance(var, classmethod):
                 var = var.__func__
                 _var = _var.__func__ if isinstance(_var, classmethod) else None
-                namespace[key] = classmethod(_fork(var, _var, __unique__ + '/classmethod/' + key))
+                namespace[key] = classmethod(decorator(var, _var))
             elif isinstance(var, property):
                 fget, fset, fdel, = (var.fget, var.fset, var.fdel,)
                 _fget, _fset, _fdel, = (_var.fget, _var.fset, _var.fdel,) if isinstance(_var, property) else (None, None, None,)
-                namespace[key] = property(fget=_fork(fget, _fget, __unique__ + '/property.fget/' + key) if fget else None, fset=_fork(fset, _fset, __unique__ + '/property.fset/' + key) if fset else None, fdel=_fork(fdel, _fdel, __unique__ + '/property.fdel/' + key) if fdel else None)
+                namespace[key] = property(fget=decorator(fget, _fget, name='fget'), fset=decorator(fset, _fset, name='fset'), fdel=decorator(fdel, _fdel, name='fdel'))
             elif inspect.isfunction(var):
-                _var = _var if inspect.isfunction(_var) else None
-                namespace[key] = _fork(var, _var, __unique__ + '/function/' + key)
+                namespace[key] = decorator(var, _var)
             else:
                 namespace[key] = var
         return super.__new__(*args, **kwargs)
@@ -54,7 +67,7 @@ def define(super, ignore=None):
 
 # 原始调用
 def invoke(*d):
-    with frames(filter=lambda f: f.f_code is _f_code) as f:
+    with frames(filter=lambda f: f.f_code in _f_codes) as f:
         assert f.has(0)
         if f[0].f_locals['old'] is not None:
             return f[0].f_locals['old'](*f[0].f_locals['args'], **f[0].f_locals['kwargs'])
@@ -63,7 +76,7 @@ def invoke(*d):
             return d[0]
 
 
-def _fork(new, old, mark):
+def _function(new, old, mark):
     def wrapper(*args, **kwargs):
         mark
         if not depth(equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark']):
@@ -73,7 +86,19 @@ def _fork(new, old, mark):
     return wrapper
 
 
-_f_code = _fork(None, None, None).__code__
+def _generatorfunction(new, old, mark):
+    def wrapper(*args, **kwargs):
+        mark
+        if not depth(equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark']):
+            value = yield from new(*args, **kwargs)
+            return value
+        elif old is not None:
+            value = yield from old(*args, **kwargs)
+            return value
+    return wrapper
+
+
+_f_codes = (_function(None, None, None).__code__, _generatorfunction(None, None, None).__code__,)
 
 
 class weakmethod:
