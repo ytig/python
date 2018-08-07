@@ -36,18 +36,18 @@ def define(super, ignore=None):
             if isinstance(var, staticmethod):
                 var = var.__func__
                 _var = _var.__func__ if isinstance(_var, staticmethod) else None
-                namespace[key] = staticmethod(_fork(var, _var, str(__unique__) + '/staticmethod/' + key))
+                namespace[key] = staticmethod(_fork(var, _var, __unique__ + '/staticmethod/' + key))
             elif isinstance(var, classmethod):
                 var = var.__func__
                 _var = _var.__func__ if isinstance(_var, classmethod) else None
-                namespace[key] = classmethod(_fork(var, _var, str(__unique__) + '/classmethod/' + key))
+                namespace[key] = classmethod(_fork(var, _var, __unique__ + '/classmethod/' + key))
             elif isinstance(var, property):
                 fget, fset, fdel, = (var.fget, var.fset, var.fdel,)
                 _fget, _fset, _fdel, = (_var.fget, _var.fset, _var.fdel,) if isinstance(_var, property) else (None, None, None,)
-                namespace[key] = property(fget=_fork(fget, _fget, str(__unique__) + '/property.fget/' + key) if fget else None, fset=_fork(fset, _fset, str(__unique__) + '/property.fset/' + key) if fset else None, fdel=_fork(fdel, _fdel, str(__unique__) + '/property.fdel/' + key) if fdel else None)
+                namespace[key] = property(fget=_fork(fget, _fget, __unique__ + '/property.fget/' + key) if fget else None, fset=_fork(fset, _fset, __unique__ + '/property.fset/' + key) if fset else None, fdel=_fork(fdel, _fdel, __unique__ + '/property.fdel/' + key) if fdel else None)
             elif inspect.isfunction(var):
                 _var = _var if inspect.isfunction(_var) else None
-                namespace[key] = _fork(var, _var, str(__unique__) + '/function/' + key)
+                namespace[key] = _fork(var, _var, __unique__ + '/function/' + key)
             else:
                 namespace[key] = var
         return super.__new__(*args, **kwargs)

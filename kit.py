@@ -214,7 +214,7 @@ def injects(*segms, argv=sys.argv):
 # 唯一编号
 def unique():
     with _LOCK:
-        return next(COUNT)
+        return str(next(COUNT))
 
 
 # 搜索
