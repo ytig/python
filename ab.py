@@ -21,7 +21,7 @@ def define(super, ignore=None):
             assert hasvar(__class__, '__unique__') or setvar(__class__, '__unique__', unique())
             __unique__ = getvar(__class__, '__unique__')
         for key in f[0].f_code.co_varnames + f[0].f_code.co_cellvars:
-            if key in keywords:
+            if key in keywords or key not in f[0].f_locals:
                 continue
 
             def decorator(new, old, name=''):
