@@ -12,16 +12,15 @@ def define(super, ignore=None):
     assert None not in (args, kwargs, keywords,)
     bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
     namespace = args[3]
-    keywords.add('__class__')
     keywords.update(ignore or [])
     with frames(back=1) as f:
         assert f.has(0)
-        assert '__class__' in f[0].f_locals
+        assert '__class__' in f[0].f_code.co_freevars
         __class__ = f[0].f_locals['__class__']
         with Lock(__class__):
             assert hasvar(__class__, '__unique__') or setvar(__class__, '__unique__', unique())
             __unique__ = getvar(__class__, '__unique__')
-        for key in f[0].f_locals.keys():
+        for key in f[0].f_code.co_varnames + f[0].f_code.co_cellvars:
             if key in keywords:
                 continue
             var = f[0].f_locals[key]
