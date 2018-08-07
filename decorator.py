@@ -66,6 +66,7 @@ class Lock:
                 var[k] = _Lock()
             return var[k]
 
+    # 区块锁
     def __enter__(self):
         self.__lock.__enter__()
 
@@ -141,10 +142,24 @@ class Throw:
         assert hasvar(generics, name) or setvar(generics, name, set())
         return getvar(generics, name)
 
-    # 装饰单次
+    # 区块单次（代码）
+    def __enter__(self):
+        with frames(back=1) as f:
+            assert f.has(0)
+            xid = 'X:' + f[0].f_code.co_filename + '/' + str(f[0].f_code.co_firstlineno)
+        return xid in self.__throw
+
+    def __exit__(self, t, v, tb):
+        with frames(back=1) as f:
+            assert f.has(0)
+            xid = 'X:' + f[0].f_code.co_filename + '/' + str(f[0].f_code.co_firstlineno)
+        if t is None:
+            self.__throw.add(xid)
+
+    # 装饰单次（实例）
     def __call__(self, generics, r=None):
         def decorator(call):
-            id = unique()
+            sid = 'S:' + unique()
             if isinstance(r, str):
                 a = bind(call, **{r: False, })
                 b = bind(call, **{r: True, })
@@ -154,9 +169,9 @@ class Throw:
 
             def wrapper(*args, **kwargs):
                 throw = self.__throw
-                if id not in throw:
+                if sid not in throw:
                     ret = a(*args, **kwargs)
-                    throw.add(id)
+                    throw.add(sid)
                     return ret
                 else:
                     return b(*args, **kwargs)
