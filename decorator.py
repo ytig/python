@@ -83,9 +83,15 @@ class Lock:
         if callable(generics):
             return decorator(generics)
         elif isinstance(generics, staticmethod):
-            return staticmethod(decorator(generics.__func__))
+            if generics.__func__:
+                return staticmethod(decorator(generics.__func__))
+            else:
+                return generics
         elif isinstance(generics, classmethod):
-            return classmethod(decorator(generics.__func__))
+            if generics.__func__:
+                return classmethod(decorator(generics.__func__))
+            else:
+                return generics
         elif isinstance(generics, property):
             if generics.fdel:
                 return property(fget=generics.fget, fset=generics.fset, fdel=decorator(generics.fdel))
@@ -179,9 +185,15 @@ class Throw:
         if callable(generics):
             return decorator(generics)
         elif isinstance(generics, staticmethod):
-            return staticmethod(decorator(generics.__func__))
+            if generics.__func__:
+                return staticmethod(decorator(generics.__func__))
+            else:
+                return generics
         elif isinstance(generics, classmethod):
-            return classmethod(decorator(generics.__func__))
+            if generics.__func__:
+                return classmethod(decorator(generics.__func__))
+            else:
+                return generics
         elif isinstance(generics, property):
             if generics.fdel:
                 return property(fget=generics.fget, fset=generics.fset, fdel=decorator(generics.fdel))
