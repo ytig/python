@@ -3,6 +3,7 @@ import re
 import gc
 import os
 import sys
+import types
 import inspect
 import threading
 import traceback
@@ -244,12 +245,12 @@ class search:
 
 # 检查变量
 def hasvar(o, k):
-    return hasattr(o, '__dict__') and k in o.__dict__
+    return hasattr(o, '__dict__') and isinstance(o.__dict__, (dict, types.MappingProxyType,)) and k in o.__dict__
 
 
 # 获取变量
 def getvar(o, k, d=None):
-    return o.__dict__.get(k, d) if hasattr(o, '__dict__') else d
+    return o.__dict__.get(k, d) if hasattr(o, '__dict__') and isinstance(o.__dict__, (dict, types.MappingProxyType,)) else d
 
 
 # 设置变量
@@ -258,7 +259,7 @@ def setvar(o, k, v):
         if isinstance(o.__dict__, dict):
             o.__dict__[k] = v
             return True
-        else:
+        elif isinstance(o.__dict__, types.MappingProxyType):
             b = True
             if hasattr(o, k):
                 for base in search(lambda cls: cls.__bases__).depth(o.__class__):
