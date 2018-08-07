@@ -10,7 +10,7 @@ from shutdown import bregister, aregister, unregister
 def define(__class__, __new__=None):
     with frames(back=1) as f:
         assert f.has(0)
-        assert '__class__' in f[0].f_code.co_freevars
+        assert '__class__' in f[0].f_code.co_freevars and __class__ is f[0].f_locals.get('__class__')
         args, kwargs, keywords, = getargs(pattern=r'__new__', back=1)
         assert None not in (args, kwargs, keywords,)
         with Lock(__class__):
@@ -40,7 +40,7 @@ def define(__class__, __new__=None):
             var = f[0].f_locals[key]
             _var = None
             if key in namespace:
-                _var = namespace.get(key)
+                _var = namespace[key]
             else:
                 for b in bases:
                     if hasvar(b, key):
