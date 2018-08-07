@@ -84,7 +84,7 @@ class _function:
             elif old is not None:
                 return old(*args, **kwargs)
             else:
-                with frames(filter=lambda f: f.f_code is __class__.f_codes[0]) as f:
+                with frames(filter=lambda f: f.f_code is _function.f_codes[0]) as f:
                     assert f.has(0)
                     d = f[0].f_locals['d']
                 assert d
@@ -93,7 +93,7 @@ class _function:
 
     @staticmethod
     def invoke(*d):
-        with frames(filter=lambda f: f.f_code is __class__.f_codes[1]) as f:
+        with frames(filter=lambda f: f.f_code is _function.f_codes[1]) as f:
             assert f.has(0)
             old = f[0].f_locals['old']
             args = f[0].f_locals['args']
@@ -118,7 +118,7 @@ class _generatorfunction:
                 value = yield from old(*args, **kwargs)
                 return value
             else:
-                with frames(filter=lambda f: f.f_code is __class__.f_codes[0]) as f:
+                with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[0]) as f:
                     assert f.has(0)
                     d = f[0].f_locals['d']
                 assert d
@@ -128,7 +128,7 @@ class _generatorfunction:
 
     @staticmethod
     def invoke(*d):
-        with frames(filter=lambda f: f.f_code is __class__.f_codes[1]) as f:
+        with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[1]) as f:
             assert f.has(0)
             old = f[0].f_locals['old']
             args = f[0].f_locals['args']
