@@ -262,9 +262,9 @@ def setvar(o, k, v):
         elif isinstance(o.__dict__, types.MappingProxyType):
             b = True
             if hasattr(o, k):
-                for base in search(lambda cls: cls.__bases__).depth(o.__class__):
-                    if hasvar(base, k):
-                        if hasattr(getvar(base, k), '__set__'):
+                for c in search(lambda cls: cls.__bases__).depth(o.__class__):
+                    if hasvar(c, k):
+                        if hasattr(getvar(c, k), '__set__'):
                             b = False
                         break
             if b:
