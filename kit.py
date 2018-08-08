@@ -263,9 +263,9 @@ def setvar(o, k, v):
             b = True
             if hasattr(o, k):
                 for base in search(lambda cls: cls.__bases__).depth(o.__class__):
-                    var = getvar(base, k)
-                    if var is not None and hasattr(var, '__set__'):
-                        b = False
+                    if hasvar(base, k):
+                        if hasattr(getvar(base, k), '__set__'):
+                            b = False
                         break
             if b:
                 try:
