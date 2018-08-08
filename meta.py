@@ -18,20 +18,21 @@ def define(__class__, __new__=None):
         __new__ = super(__class__, args[0]).__new__
     bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
     namespace = args[3]
-    for key, var, in dict(list(context['varnames'].items()) + list(context['cellvars'].items())).items():
-        def decorator(new, old, name=''):
-            if inspect.isfunction(new):
-                if not inspect.isfunction(old):
-                    old = None
-                mark = '/'.join((__unique__, key, name,))
-                if inspect.isgeneratorfunction(new):
-                    assert old is None or inspect.isgeneratorfunction(old)
-                    return _generatorfunction.define(new, old, mark)
-                else:
-                    assert not inspect.isgeneratorfunction(old)
-                    return _function.define(new, old, mark)
+
+    def decorator(new, old, name=''):
+        if inspect.isfunction(new):
+            if not inspect.isfunction(old):
+                old = None
+            mark = '/'.join((__unique__, key, name,))
+            if inspect.isgeneratorfunction(new):
+                assert old is None or inspect.isgeneratorfunction(old)
+                return _generatorfunction.define(new, old, mark)
             else:
-                return old
+                assert not inspect.isgeneratorfunction(old)
+                return _function.define(new, old, mark)
+        else:
+            return old
+    for key, var, in dict(list(context['varnames'].items()) + list(context['cellvars'].items())).items():
         _var = None
         if key in namespace:
             _var = namespace[key]
