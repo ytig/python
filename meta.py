@@ -18,7 +18,7 @@ def define(__class__, __new__=None):
         __new__ = super(__class__, args[0]).__new__
     bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
     namespace = args[3]
-    for key, var, in dict(list(context['varnames'].items()) + list(context['cellvars'].items())):
+    for key, var, in dict(list(context['varnames'].items()) + list(context['cellvars'].items())).items():
         def decorator(new, old, name=''):
             if inspect.isfunction(new):
                 if not inspect.isfunction(old):
