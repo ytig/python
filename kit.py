@@ -295,43 +295,64 @@ class frames(list):
         self.clear()
 
 
-# 获取参数
-def getargs(pattern=r'', **fi):
+# 作用域值
+def scope(pattern=r'', **fi):
     fi['back'] = 1 + fi.get('back', 0)
+    ret = dict()
     with frames(**fi) as f:
         assert f.has(0)
         try:
-            for owner in gc.get_referrers(f[0].f_code):
-                if not inspect.isfunction(owner):
+            keys = set()
+            if pattern is not None:
+                for owner in gc.get_referrers(f[0].f_code):
+                    if not inspect.isfunction(owner):
+                        continue
+                    if getattr(owner, '__globals__', None) is not f[0].f_globals:
+                        continue
+                    if not re.search(pattern, getattr(owner, '__qualname__', '')):
+                        continue
+                    ret['args'] = list()
+                    ret['kwargs'] = dict()
+                    fullargspec = inspect.getfullargspec(owner)
+                    for key in fullargspec.args:
+                        ret['args'].append(f[0].f_locals.get(key))
+                        keys.add(key)
+                    if fullargspec.varargs is not None:
+                        ret['args'].extend(f[0].f_locals.get(fullargspec.varargs) or [])
+                        keys.add(fullargspec.varargs)
+                    for key in fullargspec.kwonlyargs:
+                        ret['kwargs'][key] = f[0].f_locals.get(key)
+                        keys.add(key)
+                    if fullargspec.varkw is not None:
+                        ret['kwargs'].update(f[0].f_locals.get(fullargspec.varkw) or {})
+                        keys.add(fullargspec.varkw)
+                    ret['args'] = tuple(ret['args'])
+                    break
+            ret['varnames'] = dict()
+            ret['cellvars'] = dict()
+            ret['freevars'] = dict()
+            for key in f[0].f_code.co_varnames:
+                if key in keys:
                     continue
-                if getattr(owner, '__globals__', None) is not f[0].f_globals:
+                if key in f[0].f_locals:
+                    ret['varnames'][key] = f[0].f_locals[key]
+            for key in f[0].f_code.co_cellvars:
+                if key in keys:
                     continue
-                if not re.search(pattern, getattr(owner, '__qualname__', '')):
+                if key in f[0].f_locals:
+                    ret['cellvars'][key] = f[0].f_locals[key]
+            for key in f[0].f_code.co_freevars:
+                if key in keys:
                     continue
-                args = list()
-                kwargs = dict()
-                keywords = set()
-                fas = inspect.getfullargspec(owner)
-                for arg in fas.args:
-                    args.append(f[0].f_locals.get(arg))
-                    keywords.add(arg)
-                if fas.varargs is not None:
-                    args.extend(f[0].f_locals.get(fas.varargs) or [])
-                    keywords.add(fas.varargs)
-                for arg in fas.kwonlyargs:
-                    kwargs[arg] = f[0].f_locals.get(arg)
-                    keywords.add(arg)
-                if fas.varkw is not None:
-                    kwargs.update(f[0].f_locals.get(fas.varkw) or {})
-                    keywords.add(fas.varkw)
-                return tuple(args), kwargs, keywords,
+                if key in f[0].f_locals:
+                    ret['freevars'][key] = f[0].f_locals[key]
         finally:
             owner = None
-    return None, None, None,
+    return ret
 
 
 # 迭代深度
-def depth(equal=lambda b, f: True, **fi):
+def depth(equal=None, **fi):
     fi['back'] = 1 + fi.get('back', 0)
     ret = 0
     with frames(**fi) as f:
@@ -339,7 +360,7 @@ def depth(equal=lambda b, f: True, **fi):
         try:
             back = f[0].f_back
             while back:
-                if back.f_code is f[0].f_code and equal(back, f[0]):
+                if back.f_code is f[0].f_code and (not equal or equal(f[0], back)):
                     ret += 1
                 back = back.f_back
         finally:
