@@ -60,14 +60,24 @@ def define(__class__, __new__=None):
 
 
 # 原始调用
-def invoke(*d):
+def invoke(*d, arguments=False):
+    def default(*args, **kwargs):
+        assert d
+        return d[0]
+    if not arguments:
+        args = None
+        kwargs = None
+    else:
+        context = scope(back=1)
+        args = context.get('args')
+        kwargs = context.get('kwargs')
     with frames(back=1) as f:
         assert f.has(0)
         isgeneratorfunction = bool(f[0].f_code.co_flags & 32)
     if isgeneratorfunction:
-        return _generatorfunction.invoke(*d)
+        return _generatorfunction.invoke(args, kwargs, default)
     else:
-        return _function.invoke(*d)
+        return _function.invoke(args, kwargs, default)
 
 
 class _function:
@@ -82,23 +92,23 @@ class _function:
             else:
                 with frames(filter=lambda f: f.f_code is _function.f_codes[0]) as f:
                     assert f.has(0)
-                    d = f[0].f_locals['d']
-                assert d
-                return d[0]
+                    default = f[0].f_locals['default']
+                return default(*args, **kwargs)
         return wrapper
 
     @staticmethod
-    def invoke(*d):
+    def invoke(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _function.f_codes[1]) as f:
             assert f.has(0)
             old = f[0].f_locals['old']
-            args = f[0].f_locals['args']
-            kwargs = f[0].f_locals['kwargs']
+            if args is None:
+                args = f[0].f_locals['args']
+            if kwargs is None:
+                kwargs = f[0].f_locals['kwargs']
         if old is not None:
             return old(*args, **kwargs)
         else:
-            assert d
-            return d[0]
+            return default(*args, **kwargs)
     f_codes = (invoke.__func__.__code__, define.__func__(None, None, None).__code__,)
 
 
@@ -116,24 +126,24 @@ class _generatorfunction:
             else:
                 with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[0]) as f:
                     assert f.has(0)
-                    d = f[0].f_locals['d']
-                assert d
-                value = yield from d[0]
+                    default = f[0].f_locals['default']
+                value = yield from default(*args, **kwargs)
                 return value
         return wrapper
 
     @staticmethod
-    def invoke(*d):
+    def invoke(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[1]) as f:
             assert f.has(0)
             old = f[0].f_locals['old']
-            args = f[0].f_locals['args']
-            kwargs = f[0].f_locals['kwargs']
+            if args is None:
+                args = f[0].f_locals['args']
+            if kwargs is None:
+                kwargs = f[0].f_locals['kwargs']
         if old is not None:
             value = yield from old(*args, **kwargs)
             return value
         else:
-            assert d
-            value = yield from d[0]
+            value = yield from default(*args, **kwargs)
             return value
     f_codes = (invoke.__func__.__code__, define.__func__(None, None, None).__code__,)
