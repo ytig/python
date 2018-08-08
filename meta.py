@@ -24,14 +24,14 @@ def define(__class__, __new__=None):
 
             def decorator(new, old, name=''):
                 if inspect.isfunction(new):
+                    if not inspect.isfunction(old):
+                        old = None
                     mark = '/'.join((__unique__, key, name,))
                     if inspect.isgeneratorfunction(new):
-                        if not inspect.isgeneratorfunction(old):
-                            old = None
+                        assert old is None or inspect.isgeneratorfunction(old)
                         return _generatorfunction.define(new, old, mark)
                     else:
-                        if not inspect.isfunction(old):
-                            old = None
+                        assert not inspect.isgeneratorfunction(old)
                         return _function.define(new, old, mark)
                 else:
                     return old
