@@ -152,13 +152,13 @@ class Throw:
     def __enter__(self):
         with frames(back=1) as f:
             assert f.has(0)
-            xid = 'X:' + f[0].f_code.co_filename + '/' + str(f[0].f_code.co_firstlineno)
+            xid = 'X:' + f[0].f_code.co_filename + '/' + str(f[0].f_lineno)
         return xid in self.__throw
 
     def __exit__(self, t, v, tb):
         with frames(back=1) as f:
             assert f.has(0)
-            xid = 'X:' + f[0].f_code.co_filename + '/' + str(f[0].f_code.co_firstlineno)
+            xid = 'X:' + f[0].f_code.co_filename + '/' + str(f[0].f_lineno)
         if t is None:
             self.__throw.add(xid)
 
