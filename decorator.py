@@ -133,6 +133,7 @@ def mlock(k=None):
 class Throw:
     def __init__(self, generics):
         self.generics = generics
+        self.stack = []
 
     @property
     def __throw(self):
@@ -153,12 +154,11 @@ class Throw:
         with frames(back=1) as f:
             assert f.has(0)
             xid = 'X:' + f[0].f_code.co_filename + '/' + str(f[0].f_lineno)
+        self.stack.append(xid)
         return xid in self.__throw
 
     def __exit__(self, t, v, tb):
-        with frames(back=1) as f:
-            assert f.has(0)
-            xid = 'X:' + f[0].f_code.co_filename + '/' + str(f[0].f_lineno)
+        xid = self.stack.pop()
         if t is None:
             self.__throw.add(xid)
 
