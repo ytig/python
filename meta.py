@@ -101,9 +101,8 @@ class _function:
         with frames(filter=lambda f: f.f_code is _function.f_codes[1]) as f:
             assert f.has(0)
             old = f[0].f_locals['old']
-            if args is None:
+            if args is None or kwargs is None:
                 args = f[0].f_locals['args']
-            if kwargs is None:
                 kwargs = f[0].f_locals['kwargs']
         if old is not None:
             return old(*args, **kwargs)
@@ -136,9 +135,8 @@ class _generatorfunction:
         with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[1]) as f:
             assert f.has(0)
             old = f[0].f_locals['old']
-            if args is None:
+            if args is None or kwargs is None:
                 args = f[0].f_locals['args']
-            if kwargs is None:
                 kwargs = f[0].f_locals['kwargs']
         if old is not None:
             value = yield from old(*args, **kwargs)
