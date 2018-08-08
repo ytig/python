@@ -60,11 +60,11 @@ def define(__class__, __new__=None):
 
 
 # 原始调用
-def invoke(*d, arguments=False):
+def invoke(*d, update=False):
     def default(*args, **kwargs):
         assert d
         return d[0]
-    if not arguments:
+    if not update:
         args = None
         kwargs = None
     else:
