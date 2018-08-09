@@ -109,12 +109,12 @@ class _property:
     def set(o, b):
         r = property(fget=_except()(o.fget) if o.fget else None, fset=_except()(o.fset) if o.fset else None, fdel=_except()(o.fdel) if o.fdel else None)
         if b:
-            setvar(r.fget or r.fset or r.fdel, '__export__', property(fget=_exec()(r.fget) if r.fget else None, fset=_exec()(r.fset) if r.fset else None, fdel=_exec()(r.fdel) if r.fdel else None))
+            setvar(r.fget or r.fset or r.fdel, '__export__', True)
         return r
 
     @staticmethod
     def get(o):
-        return getvar(o.fget or o.fset or o.fdel, '__export__')
+        return property(fget=_exec()(o.fget) if o.fget else None, fset=_exec()(o.fset) if o.fset else None, fdel=_exec()(o.fdel) if o.fdel else None) if getvar(o.fget or o.fset or o.fdel, '__export__') else None
 
 
 class _function:
@@ -122,12 +122,12 @@ class _function:
     def set(o, b):
         r = _except()(o)
         if b:
-            setvar(r, '__export__', _exec()(r))
+            setvar(r, '__export__', True)
         return r
 
     @staticmethod
     def get(o):
-        return getvar(o, '__export__')
+        return _exec()(o) if getvar(o, '__export__') else None
 
 
 class _list(list):
