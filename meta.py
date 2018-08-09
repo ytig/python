@@ -16,48 +16,69 @@ def define(__class__, __new__=None):
         __unique__ = getvar(__class__, '__unique__')
     if not callable(__new__):
         __new__ = super(__class__, args[0]).__new__
-    bases = tuple(search(lambda cls: cls.__bases__).depth(*args[2]))
     namespace = args[3]
 
-    def decorator(new, old, name=''):
-        if inspect.isfunction(new):
-            if not inspect.isfunction(old):
-                old = None
-            mark = '/'.join((__unique__, key, name,))
-            if inspect.isgeneratorfunction(new):
-                assert old is None or inspect.isgeneratorfunction(old)
-                return _generatorfunction.define(new, old, mark)
-            else:
-                assert not inspect.isgeneratorfunction(old)
-                return _function.define(new, old, mark)
-        else:
-            return old
-    for key, var, in dict(list(context['varnames'].items()) + list(context['cellvars'].items())).items():
-        _var = None
+    def function(func, find, name=''):
+        assert inspect.isfunction(func)
+        isgeneratorfunction = inspect.isgeneratorfunction(func)
         if key in namespace:
-            _var = namespace[key]
+            def base(v=namespace[key]):
+                f = find(v)
+                assert inspect.isfunction(f)
+                assert inspect.isgeneratorfunction(f) == isgeneratorfunction
+                return f
         else:
-            for b in bases:
-                if hasvar(b, key):
-                    _var = getvar(b, key)
-                    break
+            def base(k=key):
+                f = None
+                for b in search(lambda cls: cls.__bases__).depth(*ret.__bases__):
+                    if hasvar(b, k):
+                        f = find(getvar(b, k))
+                        assert inspect.isfunction(f)
+                        assert inspect.isgeneratorfunction(f) == isgeneratorfunction
+                        break
+                return f
+        mark = '/'.join((__unique__, key, name,))
+        return (_generatorfunction if isgeneratorfunction else _function).define(func, base, mark)
+    for key, var, in dict(list(context['varnames'].items()) + list(context['cellvars'].items())).items():
         if isinstance(var, staticmethod):
-            var = var.__func__
-            _var = _var.__func__ if isinstance(_var, staticmethod) else None
-            namespace[key] = staticmethod(decorator(var, _var))
+            def find(v):
+                assert isinstance(v, staticmethod)
+                return v.__func__
+            namespace[key] = staticmethod(function(var.__func__, find))
         elif isinstance(var, classmethod):
-            var = var.__func__
-            _var = _var.__func__ if isinstance(_var, classmethod) else None
-            namespace[key] = classmethod(decorator(var, _var))
+            def find(v):
+                assert isinstance(v, classmethod)
+                return v.__func__
+            namespace[key] = classmethod(function(var.__func__, find))
         elif isinstance(var, property):
-            fget, fset, fdel, = (var.fget, var.fset, var.fdel,)
-            _fget, _fset, _fdel, = (_var.fget, _var.fset, _var.fdel,) if isinstance(_var, property) else (None, None, None,)
-            namespace[key] = property(fget=decorator(fget, _fget, name='fget'), fset=decorator(fset, _fset, name='fset'), fdel=decorator(fdel, _fdel, name='fdel'))
+            if var.fget is not None:
+                def find(v):
+                    assert isinstance(v, property)
+                    return v.fget
+                fget = function(var.fget, find, name='fget')
+            else:
+                fget = None
+            if var.fset is not None:
+                def find(v):
+                    assert isinstance(v, property)
+                    return v.fset
+                fset = function(var.fset, find, name='fset')
+            else:
+                fset = None
+            if var.fdel is not None:
+                def find(v):
+                    assert isinstance(v, property)
+                    return v.fdel
+                fdel = function(var.fdel, find, name='fdel')
+            else:
+                fdel = None
+            namespace[key] = property(fget=fget, fset=fset, fdel=fdel)
         elif inspect.isfunction(var):
-            namespace[key] = decorator(var, _var)
-        else:
-            namespace[key] = var
-    return __new__(*args, **kwargs)
+            def find(v):
+                return v
+            namespace[key] = function(var, find)
+    ret = __new__(*args, **kwargs)
+    return ret
 
 
 # 原始调用
@@ -83,30 +104,33 @@ def invoke(*d, update=False):
 
 class _function:
     @staticmethod
-    def define(new, old, mark):
+    def define(func, base, mark):
         def wrapper(*args, **kwargs):
             mark
             if not depth(equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark']):
-                return new(*args, **kwargs)
-            elif old is not None:
-                return old(*args, **kwargs)
+                return func(*args, **kwargs)
             else:
-                with frames(filter=lambda f: f.f_code is _function.f_codes[0]) as f:
-                    assert f.has(0)
-                    default = f[0].f_locals['default']
-                return default(*args, **kwargs)
+                _func = base()
+                if _func is not None:
+                    return _func(*args, **kwargs)
+                else:
+                    with frames(filter=lambda f: f.f_code is _function.f_codes[0]) as f:
+                        assert f.has(0)
+                        default = f[0].f_locals['default']
+                    return default(*args, **kwargs)
         return wrapper
 
     @staticmethod
     def invoke(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _function.f_codes[1]) as f:
             assert f.has(0)
-            old = f[0].f_locals['old']
+            base = f[0].f_locals['base']
             if args is None or kwargs is None:
                 args = f[0].f_locals['args']
                 kwargs = f[0].f_locals['kwargs']
-        if old is not None:
-            return old(*args, **kwargs)
+        func = base()
+        if func is not None:
+            return func(*args, **kwargs)
         else:
             return default(*args, **kwargs)
     f_codes = (invoke.__func__.__code__, define.__func__(None, None, None).__code__,)
@@ -114,33 +138,36 @@ class _function:
 
 class _generatorfunction:
     @staticmethod
-    def define(new, old, mark):
+    def define(func, base, mark):
         def wrapper(*args, **kwargs):
             mark
             if not depth(equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark']):
-                value = yield from new(*args, **kwargs)
-                return value
-            elif old is not None:
-                value = yield from old(*args, **kwargs)
+                value = yield from func(*args, **kwargs)
                 return value
             else:
-                with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[0]) as f:
-                    assert f.has(0)
-                    default = f[0].f_locals['default']
-                value = yield from default(*args, **kwargs)
-                return value
+                _func = base()
+                if _func is not None:
+                    value = yield from _func(*args, **kwargs)
+                    return value
+                else:
+                    with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[0]) as f:
+                        assert f.has(0)
+                        default = f[0].f_locals['default']
+                    value = yield from default(*args, **kwargs)
+                    return value
         return wrapper
 
     @staticmethod
     def invoke(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[1]) as f:
             assert f.has(0)
-            old = f[0].f_locals['old']
+            base = f[0].f_locals['base']
             if args is None or kwargs is None:
                 args = f[0].f_locals['args']
                 kwargs = f[0].f_locals['kwargs']
-        if old is not None:
-            value = yield from old(*args, **kwargs)
+        func = base()
+        if func is not None:
+            value = yield from func(*args, **kwargs)
             return value
         else:
             value = yield from default(*args, **kwargs)
