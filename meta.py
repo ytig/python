@@ -128,9 +128,9 @@ class _function:
             if args is None or kwargs is None:
                 args = f[0].f_locals['args']
                 kwargs = f[0].f_locals['kwargs']
-        func = base()
-        if func is not None:
-            return func(*args, **kwargs)
+        _func = base()
+        if _func is not None:
+            return _func(*args, **kwargs)
         else:
             return default(*args, **kwargs)
     f_codes = (invoke.__func__.__code__, define.__func__(None, None, None).__code__,)
@@ -165,9 +165,9 @@ class _generatorfunction:
             if args is None or kwargs is None:
                 args = f[0].f_locals['args']
                 kwargs = f[0].f_locals['kwargs']
-        func = base()
-        if func is not None:
-            value = yield from func(*args, **kwargs)
+        _func = base()
+        if _func is not None:
+            value = yield from _func(*args, **kwargs)
             return value
         else:
             value = yield from default(*args, **kwargs)
