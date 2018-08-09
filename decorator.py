@@ -2,6 +2,7 @@
 import json
 import inspect
 import threading
+import atexit
 from kit import bind, unique, hasvar, getvar, setvar, frames, module
 
 
@@ -19,7 +20,7 @@ class _Lock:
 
     def __init__(self):
         self.lock = threading.Lock()
-        self.stack = []
+        self.stack = list()
 
     def __enter__(self):
         tn = threading.current_thread().name
@@ -133,7 +134,7 @@ def mlock(k=None):
 class Throw:
     def __init__(self, generics):
         self.generics = generics
-        self.stack = []
+        self.stack = list()
 
     @property
     def __throw(self):
@@ -235,15 +236,26 @@ def mthrow(r=None):
 # 单例类型（同参）
 def instance(fn='instanceOf'):
     def decorator(cls):
-        instances = {}
+        cn = unique()
 
-        @staticmethod
-        def instanceOf(*args, **kwargs):
-            key = json.dumps((args, sorted(kwargs.items(), key=lambda i: i[0]),))
+        @classmethod
+        def instanceOf(cls, *args, **kwargs):
+            assert getvar(cls, fn) is instanceOf
+            vn = '__instances__'
+            with Lock(instance):
+                assert hasvar(instance, vn) or setvar(instance, vn, dict())
+                INSTANCES = getvar(instance, vn)
+                if cn not in INSTANCES:
+                    INSTANCES[cn] = dict()
+                instances = INSTANCES[cn]
+            sn = json.dumps((args, sorted(kwargs.items(), key=lambda i: i[0]),))
             with Lock(cls):
-                if key not in instances:
-                    instances[key] = cls(*args, **kwargs)
-                return instances[key]
+                if sn not in instances:
+                    instances[sn] = cls(*args, **kwargs)
+                return instances[sn]
         assert not hasvar(cls, fn) and setvar(cls, fn, instanceOf)
         return cls
     return decorator
+
+
+atexit.register(lambda: setvar(instance, '__instances__', None))
