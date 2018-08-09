@@ -19,12 +19,12 @@ def define(__class__, __new__=None):
     namespace = args[3]
 
     def function(func, find, name=''):
-        assert inspect.isfunction(func)
+        assert callable(func)
         isgeneratorfunction = inspect.isgeneratorfunction(func)
         if key in namespace:
             def base(v=namespace[key]):
                 f = find(v)
-                assert inspect.isfunction(f)
+                assert callable(f)
                 assert inspect.isgeneratorfunction(f) == isgeneratorfunction
                 return f
         else:
@@ -33,7 +33,7 @@ def define(__class__, __new__=None):
                 for b in search(lambda cls: cls.__bases__).depth(*ret.__bases__):
                     if hasvar(b, k):
                         f = find(getvar(b, k))
-                        assert inspect.isfunction(f)
+                        assert callable(f)
                         assert inspect.isgeneratorfunction(f) == isgeneratorfunction
                         break
                 return f
@@ -111,7 +111,7 @@ class _function:
                 return func(*args, **kwargs)
             else:
                 _func = base()
-                if _func is not None:
+                if callable(_func):
                     return _func(*args, **kwargs)
                 else:
                     with frames(filter=lambda f: f.f_code is _function.f_codes[0]) as f:
@@ -129,7 +129,7 @@ class _function:
                 args = f[0].f_locals['args']
                 kwargs = f[0].f_locals['kwargs']
         _func = base()
-        if _func is not None:
+        if callable(_func):
             return _func(*args, **kwargs)
         else:
             return default(*args, **kwargs)
@@ -146,7 +146,7 @@ class _generatorfunction:
                 return value
             else:
                 _func = base()
-                if _func is not None:
+                if callable(_func):
                     value = yield from _func(*args, **kwargs)
                     return value
                 else:
@@ -166,7 +166,7 @@ class _generatorfunction:
                 args = f[0].f_locals['args']
                 kwargs = f[0].f_locals['kwargs']
         _func = base()
-        if _func is not None:
+        if callable(_func):
             value = yield from _func(*args, **kwargs)
             return value
         else:
