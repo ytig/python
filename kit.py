@@ -264,7 +264,8 @@ def setvar(o, k, v):
             if hasattr(o, k):
                 for c in search(lambda cls: cls.__bases__).depth(o.__class__):
                     if hasvar(c, k):
-                        if hasattr(getvar(c, k), '__set__'):
+                        var = getvar(c, k)
+                        if hasattr(var, '__set__') or hasattr(var, '__delete__'):
                             b = False
                         break
             if b:
