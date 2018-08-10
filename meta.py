@@ -121,10 +121,6 @@ def invoke(*d, update=False):
             return d[0]
         return (_function.invoke, _generatorfunction.invoke,)[index - 0](args, kwargs, default)
     elif index in range(2, 5):
-        if args is not None:
-            assert args
-            args = args[1:]
-
         def default(name):
             assert d
             b = hasattr(d[0], name)
@@ -132,6 +128,9 @@ def invoke(*d, update=False):
                 return _wrapper.descriptor(d[0]).__get__
             assert b
             return getattr(d[0], name)
+        if args is not None:
+            assert args
+            args = args[1:]
         return (_descriptor.get, _datadescriptor.set, _datadescriptor.delete,)[index - 2](args, kwargs, default)
 
 
