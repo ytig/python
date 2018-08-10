@@ -60,35 +60,20 @@ def define(__class__, __new__=None):
         return (_datadescriptor if isdatadescriptor else _descriptor)(desc, base, mark)
     for key, var, in dict(list(context['varnames'].items()) + list(context['cellvars'].items())).items():
         if isinstance(var, staticmethod):
-            def find(v):
-                assert isinstance(v, staticmethod)
-                return v.__func__
-            namespace[key] = staticmethod(function(var.__func__, find=find))
+            namespace[key] = staticmethod(function(var.__func__, find=lambda v: v.__func__ if isinstance(v, staticmethod) else None))
         elif isinstance(var, classmethod):
-            def find(v):
-                assert isinstance(v, classmethod)
-                return v.__func__
-            namespace[key] = classmethod(function(var.__func__, find=find))
+            namespace[key] = classmethod(function(var.__func__, find=lambda v: v.__func__ if isinstance(v, classmethod) else None))
         elif isinstance(var, property):
             if var.fget is not None:
-                def find(v):
-                    assert isinstance(v, property)
-                    return v.fget
-                fget = function(var.fget, find=find, name='fget')
+                fget = function(var.fget, find=lambda v: v.fget if isinstance(v, property) else None, name='fget')
             else:
                 fget = None
             if var.fset is not None:
-                def find(v):
-                    assert isinstance(v, property)
-                    return v.fset
-                fset = function(var.fset, find=find, name='fset')
+                fset = function(var.fset, find=lambda v: v.fset if isinstance(v, property) else None, name='fset')
             else:
                 fset = None
             if var.fdel is not None:
-                def find(v):
-                    assert isinstance(v, property)
-                    return v.fdel
-                fdel = function(var.fdel, find=find, name='fdel')
+                fdel = function(var.fdel, find=lambda v: v.fdel if isinstance(v, property) else None, name='fdel')
             else:
                 fdel = None
             namespace[key] = property(fget=fget, fset=fset, fdel=fdel)
