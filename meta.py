@@ -131,9 +131,7 @@ def invoke(*d, update=False):
         return (_descriptor.get, _datadescriptor.set, _datadescriptor.delete,)[index - 2](args[1:], kwargs, default)
 
 
-# 函数
 class _function:
-    # 定义
     @staticmethod
     def define(func, base, mark):
         def wrapper(*args, **kwargs):
@@ -151,7 +149,6 @@ class _function:
                     return default(*args, **kwargs)
         return wrapper
 
-    # 调用
     @staticmethod
     def invoke(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _function.f_codes[1]) as f:
@@ -168,9 +165,7 @@ class _function:
     f_codes = (invoke.__func__.__code__, define.__func__(None, None, None).__code__,)
 
 
-# 生成器函数
 class _generatorfunction:
-    # 定义
     @staticmethod
     def define(func, base, mark):
         def wrapper(*args, **kwargs):
@@ -191,7 +186,6 @@ class _generatorfunction:
                     return value
         return wrapper
 
-    # 调用
     @staticmethod
     def invoke(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[1]) as f:
@@ -210,9 +204,7 @@ class _generatorfunction:
     f_codes = (invoke.__func__.__code__, define.__func__(None, None, None).__code__,)
 
 
-# 描述器
 class _descriptor:
-    # 定义
     def __init__(self, desc, base, mark):
         self.desc = desc
         self.base = base
@@ -231,7 +223,6 @@ class _descriptor:
                     default = f[0].f_locals['default']
                 return default('__get__')(*args, **kwargs)
 
-    # 调用
     @staticmethod
     def get(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _descriptor.f_codes_get[1]) as f:
@@ -248,7 +239,6 @@ class _descriptor:
     f_codes_get = (get.__func__.__code__, __get__.__code__,)
 
 
-# 资料描述器
 class _datadescriptor(_descriptor):
     def __set__(self, *args, **kwargs):
         if not depth(equal=lambda f1, f2: f1.f_locals['self'].mark == f2.f_locals['self'].mark):
@@ -263,7 +253,6 @@ class _datadescriptor(_descriptor):
                     default = f[0].f_locals['default']
                 return default('__set__')(*args, **kwargs)
 
-    # 调用
     @staticmethod
     def set(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _datadescriptor.f_codes_set[1]) as f:
@@ -292,7 +281,6 @@ class _datadescriptor(_descriptor):
                     default = f[0].f_locals['default']
                 return default('__delete__')(*args, **kwargs)
 
-    # 调用
     @staticmethod
     def delete(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _datadescriptor.f_codes_delete[1]) as f:
@@ -309,7 +297,6 @@ class _datadescriptor(_descriptor):
     f_codes_delete = (delete.__func__.__code__, __delete__.__code__,)
 
 
-# 包装器
 class _wrapper:
     class _descriptor:
         def __init__(self, desc):
@@ -327,7 +314,6 @@ class _wrapper:
             assert hasattr(self.desc, '__delete__')
             return self.desc.__delete__(*args, **kwargs)
 
-    # 生成描述器
     @staticmethod
     def descriptor(desc):
         if hasattr(desc, '__set__') or hasattr(desc, '__delete__'):
