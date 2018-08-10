@@ -123,13 +123,15 @@ def invoke(*d, update=False):
     elif index in range(2, 5):
         index -= 2
 
-        def default(name):
+        def default(*args, **kwargs):
+            name = args[0]
+            args = args[1:]
             assert d
             b = hasattr(d[0], name)
             if not b and name == '__get__':
-                return _wrapper.descriptor(d[0]).__get__
+                return d[0]
             assert b
-            return getattr(d[0], name)
+            return getattr(d[0], name)(*args, **kwargs)
         if not update:
             args = None
             kwargs = None
@@ -232,7 +234,7 @@ class _descriptor:
                 with frames(filter=lambda f: f.f_code is _descriptor.f_codes_get[0]) as f:
                     assert f.has(0)
                     default = f[0].f_locals['default']
-                return default('__get__')(*args, **kwargs)
+                return default('__get__', *args, **kwargs)
 
     @staticmethod
     def get(args, kwargs, default):
@@ -246,7 +248,7 @@ class _descriptor:
         if _desc is not None:
             return _desc.__get__(*args, **kwargs)
         else:
-            return default('__get__')(*args, **kwargs)
+            return default('__get__', *args, **kwargs)
     f_codes_get = (get.__func__.__code__, __get__.__code__,)
 
 
@@ -262,7 +264,7 @@ class _datadescriptor(_descriptor):
                 with frames(filter=lambda f: f.f_code is _datadescriptor.f_codes_set[0]) as f:
                     assert f.has(0)
                     default = f[0].f_locals['default']
-                return default('__set__')(*args, **kwargs)
+                return default('__set__', *args, **kwargs)
 
     @staticmethod
     def set(args, kwargs, default):
@@ -276,7 +278,7 @@ class _datadescriptor(_descriptor):
         if _desc is not None:
             return _desc.__set__(*args, **kwargs)
         else:
-            return default('__set__')(*args, **kwargs)
+            return default('__set__', *args, **kwargs)
     f_codes_set = (set.__func__.__code__, __set__.__code__,)
 
     def __delete__(self, *args, **kwargs):
@@ -290,7 +292,7 @@ class _datadescriptor(_descriptor):
                 with frames(filter=lambda f: f.f_code is _datadescriptor.f_codes_delete[0]) as f:
                     assert f.has(0)
                     default = f[0].f_locals['default']
-                return default('__delete__')(*args, **kwargs)
+                return default('__delete__', *args, **kwargs)
 
     @staticmethod
     def delete(args, kwargs, default):
@@ -304,7 +306,7 @@ class _datadescriptor(_descriptor):
         if _desc is not None:
             return _desc.__delete__(*args, **kwargs)
         else:
-            return default('__delete__')(*args, **kwargs)
+            return default('__delete__', *args, **kwargs)
     f_codes_delete = (delete.__func__.__code__, __delete__.__code__,)
 
 
