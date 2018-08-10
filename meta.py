@@ -107,18 +107,18 @@ def invoke(*d, update=False):
     with frames(filter=lambda f: f.f_code in codes) as f:
         assert f.has(0)
         index = codes.index(f[0].f_code)
+    if not update:
+        args = None
+        kwargs = None
+    else:
+        context = scope(back=1)
+        assert 'args' in context and 'kwargs' in context
+        args = context['args']
+        kwargs = context['kwargs']
     if index in range(0, 2):
         def default(*args, **kwargs):
             assert d
             return d[0]
-        if not update:
-            args = None
-            kwargs = None
-        else:
-            context = scope(back=1)
-            assert 'args' in context and 'kwargs' in context
-            args = context['args']
-            kwargs = context['kwargs']
         return (_function.invoke, _generatorfunction.invoke,)[index - 0](args, kwargs, default)
     elif index in range(2, 5):
         def default(name):
@@ -128,15 +128,7 @@ def invoke(*d, update=False):
                 return _wrapper.descriptor(d[0]).__get__
             assert b
             return getattr(d[0], name)
-        if not update:
-            args = None
-            kwargs = None
-        else:
-            context = scope(back=1)
-            assert 'args' in context and 'kwargs' in context
-            args = context['args'][1:]
-            kwargs = context['kwargs']
-        return (_descriptor.get, _datadescriptor.set, _datadescriptor.delete,)[index - 2](args, kwargs, default)
+        return (_descriptor.get, _datadescriptor.set, _datadescriptor.delete,)[index - 2](args[1:], kwargs, default)
 
 
 # 函数
@@ -239,7 +231,7 @@ class _descriptor:
                     default = f[0].f_locals['default']
                 return default('__get__')(*args, **kwargs)
 
-    # 调用get
+    # 调用
     @staticmethod
     def get(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _descriptor.f_codes_get[1]) as f:
@@ -271,7 +263,7 @@ class _datadescriptor(_descriptor):
                     default = f[0].f_locals['default']
                 return default('__set__')(*args, **kwargs)
 
-    # 调用set
+    # 调用
     @staticmethod
     def set(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _datadescriptor.f_codes_set[1]) as f:
@@ -300,7 +292,7 @@ class _datadescriptor(_descriptor):
                     default = f[0].f_locals['default']
                 return default('__delete__')(*args, **kwargs)
 
-    # 调用delete
+    # 调用
     @staticmethod
     def delete(args, kwargs, default):
         with frames(filter=lambda f: f.f_code is _datadescriptor.f_codes_delete[1]) as f:
