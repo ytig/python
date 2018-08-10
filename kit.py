@@ -297,14 +297,15 @@ class frames(list):
 
 
 # 作用域值
-def scope(pattern=r'', **fi):
+def scope(pattern=None, **fi):
     fi['back'] = 1 + fi.get('back', 0)
     ret = dict()
     with frames(**fi) as f:
         assert f.has(0)
         try:
             keys = set()
-            if pattern is not None:
+            if isinstance(pattern, str):
+                b = False
                 for owner in gc.get_referrers(f[0].f_code):
                     if not inspect.isfunction(owner):
                         continue
@@ -312,6 +313,7 @@ def scope(pattern=r'', **fi):
                         continue
                     if not re.search(pattern, getattr(owner, '__qualname__', '')):
                         continue
+                    b = True
                     ret['args'] = list()
                     ret['kwargs'] = dict()
                     fullargspec = inspect.getfullargspec(owner)
@@ -329,6 +331,7 @@ def scope(pattern=r'', **fi):
                         keys.add(fullargspec.varkw)
                     ret['args'] = tuple(ret['args'])
                     break
+                assert b
             ret['varnames'] = dict()
             ret['cellvars'] = dict()
             ret['freevars'] = dict()

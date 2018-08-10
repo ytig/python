@@ -7,7 +7,6 @@ from decorator import Lock
 # 定义类型
 def define(__class__, __new__=None):
     context = scope(pattern=r'__new__', back=1)
-    assert 'args' in context and 'kwargs' in context
     args = context['args']
     kwargs = context['kwargs']
     assert __class__ is not None and __class__ is context['freevars'].get('__class__')
@@ -107,20 +106,23 @@ def invoke(*d, update=False):
     with frames(filter=lambda f: f.f_code in codes) as f:
         assert f.has(0)
         index = codes.index(f[0].f_code)
-    if not update:
-        args = None
-        kwargs = None
-    else:
-        context = scope(back=1)
-        assert 'args' in context and 'kwargs' in context
-        args = context['args']
-        kwargs = context['kwargs']
     if index in range(0, 2):
+        index -= 0
+
         def default(*args, **kwargs):
             assert d
             return d[0]
-        return (_function.invoke, _generatorfunction.invoke,)[index - 0](args, kwargs, default)
+        if not update:
+            args = None
+            kwargs = None
+        else:
+            context = scope(pattern=r'', back=1)
+            args = context['args']
+            kwargs = context['kwargs']
+        return (_function.invoke, _generatorfunction.invoke,)[index](args, kwargs, default)
     elif index in range(2, 5):
+        index -= 2
+
         def default(name):
             assert d
             b = hasattr(d[0], name)
@@ -128,10 +130,16 @@ def invoke(*d, update=False):
                 return _wrapper.descriptor(d[0]).__get__
             assert b
             return getattr(d[0], name)
-        if args is not None:
+        if not update:
+            args = None
+            kwargs = None
+        else:
+            context = scope(pattern=(r'__get__', r'__set__', r'__delete__',)[index], back=1)
+            args = context['args']
             assert args
             args = args[1:]
-        return (_descriptor.get, _datadescriptor.set, _datadescriptor.delete,)[index - 2](args, kwargs, default)
+            kwargs = context['kwargs']
+        return (_descriptor.get, _datadescriptor.set, _datadescriptor.delete,)[index](args, kwargs, default)
 
 
 class _function:
