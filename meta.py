@@ -17,13 +17,11 @@ def define(__class__, __new__=None):
         __new__ = super(__class__, args[0]).__new__
     namespace = args[3]
 
-    def function(func, find=lambda f: f, name=''):
-        assert callable(func)
+    def function(func, find, name=''):
         isgeneratorfunction = inspect.isgeneratorfunction(func)
         if key in namespace:
             def base(v=namespace[key]):
                 f = find(v)
-                assert callable(f)
                 assert inspect.isgeneratorfunction(f) == isgeneratorfunction
                 return f
         else:
@@ -32,7 +30,6 @@ def define(__class__, __new__=None):
                 for b in ret.__mro__[1:]:
                     if hasvar(b, k):
                         f = find(_wrapper.function(getvar(b, k)))
-                        assert callable(f)
                         assert inspect.isgeneratorfunction(f) == isgeneratorfunction
                         break
                 return f
@@ -60,25 +57,51 @@ def define(__class__, __new__=None):
         return (_datadescriptor if isdatadescriptor else _descriptor)(desc, base, mark)
     for key, var, in dict(list(context['varnames'].items()) + list(context['cellvars'].items())).items():
         if isinstance(var, staticmethod):
-            namespace[key] = staticmethod(function(var.__func__, find=lambda v: v.__func__ if isinstance(v, staticmethod) else None))
+            if callable(var.__func__):
+                def find(v):
+                    assert isinstance(v, staticmethod) and callable(v.__func__)
+                    return v.__func__
+                __func__ = function(var.__func__, find)
+            else:
+                __func__ = None
+            namespace[key] = staticmethod(__func__)
         elif isinstance(var, classmethod):
-            namespace[key] = classmethod(function(var.__func__, find=lambda v: v.__func__ if isinstance(v, classmethod) else None))
+            if callable(var.__func__):
+                def find(v):
+                    assert isinstance(v, classmethod) and callable(v.__func__)
+                    return v.__func__
+                __func__ = function(var.__func__, find)
+            else:
+                __func__ = None
+            namespace[key] = classmethod(__func__)
         elif isinstance(var, property):
-            if var.fget is not None:
-                fget = function(var.fget, find=lambda v: v.fget if isinstance(v, property) else None, name='fget')
+            if callable(var.fget):
+                def find(v):
+                    assert isinstance(v, property) and callable(v.fget)
+                    return v.fget
+                fget = function(var.fget, find, name='fget')
             else:
                 fget = None
-            if var.fset is not None:
-                fset = function(var.fset, find=lambda v: v.fset if isinstance(v, property) else None, name='fset')
+            if callable(var.fset):
+                def find(v):
+                    assert isinstance(v, property) and callable(v.fset)
+                    return v.fset
+                fset = function(var.fset, find, name='fset')
             else:
                 fset = None
-            if var.fdel is not None:
-                fdel = function(var.fdel, find=lambda v: v.fdel if isinstance(v, property) else None, name='fdel')
+            if callable(var.fdel):
+                def find(v):
+                    assert isinstance(v, property) and callable(v.fdel)
+                    return v.fdel
+                fdel = function(var.fdel, find, name='fdel')
             else:
                 fdel = None
             namespace[key] = property(fget=fget, fset=fset, fdel=fdel)
         elif inspect.isfunction(var):
-            namespace[key] = function(var)
+            def find(v):
+                assert callable(v)
+                return v
+            namespace[key] = function(var, find)
         else:
             namespace[key] = descriptor(var)
     ret = __new__(*args, **kwargs)
