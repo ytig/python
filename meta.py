@@ -303,9 +303,9 @@ class _wrapper:
 
     def __init__(self, *args, **kwargs):
         if not getvar(self, '__foobar__', d=False):
-            object.__dict__['__init__'](self)
+            return object.__dict__['__init__'](self)
         else:
-            object.__dict__['__init__'](self, *args, **kwargs)
+            return object.__dict__['__init__'](self, *args, **kwargs)
 
     @classmethod
     def __init_subclass__(cls, *args, **kwargs):
