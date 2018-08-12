@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 import inspect
-from kit import unique, search, hasvar, getvar, setvar, frames, scope, depth
+from kit import unique, hasvar, getvar, setvar, frames, scope, depth
 from decorator import Lock
 
 
@@ -29,7 +29,7 @@ def define(__class__, __new__=None):
         else:
             def base(k=key):
                 f = None
-                for b in search(lambda cls: cls.__bases__).depth(*ret.__bases__):
+                for b in ret.__mro__[1:]:
                     if hasvar(b, k):
                         f = find(_wrapper.function(getvar(b, k)))
                         assert callable(f)
@@ -50,7 +50,7 @@ def define(__class__, __new__=None):
         else:
             def base(k=key):
                 d = None
-                for b in search(lambda cls: cls.__bases__).depth(*ret.__bases__):
+                for b in ret.__mro__[1:]:
                     if hasvar(b, k):
                         d = _wrapper.descriptor(getvar(b, k))
                         assert inspect.isdatadescriptor(d) == isdatadescriptor
