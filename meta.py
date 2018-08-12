@@ -18,12 +18,11 @@ def define(__class__, __new__=None):
     namespace = args[3]
 
     def function(func, find=lambda f: f, name=''):
-        assert callable(func)
+        func = _wrapper.function(func)
         isgeneratorfunction = inspect.isgeneratorfunction(func)
         if key in namespace:
             def base(v=namespace[key]):
-                f = find(v)
-                assert callable(f)
+                f = _wrapper.function(find(v))
                 assert inspect.isgeneratorfunction(f) == isgeneratorfunction
                 return f
         else:
@@ -31,8 +30,7 @@ def define(__class__, __new__=None):
                 f = None
                 for b in search(lambda cls: cls.__bases__).depth(*ret.__bases__):
                     if hasvar(b, k):
-                        f = find(getvar(b, k))
-                        assert callable(f)
+                        f = _wrapper.function(find(getvar(b, k)))
                         assert inspect.isgeneratorfunction(f) == isgeneratorfunction
                         break
                 return f
@@ -138,7 +136,7 @@ class _function:
                 return func(*args, **kwargs)
             else:
                 _func = base()
-                if callable(_func):
+                if _func is not None:
                     return _func(*args, **kwargs)
                 else:
                     with frames(filter=lambda f: f.f_code is _function.f_codes[0]) as f:
@@ -156,7 +154,7 @@ class _function:
                 args = f[0].f_locals['args']
                 kwargs = f[0].f_locals['kwargs']
         _func = base()
-        if callable(_func):
+        if _func is not None:
             return _func(*args, **kwargs)
         else:
             return default(*args, **kwargs)
@@ -173,7 +171,7 @@ class _generatorfunction:
                 return value
             else:
                 _func = base()
-                if callable(_func):
+                if _func is not None:
                     value = yield from _func(*args, **kwargs)
                     return value
                 else:
@@ -193,7 +191,7 @@ class _generatorfunction:
                 args = f[0].f_locals['args']
                 kwargs = f[0].f_locals['kwargs']
         _func = base()
-        if callable(_func):
+        if _func is not None:
             value = yield from _func(*args, **kwargs)
             return value
         else:
@@ -296,6 +294,27 @@ class _datadescriptor(_descriptor):
 
 
 class _wrapper:
+    def __new__(cls, *args, **kwargs):
+        ret = object.__new__(cls)
+        setvar(ret, '__foobar__', True)
+        return ret
+
+    def __init__(self, *args, **kwargs):
+        if getvar(self, '__foobar__', d=False):
+            object.__init__(self, *args, **kwargs)
+        else:
+            object.__init__(self)
+
+    @staticmethod
+    def function(func):
+        if func is object.__new__:
+            return _wrapper.__new__
+        elif func is object.__init__:
+            return _wrapper.__init__
+        else:
+            assert inspect.isfunction(func)
+            return func
+
     class _descriptor:
         def __init__(self, desc):
             self.desc = desc
