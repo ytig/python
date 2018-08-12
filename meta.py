@@ -19,10 +19,12 @@ def define(__class__, __new__=None):
 
     def function(func, find=lambda f: f, name=''):
         func = _wrapper.function(func)
+        assert callable(func)
         isgeneratorfunction = inspect.isgeneratorfunction(func)
         if key in namespace:
             def base(v=namespace[key]):
-                f = _wrapper.function(find(v))
+                f = find(_wrapper.function(v))
+                assert callable(f)
                 assert inspect.isgeneratorfunction(f) == isgeneratorfunction
                 return f
         else:
@@ -30,7 +32,8 @@ def define(__class__, __new__=None):
                 f = None
                 for b in search(lambda cls: cls.__bases__).depth(*ret.__bases__):
                     if hasvar(b, k):
-                        f = _wrapper.function(find(getvar(b, k)))
+                        f = find(_wrapper.function(getvar(b, k)))
+                        assert callable(f)
                         assert inspect.isgeneratorfunction(f) == isgeneratorfunction
                         break
                 return f
@@ -295,30 +298,30 @@ class _datadescriptor(_descriptor):
 
 class _wrapper:
     def __new__(cls, *args, **kwargs):
-        ret = object.__new__(cls)
+        ret = object.__dict__['__new__'](cls)
         setvar(ret, '__foobar__', True)
         return ret
 
     def __init__(self, *args, **kwargs):
-        if getvar(self, '__foobar__', d=False):
-            object.__init__(self, *args, **kwargs)
+        if not getvar(self, '__foobar__', d=False):
+            object.__dict__['__init__'](self)
         else:
-            object.__init__(self)
+            object.__dict__['__init__'](self, *args, **kwargs)
 
-    def __init_subclass__(cls, **kwargs):
-        return object.__init_subclass__()
+    @classmethod
+    def __init_subclass__(cls, *args, **kwargs):
+        return object.__dict__['__init_subclass__'](cls)
+
+    @classmethod
+    def __subclasshook__(cls, *args, **kwargs):
+        return object.__dict__['__subclasshook__'](cls)
 
     @staticmethod
     def function(func):
-        if func is object.__new__:
-            return _wrapper.__new__
-        elif func is object.__init__:
-            return _wrapper.__init__
-        elif func is object.__init_subclass__:
-            return _wrapper.__init_subclass__
-        else:
-            assert callable(func)
-            return func
+        for key in ('__new__', '__init__', '__init_subclass__', '__subclasshook__',):
+            if func is object.__dict__[key]:
+                return _wrapper.__dict__[key]
+        return func
 
     class _descriptor:
         def __init__(self, desc):
