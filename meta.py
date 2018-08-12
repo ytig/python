@@ -18,12 +18,11 @@ def define(__class__, __new__=None):
     namespace = args[3]
 
     def function(func, find=lambda f: f, name=''):
-        func = _wrapper.function(func)
         assert callable(func)
         isgeneratorfunction = inspect.isgeneratorfunction(func)
         if key in namespace:
             def base(v=namespace[key]):
-                f = find(_wrapper.function(v))
+                f = find(v)
                 assert callable(f)
                 assert inspect.isgeneratorfunction(f) == isgeneratorfunction
                 return f
