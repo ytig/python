@@ -296,16 +296,17 @@ class _datadescriptor(_descriptor):
 
 
 class _wrapper:
-    def __new__(cls, *args, **kwargs):
-        ret = object.__dict__['__new__'](cls)
-        setvar(ret, '__foobar__', True)
+    @staticmethod
+    def __new__(*args, **kwargs):
+        ret = object.__dict__['__new__'](args[0])
+        setvar(ret, '__old__', True)
         return ret
 
     def __init__(self, *args, **kwargs):
-        if not getvar(self, '__foobar__', d=False):
-            return object.__dict__['__init__'](self)
-        else:
+        if getvar(self, '__old__', d=getattr(self.__class__, '__new__') is getattr(object, '__new__')):
             return object.__dict__['__init__'](self, *args, **kwargs)
+        else:
+            return object.__dict__['__init__'](self)
 
     @classmethod
     def __init_subclass__(cls, *args, **kwargs):
