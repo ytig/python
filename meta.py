@@ -305,14 +305,19 @@ class _wrapper:
         else:
             object.__init__(self)
 
+    def __init_subclass__(cls, **kwargs):
+        return object.__init_subclass__()
+
     @staticmethod
     def function(func):
         if func is object.__new__:
             return _wrapper.__new__
         elif func is object.__init__:
             return _wrapper.__init__
+        elif func is object.__init_subclass__:
+            return _wrapper.__init_subclass__
         else:
-            assert inspect.isfunction(func)
+            assert callable(func)
             return func
 
     class _descriptor:
