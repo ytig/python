@@ -309,7 +309,7 @@ class _wrapper:
 
     @classmethod
     def __init_subclass__(cls, *args, **kwargs):
-        return object.__dict__['__init_subclass__'](cls)
+        return object.__dict__['__init_subclass__'](cls, *args, **kwargs)
 
     @classmethod
     def __subclasshook__(cls, *args, **kwargs):
