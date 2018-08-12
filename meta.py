@@ -303,7 +303,7 @@ class _wrapper:
         return ret
 
     def __init__(self, *args, **kwargs):
-        if getvar(self, '__old__', d=getattr(self.__class__, '__new__') is getattr(object, '__new__')):
+        if getvar(self, '__old__', d=self.__class__.__new__ is object.__new__):
             return object.__dict__['__init__'](self, *args, **kwargs)
         else:
             return object.__dict__['__init__'](self)
