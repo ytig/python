@@ -145,9 +145,8 @@ def invoke(*d, update=False):
             kwargs = None
         else:
             context = scope(pattern=(r'__get__', r'__set__', r'__delete__',)[index], back=1)
-            args = context['args']
-            assert args
-            args = args[1:]
+            assert context['args']
+            args = context['args'][1:]
             kwargs = context['kwargs']
         return (_descriptor.get, _datadescriptor.set, _datadescriptor.delete,)[index](args, kwargs, default)
 
