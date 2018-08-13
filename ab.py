@@ -22,7 +22,8 @@ class weakmethod:
 
 
 class ABMeta(type):
-    def __new__(cls, *args, **kwargs):
+    @staticmethod
+    def __new__(*args, **kwargs):
         def __init__(self, *args, **kwargs):
             setvar(self, '__weakbef__', weakmethod(self, '__bef__'))
             setvar(self, '__weakaft__', weakmethod(self, '__aft__'))

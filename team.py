@@ -226,6 +226,7 @@ class _baseclass:
 
 
 class _metaclass(type):
+    @staticmethod
     def __new__(mcls, name, bases, namespace, **kwargs):
         searcher = search(lambda cls: [b for b in cls.__bases__ if b is not object])
         if _baseclass in bases and len(bases) == 1:
@@ -254,7 +255,7 @@ class _metaclass(type):
                             if k in final:
                                 raise Exception('cannot export keyword ' + k + '.')
                             namespace[k] = v
-            return super().__new__(mcls, name, bases, namespace, **kwargs)
+            return type.__new__(mcls, name, bases, namespace, **kwargs)
         else:
             bases = tuple([getvar(b, '__cls__', d=b) if issubclass(b, _baseclass) else b for b in bases])
             return type.__new__(type, name, bases, namespace, **kwargs)

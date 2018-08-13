@@ -43,7 +43,8 @@ class _weakrunnable:
 
 
 class View(ABMeta):
-    def __new__(cls, *args, **kwargs):
+    @staticmethod
+    def __new__(*args, **kwargs):
         def __init__(self, *args, **kwargs):
             self.__loop__ = []
             self.__shutdown__ = False
