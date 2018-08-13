@@ -337,7 +337,7 @@ class _wrapper:
 
     @classmethod
     def __subclasshook__(cls, *args, **kwargs):
-        return object.__dict__['__subclasshook__'](cls)
+        return object.__dict__['__subclasshook__'](cls, *args, **kwargs)
 
     @staticmethod
     def function(func):
