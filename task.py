@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import threading
 from kit import hasvar, getvar, setvar, loge
-from decorator import Lock, ilock, ithrow
+from decorator import Lock, ilock
 
 
 def Pair(function):
@@ -101,7 +101,6 @@ class Tree:
         def push(self, seed):
             self.seeds.append(seed)
 
-        @ithrow()
         def plant(self, t):
             threads = [Tree.Gardener.Executor(self) for i in range(t)]
             for thread in threads:
