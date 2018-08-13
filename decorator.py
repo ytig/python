@@ -239,6 +239,24 @@ def instance():
         cid = unique()
         none = object()
 
+        def init(ret=getvar(__class__, '__init__', d=none)):
+            if ret is none:
+                for b in __class__.__mro__[1:]:
+                    if b is object:
+                        ret = lambda self, *args, **kwargs: object.__dict__['__init__'](self, *args, **kwargs)
+                        break
+                    elif hasvar(b, '__init__'):
+                        ret = getvar(b, '__init__')
+                        break
+            assert callable(ret)
+            return ret
+
+        @ilock()
+        @ithrow()
+        def __init__(self, *args, **kwargs):
+            return init()(self, *args, **kwargs)
+        assert setvar(__class__, '__init__', __init__)
+
         def new(ret=getvar(__class__, '__new__', d=none)):
             if ret is none:
                 for b in __class__.__mro__[1:]:
@@ -268,24 +286,6 @@ def instance():
             else:
                 return new()(*args, **kwargs)
         assert setvar(__class__, '__new__', __new__)
-
-        def init(ret=getvar(__class__, '__init__', d=none)):
-            if ret is none:
-                for b in __class__.__mro__[1:]:
-                    if b is object:
-                        ret = lambda self, *args, **kwargs: object.__dict__['__init__'](self, *args, **kwargs)
-                        break
-                    elif hasvar(b, '__init__'):
-                        ret = getvar(b, '__init__')
-                        break
-            assert callable(ret)
-            return ret
-
-        @ilock()
-        @ithrow()
-        def __init__(self, *args, **kwargs):
-            return init()(self, *args, **kwargs)
-        assert setvar(__class__, '__init__', __init__)
         return __class__
     return decorator
 
