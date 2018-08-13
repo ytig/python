@@ -2,9 +2,9 @@
 import os
 import random
 import pickle
+import weakref
 from kit import workspace
 from decorator import instance
-from shutdown import aregister
 
 
 # 数据编码
@@ -58,7 +58,6 @@ class _Storage:
                 if item[0] in self._reader:
                     self._dirty = True
                 self._reader[item[0]] = item[1]
-        aregister(self.__del)
 
     def keys(self):
         return list(self._reader.keys())
@@ -75,7 +74,7 @@ class _Storage:
             self._dirty = True
         self._reader[key] = value
 
-    def __del(self):
+    def __del__(self):
         self._writer.close()
         if self._dirty:
             path = self._writer.name
@@ -93,16 +92,16 @@ class Storage:
         if path.startswith('~/'):
             path = workspace() + '/.storage/' + path[2:]
         path = os.path.realpath(path)
-        self._storage = _Storage.instanceOf(path)
+        self._storage = weakref.ref(_Storage(path))
 
     # 轮询
     def keys(self):
-        return self._storage.keys()
+        return self._storage().keys()
 
     # 读取
     def get(self, key, defaultValue=None):
-        return self._storage.get(key, defaultValue=defaultValue)
+        return self._storage().get(key, defaultValue=defaultValue)
 
     # 写入
     def set(self, key, value):
-        return self._storage.set(key, value)
+        return self._storage().set(key, value)

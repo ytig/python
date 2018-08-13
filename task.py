@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import threading
 from kit import hasvar, getvar, setvar, loge
-from decorator import Lock, ilock, ithrow, instance
+from decorator import Lock, ilock, ithrow
 
 
 def Pair(function):

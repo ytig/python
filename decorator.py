@@ -234,28 +234,60 @@ def mthrow(r=None):
 
 
 # 单例类型（同参）
-def instance(fn='instanceOf'):
-    def decorator(cls):
-        cn = unique()
+def instance():
+    def decorator(__class__):
+        cid = unique()
+        none = object()
 
-        @classmethod
-        def instanceOf(cls, *args, **kwargs):
-            assert getvar(cls, fn) is instanceOf
-            vn = '__instances__'
-            with Lock(instance):
-                assert hasvar(instance, vn) or setvar(instance, vn, dict())
-                INSTANCES = getvar(instance, vn)
-                if cn not in INSTANCES:
-                    INSTANCES[cn] = dict()
-                instances = INSTANCES[cn]
-            sn = json.dumps((args, sorted(kwargs.items(), key=lambda i: i[0]),))
-            with Lock(cls):
-                if sn not in instances:
-                    instances[sn] = cls(*args, **kwargs)
-                return instances[sn]
-        assert not hasvar(cls, fn) and setvar(cls, fn, instanceOf)
-        return cls
+        def new(ret=getvar(__class__, '__new__', d=none)):
+            if ret is none:
+                for b in __class__.__mro__[1:]:
+                    if b is object:
+                        ret = staticmethod(lambda *args, **kwargs: object.__dict__['__new__'](args[0]))
+                        break
+                    elif hasvar(b, '__new__'):
+                        ret = getvar(b, '__new__')
+                        break
+            assert isinstance(ret, staticmethod) and callable(ret.__func__)
+            return ret.__func__
+
+        @staticmethod
+        def __new__(*args, **kwargs):
+            if args[0] is __class__:
+                with Lock(instance):
+                    assert hasvar(instance, '__instance__') or setvar(instance, '__instance__', dict())
+                    INSTANCES = getvar(instance, '__instance__')
+                    if cid not in INSTANCES:
+                        INSTANCES[cid] = dict()
+                    instances = INSTANCES[cid]
+                sid = json.dumps((args[1:], sorted(kwargs.items(), key=lambda i: i[0]),))
+                with Lock(__class__):
+                    if sid not in instances:
+                        instances[sid] = new()(*args, **kwargs)
+                    return instances[sid]
+            else:
+                return new()(*args, **kwargs)
+        assert setvar(__class__, '__new__', __new__)
+
+        def init(ret=getvar(__class__, '__init__', d=none)):
+            if ret is none:
+                for b in __class__.__mro__[1:]:
+                    if b is object:
+                        ret = lambda self, *args, **kwargs: object.__dict__['__init__'](self, *args, **kwargs)
+                        break
+                    elif hasvar(b, '__init__'):
+                        ret = getvar(b, '__init__')
+                        break
+            assert callable(ret)
+            return ret
+
+        @ilock()
+        @ithrow()
+        def __init__(self, *args, **kwargs):
+            return init()(self, *args, **kwargs)
+        assert setvar(__class__, '__init__', __init__)
+        return __class__
     return decorator
 
 
-atexit.register(lambda: setvar(instance, '__instances__', None))
+atexit.register(lambda: setvar(instance, '__instance__', None))
