@@ -251,10 +251,23 @@ def instance():
             assert callable(ret)
             return ret
 
-        @ilock()
-        @ithrow()
         def __init__(self, *args, **kwargs):
-            return init()(self, *args, **kwargs)
+            if self.__class__ is __class__:
+                with Lock(self):
+                    with Lock(instance):
+                        instances = getvar(instance, '__instance__')[cid]
+                        assert self in instances.values()
+                    try:
+                        assert hasvar(self, '__old__') or setvar(self, '__old__', init()(self, *args, **kwargs))
+                        return getvar(self, '__old__')
+                    except BaseException:
+                        with Lock(instance):
+                            for k in tuple(instances.keys()):
+                                if instances[k] is self:
+                                    del instances[k]
+                        raise
+            else:
+                return init()(self, *args, **kwargs)
         assert setvar(__class__, '__init__', __init__)
 
         def new(ret=getvar(__class__, '__new__', d=none)):
@@ -272,14 +285,13 @@ def instance():
         @staticmethod
         def __new__(*args, **kwargs):
             if args[0] is __class__:
+                sid = json.dumps((args[1:], sorted(kwargs.items(), key=lambda i: i[0]),))
                 with Lock(instance):
                     assert hasvar(instance, '__instance__') or setvar(instance, '__instance__', dict())
                     INSTANCES = getvar(instance, '__instance__')
                     if cid not in INSTANCES:
                         INSTANCES[cid] = dict()
                     instances = INSTANCES[cid]
-                sid = json.dumps((args[1:], sorted(kwargs.items(), key=lambda i: i[0]),))
-                with Lock(__class__):
                     if sid not in instances:
                         instances[sid] = new()(*args, **kwargs)
                     return instances[sid]
