@@ -14,7 +14,7 @@ def define(__class__, __new__=None):
         assert hasvar(__class__, '__unique__') or setvar(__class__, '__unique__', unique())
         __unique__ = getvar(__class__, '__unique__')
     if not callable(__new__):
-        __new__ = super(__class__, args[0]).__new__
+        __new__ = super(__class__, __class__).__new__
     namespace = args[3]
 
     def function(func, find, name=''):
