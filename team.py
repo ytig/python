@@ -221,7 +221,7 @@ class _baseclass:
                 except BaseException:
                     pass
             else:
-                ret.append(Tree(cpu, *mems, log=None).plant(t=t))
+                ret.extend(Tree(cpu, *mems, log=None).plant(t=t))
             return ret
 
 
