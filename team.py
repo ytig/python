@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 import inspect
-from kit import search, getvar, setvar, depth
+from kit import hasvar, getvar, setvar, depth
 from decorator import Lock, ilock
 from task import Tree
 
@@ -228,55 +228,92 @@ class _baseclass:
 class _metaclass(type):
     @staticmethod
     def __new__(mcls, name, bases, namespace, **kwargs):
-        searcher = search(lambda cls: [b for b in cls.__bases__ if b is not object])
-        if _baseclass in bases and len(bases) == 1:
-            final = set()
-            final.update(namespace.keys())
-            for b in searcher.depth(*bases):
-                final.update(vars(b).keys())
-            override = set()
-            base = namespace['__cls__']
-            name = base.__name__
-            for b in searcher.depth(base):
-                for k, v, in vars(b).items():
-                    if k not in override:
-                        override.add(k)
-                        if isinstance(v, staticmethod):
-                            v = _staticmethod.get(v)
-                        elif isinstance(v, classmethod):
-                            v = _classmethod.get(v)
-                        elif isinstance(v, property):
-                            v = _property.get(v)
-                        elif inspect.isfunction(v):
-                            v = _function.get(v)
-                        else:
-                            v = None
-                        if v:
-                            if k in final:
-                                raise Exception('cannot export keyword ' + k + '.')
-                            namespace[k] = v
-            return type.__new__(mcls, name, bases, namespace, **kwargs)
+        if 'baseclass' in kwargs:
+            namespace['__cls__'] = kwargs['baseclass']
+            del kwargs['baseclass']
+
+            def __init__(self, *objects, **setting):
+                for obj in objects:
+                    assert obj.__class__ is __class__.__cls__
+                return super(__class__, self).__init__(*objects, **setting)
+            namespace['__init__'] = __init__
+
+            def __getattribute__(self, name):
+                try:
+                    return super(__class__, self).__getattribute__(name)
+                except AttributeError:
+                    attr = None
+                    for c in self.__class__.__cls__.__mro__:
+                        if hasvar(c, name):
+                            var = getvar(c, name)
+                            if isinstance(var, property):
+                                attr = _property.get(var)
+                            elif inspect.isfunction(var):
+                                attr = _function.get(var)
+                            break
+                    if attr is not None:
+                        return attr.__get__(self, self.__class__)
+                    raise
+            namespace['__getattribute__'] = __getattribute__
+
+            def __setattr__(self, name, value):
+                attr = None
+                for c in self.__class__.__cls__.__mro__:
+                    if hasvar(c, name):
+                        var = getvar(c, name)
+                        if isinstance(var, property):
+                            attr = _property.get(var)
+                        break
+                if attr is not None:
+                    return attr.__set__(self, value)
+                return super(__class__, self).__setattr__(name, value)
+            namespace['__setattr__'] = __setattr__
+
+            def __delattr__(self, name):
+                attr = None
+                for c in self.__class__.__cls__.__mro__:
+                    if hasvar(c, name):
+                        var = getvar(c, name)
+                        if isinstance(var, property):
+                            attr = _property.get(var)
+                        break
+                if attr is not None:
+                    return attr.__delete__(self)
+                return super(__class__, self).__delattr__(name)
+            namespace['__delattr__'] = __delattr__
+            __class__ = type.__new__(mcls, name, (_baseclass,), namespace, **kwargs)
+            return __class__
         else:
-            bases = tuple([getvar(b, '__cls__', d=b) if issubclass(b, _baseclass) else b for b in bases])
-            return type.__new__(type, name, bases, namespace, **kwargs)
+            bases = list(bases)
+            for i in range(len(bases)):
+                while isinstance(bases[i], _metaclass):
+                    bases[i] = bases[i].__cls__
+            return type(name, tuple(bases), namespace, **kwargs)
+
+    def __getattr__(cls, name):
+        attr = None
+        for c in cls.__cls__.__mro__:
+            if hasvar(c, name):
+                var = getvar(c, name)
+                if isinstance(var, staticmethod):
+                    attr = _staticmethod.get(var)
+                elif isinstance(var, classmethod):
+                    attr = _classmethod.get(var)
+                break
+        if attr is not None:
+            return attr.__get__(None, cls)
+        raise AttributeError
 
 
 class _class:
     @staticmethod
     def set(o):
-        class classes(_baseclass, metaclass=_metaclass):
-            __cls__ = o  # 原类
-
-            def __init__(self, *objects, **setting):
-                for obj in objects:
-                    if obj.__class__ is not classes.__cls__:
-                        name = str(getattr(obj.__class__, '__name__', None))
-                        raise Exception('cannot append instance of ' + name + '.')
-                super().__init__(*objects, **setting)
+        class classes(metaclass=_metaclass, baseclass=o):
+            pass
         return classes
 
     @staticmethod
     def get(o):
-        while inspect.isclass(o) and issubclass(o, _baseclass):
-            o = getvar(o, '__cls__')
+        while inspect.isclass(o) and isinstance(o, _metaclass):
+            o = o.__cls__
         return o
