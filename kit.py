@@ -261,7 +261,7 @@ def setvar(o, k, v):
             return True
         elif isinstance(o.__dict__, types.MappingProxyType):
             b = True
-            for c in o.__class__.__mro__:
+            for c in type(o).__mro__:
                 if hasvar(c, k):
                     tp = type(getvar(c, k))
                     if hasattr(tp, '__set__') or hasattr(tp, '__delete__'):
@@ -385,6 +385,6 @@ def module(**fi):
 # 异常信息
 def loge(e):
     if isinstance(e, BaseException):
-        return ''.join(traceback.format_exception(e.__class__, e, e.__traceback__)).strip('\n')
+        return ''.join(traceback.format_exception(type(e), e, e.__traceback__)).strip('\n')
     else:
         return ''

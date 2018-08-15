@@ -234,34 +234,31 @@ class _metaclass(type):
 
             def __init__(self, *objects, **setting):
                 for obj in objects:
-                    assert obj.__class__ is __class__.__cls__
+                    assert type(obj) is __class__.__cls__
                 return super(__class__, self).__init__(*objects, **setting)
             namespace['__init__'] = __init__
 
             def __getattribute__(self, name):
-                if name in ('__class__',):
+                for c in type(self).__cls__.__mro__:
+                    if hasvar(c, name):
+                        var = getvar(c, name)
+                        if isinstance(var, property):
+                            return _property.get(var).__get__(self, type(self))
+                        break
+                try:
                     return super(__class__, self).__getattribute__(name)
-                else:
-                    for c in self.__class__.__cls__.__mro__:
+                except AttributeError:
+                    for c in type(self).__cls__.__mro__:
                         if hasvar(c, name):
                             var = getvar(c, name)
-                            if isinstance(var, property):
-                                return _property.get(var).__get__(self, self.__class__)
+                            if inspect.isfunction(var):
+                                return _function.get(var).__get__(self, type(self))
                             break
-                    try:
-                        return super(__class__, self).__getattribute__(name)
-                    except AttributeError:
-                        for c in self.__class__.__cls__.__mro__:
-                            if hasvar(c, name):
-                                var = getvar(c, name)
-                                if inspect.isfunction(var):
-                                    return _function.get(var).__get__(self, self.__class__)
-                                break
-                        raise
+                    raise
             namespace['__getattribute__'] = __getattribute__
 
             def __setattr__(self, name, value):
-                for c in self.__class__.__cls__.__mro__:
+                for c in type(self).__cls__.__mro__:
                     if hasvar(c, name):
                         var = getvar(c, name)
                         if isinstance(var, property):
@@ -271,7 +268,7 @@ class _metaclass(type):
             namespace['__setattr__'] = __setattr__
 
             def __delattr__(self, name):
-                for c in self.__class__.__cls__.__mro__:
+                for c in type(self).__cls__.__mro__:
                     if hasvar(c, name):
                         var = getvar(c, name)
                         if isinstance(var, property):

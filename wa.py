@@ -158,7 +158,7 @@ def _series(Parent, Child, Pipe):
                 self.__child.push(child)
                 return c
             except BaseException as e:
-                parent.__exit__(e.__class__, e, e.__traceback__)
+                parent.__exit__(type(e), e, e.__traceback__)
                 raise
 
         def __exit__(self, t, v, tb):
@@ -167,7 +167,7 @@ def _series(Parent, Child, Pipe):
             try:
                 child.__exit__(t, v, tb)
             except BaseException as e:
-                parent.__exit__(e.__class__, e, e.__traceback__)
+                parent.__exit__(type(e), e, e.__traceback__)
                 raise
             parent.__exit__(t, v, tb)
     return Series
@@ -192,7 +192,7 @@ def _parallel(Husband, Wife, Pipe):
                 self.__wife.push(wife)
                 return (h, w,)
             except BaseException as e:
-                husband.__exit__(e.__class__, e, e.__traceback__)
+                husband.__exit__(type(e), e, e.__traceback__)
                 raise
 
         def __exit__(self, t, v, tb):
@@ -201,7 +201,7 @@ def _parallel(Husband, Wife, Pipe):
             try:
                 wife.__exit__(t, v, tb)
             except BaseException as e:
-                husband.__exit__(e.__class__, e, e.__traceback__)
+                husband.__exit__(type(e), e, e.__traceback__)
                 raise
             husband.__exit__(t, v, tb)
     return Parallel
@@ -214,7 +214,7 @@ def _branch(Parent, Child, Pipe):
             try:
                 exit.__exit__(t, v, tb)
             except BaseException as e:
-                exits(queue, e.__class__, e, e.__traceback__)
+                exits(queue, type(e), e, e.__traceback__)
                 raise
             exits(queue, t, v, tb)
 
@@ -236,7 +236,7 @@ def _branch(Parent, Child, Pipe):
                     cs.append(child.__enter__())
                     children.append(child)
             except BaseException as e:
-                exits([parent] + children, e.__class__, e, e.__traceback__)
+                exits([parent] + children, type(e), e, e.__traceback__)
                 raise
             self.__parent.push(parent)
             self.__children.push(children)

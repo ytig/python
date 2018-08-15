@@ -37,7 +37,7 @@ class Queue:
 
     # 任务分发
     def push(self):
-        cls = self.__class__
+        cls = type(self)
         name = '__mutex__'
         with Lock(cls):
             assert hasvar(cls, name) or setvar(cls, name, {'q': [], 'r': 0, })

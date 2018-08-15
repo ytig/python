@@ -252,7 +252,7 @@ def instance():
             return ret
 
         def __init__(self, *args, **kwargs):
-            if self.__class__ is __class__:
+            if type(self) is __class__:
                 with Lock(self):
                     with Lock(instance):
                         instances = getvar(instance, '__instance__')[cid]
