@@ -239,46 +239,44 @@ class _metaclass(type):
             namespace['__init__'] = __init__
 
             def __getattribute__(self, name):
-                try:
+                if name in ('__class__',):
                     return super(__class__, self).__getattribute__(name)
-                except AttributeError:
-                    attr = None
+                else:
                     for c in self.__class__.__cls__.__mro__:
                         if hasvar(c, name):
                             var = getvar(c, name)
                             if isinstance(var, property):
-                                attr = _property.get(var)
-                            elif inspect.isfunction(var):
-                                attr = _function.get(var)
+                                return _property.get(var).__get__(self, self.__class__)
                             break
-                    if attr is not None:
-                        return attr.__get__(self, self.__class__)
-                    raise
+                    try:
+                        return super(__class__, self).__getattribute__(name)
+                    except AttributeError:
+                        for c in self.__class__.__cls__.__mro__:
+                            if hasvar(c, name):
+                                var = getvar(c, name)
+                                if inspect.isfunction(var):
+                                    return _function.get(var).__get__(self, self.__class__)
+                                break
+                        raise
             namespace['__getattribute__'] = __getattribute__
 
             def __setattr__(self, name, value):
-                attr = None
                 for c in self.__class__.__cls__.__mro__:
                     if hasvar(c, name):
                         var = getvar(c, name)
                         if isinstance(var, property):
-                            attr = _property.get(var)
+                            return _property.get(var).__set__(self, value)
                         break
-                if attr is not None:
-                    return attr.__set__(self, value)
                 return super(__class__, self).__setattr__(name, value)
             namespace['__setattr__'] = __setattr__
 
             def __delattr__(self, name):
-                attr = None
                 for c in self.__class__.__cls__.__mro__:
                     if hasvar(c, name):
                         var = getvar(c, name)
                         if isinstance(var, property):
-                            attr = _property.get(var)
+                            return _property.get(var).__delete__(self)
                         break
-                if attr is not None:
-                    return attr.__delete__(self)
                 return super(__class__, self).__delattr__(name)
             namespace['__delattr__'] = __delattr__
             __class__ = type.__new__(mcls, name, (_baseclass,), namespace, **kwargs)
@@ -291,17 +289,14 @@ class _metaclass(type):
             return type(name, tuple(bases), namespace, **kwargs)
 
     def __getattr__(cls, name):
-        attr = None
         for c in cls.__cls__.__mro__:
             if hasvar(c, name):
                 var = getvar(c, name)
                 if isinstance(var, staticmethod):
-                    attr = _staticmethod.get(var)
+                    return _staticmethod.get(var).__get__(None, cls)
                 elif isinstance(var, classmethod):
-                    attr = _classmethod.get(var)
+                    return _classmethod.get(var).__get__(None, cls)
                 break
-        if attr is not None:
-            return attr.__get__(None, cls)
         raise AttributeError
 
 
