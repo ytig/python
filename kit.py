@@ -261,13 +261,12 @@ def setvar(o, k, v):
             return True
         elif isinstance(o.__dict__, types.MappingProxyType):
             b = True
-            if hasattr(o, k):
-                for c in o.__class__.__mro__:
-                    if hasvar(c, k):
-                        var = getvar(c, k)
-                        if hasattr(var, '__set__') or hasattr(var, '__delete__'):
-                            b = False
-                        break
+            for c in o.__class__.__mro__:
+                if hasvar(c, k):
+                    tp = type(getvar(c, k))
+                    if hasattr(tp, '__set__') or hasattr(tp, '__delete__'):
+                        b = False
+                    break
             if b:
                 try:
                     setattr(o, k, v)
