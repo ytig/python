@@ -239,7 +239,7 @@ class _metaclass(type):
             namespace['__init__'] = __init__
 
             def __getattribute__(self, name):
-                for c in type(self).__cls__.__mro__:
+                for c in type.mro(type(self).__cls__):
                     if hasvar(c, name):
                         var = getvar(c, name)
                         if isinstance(var, property):
@@ -248,7 +248,7 @@ class _metaclass(type):
                 try:
                     return super(__class__, self).__getattribute__(name)
                 except AttributeError:
-                    for c in type(self).__cls__.__mro__:
+                    for c in type.mro(type(self).__cls__):
                         if hasvar(c, name):
                             var = getvar(c, name)
                             if inspect.isfunction(var):
@@ -258,7 +258,7 @@ class _metaclass(type):
             namespace['__getattribute__'] = __getattribute__
 
             def __setattr__(self, name, value):
-                for c in type(self).__cls__.__mro__:
+                for c in type.mro(type(self).__cls__):
                     if hasvar(c, name):
                         var = getvar(c, name)
                         if isinstance(var, property):
@@ -268,7 +268,7 @@ class _metaclass(type):
             namespace['__setattr__'] = __setattr__
 
             def __delattr__(self, name):
-                for c in type(self).__cls__.__mro__:
+                for c in type.mro(type(self).__cls__):
                     if hasvar(c, name):
                         var = getvar(c, name)
                         if isinstance(var, property):
@@ -286,7 +286,7 @@ class _metaclass(type):
             return type(name, tuple(bases), namespace, **kwargs)
 
     def __getattr__(cls, name):
-        for c in cls.__cls__.__mro__:
+        for c in type.mro(cls.__cls__):
             if hasvar(c, name):
                 var = getvar(c, name)
                 if isinstance(var, staticmethod):

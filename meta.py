@@ -27,7 +27,7 @@ def define(__class__, __new__=None):
         else:
             def base(k=key):
                 f = None
-                for b in ret.__mro__[1:]:
+                for b in type.mro(ret)[1:]:
                     if hasvar(b, k):
                         f = find(_wrapper.function(getvar(b, k)))
                         assert inspect.isgeneratorfunction(f) == isgeneratorfunction
@@ -47,7 +47,7 @@ def define(__class__, __new__=None):
         else:
             def base(k=key):
                 d = None
-                for b in ret.__mro__[1:]:
+                for b in type.mro(ret)[1:]:
                     if hasvar(b, k):
                         d = _wrapper.descriptor(getvar(b, k))
                         assert inspect.isdatadescriptor(d) == isdatadescriptor

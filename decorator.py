@@ -241,7 +241,7 @@ def instance():
 
         def init(ret=getvar(__class__, '__init__', d=none)):
             if ret is none:
-                for b in __class__.__mro__[1:]:
+                for b in type.mro(__class__)[1:]:
                     if b is object:
                         ret = lambda self, *args, **kwargs: object.__dict__['__init__'](self, *args, **kwargs)
                         break
@@ -272,7 +272,7 @@ def instance():
 
         def new(ret=getvar(__class__, '__new__', d=none)):
             if ret is none:
-                for b in __class__.__mro__[1:]:
+                for b in type.mro(__class__)[1:]:
                     if b is object:
                         ret = staticmethod(lambda *args, **kwargs: object.__dict__['__new__'](args[0]))
                         break
