@@ -16,14 +16,15 @@ def str2int(s, d=None):
 
 
 # 获取请求参数
-def param(k, **d):
-    kv = request.get_json()
-    if kv and k in kv:
-        return kv[k]
-    kv = request.args
-    if kv and k in kv:
-        return kv[k]
-    return d['d']
+def params():
+    ret = {}
+    get = request.args
+    if get:
+        ret.update(get)
+    post = request.get_json()
+    if post:
+        ret.update(post)
+    return ret
 
 
 class Server(Flask):
@@ -86,21 +87,24 @@ class Server(Flask):
     def __request(function):
         args = []
         kwargs = {}
-        info = inspect.getargspec(function)
-        len1 = len(info.args)
-        len2 = 0 if not info.defaults else len(info.defaults)
+        arguments = params()
+        argspec = inspect.getargspec(function)
+        len1 = len(argspec.args)
+        len2 = 0 if not argspec.defaults else len(argspec.defaults)
         for i1 in range(len1):
-            arg = info.args[i1]
+            arg = argspec.args[i1]
             i2 = i1 + len2 - len1
             if i2 < 0:
                 try:
-                    args.append(param(arg))
+                    args.append(arguments.pop(arg))
                 except KeyError:
                     abort(400)
             else:
-                default = info.defaults[i2]
-                kwargs[arg] = param(arg, d=default)
-        return function(*args, **kwargs)
+                default = argspec.defaults[i2]
+                kwargs[arg] = arguments.pop(arg, default)
+        if argspec.keywords is None:
+            arguments.clear()
+        return function(*args, **kwargs, **arguments)
 
     @staticmethod
     def __response(ret):
