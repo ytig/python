@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import json
+import inspect
 import http.cookiejar
 import requests.cookies
 import requests.sessions
@@ -84,11 +85,13 @@ class Client(requests.Session):
 
     def request(self, *args, **kwargs):
         self.__cookies()
-        if 'proxies' not in kwargs:
+        method = super().request
+        ba = inspect.signature(method).bind(*args, **kwargs)
+        if 'proxies' not in ba.arguments:
             proxies = self._proxies()
             if proxies is not None:
-                kwargs['proxies'] = proxies
-        response = super().request(*args, **kwargs)
+                ba.arguments['proxies'] = proxies
+        response = method(*ba.args, **ba.kwargs)
         if response.cookies:
             with Lock(self):
                 cookies = string2cookies(self._cookies(None))
