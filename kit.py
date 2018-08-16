@@ -23,6 +23,9 @@ def doc(module=None):
                 module = m
                 break
     if module is not None:
+        doc = getattr(module, '__doc__', '')
+        if doc:
+            return doc.strip('\n')
         file = getattr(module, '__file__', '')
         if file:
             with open(file) as f:
