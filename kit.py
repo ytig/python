@@ -11,7 +11,6 @@ import itertools
 _LOCK = threading.Lock()  # 全局锁
 CWDS = []  # 历史目录
 WORKSPACE = None  # 工作区目录
-PASS = object()  # 跳过参数绑定
 COUNT = itertools.count(1)  # 无限递增迭代
 
 
@@ -115,28 +114,6 @@ def daemon(dirname=None, stdin=None, stdout=None, stderr=None):
     i = open(touch(dirname, stdin), mode='r')
     os.dup2(i.fileno(), sys.__stdin__.fileno())
     sys.stdin = i
-
-
-# 绑定参数
-def bind(*args, **kwargs):
-    call = args[0] if len(args) else None
-    if not callable(call):
-        raise Exception('callable missing.')
-    extends = args[1:]
-    updates = kwargs
-
-    def bound(*args, **kwargs):
-        args = list(args)
-        for i in range(len(extends)):
-            arg = extends[i]
-            if arg is PASS:
-                if i >= len(args):
-                    raise Exception('argument missing.')
-            else:
-                args.insert(i, arg)
-        kwargs.update(updates)
-        return call(*args, **kwargs)
-    return bound
 
 
 def _inject(segm, argv):

@@ -3,7 +3,7 @@ import json
 import inspect
 import threading
 import atexit
-from kit import bind, unique, hasvar, getvar, setvar, frames, module
+from kit import unique, hasvar, getvar, setvar, frames, module
 
 
 class Closure:
@@ -168,8 +168,8 @@ class Throw:
         def decorator(call):
             sid = 'S:' + unique()
             if isinstance(r, str):
-                a = bind(call, **{r: False, })
-                b = bind(call, **{r: True, })
+                a = lambda *args, **kwargs: call(*args, **kwargs, **{r: False, })
+                b = lambda *args, **kwargs: call(*args, **kwargs, **{r: True, })
             else:
                 a = call
                 b = r if callable(r) else lambda *args, **kwargs: None

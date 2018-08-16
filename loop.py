@@ -121,10 +121,10 @@ main_loop = Loop()  # 主循环
 
 
 # 执行
-def do(runnable, delay, **kwargs):
-    return main_loop.do(runnable, delay, **kwargs)
+def do(*args, **kwargs):
+    return main_loop.do(*args, **kwargs)
 
 
 # 取消执行
-def undo(generics):
-    return main_loop.undo(generics)
+def undo(*args, **kwargs):
+    return main_loop.undo(*args, **kwargs)
