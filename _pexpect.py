@@ -6,14 +6,14 @@ import pexpect
 
 class spawn(pexpect.spawn):
     def __init__(self, *args, **kwargs):
-        init = pexpect.spawn.__init__
-        ba = inspect.signature(init).bind(self, *args, **kwargs)
+        method = super().__init__
+        ba = inspect.signature(method).bind(*args, **kwargs)
         if 'logfile' not in ba.arguments:
             logfile_read = sys.stdout.buffer
         else:
             logfile_read = ba.arguments['logfile']
             ba.arguments['logfile'] = None
-        init(*ba.args, **ba.kwargs)
+        method(*ba.args, **ba.kwargs)
         self.logfile_read = logfile_read
 
     def interact(self, *args, **kwargs):
