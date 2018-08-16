@@ -50,23 +50,17 @@ class Log:
     LEVEL = INFO  # 日志级别
     PRINT = Print  # 日志打印
 
-    @staticmethod
-    def __tag(level, tag):
-        return {Log.VERBOSE: 'V', Log.DEBUG: 'D', Log.INFO: 'I', Log.WARN: 'W', Log.ERROR: 'E', Log.ASSERT: 'A', }.get(level) + '/' + tag + ':'
-
     # 打印日志
     @staticmethod
     @clock(lambda: __class__)
-    def log(*args, tag=None, **kwargs):
-        level = args[0]
-        args = [args[i + 1] for i in range(len(args) - 1)]
+    def log(level, *args, tag=None):
         if level < Log.LEVEL:
             return False
         color = {Log.WARN: 34, Log.ERROR: 31, }.get(level)
         if color is not None:
             Log.PRINT('\033[0;%d;48m' % (color,), end='', flush=True, skip=True)
         if tag is not None:
-            args.insert(0, Log.__tag(level, tag))
+            args = ({Log.VERBOSE: 'V', Log.DEBUG: 'D', Log.INFO: 'I', Log.WARN: 'W', Log.ERROR: 'E', Log.ASSERT: 'A', }.get(level) + '/' + tag + ':', *args,)
         Log.PRINT(*args, flush=True)
         if color is not None:
             Log.PRINT('\033[0m', end='', flush=True, skip=True)
