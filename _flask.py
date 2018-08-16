@@ -20,7 +20,7 @@ def params():
     ret = {}
     get = request.args
     if get:
-        ret.update(get)
+        ret.update(get.to_dict())
     post = request.get_json()
     if post:
         ret.update(post)
