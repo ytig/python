@@ -146,11 +146,11 @@ def _inject(segm, argv):
                     a = argv[1:]
                     if '-' in a:
                         args = a[a.index('-'):]
-            spec = inspect.getfullargspec(function)
-            d = len(args) - len(spec.args)
+            fullargspec = inspect.getfullargspec(function)
+            d = len(args) - len(fullargspec.args)
             if d < 0:
                 return function(*args + [None for i in range(-d)])
-            elif d == 0 or spec.varargs is not None:
+            elif d == 0 or fullargspec.varargs is not None:
                 return function(*args)
             else:
                 return function(*args[:-d])
