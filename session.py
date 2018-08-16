@@ -95,3 +95,6 @@ class Session(requests.Session):
                 cookies.update(response.cookies)
                 self._cookies(cookies2string(cookies))
         return response
+
+    def __del__(self):
+        self.close()
