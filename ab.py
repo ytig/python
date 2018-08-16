@@ -3,7 +3,7 @@ import weakref
 from kit import getvar, setvar
 from decorator import ilock, ithrow
 from meta import define, invoke
-from shutdown import bregister, aregister, unregister
+from _atexit import bregister, aregister, unregister
 
 
 class weakmethod:

@@ -63,7 +63,7 @@ def string2cookies(string, catch=False):
     return cookies
 
 
-class Session(requests.Session):
+class Client(requests.Session):
     # 动态代理
     def _proxies(self):
         pass
