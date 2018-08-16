@@ -5,8 +5,8 @@ import threading
 import subprocess
 from kit import loge
 from decorator import Lock
-from _atexit import bregister
-from log import Log
+from shutdown import bregister
+from logger import Log
 
 
 # 睡眠进程

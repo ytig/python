@@ -14,7 +14,7 @@ class Queue:
     # 打印日志
     @staticmethod
     def log(e):
-        logging.Log.e(loge(e))
+        logger.Log.e(loge(e))
 
     @classmethod
     def __run(cls):
@@ -109,7 +109,7 @@ class Tree:
                 thread.join()
             return self.seeds
 
-    def __init__(self, cpu, *mems, log=lambda e: logging.Log.e(loge(e))):
+    def __init__(self, cpu, *mems, log=lambda e: logger.Log.e(loge(e))):
         self.twigs = [Tree.Twig(cpu, mem, log) for mem in mems]
 
     # 任务并发
@@ -117,4 +117,4 @@ class Tree:
         return Tree.Gardener(*self.twigs).plant(t)
 
 
-import log as logging
+import logger
