@@ -80,7 +80,7 @@ class _Storage:
             path = self._writer.name
             _path = rf(path)
             os.rename(path, _path)
-            with open(path, 'w') as file:
+            with open(path, mode='w') as file:
                 for key, value, in self._reader.items():
                     file.write(encode((key, value,)) + '\n')
             os.remove(_path)
