@@ -4,25 +4,25 @@ from kit import getvar
 
 
 # 切面
-def aspect(obj):
+def aspect(wrapped):
     def wrapper(*args, **kwargs):
         try:
-            w = wrapper.__wrapped__
-            ba = inspect.signature(w).bind(*args, **kwargs)
-            for c in wrapper.__input__:
-                ba = c(ba)
-            ret = w(*ba.args, **ba.kwargs)
-            for c in wrapper.__output__:
-                ret = c(ba, ret)
-            return ret
+            wrapped = wrapper.__wrapped__
+            i = inspect.signature(wrapped).bind(*args, **kwargs)
+            for input in wrapper.__input__:
+                i = input(i)
+            o = wrapped(*i.args, **i.kwargs)
+            for output in wrapper.__output__:
+                o = output(i, o)
+            return o
         except BaseException as e:
-            for c in wrapper.__error__:
+            for error in wrapper.__error__:
                 try:
-                    e = c(ba, e)
+                    e = error(i, e)
                 except BaseException:
                     pass
             raise e
-    wrapper.__wrapped__ = obj
+    wrapper.__wrapped__ = wrapped
     wrapper.__input__ = []
     wrapper.__output__ = []
     wrapper.__error__ = []
