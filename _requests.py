@@ -2,8 +2,7 @@
 import json
 import inspect
 import http.cookiejar
-import requests.cookies
-import requests.sessions
+import requests
 from decorator import Lock, ilock, ithrow
 
 

@@ -2,7 +2,7 @@
 import numbers
 import inspect
 import weakref
-from kit import hasvar, getvar, setvar, module
+from kit import module
 from decorator import Lock
 from meta import define, invoke
 from ab import ABMeta
@@ -42,7 +42,7 @@ class _weakrunnable:
                                 break
 
 
-class View(ABMeta):
+class Looper(ABMeta):
     @staticmethod
     def __new__(*args, **kwargs):
         __LOOP__ = Loop()  # 循环器
