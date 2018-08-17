@@ -135,12 +135,7 @@ class Server(Flask):
 
 class Json:
     def __str__(self):
-        j = {}
-        for k in dir(self):
-            v = getattr(self, k)
-            if not k.startswith('_'):
-                j[k] = v
-        return json.dumps(j)
+        return json.dumps({k: v for k, v, in self.__dict__.items() if not k.startswith('_')})
 
 
 class Redirect(Json):
