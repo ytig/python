@@ -258,10 +258,10 @@ def setvar(o, k, v):
 
 # 栈帧
 class frames(list):
-    def __init__(self, back=0, filter=None):
+    def __init__(self, back=0, keep=None):
         assert back >= 0
-        assert not filter or callable(filter)
-        super().__init__([i.frame for i in inspect.stack()[1 + back:] if not filter or filter(i.frame)])
+        assert not keep or callable(keep)
+        super().__init__([i.frame for i in inspect.stack()[1 + back:] if not keep or keep(i.frame)])
 
     # 检查
     def has(self, index):

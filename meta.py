@@ -111,7 +111,7 @@ def define(__class__, __new__=None):
 # 原始调用
 def invoke(*d, update=False):
     codes = (_function.f_codes[1], _generatorfunction.f_codes[1], _descriptor.f_codes_get[1], _datadescriptor.f_codes_set[1], _datadescriptor.f_codes_delete[1],)
-    with frames(filter=lambda f: f.f_code in codes) as f:
+    with frames(keep=lambda f: f.f_code in codes) as f:
         assert f.has(0)
         index = codes.index(f[0].f_code)
     if index in range(0, 2):
@@ -163,7 +163,7 @@ class _function:
                 if _func is not None:
                     return _func(*args, **kwargs)
                 else:
-                    with frames(filter=lambda f: f.f_code is _function.f_codes[0]) as f:
+                    with frames(keep=lambda f: f.f_code is _function.f_codes[0]) as f:
                         assert f.has(0)
                         default = f[0].f_locals['default']
                     return default(*args, **kwargs)
@@ -171,7 +171,7 @@ class _function:
 
     @staticmethod
     def invoke(args, kwargs, default):
-        with frames(filter=lambda f: f.f_code is _function.f_codes[1]) as f:
+        with frames(keep=lambda f: f.f_code is _function.f_codes[1]) as f:
             assert f.has(0)
             base = f[0].f_locals['base']
             if args is None or kwargs is None:
@@ -199,7 +199,7 @@ class _generatorfunction:
                     value = yield from _func(*args, **kwargs)
                     return value
                 else:
-                    with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[0]) as f:
+                    with frames(keep=lambda f: f.f_code is _generatorfunction.f_codes[0]) as f:
                         assert f.has(0)
                         default = f[0].f_locals['default']
                     value = yield from default(*args, **kwargs)
@@ -208,7 +208,7 @@ class _generatorfunction:
 
     @staticmethod
     def invoke(args, kwargs, default):
-        with frames(filter=lambda f: f.f_code is _generatorfunction.f_codes[1]) as f:
+        with frames(keep=lambda f: f.f_code is _generatorfunction.f_codes[1]) as f:
             assert f.has(0)
             base = f[0].f_locals['base']
             if args is None or kwargs is None:
@@ -238,14 +238,14 @@ class _descriptor:
             if _desc is not None:
                 return _desc.__get__(*args, **kwargs)
             else:
-                with frames(filter=lambda f: f.f_code is _descriptor.f_codes_get[0]) as f:
+                with frames(keep=lambda f: f.f_code is _descriptor.f_codes_get[0]) as f:
                     assert f.has(0)
                     default = f[0].f_locals['default']
                 return default('__get__', *args, **kwargs)
 
     @staticmethod
     def get(args, kwargs, default):
-        with frames(filter=lambda f: f.f_code is _descriptor.f_codes_get[1]) as f:
+        with frames(keep=lambda f: f.f_code is _descriptor.f_codes_get[1]) as f:
             assert f.has(0)
             base = f[0].f_locals['self'].base
             if args is None or kwargs is None:
@@ -268,14 +268,14 @@ class _datadescriptor(_descriptor):
             if _desc is not None:
                 return _desc.__set__(*args, **kwargs)
             else:
-                with frames(filter=lambda f: f.f_code is _datadescriptor.f_codes_set[0]) as f:
+                with frames(keep=lambda f: f.f_code is _datadescriptor.f_codes_set[0]) as f:
                     assert f.has(0)
                     default = f[0].f_locals['default']
                 return default('__set__', *args, **kwargs)
 
     @staticmethod
     def set(args, kwargs, default):
-        with frames(filter=lambda f: f.f_code is _datadescriptor.f_codes_set[1]) as f:
+        with frames(keep=lambda f: f.f_code is _datadescriptor.f_codes_set[1]) as f:
             assert f.has(0)
             base = f[0].f_locals['self'].base
             if args is None or kwargs is None:
@@ -296,14 +296,14 @@ class _datadescriptor(_descriptor):
             if _desc is not None:
                 return _desc.__delete__(*args, **kwargs)
             else:
-                with frames(filter=lambda f: f.f_code is _datadescriptor.f_codes_delete[0]) as f:
+                with frames(keep=lambda f: f.f_code is _datadescriptor.f_codes_delete[0]) as f:
                     assert f.has(0)
                     default = f[0].f_locals['default']
                 return default('__delete__', *args, **kwargs)
 
     @staticmethod
     def delete(args, kwargs, default):
-        with frames(filter=lambda f: f.f_code is _datadescriptor.f_codes_delete[1]) as f:
+        with frames(keep=lambda f: f.f_code is _datadescriptor.f_codes_delete[1]) as f:
             assert f.has(0)
             base = f[0].f_locals['self'].base
             if args is None or kwargs is None:
