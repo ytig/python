@@ -256,6 +256,11 @@ def setvar(o, k, v):
     return False
 
 
+# 获取闭包
+def getnonlocals(func, name):
+    return dict(zip(func.__code__.co_freevars, func.__closure__))[name].cell_contents
+
+
 # 栈帧
 class frames(list):
     def __init__(self, back=0, keep=None):
