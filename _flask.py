@@ -117,7 +117,7 @@ class Server(Flask):
     # get请求（装饰器）
     def get(self, rule=None):
         def decorator(function):
-            @self.route(rule if rule is not None else '/' + function.__name__.replace('_', '/'), endpoint=function.__name__, methods=['GET'])
+            @self.route(rule if rule is not None else '/' + function.__name__.replace('_', '/'), endpoint=function.__name__, methods=['GET', ])
             def wrapper():
                 return Server.__response(Server.__request(function))
             return wrapper
@@ -126,7 +126,7 @@ class Server(Flask):
     # post请求（装饰器）
     def post(self, rule=None):
         def decorator(function):
-            @self.route(rule if rule is not None else '/' + function.__name__.replace('_', '/'), endpoint=function.__name__, methods=['POST'])
+            @self.route(rule if rule is not None else '/' + function.__name__.replace('_', '/'), endpoint=function.__name__, methods=['POST', ])
             def wrapper():
                 return Server.__response(Server.__request(function))
             return wrapper
