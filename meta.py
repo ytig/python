@@ -55,7 +55,7 @@ def define(__class__, __new__=None):
                 return d
         mark = '/'.join((__unique__, key, '',))
         return (_datadescriptor if isdatadescriptor else _descriptor)(desc, base, mark)
-    for key, var, in dict(list(context['varnames'].items()) + list(context['cellvars'].items())).items():
+    for key, var, in dict(context['varnames'], **context['cellvars']).items():
         if isinstance(var, staticmethod):
             if callable(var.__func__):
                 def find(v):
