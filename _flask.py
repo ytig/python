@@ -3,7 +3,7 @@ import time
 import inspect
 import json
 from Crypto.Cipher import AES
-from flask import Flask, g, request, Response, make_response, abort
+from flask import Flask, g, request, make_response, abort
 from flask_cors import CORS
 
 
@@ -77,7 +77,7 @@ class Server(Flask):
                 if expire < 0 or expire > time.time():
                     token = join[index + 1:]
             if not token and cls.REDIRECT:
-                abort(self.make_response(str(cls.REDIRECT)))
+                abort(make_response(cls.REDIRECT))
         else:
             token = str(token)
             join = str(-1 if cls.EXPIRE < 0 else int(time.time() + cls.EXPIRE)) + ',' + token if token else token
@@ -116,9 +116,7 @@ class Server(Flask):
                         kwargs[arg] = arguments.pop(arg, default)
                 if argspec.keywords is None:
                     arguments.clear()
-                ret = function(*args, **kwargs, **arguments)
-                if not isinstance(ret, Response):
-                    ret = make_response(ret)
+                ret = make_response(function(*args, **kwargs, **arguments))
                 if hasattr(g, 'cookies'):
                     for k in g.cookies:
                         ret.set_cookie(k, g.cookies[k])
@@ -139,7 +137,7 @@ class Server(Flask):
         obj = {
             'redirect': redirect,
         }
-        return self.make_response(json.dumps(obj))
+        return make_response(json.dumps(obj))
 
     # 成功响应
     def success(self, result, message=''):
@@ -148,7 +146,7 @@ class Server(Flask):
             'result': result,
             'message': message,
         }
-        return self.make_response(json.dumps(obj))
+        return make_response(json.dumps(obj))
 
     # 失败响应
     def failure(self, result, message=''):
@@ -157,4 +155,4 @@ class Server(Flask):
             'result': result,
             'message': message,
         }
-        return self.make_response(json.dumps(obj))
+        return make_response(json.dumps(obj))
