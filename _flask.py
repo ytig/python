@@ -108,11 +108,14 @@ class Server(Flask):
 
     @staticmethod
     def __response(ret):
-        response = ret if isinstance(ret, Response) else make_response(str(ret))
+        while hasattr(ret, '__json__'):
+            ret = ret.__json__()
+        if not isinstance(ret, Response):
+            ret = make_response(ret)
         if hasattr(g, 'cookies'):
             for k in g.cookies:
-                response.set_cookie(k, g.cookies[k])
-        return response
+                ret.set_cookie(k, g.cookies[k])
+        return ret
 
     # get请求（装饰器）
     def get(self, rule=None):
@@ -134,7 +137,7 @@ class Server(Flask):
 
 
 class Json:
-    def __str__(self):
+    def __json__(self):
         return json.dumps({k: v for k, v, in self.__dict__.items() if not k.startswith('_')})
 
 
