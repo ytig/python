@@ -37,8 +37,9 @@ class Server(Flask):
         CORS(self, supports_credentials=True)
 
     # 加密token
-    def encrypt(self, data):
-        key = self.SECRET
+    @classmethod
+    def encrypt(cls, data):
+        key = cls.SECRET
         if key and data:
             try:
                 data = data.encode('utf-8')
@@ -51,8 +52,9 @@ class Server(Flask):
         return data
 
     # 解密token
-    def decrypt(self, data):
-        key = self.SECRET
+    @classmethod
+    def decrypt(cls, data):
+        key = cls.SECRET
         if key and data:
             try:
                 data = bytes.fromhex(data)
@@ -65,58 +67,26 @@ class Server(Flask):
 
     # 读/写token
     def token(self, token=None):
+        cls = type(self)
         if token is None:
             token = ''
-            join = self.decrypt(str(request.cookies.get('token')))
+            join = cls.decrypt(str(request.cookies.get('token')))
             index = join.find(',')
             if index != -1:
                 expire = str2int(join[:index], d=0)
                 if expire < 0 or expire > time.time():
                     token = join[index + 1:]
-            if not token and self.REDIRECT:
-                abort(make_response(str(self.REDIRECT)))
+            if not token and cls.REDIRECT:
+                abort(self.make_response(str(cls.REDIRECT)))
         else:
             token = str(token)
-            join = str(-1 if self.EXPIRE < 0 else int(time.time() + self.EXPIRE)) + ',' + token if token else token
+            join = str(-1 if cls.EXPIRE < 0 else int(time.time() + cls.EXPIRE)) + ',' + token if token else token
             if not hasattr(g, 'cookies'):
                 g.cookies = {}
-            g.cookies['token'] = self.encrypt(join)
+            g.cookies['token'] = cls.encrypt(join)
         return token
 
-    @staticmethod
-    def __request(function):
-        args = []
-        kwargs = {}
-        arguments = params()
-        argspec = inspect.getargspec(function)
-        len1 = len(argspec.args)
-        len2 = 0 if not argspec.defaults else len(argspec.defaults)
-        for i1 in range(len1):
-            arg = argspec.args[i1]
-            i2 = i1 + len2 - len1
-            if i2 < 0:
-                try:
-                    args.append(arguments.pop(arg))
-                except KeyError:
-                    abort(400)
-            else:
-                default = argspec.defaults[i2]
-                kwargs[arg] = arguments.pop(arg, default)
-        if argspec.keywords is None:
-            arguments.clear()
-        return function(*args, **kwargs, **arguments)
-
-    @staticmethod
-    def __response(ret):
-        while hasattr(ret, '__json__'):
-            ret = ret.__json__()
-        if not isinstance(ret, Response):
-            ret = make_response(ret)
-        if hasattr(g, 'cookies'):
-            for k in g.cookies:
-                ret.set_cookie(k, g.cookies[k])
-        return ret
-
+    # 请求（装饰器）
     def request(self, *methods, rule=None):
         def decorator(function):
             r = rule
@@ -127,7 +97,32 @@ class Server(Flask):
 
             @self.route(r, endpoint=function.__name__, methods=methods)
             def wrapper():
-                return Server.__response(Server.__request(function))
+                args = []
+                kwargs = {}
+                arguments = params()
+                argspec = inspect.getargspec(function)
+                len1 = len(argspec.args)
+                len2 = 0 if not argspec.defaults else len(argspec.defaults)
+                for i1 in range(len1):
+                    arg = argspec.args[i1]
+                    i2 = i1 + len2 - len1
+                    if i2 < 0:
+                        try:
+                            args.append(arguments.pop(arg))
+                        except KeyError:
+                            abort(400)
+                    else:
+                        default = argspec.defaults[i2]
+                        kwargs[arg] = arguments.pop(arg, default)
+                if argspec.keywords is None:
+                    arguments.clear()
+                ret = function(*args, **kwargs, **arguments)
+                if not isinstance(ret, Response):
+                    ret = make_response(ret)
+                if hasattr(g, 'cookies'):
+                    for k in g.cookies:
+                        ret.set_cookie(k, g.cookies[k])
+                return ret
             return wrapper
         return decorator
 
@@ -139,26 +134,27 @@ class Server(Flask):
     def post(self, rule=None):
         return self.request('POST', rule=rule)
 
+    # 重定向响应
+    def redirect(self, redirect):
+        obj = {
+            'redirect': redirect,
+        }
+        return self.make_response(json.dumps(obj))
 
-class Json:
-    def __json__(self):
-        return json.dumps({k: v for k, v, in self.__dict__.items() if not k.startswith('_')})
+    # 成功响应
+    def success(self, result, message=''):
+        obj = {
+            'state': True,
+            'result': result,
+            'message': message,
+        }
+        return self.make_response(json.dumps(obj))
 
-
-class Redirect(Json):
-    def __init__(self, redirect):
-        self.redirect = redirect
-
-
-class Success(Json):
-    def __init__(self, result, message=''):
-        self.state = True
-        self.result = result
-        self.message = message
-
-
-class Failure(Json):
-    def __init__(self, result, message=''):
-        self.state = False
-        self.result = result
-        self.message = message
+    # 失败响应
+    def failure(self, result, message=''):
+        obj = {
+            'state': False,
+            'result': result,
+            'message': message,
+        }
+        return self.make_response(json.dumps(obj))
