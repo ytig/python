@@ -176,10 +176,7 @@ def injects(*segms, argv=sys.argv):
         def wrapper():
             args = []
             for segm, argc, in segms:
-                @_inject(segm, argv)
-                def f(*args):
-                    return args
-                _argv = f()
+                _argv = _inject(segm, argv)(lambda *args: args)()
                 if argc == 0:
                     args.append(len(_argv) > 0)
                 elif argc > 0:
