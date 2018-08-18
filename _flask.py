@@ -117,23 +117,27 @@ class Server(Flask):
                 ret.set_cookie(k, g.cookies[k])
         return ret
 
-    # get请求（装饰器）
-    def get(self, rule=None):
+    def request(self, *methods, rule=None):
         def decorator(function):
-            @self.route(rule if rule is not None else '/' + function.__name__.replace('_', '/'), endpoint=function.__name__, methods=['GET', ])
+            r = rule
+            if r is None:
+                r = function.__name__.replace('_', '/')
+                if not r.startswith('/'):
+                    r = '/' + r
+
+            @self.route(r, endpoint=function.__name__, methods=methods)
             def wrapper():
                 return Server.__response(Server.__request(function))
             return wrapper
         return decorator
 
+    # get请求（装饰器）
+    def get(self, rule=None):
+        return self.request('GET', rule=rule)
+
     # post请求（装饰器）
     def post(self, rule=None):
-        def decorator(function):
-            @self.route(rule if rule is not None else '/' + function.__name__.replace('_', '/'), endpoint=function.__name__, methods=['POST', ])
-            def wrapper():
-                return Server.__response(Server.__request(function))
-            return wrapper
-        return decorator
+        return self.request('POST', rule=rule)
 
 
 class Json:
