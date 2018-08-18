@@ -3,7 +3,7 @@ import time
 import inspect
 import json
 from Crypto.Cipher import AES
-from flask import Flask, g, request, make_response, abort
+from flask import Flask, g, request, Response, make_response, abort
 from flask_cors import CORS
 
 
@@ -108,7 +108,7 @@ class Server(Flask):
 
     @staticmethod
     def __response(ret):
-        response = make_response(str(ret))
+        response = ret if isinstance(ret, Response) else make_response(str(ret))
         if hasattr(g, 'cookies'):
             for k in g.cookies:
                 response.set_cookie(k, g.cookies[k])
