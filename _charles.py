@@ -7,7 +7,7 @@ from flask import Flask, request, make_response, abort
 
 def _request(req):
     url = req.url
-    headers = dict(req.headers)
+    headers = dict({'Accept': None, }, **req.headers)
     for k in ('Host', 'Content-Length',):
         if k in headers:
             del headers[k]
