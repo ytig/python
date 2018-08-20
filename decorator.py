@@ -69,10 +69,10 @@ class Lock:
 
     # 区块锁
     def __enter__(self):
-        self.__lock.__enter__()
+        return self.__lock.__enter__()
 
     def __exit__(self, t, v, tb):
-        self.__lock.__exit__(t, v, tb)
+        return self.__lock.__exit__(t, v, tb)
 
     # 装饰锁
     def __call__(self, generics):
