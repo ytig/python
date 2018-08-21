@@ -3,7 +3,7 @@ import inspect
 import threading
 import contextlib
 import collections
-from decorator import ilock
+from decorator import Lock
 from task import Tree
 
 
@@ -14,60 +14,47 @@ def withas(generics):
             return generics
         else:
             class _class(_baseclass):
-                def __init__(self, *args, **kwargs):
-                    self.args = args
-                    self.kwargs = kwargs
-                    self.__obj = Stack()
+                def _init(self, *args, **kwargs):
+                    self.stack = [Arguments(*args, **kwargs), ]
 
-                def __enter__(self):
-                    obj = generics(*self.args, **self.kwargs)
-                    o = obj.__enter__()
-                    self.__obj.push(obj)
-                    return o
+                def _enter(self):
+                    obj = self.stack.pop()(generics)
+                    ret = obj.__enter__()
+                    self.stack.append(obj)
+                    return ret
 
-                def __exit__(self, t, v, tb):
-                    obj = self.__obj.pop()
-                    return obj.__exit__(t, v, tb)
+                def _exit(self, t, v, tb):
+                    return self.stack.pop().__exit__(t, v, tb)
             return _class
     elif inspect.isfunction(generics):
         if inspect.isgeneratorfunction(generics):
             generics = contextlib.contextmanager(generics)
 
             class _generatorfunction(_baseclass):
-                def __init__(self, *args, **kwargs):
-                    self.args = args
-                    self.kwargs = kwargs
-                    self.__obj = Stack()
+                def _init(self, *args, **kwargs):
+                    self.stack = [Arguments(*args, **kwargs), ]
 
-                def __enter__(self):
-                    obj = generics(*self.args, **self.kwargs)
-                    o = obj.__enter__()
-                    self.__obj.push(obj)
-                    return o
+                def _enter(self):
+                    obj = self.stack.pop()(generics)
+                    ret = obj.__enter__()
+                    self.stack.append(obj)
+                    return ret
 
-                def __exit__(self, t, v, tb):
-                    obj = self.__obj.pop()
-                    return obj.__exit__(t, v, tb)
+                def _exit(self, t, v, tb):
+                    return self.stack.pop().__exit__(t, v, tb)
             return _generatorfunction
         else:
             class _function(_baseclass):
-                def __init__(self, *args, **kwargs):
-                    self.args = args
-                    self.kwargs = kwargs
+                def _init(self, *args, **kwargs):
+                    self.stack = [Arguments(*args, **kwargs), ]
 
-                def __enter__(self):
-                    return generics(*self.args, **self.kwargs)
-
-                def __exit__(self, t, v, tb):
-                    pass
+                def _enter(self):
+                    return self.stack.pop()(generics)
             return _function
     else:
         class _object(_baseclass):
-            def __enter__(self):
+            def _enter(self):
                 return generics
-
-            def __exit__(self, t, v, tb):
-                pass
         return _object
 
 
@@ -92,7 +79,44 @@ def tree(t, log=None):
         return _tree
 
 
+def _strict(i):
+    def decorator(function):
+        def wrapper(self, *args, **kwargs):
+            with Lock(self):
+                assert getattr(self, '__withas__', 0) == i
+                setattr(self, '__withas__', i + 1)
+            try:
+                return function(self, *args, **kwargs)
+            except BaseException:
+                with Lock(self):
+                    setattr(self, '__withas__', -1)
+                raise
+        return wrapper
+    return decorator
+
+
 class _baseclass:
+    @_strict(0)
+    def __init__(self, *args, **kwargs):
+        return self._init(*args, **kwargs)
+
+    @_strict(1)
+    def __enter__(self):
+        return self._enter()
+
+    @_strict(2)
+    def __exit__(self, t, v, tb):
+        return self._exit(t, v, tb)
+
+    def _init(self):
+        pass
+
+    def _enter(self):
+        pass
+
+    def _exit(self, t, v, tb):
+        pass
+
     # 输入转换
     @classmethod
     def input(this, pipe):
@@ -268,25 +292,6 @@ class _baseclass:
             else:
                 stack.pop().__exit__(None, None, None)
         return withas(_merge)
-
-
-class Stack:
-    def __init__(self):
-        self.values = {}
-
-    # 入栈
-    @ilock()
-    def push(self, data):
-        key = threading.current_thread().name
-        if key not in self.values:
-            self.values[key] = []
-        self.values[key].append(data)
-
-    # 出栈
-    @ilock()
-    def pop(self):
-        key = threading.current_thread().name
-        return self.values[key].pop()
 
 
 class Arguments:
