@@ -61,6 +61,14 @@ def withas(generics):
                 def __exit__(self, t, v, tb):
                     pass
             return _function
+    else:
+        class _object(_baseclass):
+            def __enter__(self):
+                return generics
+
+            def __exit__(self, t, v, tb):
+                pass
+        return _object
 
 
 # 执行器
@@ -269,7 +277,7 @@ class Stack:
     # 入栈
     @ilock()
     def push(self, data):
-        key = threading.currentThread().name
+        key = threading.current_thread().name
         if key not in self.values:
             self.values[key] = []
         self.values[key].append(data)
@@ -277,7 +285,7 @@ class Stack:
     # 出栈
     @ilock()
     def pop(self):
-        key = threading.currentThread().name
+        key = threading.current_thread().name
         return self.values[key].pop()
 
 
