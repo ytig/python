@@ -67,7 +67,7 @@ class Tree:
                     self.__ret = (True, self.__cpu(self.__mem),)
             except BaseException as e:
                 try:
-                    self.__log(e)
+                    callable(self.__log) and self.__log(e)
                 except BaseException:
                     pass
             return self.__ret

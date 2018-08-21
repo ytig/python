@@ -112,7 +112,7 @@ class Loop(threading.Thread):
                     pop[1]()
                 except BaseException as e:
                     try:
-                        pop[-1](e)
+                        callable(pop[-1]) and pop[-1](e)
                     except BaseException:
                         pass
 

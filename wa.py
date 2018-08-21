@@ -73,7 +73,7 @@ def tree(t, log=None):
                     ret.append(cpu(mem))
                 except BaseException as e:
                     try:
-                        log(e)
+                        callable(log) and log(e)
                     except BaseException:
                         pass
             return ret
