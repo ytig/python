@@ -14,15 +14,22 @@ def Connect(*args, **kwargs):
 
 @withas
 def Cursor(connect):
+    hasattr(connect, '_cursors') or setattr(connect, '_cursors', set())
+    _cursors = getattr(connect, '_cursors')
     cursor = connect.cursor(cursor=pymysql.cursors.DictCursor)
+    _cursors.add(cursor)
     try:
         yield cursor
     except BaseException:
-        connect.rollback()
+        _cursors.remove(cursor)
+        if not _cursors:
+            connect.rollback()
+        cursor.close()
         raise
     else:
-        connect.commit()
-    finally:
+        _cursors.remove(cursor)
+        if not _cursors:
+            connect.commit()
         cursor.close()
 
 
