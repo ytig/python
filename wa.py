@@ -147,7 +147,7 @@ class _baseclass:
             y = False
             pstack = (lambda i: [i, i.__enter__(), ])(parent(*args, **kwargs))
             try:
-                cstack = (lambda i: [i, i.__enter__(), ])(pipe(pstack.pop())(child))
+                cstack = (lambda i: [i, i.__enter__(), ])(Arguments.make(pipe(pstack.pop()))(child))
                 try:
                     y = True
                     yield cstack.pop()
@@ -188,9 +188,7 @@ class _baseclass:
                 return obj.__exit__(type(e), e, e.__traceback__)
 
         def _parallel(*args, **kwargs):
-            p = [list(pipe(*args, **kwargs)), ]
-            p[0] += [Arguments() for i in range(len(humans) - len(p[0]))]
-            stacks = core(enter, *[t for t in zip(humans, p.pop())])
+            stacks = core(enter, *[t for t in zip(humans, (lambda i: i + [Arguments()] * (len(humans) - len(i)))((lambda i: [Arguments.make(g) for g in i])(pipe(*args, **kwargs))))])
             try:
                 assert len(stacks) == len(humans), 'parallel enter error'
             except BaseException:
@@ -246,7 +244,7 @@ class _baseclass:
                     p = None
                     raise
                 else:
-                    cstacks = core(enter, *[(child, pipe(o),) for o in pstack.pop()])
+                    cstacks = core(enter, *[(child, Arguments.make(pipe(o)),) for o in pstack.pop()])
                     try:
                         assert len(cstacks) == l, 'branch enter error'
                     except BaseException:
@@ -309,3 +307,18 @@ class Arguments:
     # 调用函数
     def __call__(self, call):
         return call(*self.args, **self.kwargs)
+
+    # 构造参数
+    @staticmethod
+    def make(generics):
+        if isinstance(generics, Arguments):
+            return generics
+        elif isinstance(generics, tuple):
+            return Arguments(*generics)
+        elif isinstance(generics, dict):
+            return Arguments(**generics)
+        elif isinstance(generics, collections.Iterable):
+            arguments = list(generics)
+            if len(arguments) == 2 and isinstance(arguments[0], tuple) and isinstance(arguments[1], dict):
+                return Arguments(*arguments[0], **arguments[1])
+        raise TypeError
