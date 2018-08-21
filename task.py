@@ -94,7 +94,7 @@ class Tree:
         @ilock()
         def pop(self):
             if self.twigs:
-                return self.twigs.pop()
+                return self.twigs.pop(0)
             return None
 
         @ilock()
