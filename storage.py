@@ -63,11 +63,11 @@ class _Storage:
         return list(self._reader.keys())
 
     def get(self, key, defaultValue=None):
+        assert isinstance(key, str)
         return self._reader.get(key, defaultValue)
 
     def set(self, key, value):
-        if not isinstance(key, str):
-            raise Exception('key must be str.')
+        assert isinstance(key, str)
         self._writer.write(encode((key, value,)) + '\n')
         self._writer.flush()
         if key in self._reader:

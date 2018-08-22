@@ -2,8 +2,7 @@
 import traceback
 import threading
 _LOCK = threading.Lock()  # 全局锁
-if threading.current_thread() is not threading.main_thread():
-    raise Exception('cannot import at thread.')
+assert threading.current_thread() is threading.main_thread()
 if threading.main_thread().is_alive():
     _current_state = 0
     _events = []
@@ -38,8 +37,7 @@ else:
 
 # 注册（关闭前）
 def bregister(*args, **kwargs):
-    if len(args) <= 0:
-        raise Exception('no func.')
+    assert len(args) > 0
     func = args[0]
     args = args[1:]
     with _LOCK:
@@ -54,8 +52,7 @@ def bregister(*args, **kwargs):
 
 # 注册（关闭后）
 def aregister(*args, **kwargs):
-    if len(args) <= 0:
-        raise Exception('no func.')
+    assert len(args) > 0
     func = args[0]
     args = args[1:]
     with _LOCK:
