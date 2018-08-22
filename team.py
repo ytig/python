@@ -200,26 +200,19 @@ class _baseclass:
             function = args[0]
             args = args[1:]
             with Lock(self):
-                mems = self.__objects.copy()
+                objects = self.__objects.copy()
                 t = self.getting(name='t')
 
-            def cpu(mem):
+            def target(obj):
                 try:
-                    return function(mem, *args, **kwargs)
+                    return function(obj, *args, **kwargs)
                 except BaseException:
                     with Lock(self):
-                        if mem in self.__objects:
-                            self.__objects.remove(mem)
+                        if obj in self.__objects:
+                            self.__objects.remove(obj)
                     raise
-            ret = _list(len(mems), t <= 0)
-            if t <= 0:
-                try:
-                    for mem in mems:
-                        ret.append(cpu(mem))
-                except BaseException:
-                    pass
-            else:
-                ret.extend(Tree(cpu, *mems, log=None).plant(t=t))
+            ret = _list(len(objects), t <= 0)
+            ret.extend(Tree(-1 if t == 0 else t).plant(*[Tree.Twig(target, args=(obj,), log=None) for obj in objects]))
             return ret
 
 

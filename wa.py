@@ -60,23 +60,8 @@ def withas(generics):
 
 # 执行器
 def tree(t, log=None):
-    if t <= 0:
-        def _tree(cpu, *mems):
-            ret = []
-            for mem in mems:
-                try:
-                    ret.append(cpu(mem))
-                except BaseException as e:
-                    try:
-                        callable(log) and log(e)
-                    except BaseException:
-                        pass
-            return ret
-        return _tree
-    else:
-        def _tree(cpu, *mems):
-            return Tree(cpu, *mems, log=log).plant(t=t)
-        return _tree
+    T = Tree(0 if t < 0 else t)
+    return lambda target, *tuples: T.plant(*[Tree.Twig(target, args=args, log=log) for args in tuples])
 
 
 def _strict(i):
@@ -170,22 +155,17 @@ class _baseclass:
     def parallel(husband, *wives, pipe=lambda *args, **kwargs: [Arguments(*args, **kwargs), ], core=tree(0)):
         """
         pipe: *args, **kwargs -> Arguments[]
+        core: target, *tuples -> object[]
         """
         humans = [withas(i) for i in (husband,) + wives]
 
-        def enter(args):
-            call = args[0]
-            arguments = args[1]
-            obj = arguments(call)
-            return [obj, obj.__enter__(), ]
+        def enter(cls, arguments):
+            self = arguments(cls)
+            return [self, self.__enter__(), ]
 
-        def exit(args):
-            obj = args[0]
-            e = args[1]
-            if e is None:
-                return obj.__exit__(None, None, None)
-            else:
-                return obj.__exit__(type(e), e, e.__traceback__)
+        def exit(self, e):
+            t, v, tb, = (None, None, None,) if e is None else (type(e), e, e.__traceback__,)
+            return self.__exit__(t, v, tb)
 
         def _parallel(*args, **kwargs):
             stacks = core(enter, *[t for t in zip(humans, (lambda i: i + [Arguments()] * (len(humans) - len(i)))((lambda i: [Arguments.make(g) for g in i])(pipe(*args, **kwargs))))])
@@ -211,23 +191,18 @@ class _baseclass:
     def branch(parent, child, pipe=lambda o: Arguments(o), core=tree(0)):
         """
         pipe: object -> Arguments
+        core: target, *tuples -> object[]
         """
         parent = withas(parent)
         child = withas(child)
 
-        def enter(args):
-            call = args[0]
-            arguments = args[1]
-            obj = arguments(call)
-            return [obj, obj.__enter__(), ]
+        def enter(cls, arguments):
+            self = arguments(cls)
+            return [self, self.__enter__(), ]
 
-        def exit(args):
-            obj = args[0]
-            e = args[1]
-            if e is None:
-                return obj.__exit__(None, None, None)
-            else:
-                return obj.__exit__(type(e), e, e.__traceback__)
+        def exit(self, e):
+            t, v, tb, = (None, None, None,) if e is None else (type(e), e, e.__traceback__,)
+            return self.__exit__(t, v, tb)
 
         def _branch(*args, **kwargs):
             y = False

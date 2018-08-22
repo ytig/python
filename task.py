@@ -4,13 +4,22 @@ from kit import hasvar, getvar, setvar, loge
 from decorator import Lock, ilock
 
 
-def Pair(function):
-    def wrapper(*args, **kwargs):
-        threading.Thread(target=function, args=args, kwargs=kwargs).start()
-    return wrapper
-
-
 class Queue:
+    # 任务分发
+    def push(self):
+        cls = type(self)
+        with Lock(cls):
+            assert hasvar(cls, '__mutex__') or setvar(cls, '__mutex__', {'targets': [], 'running': 0, })
+            mutex = getvar(cls, '__mutex__')
+            mutex['targets'].append(self)
+            if mutex['running'] < 1:
+                threading.Thread(target=cls.__run).start()
+                mutex['running'] += 1
+
+    # 任务处理
+    def pop(self):
+        pass
+
     # 打印日志
     @staticmethod
     def log(e):
@@ -18,103 +27,89 @@ class Queue:
 
     @classmethod
     def __run(cls):
-        name = '__mutex__'
         while True:
             with Lock(cls):
-                mutex = getvar(cls, name)
-                if mutex['q']:
-                    queue = mutex['q'].pop(0)
+                mutex = getvar(cls, '__mutex__')
+                if mutex['targets']:
+                    target = mutex['targets'].pop(0)
                 else:
-                    mutex['r'] -= 1
+                    mutex['running'] -= 1
                     break
             try:
-                queue.pop()
+                target.pop()
             except BaseException as e:
                 try:
                     cls.log(e)
                 except BaseException:
                     pass
 
-    # 任务分发
-    def push(self):
-        cls = type(self)
-        name = '__mutex__'
-        with Lock(cls):
-            assert hasvar(cls, name) or setvar(cls, name, {'q': [], 'r': 0, })
-            mutex = getvar(cls, name)
-            mutex['q'].append(self)
-            if mutex['r'] < 1:
-                threading.Thread(target=cls.__run).start()
-                mutex['r'] += 1
-
-    # 任务处理
-    def pop(self):
-        pass
-
 
 class Tree:
+    SEIZE = object()  # 占位符
+
     class Twig:
-        def __init__(self, cpu, mem, log):
-            self.__cpu = cpu
-            self.__mem = mem
-            self.__log = log
-            self.__ret = (False, None,)
+        def __init__(self, target, args=(), kwargs={}, log=lambda e: logger.Log.e(loge(e))):
+            self.target = target
+            self.args = args
+            self.kwargs = kwargs
+            self.log = log
+            self.ret = (False, None,)
 
         @ilock()
-        def plant(self):
-            try:
-                if not self.__ret[0]:
-                    self.__ret = (True, self.__cpu(self.__mem),)
-            except BaseException as e:
+        def __call__(self):
+            if not self.ret[0]:
                 try:
-                    callable(self.__log) and self.__log(e)
-                except BaseException:
-                    pass
-            return self.__ret
+                    self.ret = (True, self.target(*self.args, **self.kwargs),)
+                    del self.target, self.args, self.kwargs, self.log,
+                except BaseException as e:
+                    callable(self.log) and self.log(e)
+            return self.ret
 
-    class Gardener:
-        class Executor(threading.Thread):
-            def __init__(self, queue):
-                super().__init__()
-                self.queue = queue
-
-            def run(self):
-                while True:
-                    twig = self.queue.pop()
-                    if twig is None:
-                        break
-                    ret = twig.plant()
-                    if ret[0]:
-                        self.queue.push(ret[1])
-
-        def __init__(self, *twigs):
-            self.twigs = list(twigs)
-            self.seeds = []
-
-        @ilock()
-        def pop(self):
-            if self.twigs:
-                return self.twigs.pop(0)
-            return None
-
-        @ilock()
-        def push(self, seed):
-            self.seeds.append(seed)
-
-        def plant(self, t):
-            threads = [Tree.Gardener.Executor(self) for i in range(t)]
-            for thread in threads:
-                thread.start()
-            for thread in threads:
-                thread.join()
-            return self.seeds
-
-    def __init__(self, cpu, *mems, log=lambda e: logger.Log.e(loge(e))):
-        self.twigs = [Tree.Twig(cpu, mem, log) for mem in mems]
+    def __init__(self, t):
+        self.t = t
+        self.targets = []
+        self.running = 0
 
     # 任务并发
-    def plant(self, t=1):
-        return Tree.Gardener(*self.twigs).plant(t)
+    def plant(self, *twigs, seize=False):
+        ret = []
+        if self.t < 0:
+            for twig in twigs:
+                b, r, = twig()
+                if not b:
+                    break
+                ret.append(r)
+            ret += [Tree.SEIZE, ] * (len(twigs) - len(ret))
+        elif self.t == 0:
+            for twig in twigs:
+                b, r, = twig()
+                ret.append(r if b else Tree.SEIZE)
+        else:
+            with Lock(self):
+                targets = [{'twig': twig, 'event': threading.Event(), } for twig in twigs]
+                self.targets.extend(targets)
+                for i in range(min(len(targets), self.t - self.running)):
+                    threading.Thread(target=self.__run).start()
+                    self.running += 1
+            for target in targets:
+                target['event'].wait()
+                b, r, = target['ret']
+                ret.append(r if b else Tree.SEIZE)
+        if not seize:
+            while Tree.SEIZE in ret:
+                ret.remove(Tree.SEIZE)
+        return ret
+
+    def __run(self):
+        while True:
+            with Lock(self):
+                if self.targets:
+                    target = self.targets.pop(0)
+                else:
+                    self.running -= 1
+                    break
+            target['ret'] = target['twig']()
+            target['event'].set()
 
 
 import logger
