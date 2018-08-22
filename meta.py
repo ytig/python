@@ -9,7 +9,7 @@ def define(__class__, __new__=None):
     context = scope(pattern=r'__new__', back=1)
     args = context['args']
     kwargs = context['kwargs']
-    assert __class__ is not None and __class__ is context['freevars'].get('__class__'), '__class__ type error'
+    assert __class__ is not None and __class__ is context['freevars'].get('__class__'), '__class__ value error'
     with Lock(__class__):
         assert hasvar(__class__, '__unique__') or setvar(__class__, '__unique__', unique())
         __unique__ = getvar(__class__, '__unique__')
