@@ -253,15 +253,47 @@ def setvar(o, k, v):
     return False
 
 
-# 调用函数
+# 获取定义
+def appliable(o, k, d=None):
+    for c in type.mro(type(o)):
+        if hasvar(c, k):
+            return getvar(c, k)
+    return d
+
+
+def _appliable(var, bug={
+    object.__dict__['__new__']: 0,
+    object.__dict__['__init_subclass__']: 1,
+    object.__dict__['__subclasshook__']: 1,
+}):
+    if var in bug:
+        val = bug[var]
+        if isinstance(val, int):
+            val = (var, val,)
+        return val
+    elif isinstance(var, staticmethod):
+        return var.__func__, 0,
+    elif isinstance(var, classmethod):
+        return var.__func__, 1,
+    elif callable(var):
+        return var, 2,
+    else:
+        return None, -1,
+
+
+# 运用定义
 def apply(*args, **kwargs):
     assert len(args) > 1
     o = args[0]
     k = args[1]
     args = args[2:]
-    for c in type.mro(type(o)):
-        if hasvar(c, k):
-            return getvar(c, k)(o, *args, **kwargs)
+    call, mode, = _appliable(appliable(o, k))
+    if mode == 0:
+        return call(*args, **kwargs)
+    elif mode == 1:
+        return call(type(o), *args, **kwargs)
+    elif mode == 2:
+        return call(o, *args, **kwargs)
     raise NotImplementedError
 
 
