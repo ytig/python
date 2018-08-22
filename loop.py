@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import time
-import numbers
 import threading
+import itertools
 import subprocess
 from kit import loge
 from decorator import Lock
@@ -20,50 +20,54 @@ def sleep(seconds):
 class Loop(threading.Thread):
     def __init__(self, daemon=False):
         super().__init__(daemon=daemon)
-        self.__pid = 0
-        self.__pool = []
+        self.__count = itertools.count(1)
+        self.__block = []
         self.__process = None
         self.__shutdown = False
         bregister(self._shutdown)
 
-    # 执行
-    def do(self, runnable, delay, tag='', log=lambda e: Log.e(loge(e))):
-        assert callable(runnable)
-        assert isinstance(delay, numbers.Real)
-        assert isinstance(tag, str)
-        t = time.time() + max(0, delay)
+    # 开始
+    def enter(self, delay, action, args=(), kwargs={}, tag='', log=lambda e: Log.e(loge(e))):
+        until = time.time() + max(0, delay)
         with Lock(self):
-            self.__pid += 1
-            pid = self.__pid
-            if not self.__pool or t < self.__pool[0][0]:
+            eid = next(self.__count)
+            if not self.__block or until < self.__block[0]['until']:
                 if self.__process is not None:
                     try:
                         self.__process.kill()
                     except BaseException:
                         pass
                     self.__process = None
-            self.__pool.append((t, runnable, pid, tag, log,))
-            self.__pool.sort(key=lambda t: t[0])
+            self.__block.append({
+                'eid': eid,
+                'until': until,
+                'action': action,
+                'args': args,
+                'kwargs': kwargs,
+                'tag': tag,
+                'log': log,
+            })
+            self.__block.sort(key=lambda d: d['until'])
             if not self.is_alive():
                 self.start()
-        return pid
+        return eid
 
-    # 取消执行
-    def undo(self, generics):
+    # 取消
+    def cancel(self, generics):
         ret = 0
         with Lock(self):
-            for i in range(len(self.__pool) - 1, -1, -1):
+            for i in range(len(self.__block) - 1, -1, -1):
                 p = False
                 if generics is None:
                     p = True
                 elif callable(generics):
-                    p = self.__pool[i][1] is generics
+                    p = self.__block[i]['action'] is generics
                 elif isinstance(generics, int):
-                    p = self.__pool[i][2] == generics
+                    p = self.__block[i]['eid'] == generics
                 elif isinstance(generics, str):
-                    p = self.__pool[i][3] == generics
+                    p = self.__block[i]['tag'] == generics
                 if p:
-                    self.__pool.pop(i)
+                    self.__block.pop(i)
                     if i == 0:
                         if self.__process is not None:
                             try:
@@ -90,8 +94,8 @@ class Loop(threading.Thread):
             pop = None
             with Lock(self):
                 self.__process = None
-                if self.__pool:
-                    t = self.__pool[0][0] - time.time()
+                if self.__block:
+                    t = self.__block[0]['until'] - time.time()
                     t = t if t > 0 else None
                 elif self.__shutdown:
                     return
@@ -101,7 +105,7 @@ class Loop(threading.Thread):
                     process = sleep(t)
                     self.__process = process
                 else:
-                    pop = self.__pool.pop(0)
+                    pop = self.__block.pop(0)
             if process is not None:
                 try:
                     process.wait()
@@ -109,10 +113,10 @@ class Loop(threading.Thread):
                     pass
             if pop is not None:
                 try:
-                    pop[1]()
+                    pop['action'](*pop['args'], **pop['kwargs'])
                 except BaseException as e:
                     try:
-                        callable(pop[-1]) and pop[-1](e)
+                        callable(pop['log']) and pop['log'](e)
                     except BaseException:
                         pass
 
@@ -120,11 +124,11 @@ class Loop(threading.Thread):
 main_loop = Loop()  # 主循环
 
 
-# 执行
-def do(*args, **kwargs):
-    return main_loop.do(*args, **kwargs)
+# 开始
+def enter(*args, **kwargs):
+    return main_loop.enter(*args, **kwargs)
 
 
-# 取消执行
-def undo(*args, **kwargs):
-    return main_loop.undo(*args, **kwargs)
+# 取消
+def cancel(*args, **kwargs):
+    return main_loop.cancel(*args, **kwargs)
