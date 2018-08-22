@@ -9,7 +9,7 @@ def define(__class__, __new__=None):
     context = scope(pattern=r'__new__', back=1)
     args = context['args']
     kwargs = context['kwargs']
-    assert __class__ is not None and __class__ is context['freevars'].get('__class__')
+    assert __class__ is not None and __class__ is context['freevars'].get('__class__'), '__class__ type error'
     with Lock(__class__):
         assert hasvar(__class__, '__unique__') or setvar(__class__, '__unique__', unique())
         __unique__ = getvar(__class__, '__unique__')
@@ -22,7 +22,7 @@ def define(__class__, __new__=None):
         if key in namespace:
             def base(v=namespace[key]):
                 f = find(v)
-                assert inspect.isgeneratorfunction(f) == isgeneratorfunction
+                assert inspect.isgeneratorfunction(f) == isgeneratorfunction, 'function blend error'
                 return f
         else:
             def base(k=key):
@@ -30,7 +30,7 @@ def define(__class__, __new__=None):
                 for b in type.mro(ret)[1:]:
                     if hasvar(b, k):
                         f = find(_wrapper.function(getvar(b, k)))
-                        assert inspect.isgeneratorfunction(f) == isgeneratorfunction
+                        assert inspect.isgeneratorfunction(f) == isgeneratorfunction, 'function blend error'
                         break
                 return f
         mark = '/'.join((__unique__, key, name,))
@@ -42,7 +42,7 @@ def define(__class__, __new__=None):
         if key in namespace:
             def base(v=namespace[key]):
                 d = _wrapper.descriptor(v)
-                assert inspect.isdatadescriptor(d) == isdatadescriptor
+                assert inspect.isdatadescriptor(d) == isdatadescriptor, 'descriptor blend error'
                 return d
         else:
             def base(k=key):
@@ -50,7 +50,7 @@ def define(__class__, __new__=None):
                 for b in type.mro(ret)[1:]:
                     if hasvar(b, k):
                         d = _wrapper.descriptor(getvar(b, k))
-                        assert inspect.isdatadescriptor(d) == isdatadescriptor
+                        assert inspect.isdatadescriptor(d) == isdatadescriptor, 'descriptor blend error'
                         break
                 return d
         mark = '/'.join((__unique__, key, '',))
@@ -59,7 +59,7 @@ def define(__class__, __new__=None):
         if isinstance(var, staticmethod):
             if callable(var.__func__):
                 def find(v):
-                    assert isinstance(v, staticmethod) and callable(v.__func__)
+                    assert isinstance(v, staticmethod) and callable(v.__func__), 'staticmethod type error'
                     return v.__func__
                 __func__ = function(var.__func__, find)
             else:
@@ -68,7 +68,7 @@ def define(__class__, __new__=None):
         elif isinstance(var, classmethod):
             if callable(var.__func__):
                 def find(v):
-                    assert isinstance(v, classmethod) and callable(v.__func__)
+                    assert isinstance(v, classmethod) and callable(v.__func__), 'classmethod type error'
                     return v.__func__
                 __func__ = function(var.__func__, find)
             else:
@@ -77,21 +77,21 @@ def define(__class__, __new__=None):
         elif isinstance(var, property):
             if callable(var.fget):
                 def find(v):
-                    assert isinstance(v, property) and callable(v.fget)
+                    assert isinstance(v, property) and callable(v.fget), 'property type error'
                     return v.fget
                 fget = function(var.fget, find, name='fget')
             else:
                 fget = None
             if callable(var.fset):
                 def find(v):
-                    assert isinstance(v, property) and callable(v.fset)
+                    assert isinstance(v, property) and callable(v.fset), 'property type error'
                     return v.fset
                 fset = function(var.fset, find, name='fset')
             else:
                 fset = None
             if callable(var.fdel):
                 def find(v):
-                    assert isinstance(v, property) and callable(v.fdel)
+                    assert isinstance(v, property) and callable(v.fdel), 'property type error'
                     return v.fdel
                 fdel = function(var.fdel, find, name='fdel')
             else:
@@ -99,7 +99,7 @@ def define(__class__, __new__=None):
             namespace[key] = property(fget=fget, fset=fset, fdel=fdel)
         elif inspect.isfunction(var):
             def find(v):
-                assert callable(v)
+                assert callable(v), 'function type error'
                 return v
             namespace[key] = function(var, find)
         else:
@@ -118,7 +118,7 @@ def invoke(*d, update=False):
         index -= 0
 
         def default(*args, **kwargs):
-            assert d
+            assert d, 'function undefined error'
             return d[0]
         if not update:
             args = None
@@ -134,7 +134,7 @@ def invoke(*d, update=False):
         def default(*args, **kwargs):
             name = args[0]
             args = args[1:]
-            assert d
+            assert d, 'descriptor undefined error'
             try:
                 return apply(d[0], name, *args, **kwargs)
             except NotImplementedError:
