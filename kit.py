@@ -253,6 +253,18 @@ def setvar(o, k, v):
     return False
 
 
+# 调用函数
+def apply(*args, **kwargs):
+    assert len(args) > 1
+    o = args[0]
+    k = args[1]
+    args = args[2:]
+    tp = type(o)
+    if hasvar(tp, k):
+        return getvar(tp, k)(o, *args, **kwargs)
+    raise NotImplementedError
+
+
 # 获取闭包
 def getnonlocals(func, name):
     return dict(zip(func.__code__.co_freevars, func.__closure__))[name].cell_contents
