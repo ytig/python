@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 import inspect
-from kit import unique, hasvar, getvar, setvar, frames, scope, depth
+from kit import unique, hasvar, getvar, setvar, appliable, apply, frames, scope, depth
 from decorator import Lock
 
 
@@ -135,11 +135,12 @@ def invoke(*d, update=False):
             name = args[0]
             args = args[1:]
             assert d
-            b = hasattr(d[0], name)
-            if not b and name == '__get__':
-                return d[0]
-            assert b
-            return getattr(d[0], name)(*args, **kwargs)
+            try:
+                return apply(d[0], name, *args, **kwargs)
+            except NotImplementedError:
+                if name == '__get__':
+                    return d[0]
+                raise
         if not update:
             args = None
             kwargs = None
@@ -232,11 +233,11 @@ class _descriptor:
 
     def __get__(self, *args, **kwargs):
         if not depth(equal=lambda f1, f2: f1.f_locals['self'].mark == f2.f_locals['self'].mark):
-            return self.desc.__get__(*args, **kwargs)
+            return apply(self.desc, '__get__', *args, **kwargs)
         else:
             _desc = self.base()
             if _desc is not None:
-                return _desc.__get__(*args, **kwargs)
+                return apply(_desc, '__get__', *args, **kwargs)
             else:
                 with frames(keep=lambda f: f.f_code is _descriptor.f_codes_get[0]) as f:
                     assert f.has(0)
@@ -253,7 +254,7 @@ class _descriptor:
                 kwargs = f[0].f_locals['kwargs']
         _desc = base()
         if _desc is not None:
-            return _desc.__get__(*args, **kwargs)
+            return apply(_desc, '__get__', *args, **kwargs)
         else:
             return default('__get__', *args, **kwargs)
     f_codes_get = (get.__func__.__code__, __get__.__code__,)
@@ -262,11 +263,11 @@ class _descriptor:
 class _datadescriptor(_descriptor):
     def __set__(self, *args, **kwargs):
         if not depth(equal=lambda f1, f2: f1.f_locals['self'].mark == f2.f_locals['self'].mark):
-            return self.desc.__set__(*args, **kwargs)
+            return apply(self.desc, '__set__', *args, **kwargs)
         else:
             _desc = self.base()
             if _desc is not None:
-                return _desc.__set__(*args, **kwargs)
+                return apply(_desc, '__set__', *args, **kwargs)
             else:
                 with frames(keep=lambda f: f.f_code is _datadescriptor.f_codes_set[0]) as f:
                     assert f.has(0)
@@ -283,18 +284,18 @@ class _datadescriptor(_descriptor):
                 kwargs = f[0].f_locals['kwargs']
         _desc = base()
         if _desc is not None:
-            return _desc.__set__(*args, **kwargs)
+            return apply(_desc, '__set__', *args, **kwargs)
         else:
             return default('__set__', *args, **kwargs)
     f_codes_set = (set.__func__.__code__, __set__.__code__,)
 
     def __delete__(self, *args, **kwargs):
         if not depth(equal=lambda f1, f2: f1.f_locals['self'].mark == f2.f_locals['self'].mark):
-            return self.desc.__delete__(*args, **kwargs)
+            return apply(self.desc, '__delete__', *args, **kwargs)
         else:
             _desc = self.base()
             if _desc is not None:
-                return _desc.__delete__(*args, **kwargs)
+                return apply(_desc, '__delete__', *args, **kwargs)
             else:
                 with frames(keep=lambda f: f.f_code is _datadescriptor.f_codes_delete[0]) as f:
                     assert f.has(0)
@@ -311,7 +312,7 @@ class _datadescriptor(_descriptor):
                 kwargs = f[0].f_locals['kwargs']
         _desc = base()
         if _desc is not None:
-            return _desc.__delete__(*args, **kwargs)
+            return apply(_desc, '__delete__', *args, **kwargs)
         else:
             return default('__delete__', *args, **kwargs)
     f_codes_delete = (delete.__func__.__code__, __delete__.__code__,)
@@ -321,9 +322,6 @@ class _wrapper:
     @staticmethod
     def __new__(*args, **kwargs):
         return object.__dict__['__new__'](args[0])
-
-    def __init__(self, *args, **kwargs):
-        return object.__dict__['__init__'](self, *args, **kwargs)
 
     @classmethod
     def __init_subclass__(cls, *args, **kwargs):
@@ -335,7 +333,7 @@ class _wrapper:
 
     @staticmethod
     def function(func):
-        for key in ('__new__', '__init__', '__init_subclass__', '__subclasshook__',):
+        for key in ('__new__', '__init_subclass__', '__subclasshook__',):
             if func is object.__dict__[key]:
                 return _wrapper.__dict__[key]
         return func
@@ -345,20 +343,21 @@ class _wrapper:
             self.desc = desc
 
         def __get__(self, *args, **kwargs):
-            return self.desc.__get__(*args, **kwargs) if hasattr(self.desc, '__get__') else self.desc
+            try:
+                return apply(self.desc, '__get__', *args, **kwargs)
+            except NotImplementedError:
+                return self.desc
 
     class _datadescriptor(_descriptor):
         def __set__(self, *args, **kwargs):
-            assert hasattr(self.desc, '__set__')
-            return self.desc.__set__(*args, **kwargs)
+            return apply(self.desc, '__set__', *args, **kwargs)
 
         def __delete__(self, *args, **kwargs):
-            assert hasattr(self.desc, '__delete__')
-            return self.desc.__delete__(*args, **kwargs)
+            return apply(self.desc, '__delete__', *args, **kwargs)
 
     @staticmethod
     def descriptor(desc):
-        if hasattr(desc, '__set__') or hasattr(desc, '__delete__'):
+        if appliable(desc, '__set__') or appliable(desc, '__delete__'):
             return _wrapper._datadescriptor(desc)
         else:
             return _wrapper._descriptor(desc)
