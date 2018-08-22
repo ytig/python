@@ -2,6 +2,7 @@
 import inspect
 import contextlib
 import collections
+from kit import getvar, setvar
 from decorator import Lock
 from task import Tree
 
@@ -82,13 +83,12 @@ def _strict(i):
     def decorator(function):
         def wrapper(self, *args, **kwargs):
             with Lock(self):
-                assert getattr(self, '__withas__', 0) == i
-                setattr(self, '__withas__', i + 1)
+                assert getvar(self, '__withas__', d=0) == i and setvar(self, '__withas__', i + 1)
             try:
                 return function(self, *args, **kwargs)
             except BaseException:
                 with Lock(self):
-                    setattr(self, '__withas__', -1)
+                    assert setvar(self, '__withas__', -1)
                 raise
         return wrapper
     return decorator
