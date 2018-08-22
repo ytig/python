@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 import weakref
-from kit import getvar, setvar
+from kit import getvar, setvar, apply
 from decorator import ilock, ithrow
 from meta import define, invoke
 from shutdown import bregister, aregister, unregister
@@ -16,7 +16,7 @@ class weakmethod:
     def __call__(self, *args, **kwargs):
         obj = self.ref()
         if obj is not None:
-            return getattr(obj, self.name)(*args, **kwargs)
+            return apply(obj, self.name, *args, **kwargs)
         else:
             return weakmethod.GC
 

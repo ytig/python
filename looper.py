@@ -2,7 +2,7 @@
 import numbers
 import inspect
 import weakref
-from kit import module
+from kit import apply, module
 from decorator import Lock
 from meta import define, invoke
 from ab import ABMeta
@@ -75,7 +75,7 @@ class Looper(ABMeta):
             def g():
                 obj = yield time
                 if isinstance(call, str):
-                    getattr(obj, call)(*args, **kwargs)
+                    apply(obj, call, *args, **kwargs)
                 else:
                     call(*args, **kwargs)
                 del obj
@@ -87,7 +87,7 @@ class Looper(ABMeta):
                 while True:
                     obj = yield time
                     if isinstance(call, str):
-                        getattr(obj, call)(*args, **kwargs)
+                        apply(obj, call, *args, **kwargs)
                     else:
                         call(*args, **kwargs)
                     del obj

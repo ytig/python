@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 import inspect
-from kit import hasvar, getvar, setvar, depth
+from kit import hasvar, getvar, setvar, apply, depth
 from decorator import Lock, ilock
 from task import Tree
 
@@ -86,8 +86,7 @@ def _except(fn='__except__'):
             except BaseException as e:
                 try:
                     if not depth(equal=lambda f1, f2: f1.f_locals['self'] is f2.f_locals['self']):
-                        if hasattr(self, fn):
-                            getattr(self, fn)(e)
+                        apply(self, fn, e)
                 except BaseException:
                     pass
                 raise
@@ -98,8 +97,7 @@ def _except(fn='__except__'):
 def _exec(fn='__exec__'):
     def decorator(function):
         def wrapper(self, *args, **kwargs):
-            if hasattr(self, fn):
-                return getattr(self, fn)(function, *args, **kwargs)
+            return apply(self, fn, function, *args, **kwargs)
         return wrapper
     return decorator
 
@@ -243,7 +241,7 @@ class _metaclass(type):
                     if hasvar(c, name):
                         var = getvar(c, name)
                         if isinstance(var, property):
-                            return _property.get(var).__get__(self, type(self))
+                            return apply(_property.get(var), '__get__', self, type(self))
                         break
                 try:
                     return super(__class__, self).__getattribute__(name)
@@ -252,7 +250,7 @@ class _metaclass(type):
                         if hasvar(c, name):
                             var = getvar(c, name)
                             if inspect.isfunction(var):
-                                return _function.get(var).__get__(self, type(self))
+                                return apply(_function.get(var), '__get__', self, type(self))
                             break
                     raise
             namespace['__getattribute__'] = __getattribute__
@@ -262,7 +260,7 @@ class _metaclass(type):
                     if hasvar(c, name):
                         var = getvar(c, name)
                         if isinstance(var, property):
-                            return _property.get(var).__set__(self, value)
+                            return apply(_property.get(var), '__set__', self, value)
                         break
                 return super(__class__, self).__setattr__(name, value)
             namespace['__setattr__'] = __setattr__
@@ -272,7 +270,7 @@ class _metaclass(type):
                     if hasvar(c, name):
                         var = getvar(c, name)
                         if isinstance(var, property):
-                            return _property.get(var).__delete__(self)
+                            return apply(_property.get(var), '__delete__', self)
                         break
                 return super(__class__, self).__delattr__(name)
             namespace['__delattr__'] = __delattr__
@@ -290,9 +288,9 @@ class _metaclass(type):
             if hasvar(c, name):
                 var = getvar(c, name)
                 if isinstance(var, staticmethod):
-                    return _staticmethod.get(var).__get__(None, cls)
+                    return apply(_staticmethod.get(var), '__get__', None, cls)
                 elif isinstance(var, classmethod):
-                    return _classmethod.get(var).__get__(None, cls)
+                    return apply(_classmethod.get(var), '__get__', None, cls)
                 break
         raise AttributeError
 
