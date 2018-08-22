@@ -259,9 +259,9 @@ def apply(*args, **kwargs):
     o = args[0]
     k = args[1]
     args = args[2:]
-    tp = type(o)
-    if hasvar(tp, k):
-        return getvar(tp, k)(o, *args, **kwargs)
+    for c in type.mro(type(o)):
+        if hasvar(c, k):
+            return getvar(c, k)(o, *args, **kwargs)
     raise NotImplementedError
 
 
