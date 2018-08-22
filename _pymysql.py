@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import pymysql
+from kit import hasvar, getvar, setvar
 from wa import withas
 
 
@@ -14,21 +15,21 @@ def Connect(*args, **kwargs):
 
 @withas
 def Cursor(connect):
-    hasattr(connect, '_cursors') or setattr(connect, '_cursors', set())
-    _cursors = getattr(connect, '_cursors')
+    assert hasvar(connect, '_cursors') or setvar(connect, '_cursors', set())
+    var = getvar(connect, '_cursors')
     cursor = connect.cursor(cursor=pymysql.cursors.DictCursor)
-    _cursors.add(cursor)
+    var.add(cursor)
     try:
         yield cursor
     except BaseException:
-        _cursors.remove(cursor)
-        if not _cursors:
+        var.remove(cursor)
+        if not var:
             connect.rollback()
         cursor.close()
         raise
     else:
-        _cursors.remove(cursor)
-        if not _cursors:
+        var.remove(cursor)
+        if not var:
             connect.commit()
         cursor.close()
 
