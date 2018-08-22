@@ -79,6 +79,18 @@ def _strict(i):
     return decorator
 
 
+def _enter(cls, arguments):
+    self = arguments(cls)
+    return [self, self.__enter__(), ]
+
+
+def _exit(self, e):
+    if e is None:
+        return self.__exit__(None, None, None)
+    else:
+        return self.__exit__(type(e), e, e.__traceback__)
+
+
 class _baseclass:
     @_strict(0)
     def __init__(self, *args, **kwargs):
@@ -130,24 +142,24 @@ class _baseclass:
 
         def _series(*args, **kwargs):
             y = False
-            pstack = (lambda i: [i, i.__enter__(), ])(parent(*args, **kwargs))
+            pstack = _enter(parent, Arguments(*args, **kwargs))
             try:
-                cstack = (lambda i: [i, i.__enter__(), ])(Arguments.make(pipe(pstack.pop()))(child))
+                cstack = _enter(child, Arguments.make(pipe(pstack.pop())))
                 try:
                     y = True
                     yield cstack.pop()
                 except BaseException as e:
-                    if cstack.pop().__exit__(type(e), e, e.__traceback__) is not True:
+                    if _exit(cstack.pop(), e) is not True:
                         raise
                 else:
-                    cstack.pop().__exit__(None, None, None)
+                    _exit(cstack.pop(), None)
             except BaseException as e:
-                if pstack.pop().__exit__(type(e), e, e.__traceback__) is not True:
+                if _exit(pstack.pop(), e) is not True:
                     raise
                 if not y:
                     yield None
             else:
-                pstack.pop().__exit__(None, None, None)
+                _exit(pstack.pop(), None)
         return withas(_series)
 
     # 并联流程
@@ -159,31 +171,27 @@ class _baseclass:
         """
         humans = [withas(i) for i in (husband,) + wives]
 
-        def enter(cls, arguments):
-            self = arguments(cls)
-            return [self, self.__enter__(), ]
-
-        def exit(self, e):
-            t, v, tb, = (None, None, None,) if e is None else (type(e), e, e.__traceback__,)
-            return self.__exit__(t, v, tb)
+        def _pipe(*args, **kwargs):
+            r = pipe(*args, **kwargs)
+            return [Arguments.make(g) for g in r] + [Arguments()] * (len(humans) - len(r))
 
         def _parallel(*args, **kwargs):
-            stacks = core(enter, *[t for t in zip(humans, (lambda i: i + [Arguments()] * (len(humans) - len(i)))((lambda i: [Arguments.make(g) for g in i])(pipe(*args, **kwargs))))])
+            stacks = core(_enter, *[t for t in zip(humans, _pipe(*args, **kwargs))])
             try:
                 assert len(stacks) == len(humans), 'parallel enter error'
             except BaseException:
                 for s in stacks:
                     s.pop()
-                assert len(core(exit, *[(s.pop(), None,) for s in stacks])) == len(stacks), 'parallel exit error'
+                assert len(core(_exit, *[(s.pop(), None,) for s in stacks])) == len(stacks), 'parallel exit error'
                 raise
             else:
                 try:
                     yield [s.pop() for s in stacks]
                 except BaseException as e:
-                    assert len(core(exit, *[(s.pop(), e,) for s in stacks])) == len(stacks), 'parallel exit error'
+                    assert len(core(_exit, *[(s.pop(), e,) for s in stacks])) == len(stacks), 'parallel exit error'
                     raise
                 else:
-                    assert len(core(exit, *[(s.pop(), None,) for s in stacks])) == len(stacks), 'parallel exit error'
+                    assert len(core(_exit, *[(s.pop(), None,) for s in stacks])) == len(stacks), 'parallel exit error'
         return withas(_parallel)
 
     # 分支流程
@@ -196,17 +204,9 @@ class _baseclass:
         parent = withas(parent)
         child = withas(child)
 
-        def enter(cls, arguments):
-            self = arguments(cls)
-            return [self, self.__enter__(), ]
-
-        def exit(self, e):
-            t, v, tb, = (None, None, None,) if e is None else (type(e), e, e.__traceback__,)
-            return self.__exit__(t, v, tb)
-
         def _branch(*args, **kwargs):
             y = False
-            pstack = (lambda i: [i, i.__enter__(), ])(parent(*args, **kwargs))
+            pstack = _enter(parent, Arguments(*args, **kwargs))
             try:
                 try:
                     p = pstack.pop()
@@ -219,30 +219,30 @@ class _baseclass:
                     p = None
                     raise
                 else:
-                    cstacks = core(enter, *[(child, Arguments.make(pipe(o)),) for o in pstack.pop()])
+                    cstacks = core(_enter, *[(child, Arguments.make(pipe(o)),) for o in pstack.pop()])
                     try:
                         assert len(cstacks) == l, 'branch enter error'
                     except BaseException:
                         for s in cstacks:
                             s.pop()
-                        assert len(core(exit, *[(s.pop(), None,) for s in cstacks])) == len(cstacks), 'branch exit error'
+                        assert len(core(_exit, *[(s.pop(), None,) for s in cstacks])) == len(cstacks), 'branch exit error'
                         raise
                     else:
                         try:
                             y = True
                             yield [s.pop() for s in cstacks]
                         except BaseException as e:
-                            assert len(core(exit, *[(s.pop(), e,) for s in cstacks])) == len(cstacks), 'branch exit error'
+                            assert len(core(_exit, *[(s.pop(), e,) for s in cstacks])) == len(cstacks), 'branch exit error'
                             raise
                         else:
-                            assert len(core(exit, *[(s.pop(), None,) for s in cstacks])) == len(cstacks), 'branch exit error'
+                            assert len(core(_exit, *[(s.pop(), None,) for s in cstacks])) == len(cstacks), 'branch exit error'
             except BaseException as e:
-                if pstack.pop().__exit__(type(e), e, e.__traceback__) is not True:
+                if _exit(pstack.pop(), e) is not True:
                     raise
                 if not y:
                     yield []
             else:
-                pstack.pop().__exit__(None, None, None)
+                _exit(pstack.pop(), None)
         return withas(_branch)
 
     # 合并流程
@@ -255,14 +255,14 @@ class _baseclass:
         wife = withas(wife)
 
         def _merge(*args, **kwargs):
-            stack = (lambda i: [i, i.__enter__(), ])((husband if not pipe(*args, **kwargs) else wife)(*args, **kwargs))
+            stack = _enter(husband if not pipe(*args, **kwargs) else wife, Arguments(*args, **kwargs))
             try:
                 yield stack.pop()
             except BaseException as e:
-                if stack.pop().__exit__(type(e), e, e.__traceback__) is not True:
+                if _exit(stack.pop(), e) is not True:
                     raise
             else:
-                stack.pop().__exit__(None, None, None)
+                _exit(stack.pop(), None)
         return withas(_merge)
 
 
