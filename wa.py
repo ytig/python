@@ -85,10 +85,8 @@ def _enter(cls, arguments):
 
 
 def _exit(self, e):
-    if e is None:
-        return self.__exit__(None, None, None)
-    else:
-        return self.__exit__(type(e), e, e.__traceback__)
+    t, v, tb, = (None, None, None,) if e is None else (type(e), e, e.__traceback__,)
+    return self.__exit__(t, v, tb)
 
 
 class _baseclass:
@@ -120,16 +118,17 @@ class _baseclass:
         pipe: *args, **kwargs -> Arguments
         """
         series = _baseclass.__dict__['series'].__func__
-        return series(lambda *args, **kwargs: (args, kwargs,), this, pipe=lambda t: pipe(*t[0], **t[1]))
+        return series(lambda *args, **kwargs: (args, kwargs,), this, pipe=lambda o: pipe(*o[0], **o[1]))
 
     # 输出转换
     @classmethod
     def output(this, pipe):
         """
-        pipe: object -> object
+        pipe: object, *args, **kwargs -> object
         """
         series = _baseclass.__dict__['series'].__func__
-        return series(this, pipe)
+        parallel = _baseclass.__dict__['parallel'].__func__
+        return series(parallel(this, lambda *args, **kwargs: (args, kwargs,), pipe=lambda *args, **kwargs: [Arguments(*args, **kwargs), ] * 2), lambda o: pipe(o[0], *o[1][0], **o[1][1]))
 
     # 串联流程
     @classmethod
@@ -271,19 +270,17 @@ class Arguments:
         self.args = list(args)
         self.kwargs = dict(kwargs)
 
-    # 追加不定长参数
     def extend(self, *args):
         self.args.extend(args)
+        return self
 
-    # 更新关键字参数
     def update(self, **kwargs):
         self.kwargs.update(kwargs)
+        return self
 
-    # 调用函数
     def __call__(self, call):
         return call(*self.args, **self.kwargs)
 
-    # 构造参数
     @staticmethod
     def make(generics):
         if isinstance(generics, Arguments):
@@ -293,7 +290,11 @@ class Arguments:
         elif isinstance(generics, dict):
             return Arguments(**generics)
         elif isinstance(generics, collections.Iterable):
-            arguments = list(generics)
-            if len(arguments) == 2 and isinstance(arguments[0], tuple) and isinstance(arguments[1], dict):
-                return Arguments(*arguments[0], **arguments[1])
+            arguments = Arguments()
+            for g in generics:
+                if isinstance(g, tuple):
+                    arguments.extend(*g)
+                elif isinstance(g, dict):
+                    arguments.update(**g)
+            return arguments
         raise TypeError
