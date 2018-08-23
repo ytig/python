@@ -21,7 +21,7 @@ class Loop(threading.Thread):
     def __init__(self, daemon=False):
         super().__init__(daemon=daemon)
         self.__count = itertools.count(1)
-        self.__block = []
+        self.__actions = []
         self.__process = None
         self.__shutdown = False
         bregister(self._shutdown)
@@ -31,14 +31,14 @@ class Loop(threading.Thread):
         until = time.time() + max(0, delay)
         with Lock(self):
             eid = next(self.__count)
-            if not self.__block or until < self.__block[0]['until']:
+            if not self.__actions or until < self.__actions[0]['until']:
                 if self.__process is not None:
                     try:
                         self.__process.kill()
                     except BaseException:
                         pass
                     self.__process = None
-            self.__block.append({
+            self.__actions.append({
                 'eid': eid,
                 'until': until,
                 'action': action,
@@ -47,7 +47,7 @@ class Loop(threading.Thread):
                 'tag': tag,
                 'log': log,
             })
-            self.__block.sort(key=lambda d: d['until'])
+            self.__actions.sort(key=lambda d: d['until'])
             if not self.is_alive():
                 self.start()
         return eid
@@ -56,18 +56,18 @@ class Loop(threading.Thread):
     def cancel(self, generics):
         ret = 0
         with Lock(self):
-            for i in range(len(self.__block) - 1, -1, -1):
+            for i in range(len(self.__actions) - 1, -1, -1):
                 p = False
                 if generics is None:
                     p = True
                 elif callable(generics):
-                    p = self.__block[i]['action'] is generics
+                    p = self.__actions[i]['action'] is generics
                 elif isinstance(generics, int):
-                    p = self.__block[i]['eid'] == generics
+                    p = self.__actions[i]['eid'] == generics
                 elif isinstance(generics, str):
-                    p = self.__block[i]['tag'] == generics
+                    p = self.__actions[i]['tag'] == generics
                 if p:
-                    self.__block.pop(i)
+                    self.__actions.pop(i)
                     if i == 0:
                         if self.__process is not None:
                             try:
@@ -94,8 +94,8 @@ class Loop(threading.Thread):
             pop = None
             with Lock(self):
                 self.__process = None
-                if self.__block:
-                    t = self.__block[0]['until'] - time.time()
+                if self.__actions:
+                    t = self.__actions[0]['until'] - time.time()
                     t = t if t > 0 else None
                 elif self.__shutdown:
                     return
@@ -105,7 +105,7 @@ class Loop(threading.Thread):
                     process = sleep(t)
                     self.__process = process
                 else:
-                    pop = self.__block.pop(0)
+                    pop = self.__actions.pop(0)
             if process is not None:
                 try:
                     process.wait()
