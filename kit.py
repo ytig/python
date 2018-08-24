@@ -307,15 +307,20 @@ def getnonlocals(func, name):
 
 # 栈帧
 class frames(list):
-    STACK = 0  # 堆栈模式
-    TRACE = 1  # 追踪模式
+    # 追溯模式
+    @staticmethod
+    def traceback(e=None):
+        def make():
+            if e is None:
+                ret = inspect.trace()
+            else:
+                ret = inspect.getinnerframes(e.__traceback__)
+            ret.reverse()
+            return ret
+        return make
 
-    def __init__(self, back=0, keep=None, mode=STACK):
-        super().__init__()
-        if mode == frames.STACK:
-            self.extend([i.frame for i in inspect.stack()[1:][back:] if not keep or keep(i.frame)])
-        elif mode == frames.TRACE:
-            self.extend([i.frame for i in list(reversed(inspect.trace()))[back:] if not keep or keep(i.frame)])
+    def __init__(self, back=0, keep=None, make=None):
+        super().__init__([i.frame for i in (make() if make else inspect.stack()[1:])[back:] if not keep or keep(i.frame)])
 
     def __enter__(self):
         return self
