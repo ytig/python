@@ -2,7 +2,7 @@
 import inspect
 import contextlib
 import collections
-from kit import getvar, setvar
+from kit import getvar, setvar, frames
 from decorator import Lock
 from task import Tree
 
@@ -36,6 +36,7 @@ def withas(generics):
 
                 def _enter(self):
                     obj = self.stack.pop()(generics)
+                    del obj.func, obj.args, obj.kwds,
                     ret = obj.__enter__()
                     self.stack.append(obj)
                     return ret
@@ -61,7 +62,7 @@ def withas(generics):
 # 执行器
 def tree(t, log=None):
     T = Tree(0 if t < 0 else t)
-    return lambda target, *tuples: T.plant(*[Tree.Twig(target, args=args, log=log) for args in tuples])
+    return lambda *tuples: T.plant(*[Tree.Twig(t[0], args=t[1:], log=log) for t in tuples])
 
 
 def _strict(i):
@@ -87,6 +88,22 @@ def _enter(cls, arguments):
 def _exit(self, e):
     t, v, tb, = (None, None, None,) if e is None else (type(e), e, e.__traceback__,)
     return self.__exit__(t, v, tb)
+
+
+def _reform(core):
+    def caller(*args):
+        try:
+            return (True, args[0](*args[1:]),)
+        except BaseException as e:
+            return (False, e,)
+
+    def wrapper(*tuples):
+        out = []
+        err = []
+        for t in core(*[(caller,) + t for t in tuples]):
+            (out if t[0] else err).append(t[1])
+        return out, err,
+    return wrapper
 
 
 class _baseclass:
@@ -141,7 +158,10 @@ class _baseclass:
 
         def _series(*args, **kwargs):
             y = False
-            pstack = _enter(parent, Arguments(*args, **kwargs))
+            try:
+                pstack = _enter(parent, Arguments(*args, **kwargs))
+            finally:
+                del args, kwargs,
             try:
                 cstack = _enter(child, Arguments.make(pipe(pstack.pop())))
                 try:
@@ -166,31 +186,46 @@ class _baseclass:
     def parallel(husband, *wives, pipe=lambda *args, **kwargs: [Arguments(*args, **kwargs), ], core=tree(0)):
         """
         pipe: *args, **kwargs -> Arguments[]
-        core: target, *tuples -> object[]
+        core: *tuples -> object[]
         """
         humans = [withas(i) for i in (husband,) + wives]
 
         def _pipe(*args, **kwargs):
             r = pipe(*args, **kwargs)
             return [Arguments.make(g) for g in r] + [Arguments()] * (len(humans) - len(r))
+        _core = _reform(core)
 
         def _parallel(*args, **kwargs):
-            stacks = core(_enter, *[t for t in zip(humans, _pipe(*args, **kwargs))])
             try:
-                assert len(stacks) == len(humans), 'parallel enter error'
+                stacks, traces, = _core(*zip([_enter, ] * len(humans), humans, _pipe(*args, **kwargs)))
+            finally:
+                del args, kwargs,
+            try:
+                if traces:
+                    traces = [traces, ]
+                    raise EnterException(*traces.pop())
             except BaseException:
                 for s in stacks:
                     s.pop()
-                assert len(core(_exit, *[(s.pop(), None,) for s in stacks])) == len(stacks), 'parallel exit error'
+                traces = _core(*[(_exit, s.pop(), None,) for s in stacks])[1]
+                if traces:
+                    traces = [traces, ]
+                    raise ExitException(*traces.pop())
                 raise
             else:
                 try:
                     yield [s.pop() for s in stacks]
                 except BaseException as e:
-                    assert len(core(_exit, *[(s.pop(), e,) for s in stacks])) == len(stacks), 'parallel exit error'
+                    traces = _core(*[(_exit, s.pop(), e,) for s in stacks])[1]
+                    if traces:
+                        traces = [traces, ]
+                        raise ExitException(*traces.pop())
                     raise
                 else:
-                    assert len(core(_exit, *[(s.pop(), None,) for s in stacks])) == len(stacks), 'parallel exit error'
+                    traces = _core(*[(_exit, s.pop(), None,) for s in stacks])[1]
+                    if traces:
+                        traces = [traces, ]
+                        raise ExitException(*traces.pop())
         return withas(_parallel)
 
     # 分支流程
@@ -198,43 +233,47 @@ class _baseclass:
     def branch(parent, child, pipe=lambda o: Arguments(o), core=tree(0)):
         """
         pipe: object -> Arguments
-        core: target, *tuples -> object[]
+        core: *tuples -> object[]
         """
         parent = withas(parent)
         child = withas(child)
+        _core = _reform(core)
 
         def _branch(*args, **kwargs):
             y = False
-            pstack = _enter(parent, Arguments(*args, **kwargs))
             try:
+                pstack = _enter(parent, Arguments(*args, **kwargs))
+            finally:
+                del args, kwargs
+            try:
+                cstacks, traces, = _core(*[(_enter, child, Arguments.make(pipe(o)),) for o in pstack.pop()])
                 try:
-                    p = pstack.pop()
-                    assert isinstance(p, collections.Iterable), 'branch init error'
-                    p = list(p)
-                    l = len(p)
-                    pstack.append(p)
-                    p = None
+                    if traces:
+                        traces = [traces, ]
+                        raise EnterException(*traces.pop())
                 except BaseException:
-                    p = None
+                    for s in cstacks:
+                        s.pop()
+                    traces = _core(*[(_exit, s.pop(), None,) for s in cstacks])[1]
+                    if traces:
+                        traces = [traces, ]
+                        raise ExitException(*traces.pop())
                     raise
                 else:
-                    cstacks = core(_enter, *[(child, Arguments.make(pipe(o)),) for o in pstack.pop()])
                     try:
-                        assert len(cstacks) == l, 'branch enter error'
-                    except BaseException:
-                        for s in cstacks:
-                            s.pop()
-                        assert len(core(_exit, *[(s.pop(), None,) for s in cstacks])) == len(cstacks), 'branch exit error'
+                        y = True
+                        yield [s.pop() for s in cstacks]
+                    except BaseException as e:
+                        traces = _core(*[(_exit, s.pop(), e,) for s in cstacks])[1]
+                        if traces:
+                            traces = [traces, ]
+                            raise ExitException(*traces.pop())
                         raise
                     else:
-                        try:
-                            y = True
-                            yield [s.pop() for s in cstacks]
-                        except BaseException as e:
-                            assert len(core(_exit, *[(s.pop(), e,) for s in cstacks])) == len(cstacks), 'branch exit error'
-                            raise
-                        else:
-                            assert len(core(_exit, *[(s.pop(), None,) for s in cstacks])) == len(cstacks), 'branch exit error'
+                        traces = _core(*[(_exit, s.pop(), None,) for s in cstacks])[1]
+                        if traces:
+                            traces = [traces, ]
+                            raise ExitException(*traces.pop())
             except BaseException as e:
                 if _exit(pstack.pop(), e) is not True:
                     raise
@@ -254,7 +293,10 @@ class _baseclass:
         wife = withas(wife)
 
         def _merge(*args, **kwargs):
-            stack = _enter(husband if not pipe(*args, **kwargs) else wife, Arguments(*args, **kwargs))
+            try:
+                stack = _enter(husband if not pipe(*args, **kwargs) else wife, Arguments(*args, **kwargs))
+            finally:
+                del args, kwargs,
             try:
                 yield stack.pop()
             except BaseException as e:
@@ -298,3 +340,33 @@ class Arguments:
                     arguments.update(**g)
             return arguments
         raise TypeError
+
+
+class MultiException(Exception):
+    @staticmethod
+    def info(*exceptions):
+        ret = ''
+        for e in exceptions:
+            if ret:
+                ret = ret + ', '
+            if isinstance(e, MultiException):
+                ret += e.args[0]
+            else:
+                with frames(make=frames.traceback(e)) as f:
+                    if f.has():
+                        ret += getattr(f.module(), '__name__', '') + '.'
+                    ret += getattr(type(e), '__name__', '') + '(' + ', '.join(["'" + str(arg) + "'" for arg in e.args]) + ')'
+                    if f.has():
+                        ret += '#' + str(f[0].f_lineno)
+        return ret
+
+    def __init__(self, *exceptions):
+        super().__init__(MultiException.info(*exceptions))
+
+
+class EnterException(MultiException):
+    pass
+
+
+class ExitException(MultiException):
+    pass
