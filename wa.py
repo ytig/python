@@ -323,9 +323,7 @@ class MultiException(Exception):
                     s = str(v)
                     string += s[len(start):len(s) - len(end)]
                 elif issubclass(t, SyntaxError):
-                    with frames(make=frames.traceback(v)) as f:
-                        if f.has():
-                            string += '  File "{}", line {}\n'.format(f[0].f_code.co_filename, f[0].f_lineno)
+                    string += '  File "{}", line {}\n'.format(v.filename, v.lineno)
                     string += '    {}\n'.format(v.text.strip())
                     if v.offset is not None:
                         caretspace = v.text.rstrip('\n')
