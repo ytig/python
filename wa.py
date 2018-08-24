@@ -315,6 +315,8 @@ class MultiException(Exception):
         end = '\n<<<'
         ret = ''
         for e in exceptions:
+            if not isinstance(e, BaseException) or isinstance(e, SyntaxError):
+                continue
             try:
                 r = ''
                 if isinstance(e, MultiException):
