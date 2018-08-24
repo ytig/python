@@ -412,6 +412,6 @@ class frames(list):
 # 异常信息
 def loge(e):
     if isinstance(e, BaseException):
-        return ''.join(traceback.format_exception(type(e), e, e.__traceback__)).strip('\n')
+        return ''.join(traceback.format_exception(type(e), e, e.__traceback__)).rstrip('\n')
     else:
         return ''
