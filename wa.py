@@ -315,26 +315,28 @@ class MultiException(Exception):
         end = '\n<<<'
         ret = ''
         for e in exceptions:
-            if ret:
-                ret += '\n\n'
-            if isinstance(e, MultiException):
-                ret += e.args[0][len(start):len(e.args[0]) - len(end)]
+            try:
+                r = ''
+                if isinstance(e, MultiException):
+                    r += e.args[0][len(start):len(e.args[0]) - len(end)]
+                else:
+                    with frames(make=frames.traceback(e)) as f:
+                        if f.has():
+                            r += '  File "{}", line {}, in {}\n'.format(f[0].f_code.co_filename, f[0].f_lineno, f[0].f_code.co_name)
+                            r += '    {}\n'.format(linecache.getline(f[0].f_code.co_filename, f[0].f_lineno).strip())
+                    t = type(e)
+                    if t.__module__ not in ('__main__', 'builtins',):
+                        r += t.__module__ + '.'
+                    r += t.__qualname__
+                    s = str(e)
+                    if s:
+                        r += ': ' + s
+            except BaseException:
+                pass
             else:
-                with frames(make=frames.traceback(e)) as f:
-                    if f.has():
-                        filename = f[0].f_code.co_filename
-                        lineno = f[0].f_lineno
-                        name = f[0].f_code.co_name
-                        line = linecache.getline(filename, lineno)
-                        ret += '  File "{}", line {}, in {}\n'.format(filename, lineno, name)
-                        ret += '    {}\n'.format(line.strip())
-                        exc_type = type(e)
-                        stype = getattr(exc_type, '__qualname__', '')
-                        smod = getattr(exc_type, '__module__', '')
-                        if smod not in ('__main__', 'builtins',):
-                            stype = smod + '.' + stype
-                        msg = str(e)
-                        ret += '{}: {}'.format(stype, msg)
+                if ret:
+                    ret += '\n\n'
+                ret += r
         ret = start + ret + end
         return ret
 
