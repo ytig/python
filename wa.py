@@ -326,10 +326,8 @@ class MultiException(Exception):
                     string += '  File "{}", line {}\n'.format(v.filename, v.lineno)
                     string += '    {}\n'.format(v.text.strip())
                     if v.offset is not None:
-                        caretspace = v.text.rstrip('\n')
-                        caretspace = caretspace[:min(len(caretspace), v.offset) - 1].lstrip()
-                        caretspace = ((c.isspace() and c or ' ') for c in caretspace)
-                        string += '    {}^\n'.format(''.join(caretspace))
+                        s = v.text.rstrip('\n')
+                        string += '    {}^\n'.format(''.join([(c.isspace() and c or ' ') for c in s[:min(len(s), v.offset) - 1].lstrip()]))
                     if t.__module__ not in ('__main__', 'builtins',):
                         string += t.__module__ + '.'
                     string += t.__qualname__
