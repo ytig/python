@@ -331,7 +331,7 @@ class MultiException(Exception):
                         caretspace = v.text.rstrip('\n')
                         caretspace = caretspace[:min(len(caretspace), v.offset) - 1].lstrip()
                         caretspace = ((c.isspace() and c or ' ') for c in caretspace)
-                        yield '    {}^\n'.format(''.join(caretspace))
+                        string += '    {}^\n'.format(''.join(caretspace))
                     if t.__module__ not in ('__main__', 'builtins',):
                         string += t.__module__ + '.'
                     string += t.__qualname__
