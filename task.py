@@ -96,8 +96,9 @@ class Tree:
                 b, r, = target['ret']
                 ret.append(r if b else Tree.SEIZE)
         if not seize:
-            while Tree.SEIZE in ret:
-                ret.remove(Tree.SEIZE)
+            for i in range(len(ret) - 1, -1, -1):
+                if ret[i] is Tree.SEIZE:
+                    ret.pop(i)
         return ret
 
     def __run(self):
