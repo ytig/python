@@ -313,34 +313,48 @@ class MultiException(Exception):
     def join(*exceptions):
         start = 'The exceptions are displayed below.\n\n'
         end = '\n\nDisplay completed.'
-        ret = ''
-        for e in exceptions:
-            if not isinstance(e, BaseException) or isinstance(e, SyntaxError):
-                continue
+        strings = []
+        for v in exceptions:
+            t = type(v)
+            assert issubclass(t, BaseException)
             try:
-                r = ''
-                if isinstance(e, MultiException):
-                    r += e.args[0][len(start):len(e.args[0]) - len(end)]
-                else:
-                    with frames(make=frames.traceback(e)) as f:
+                string = ''
+                if issubclass(t, MultiException):
+                    s = str(v)
+                    string += s[len(start):len(s) - len(end)]
+                elif issubclass(t, SyntaxError):
+                    with frames(make=frames.traceback(v)) as f:
                         if f.has():
-                            r += '  File "{}", line {}, in {}\n'.format(f[0].f_code.co_filename, f[0].f_lineno, f[0].f_code.co_name)
-                            r += '    {}\n'.format(linecache.getline(f[0].f_code.co_filename, f[0].f_lineno).strip())
-                    t = type(e)
+                            string += '  File "{}", line {}\n'.format(f[0].f_code.co_filename, f[0].f_lineno)
+                    string += '    {}\n'.format(v.text.strip())
+                    if v.offset is not None:
+                        caretspace = v.text.rstrip('\n')
+                        caretspace = caretspace[:min(len(caretspace), v.offset) - 1].lstrip()
+                        caretspace = ((c.isspace() and c or ' ') for c in caretspace)
+                        yield '    {}^\n'.format(''.join(caretspace))
                     if t.__module__ not in ('__main__', 'builtins',):
-                        r += t.__module__ + '.'
-                    r += t.__qualname__
-                    s = str(e)
+                        string += t.__module__ + '.'
+                    string += t.__qualname__
+                    string += ': ' + (v.msg or '<no detail available>')
+                else:
+                    with frames(make=frames.traceback(v)) as f:
+                        if f.has():
+                            string += '  File "{}", line {}, in {}\n'.format(f[0].f_code.co_filename, f[0].f_lineno, f[0].f_code.co_name)
+                            string += '    {}\n'.format(linecache.getline(f[0].f_code.co_filename, f[0].f_lineno).strip())
+                    if t.__module__ not in ('__main__', 'builtins',):
+                        string += t.__module__ + '.'
+                    string += t.__qualname__
+                    try:
+                        s = str(v)
+                    except BaseException:
+                        s = '<unprintable %s object>' % t.__name__
                     if s:
-                        r += ': ' + s
-                if r:
-                    if ret:
-                        ret += '\n\n'
-                    ret += r
+                        string += ': ' + s
+                if string:
+                    strings.append(string)
             except BaseException:
                 pass
-        ret = start + ret + end
-        return ret
+        return start + '\n\n'.join(strings) + end
 
     def __init__(self, *exceptions):
         super().__init__(MultiException.join(*exceptions))
