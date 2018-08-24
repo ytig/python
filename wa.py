@@ -312,7 +312,7 @@ class MultiException(Exception):
     @staticmethod
     def join(*exceptions):
         start = 'The exceptions are displayed below.\n\n'
-        end = '\n\nDisplay completed.'
+        end = '\n\n...Display completed.'
         strings = []
         for v in exceptions:
             t = type(v)
