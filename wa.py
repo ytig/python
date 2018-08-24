@@ -188,11 +188,11 @@ class _baseclass:
         pipe: *args, **kwargs -> Arguments[]
         core: *tuples -> object[]
         """
-        humans = [withas(i) for i in (husband,) + wives]
+        humans = [withas(g) for g in (husband,) + wives]
 
         def _pipe(*args, **kwargs):
             r = pipe(*args, **kwargs)
-            return [Arguments.make(g) for g in r] + [Arguments()] * (len(humans) - len(r))
+            return [Arguments.make(g) for g in r] + [Arguments(), ] * (len(humans) - len(r))
         _core = _reform(core)
 
         def _parallel(*args, **kwargs):
@@ -244,7 +244,7 @@ class _baseclass:
             try:
                 pstack = _enter(parent, Arguments(*args, **kwargs))
             finally:
-                del args, kwargs
+                del args, kwargs,
             try:
                 cstacks, traces, = _core(*[(_enter, child, Arguments.make(pipe(o)),) for o in pstack.pop()])
                 try:
