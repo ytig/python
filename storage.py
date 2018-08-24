@@ -48,7 +48,7 @@ class _Storage:
     def __init__(self, path):
         dirname = os.path.dirname(path)
         if not os.path.exists(dirname):
-            os.makedirs(dirname)
+            os.makedirs(dirname, exist_ok=True)
         self._reader = {}
         self._writer = open(path, mode='a')
         self._dirty = False
