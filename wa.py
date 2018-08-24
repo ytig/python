@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import inspect
+import linecache
 import contextlib
 import collections
 from kit import getvar, setvar, frames
@@ -307,6 +308,48 @@ class _baseclass:
         return withas(_merge)
 
 
+class MultiException(Exception):
+    @staticmethod
+    def join(*exceptions):
+        start = '\n>>>\n'
+        end = '\n<<<'
+        ret = ''
+        for e in exceptions:
+            if ret:
+                ret += '\n\n'
+            if isinstance(e, MultiException):
+                ret += e.args[0][len(start):len(e.args[0]) - len(end)]
+            else:
+                with frames(make=frames.traceback(e)) as f:
+                    if f.has():
+                        filename = f[0].f_code.co_filename
+                        lineno = f[0].f_lineno
+                        name = f[0].f_code.co_name
+                        line = linecache.getline(filename, lineno)
+                        ret += '  File "{}", line {}, in {}\n'.format(filename, lineno, name)
+                        ret += '    {}\n'.format(line.strip())
+                        exc_type = type(e)
+                        stype = getattr(exc_type, '__qualname__', '')
+                        smod = getattr(exc_type, '__module__', '')
+                        if smod not in ('__main__', 'builtins',):
+                            stype = smod + '.' + stype
+                        msg = str(e)
+                        ret += '{}: {}'.format(stype, msg)
+        ret = start + ret + end
+        return ret
+
+    def __init__(self, *exceptions):
+        super().__init__(MultiException.join(*exceptions))
+
+
+class EnterException(MultiException):
+    pass
+
+
+class ExitException(MultiException):
+    pass
+
+
 class Arguments:
     def __init__(self, *args, **kwargs):
         self.args = list(args)
@@ -340,33 +383,3 @@ class Arguments:
                     arguments.update(**g)
             return arguments
         raise TypeError
-
-
-class MultiException(Exception):
-    @staticmethod
-    def info(*exceptions):
-        ret = ''
-        for e in exceptions:
-            if ret:
-                ret = ret + ', '
-            if isinstance(e, MultiException):
-                ret += e.args[0]
-            else:
-                with frames(make=frames.traceback(e)) as f:
-                    if f.has():
-                        ret += getattr(f.module(), '__name__', '') + '.'
-                    ret += getattr(type(e), '__name__', '') + '(' + ', '.join(["'" + str(arg) + "'" for arg in e.args]) + ')'
-                    if f.has():
-                        ret += '#' + str(f[0].f_lineno)
-        return ret
-
-    def __init__(self, *exceptions):
-        super().__init__(MultiException.info(*exceptions))
-
-
-class EnterException(MultiException):
-    pass
-
-
-class ExitException(MultiException):
-    pass
