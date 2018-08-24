@@ -61,9 +61,9 @@ def withas(generics):
 
 
 # 执行器
-def tree(t, log=None):
+def tree(t):
     T = Tree(0 if t < 0 else t)
-    return lambda *tuples: T.plant(*[Tree.Twig(t[0], args=t[1:], log=log) for t in tuples])
+    return lambda *tuples: T.plant(*[Tree.Twig(t[0], args=t[1:]) for t in tuples])
 
 
 def _strict(i):
