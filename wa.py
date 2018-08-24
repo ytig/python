@@ -311,8 +311,8 @@ class _baseclass:
 class MultiException(Exception):
     @staticmethod
     def join(*exceptions):
-        start = '\n>>>\n'
-        end = '\n<<<'
+        start = 'The exceptions are displayed below.\n\n'
+        end = '\n\nDisplay completed.'
         ret = ''
         for e in exceptions:
             if not isinstance(e, BaseException) or isinstance(e, SyntaxError):
