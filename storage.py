@@ -60,6 +60,12 @@ class _Storage:
     def keys(self):
         return list(self._reader.keys())
 
+    def values(self):
+        return list(self._reader.values())
+
+    def items(self):
+        return list(self._reader.items())
+
     def get(self, key, defaultValue=None):
         assert isinstance(key, str)
         return self._reader.get(key, defaultValue)
@@ -92,9 +98,17 @@ class Storage:
         path = os.path.realpath(path)
         self._storage = weakref.ref(_Storage(path))
 
-    # 轮询
+    # 键
     def keys(self):
         return self._storage().keys()
+
+    # 值
+    def values(self):
+        return self._storage().values()
+
+    # 键值
+    def items(self):
+        return self._storage().items()
 
     # 读取
     def get(self, key, defaultValue=None):
