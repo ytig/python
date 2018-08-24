@@ -307,15 +307,15 @@ def getnonlocals(func, name):
 
 # 栈帧
 class frames(list):
-    def __init__(self, back=0, keep=None):
-        assert back >= 0
-        assert not keep or callable(keep)
-        super().__init__([i.frame for i in inspect.stack()[1 + back:] if not keep or keep(i.frame)])
+    STACK = 0  # 堆栈模式
+    TRACE = 1  # 追踪模式
 
-    # 检查
-    def has(self, index):
-        length = len(self)
-        return index >= -length and index < length
+    def __init__(self, back=0, keep=None, mode=STACK):
+        super().__init__()
+        if mode == frames.STACK:
+            self.extend([i.frame for i in inspect.stack()[1:][back:] if not keep or keep(i.frame)])
+        elif mode == frames.TRACE:
+            self.extend([i.frame for i in list(reversed(inspect.trace()))[back:] if not keep or keep(i.frame)])
 
     def __enter__(self):
         return self
@@ -323,21 +323,42 @@ class frames(list):
     def __exit__(self, t, v, tb):
         self.clear()
 
+    # 检查索引
+    def has(self, index=0):
+        length = len(self)
+        return index >= -length and index < length
 
-# 作用域值
-def scope(pattern=None, **fi):
-    fi['back'] = 1 + fi.get('back', 0)
-    ret = dict()
-    with frames(**fi) as f:
-        assert f.has(0)
+    # 迭代深度
+    def depth(self, index=0, equal=None):
+        assert self.has(index=index)
+        ret = 0
+        back = self[index].f_back
+        while back:
+            if back.f_code is self[index].f_code and (not equal or equal(self[index], back)):
+                ret += 1
+            back = back.f_back
+        return ret
+
+    # 模块检索
+    def module(self, index=0):
+        assert self.has(index=index)
+        for m in sys.modules.values():
+            if vars(m) is self[index].f_globals:
+                return m
+        return None
+
+    # 作用域值
+    def scope(self, index=0, pattern=None):
+        assert self.has(index=index)
+        ret = dict()
         try:
             keys = set()
             if isinstance(pattern, str):
                 b = False
-                for owner in gc.get_referrers(f[0].f_code):
+                for owner in gc.get_referrers(self[index].f_code):
                     if not inspect.isfunction(owner):
                         continue
-                    if getattr(owner, '__globals__', None) is not f[0].f_globals:
+                    if getattr(owner, '__globals__', None) is not self[index].f_globals:
                         continue
                     if not re.search(pattern, getattr(owner, '__qualname__', '')):
                         continue
@@ -346,16 +367,16 @@ def scope(pattern=None, **fi):
                     ret['kwargs'] = dict()
                     fullargspec = inspect.getfullargspec(owner)
                     for key in fullargspec.args:
-                        ret['args'].append(f[0].f_locals.get(key))
+                        ret['args'].append(self[index].f_locals.get(key))
                         keys.add(key)
                     if fullargspec.varargs is not None:
-                        ret['args'].extend(f[0].f_locals.get(fullargspec.varargs) or [])
+                        ret['args'].extend(self[index].f_locals.get(fullargspec.varargs) or [])
                         keys.add(fullargspec.varargs)
                     for key in fullargspec.kwonlyargs:
-                        ret['kwargs'][key] = f[0].f_locals.get(key)
+                        ret['kwargs'][key] = self[index].f_locals.get(key)
                         keys.add(key)
                     if fullargspec.varkw is not None:
-                        ret['kwargs'].update(f[0].f_locals.get(fullargspec.varkw) or {})
+                        ret['kwargs'].update(self[index].f_locals.get(fullargspec.varkw) or {})
                         keys.add(fullargspec.varkw)
                     ret['args'] = tuple(ret['args'])
                     break
@@ -363,52 +384,24 @@ def scope(pattern=None, **fi):
             ret['varnames'] = dict()
             ret['cellvars'] = dict()
             ret['freevars'] = dict()
-            for key in f[0].f_code.co_varnames:
+            for key in self[index].f_code.co_varnames:
                 if key in keys:
                     continue
-                if key in f[0].f_locals:
-                    ret['varnames'][key] = f[0].f_locals[key]
-            for key in f[0].f_code.co_cellvars:
+                if key in self[index].f_locals:
+                    ret['varnames'][key] = self[index].f_locals[key]
+            for key in self[index].f_code.co_cellvars:
                 if key in keys:
                     continue
-                if key in f[0].f_locals:
-                    ret['cellvars'][key] = f[0].f_locals[key]
-            for key in f[0].f_code.co_freevars:
+                if key in self[index].f_locals:
+                    ret['cellvars'][key] = self[index].f_locals[key]
+            for key in self[index].f_code.co_freevars:
                 if key in keys:
                     continue
-                if key in f[0].f_locals:
-                    ret['freevars'][key] = f[0].f_locals[key]
+                if key in self[index].f_locals:
+                    ret['freevars'][key] = self[index].f_locals[key]
         finally:
             owner = None
-    return ret
-
-
-# 迭代深度
-def depth(equal=None, **fi):
-    fi['back'] = 1 + fi.get('back', 0)
-    ret = 0
-    with frames(**fi) as f:
-        assert f.has(0)
-        try:
-            back = f[0].f_back
-            while back:
-                if back.f_code is f[0].f_code and (not equal or equal(f[0], back)):
-                    ret += 1
-                back = back.f_back
-        finally:
-            back = None
-    return ret
-
-
-# 模块检索
-def module(**fi):
-    fi['back'] = 1 + fi.get('back', 0)
-    with frames(**fi) as f:
-        assert f.has(0)
-        for m in sys.modules.values():
-            if vars(m) is f[0].f_globals:
-                return m
-    return None
+        return ret
 
 
 # 异常信息

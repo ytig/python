@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 import inspect
-from kit import hasvar, getvar, setvar, apply, depth
+from kit import hasvar, getvar, setvar, apply, frames
 from decorator import Lock, ilock
 from task import Tree
 
@@ -85,7 +85,7 @@ def _except(fn='__except__'):
                 return function(self, *args, **kwargs)
             except BaseException as e:
                 try:
-                    if not depth(equal=lambda f1, f2: f1.f_locals['self'] is f2.f_locals['self']):
+                    if not frames().depth(equal=lambda f1, f2: f1.f_locals['self'] is f2.f_locals['self']):
                         apply(self, fn, e)
                 except BaseException:
                     pass

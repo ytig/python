@@ -2,7 +2,7 @@
 import numbers
 import inspect
 import weakref
-from kit import apply, module
+from kit import apply, frames
 from decorator import Lock
 from meta import define, invoke
 from ab import ABMeta
@@ -54,7 +54,7 @@ class Looper(ABMeta):
 
         # 开始（异常中断）
         def loop_enter(self, generator, important):
-            with Lock(module()):
+            with Lock(frames().module()):
                 assert inspect.getgeneratorstate(generator) == inspect.GEN_CREATED
                 delay = generator.send(None)
                 assert isinstance(delay, numbers.Real)

@@ -3,7 +3,7 @@ import json
 import inspect
 import threading
 import atexit
-from kit import unique, hasvar, getvar, setvar, frames, module
+from kit import unique, hasvar, getvar, setvar, frames
 
 
 class Closure:
@@ -124,7 +124,7 @@ def clock(closure, k=None):
 
 # 模块锁
 def mlock(k=None):
-    m = module(back=1)
+    m = frames(back=1).module()
 
     def lock(generics):
         return Lock(m, k=k)(generics)
@@ -153,7 +153,7 @@ class Throw:
     # 区块单次（代码）
     def __enter__(self):
         with frames(back=1) as f:
-            assert f.has(0)
+            assert f.has()
             xid = 'X:' + f[0].f_code.co_filename + '/' + str(f[0].f_lineno)
         self.stack.append(xid)
         return xid in self.__throw
@@ -226,7 +226,7 @@ def cthrow(closure, r=None):
 
 # 模块单次
 def mthrow(r=None):
-    m = module(back=1)
+    m = frames(back=1).module()
 
     def throw(generics):
         return Throw(m)(generics, r=r)

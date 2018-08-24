@@ -1,12 +1,12 @@
 #!/usr/local/bin/python3
 import inspect
-from kit import unique, hasvar, getvar, setvar, appliable, apply, frames, scope, depth
+from kit import unique, hasvar, getvar, setvar, appliable, apply, frames
 from decorator import Lock
 
 
 # 定义类型
 def define(__class__, __new__=None):
-    context = scope(pattern=r'__new__', back=1)
+    context = frames(back=1).scope(pattern=r'__new__')
     args = context['args']
     kwargs = context['kwargs']
     assert __class__ is not None and __class__ is context['freevars'].get('__class__'), '__class__ value error'
@@ -112,7 +112,7 @@ def define(__class__, __new__=None):
 def invoke(*d, update=False):
     codes = (_function.f_codes[1], _generatorfunction.f_codes[1], _descriptor.f_codes_get[1], _datadescriptor.f_codes_set[1], _datadescriptor.f_codes_delete[1],)
     with frames(keep=lambda f: f.f_code in codes) as f:
-        assert f.has(0)
+        assert f.has()
         index = codes.index(f[0].f_code)
     if index in range(0, 2):
         index -= 0
@@ -124,7 +124,7 @@ def invoke(*d, update=False):
             args = None
             kwargs = None
         else:
-            context = scope(pattern=r'', back=1)
+            context = frames(back=1).scope(pattern=r'')
             args = context['args']
             kwargs = context['kwargs']
         return (_function.invoke, _generatorfunction.invoke,)[index](args, kwargs, default)
@@ -145,7 +145,7 @@ def invoke(*d, update=False):
             args = None
             kwargs = None
         else:
-            context = scope(pattern=(r'__get__', r'__set__', r'__delete__',)[index], back=1)
+            context = frames(back=1).scope(pattern=(r'__get__', r'__set__', r'__delete__',)[index])
             assert context['args']
             args = context['args'][1:]
             kwargs = context['kwargs']
@@ -157,7 +157,7 @@ class _function:
     def define(func, base, mark):
         def wrapper(*args, **kwargs):
             mark
-            if not depth(equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark']):
+            if not frames().depth(equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark']):
                 return func(*args, **kwargs)
             else:
                 _func = base()
@@ -165,7 +165,7 @@ class _function:
                     return _func(*args, **kwargs)
                 else:
                     with frames(keep=lambda f: f.f_code is _function.f_codes[0]) as f:
-                        assert f.has(0)
+                        assert f.has()
                         default = f[0].f_locals['default']
                     return default(*args, **kwargs)
         return wrapper
@@ -173,7 +173,7 @@ class _function:
     @staticmethod
     def invoke(args, kwargs, default):
         with frames(keep=lambda f: f.f_code is _function.f_codes[1]) as f:
-            assert f.has(0)
+            assert f.has()
             base = f[0].f_locals['base']
             if args is None or kwargs is None:
                 args = f[0].f_locals['args']
@@ -191,7 +191,7 @@ class _generatorfunction:
     def define(func, base, mark):
         def wrapper(*args, **kwargs):
             mark
-            if not depth(equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark']):
+            if not frames().depth(equal=lambda f1, f2: f1.f_locals['mark'] == f2.f_locals['mark']):
                 value = yield from func(*args, **kwargs)
                 return value
             else:
@@ -201,7 +201,7 @@ class _generatorfunction:
                     return value
                 else:
                     with frames(keep=lambda f: f.f_code is _generatorfunction.f_codes[0]) as f:
-                        assert f.has(0)
+                        assert f.has()
                         default = f[0].f_locals['default']
                     value = yield from default(*args, **kwargs)
                     return value
@@ -210,7 +210,7 @@ class _generatorfunction:
     @staticmethod
     def invoke(args, kwargs, default):
         with frames(keep=lambda f: f.f_code is _generatorfunction.f_codes[1]) as f:
-            assert f.has(0)
+            assert f.has()
             base = f[0].f_locals['base']
             if args is None or kwargs is None:
                 args = f[0].f_locals['args']
@@ -232,7 +232,7 @@ class _descriptor:
         self.mark = mark
 
     def __get__(self, *args, **kwargs):
-        if not depth(equal=lambda f1, f2: f1.f_locals['self'].mark == f2.f_locals['self'].mark):
+        if not frames().depth(equal=lambda f1, f2: f1.f_locals['self'].mark == f2.f_locals['self'].mark):
             return apply(self.desc, '__get__', *args, **kwargs)
         else:
             _desc = self.base()
@@ -240,14 +240,14 @@ class _descriptor:
                 return apply(_desc, '__get__', *args, **kwargs)
             else:
                 with frames(keep=lambda f: f.f_code is _descriptor.f_codes_get[0]) as f:
-                    assert f.has(0)
+                    assert f.has()
                     default = f[0].f_locals['default']
                 return default('__get__', *args, **kwargs)
 
     @staticmethod
     def get(args, kwargs, default):
         with frames(keep=lambda f: f.f_code is _descriptor.f_codes_get[1]) as f:
-            assert f.has(0)
+            assert f.has()
             base = f[0].f_locals['self'].base
             if args is None or kwargs is None:
                 args = f[0].f_locals['args']
@@ -262,7 +262,7 @@ class _descriptor:
 
 class _datadescriptor(_descriptor):
     def __set__(self, *args, **kwargs):
-        if not depth(equal=lambda f1, f2: f1.f_locals['self'].mark == f2.f_locals['self'].mark):
+        if not frames().depth(equal=lambda f1, f2: f1.f_locals['self'].mark == f2.f_locals['self'].mark):
             return apply(self.desc, '__set__', *args, **kwargs)
         else:
             _desc = self.base()
@@ -270,14 +270,14 @@ class _datadescriptor(_descriptor):
                 return apply(_desc, '__set__', *args, **kwargs)
             else:
                 with frames(keep=lambda f: f.f_code is _datadescriptor.f_codes_set[0]) as f:
-                    assert f.has(0)
+                    assert f.has()
                     default = f[0].f_locals['default']
                 return default('__set__', *args, **kwargs)
 
     @staticmethod
     def set(args, kwargs, default):
         with frames(keep=lambda f: f.f_code is _datadescriptor.f_codes_set[1]) as f:
-            assert f.has(0)
+            assert f.has()
             base = f[0].f_locals['self'].base
             if args is None or kwargs is None:
                 args = f[0].f_locals['args']
@@ -290,7 +290,7 @@ class _datadescriptor(_descriptor):
     f_codes_set = (set.__func__.__code__, __set__.__code__,)
 
     def __delete__(self, *args, **kwargs):
-        if not depth(equal=lambda f1, f2: f1.f_locals['self'].mark == f2.f_locals['self'].mark):
+        if not frames().depth(equal=lambda f1, f2: f1.f_locals['self'].mark == f2.f_locals['self'].mark):
             return apply(self.desc, '__delete__', *args, **kwargs)
         else:
             _desc = self.base()
@@ -298,14 +298,14 @@ class _datadescriptor(_descriptor):
                 return apply(_desc, '__delete__', *args, **kwargs)
             else:
                 with frames(keep=lambda f: f.f_code is _datadescriptor.f_codes_delete[0]) as f:
-                    assert f.has(0)
+                    assert f.has()
                     default = f[0].f_locals['default']
                 return default('__delete__', *args, **kwargs)
 
     @staticmethod
     def delete(args, kwargs, default):
         with frames(keep=lambda f: f.f_code is _datadescriptor.f_codes_delete[1]) as f:
-            assert f.has(0)
+            assert f.has()
             base = f[0].f_locals['self'].base
             if args is None or kwargs is None:
                 args = f[0].f_locals['args']
