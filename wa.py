@@ -333,12 +333,12 @@ class MultiException(Exception):
                     s = str(e)
                     if s:
                         r += ': ' + s
+                if r:
+                    if ret:
+                        ret += '\n\n'
+                    ret += r
             except BaseException:
                 pass
-            else:
-                if ret:
-                    ret += '\n\n'
-                ret += r
         ret = start + ret + end
         return ret
 
