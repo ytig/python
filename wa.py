@@ -103,7 +103,7 @@ def _reform(core):
         err = []
         for t in core(*[(caller,) + t for t in tuples]):
             (out if t[0] else err).append(t[1])
-        return out, err,
+        return (out, err,)
     return wrapper
 
 

@@ -169,7 +169,7 @@ def injects(*segms, argv=sys.argv):
             kv = generics
             k = kv[0]
             v = kv[1] if 1 < len(kv) else -1
-        return k, v,
+        return (k, v,)
     segms = [parse(g) for g in segms]
 
     def decorator(function):
@@ -272,13 +272,13 @@ def _apply(var, bug={
             val = (var, val,)
         return val
     elif isinstance(var, staticmethod):
-        return var.__func__, 0,
+        return (var.__func__, 0,)
     elif isinstance(var, classmethod):
-        return var.__func__, 1,
+        return (var.__func__, 1,)
     elif callable(var):
-        return var, 2,
+        return (var, 2,)
     else:
-        return var, -1,
+        return (var, -1,)
 
 
 # 运用定义
