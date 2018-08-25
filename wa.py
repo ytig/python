@@ -120,6 +120,10 @@ class _baseclass:
     def __exit__(self, t, v, tb):
         return self._exit(t, v, tb)
 
+    def __call__(self):
+        with self as ret:
+            return ret
+
     def _init(self):
         pass
 
@@ -409,12 +413,10 @@ class Arguments:
         self.args = list(args)
         self.kwargs = dict(kwargs)
 
-    # 追加不定长参数
     def extend(self, *args):
         self.args.extend(args)
         return self
 
-    # 更新关键字参数
     def update(self, **kwargs):
         self.kwargs.update(kwargs)
         return self
