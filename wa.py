@@ -307,6 +307,46 @@ class _baseclass:
                 _exit(stack.pop(), None)
         return withas(_merge)
 
+    # 循环流程
+    @classmethod
+    def ditto(this, pipe):
+        """
+        pipe: object -> Arguments or None
+        """
+        this = withas(this)
+
+        def __ditto(*args, **kwargs):
+            y = args[-1]
+            args = args[:-1]
+            try:
+                i = this(*args, **kwargs)
+            finally:
+                del args, kwargs,
+            with i as o:
+                try:
+                    a = pipe(o)
+                except BaseException:
+                    del o
+                    raise
+                else:
+                    if a is not None:
+                        del o
+                        a = [a, ]
+                        yield from Arguments.make(a.pop()).extend(y)(__ditto)
+                    else:
+                        y[0] = True
+                        o = [o, ]
+                        yield o.pop()
+
+        def _ditto(*args, **kwargs):
+            y = [False, ]
+            a = [Arguments(*args, y, **kwargs), ]
+            del args, kwargs,
+            yield from a.pop()(__ditto)
+            if not y[0]:
+                yield None
+        return withas(_ditto)
+
 
 class MultiException(Exception):
     @staticmethod
@@ -369,10 +409,12 @@ class Arguments:
         self.args = list(args)
         self.kwargs = dict(kwargs)
 
+    # 追加不定长参数
     def extend(self, *args):
         self.args.extend(args)
         return self
 
+    # 更新关键字参数
     def update(self, **kwargs):
         self.kwargs.update(kwargs)
         return self
