@@ -87,24 +87,7 @@ def _enter(cls, arguments):
 
 
 def _exit(self, e):
-    t, v, tb, = (None, None, None,) if e is None else (type(e), e, e.__traceback__,)
-    return self.__exit__(t, v, tb)
-
-
-def _reform(core):
-    def caller(*args):
-        try:
-            return (True, args[0](*args[1:]),)
-        except BaseException as e:
-            return (False, e,)
-
-    def wrapper(*tuples):
-        out = []
-        err = []
-        for t in core(*[(caller,) + t for t in tuples]):
-            (out if t[0] else err).append(t[1])
-        return (out, err,)
-    return wrapper
+    return self.__exit__(*((None, None, None,) if e is None else (type(e), e, e.__traceback__,)))
 
 
 class _baseclass:
@@ -133,42 +116,27 @@ class _baseclass:
     def _exit(self, t, v, tb):
         pass
 
-    # 输入转换
-    @classmethod
-    def input(this, pipe):
-        """
-        pipe: *args, **kwargs -> Arguments
-        """
-        series = _baseclass.__dict__['series'].__func__
-        return series(lambda *args, **kwargs: (args, kwargs,), this, pipe=lambda o: pipe(*o[0], **o[1]))
-
-    # 输出转换
-    @classmethod
-    def output(this, pipe):
-        """
-        pipe: object, *args, **kwargs -> object
-        """
-        series = _baseclass.__dict__['series'].__func__
-        parallel = _baseclass.__dict__['parallel'].__func__
-        return series(parallel(this, lambda *args, **kwargs: (args, kwargs,), pipe=lambda *args, **kwargs: [Arguments(*args, **kwargs), ] * 2), lambda o: pipe(o[0], *o[1][0], **o[1][1]))
-
     # 串联流程
     @classmethod
-    def series(parent, child, pipe=lambda o: Arguments(o)):
+    def series(parent, child, pipe=lambda *args, **kwargs: Arguments(args[0])):
         """
-        pipe: object -> Arguments
+        pipe: return, *args, **kwargs -> Arguments
         """
         parent = withas(parent)
         child = withas(child)
+
+        def _pipe(*args, **kwargs):
+            return Arguments.make(pipe(*args, **kwargs))
 
         def _series(*args, **kwargs):
             y = False
             try:
                 pstack = _enter(parent, Arguments(*args, **kwargs))
+                pstack.append(Arguments(pstack.pop(), *args, **kwargs))
             finally:
                 del args, kwargs,
             try:
-                cstack = _enter(child, Arguments.make(pipe(pstack.pop())))
+                cstack = _enter(child, pstack.pop()(_pipe))
                 try:
                     y = True
                     yield cstack.pop()
@@ -191,18 +159,29 @@ class _baseclass:
     def parallel(husband, *wives, pipe=lambda *args, **kwargs: [Arguments(*args, **kwargs), ], core=tree(0)):
         """
         pipe: *args, **kwargs -> Arguments[]
-        core: *tuples -> object[]
+        core: *tuples -> return[]
         """
         humans = [withas(g) for g in (husband,) + wives]
 
         def _pipe(*args, **kwargs):
-            r = pipe(*args, **kwargs)
-            return [Arguments.make(g) for g in r] + [Arguments(), ] * (len(humans) - len(r))
-        _core = _reform(core)
+            return [Arguments.make(g) for g in pipe(*args, **kwargs)]
+
+        def _call(*args):
+            try:
+                return (True, args[0](*args[1:]),)
+            except BaseException as e:
+                return (False, e,)
+
+        def _core(*tuples):
+            out = []
+            err = []
+            for t in core(*[(_call,) + t for t in tuples]):
+                (out if t[0] else err).append(t[1])
+            return (out, err,)
 
         def _parallel(*args, **kwargs):
             try:
-                stacks, traces, = _core(*zip([_enter, ] * len(humans), humans, _pipe(*args, **kwargs)))
+                stacks, traces, = _core(*zip([_enter, ] * len(humans), humans, _pipe(*args, **kwargs) + [Arguments(), ] * len(humans)))
             finally:
                 del args, kwargs,
             try:
@@ -235,23 +214,41 @@ class _baseclass:
 
     # 分支流程
     @classmethod
-    def branch(parent, child, pipe=lambda o: Arguments(o), core=tree(0)):
+    def branch(parent, child, pipe=lambda *args, **kwargs: Arguments(args[0]), core=tree(0)):
         """
-        pipe: object -> Arguments
-        core: *tuples -> object[]
+        pipe: return, *args, **kwargs -> Arguments
+        core: *tuples -> return[]
         """
         parent = withas(parent)
         child = withas(child)
-        _core = _reform(core)
+
+        def _pipe(*args, **kwargs):
+            ret = args[0]
+            args = args[1:]
+            return [Arguments.make(pipe(r, *args, **kwargs)) for r in ret]
+
+        def _call(*args):
+            try:
+                return (True, args[0](*args[1:]),)
+            except BaseException as e:
+                return (False, e,)
+
+        def _core(*tuples):
+            out = []
+            err = []
+            for t in core(*[(_call,) + t for t in tuples]):
+                (out if t[0] else err).append(t[1])
+            return (out, err,)
 
         def _branch(*args, **kwargs):
             y = False
             try:
                 pstack = _enter(parent, Arguments(*args, **kwargs))
+                pstack.append(Arguments(pstack.pop(), *args, **kwargs))
             finally:
                 del args, kwargs,
             try:
-                cstacks, traces, = _core(*[(_enter, child, Arguments.make(pipe(o)),) for o in pstack.pop()])
+                cstacks, traces, = _core(*[(_enter, child, a,) for a in pstack.pop()(_pipe)])
                 try:
                     if traces:
                         traces = [traces, ]
@@ -288,16 +285,16 @@ class _baseclass:
                 _exit(pstack.pop(), None)
         return withas(_branch)
 
-    # 合并流程
+    # 条件流程
     @classmethod
-    def merge(husband, wife, pipe):
+    def either(husband, wife, pipe):
         """
         pipe: *args, **kwargs -> bool
         """
         husband = withas(husband)
         wife = withas(wife)
 
-        def _merge(*args, **kwargs):
+        def _either(*args, **kwargs):
             try:
                 stack = _enter(husband if not pipe(*args, **kwargs) else wife, Arguments(*args, **kwargs))
             finally:
@@ -309,38 +306,43 @@ class _baseclass:
                     raise
             else:
                 _exit(stack.pop(), None)
-        return withas(_merge)
+        return withas(_either)
 
     # 循环流程
     @classmethod
     def ditto(this, pipe):
         """
-        pipe: object -> Arguments or None
+        pipe: return, *args, **kwargs -> Arguments or None
         """
         this = withas(this)
+
+        def _pipe(*args, **kwargs):
+            g = pipe(*args, **kwargs)
+            if g is None:
+                return (args, kwargs,)
+            else:
+                return Arguments.make(g)
 
         def __ditto(*args, **kwargs):
             y = args[-1]
             args = args[:-1]
             try:
-                i = this(*args, **kwargs)
+                stack = _enter(this, Arguments(*args, **kwargs))
+                stack.append(Arguments(stack.pop(), *args, **kwargs))
             finally:
                 del args, kwargs,
-            with i as o:
-                try:
-                    a = pipe(o)
-                except BaseException:
-                    del o
-                    raise
+            try:
+                stack.append(stack.pop()(_pipe))
+                if isinstance(stack[-1], Arguments):
+                    yield from stack.pop().extend(y)(__ditto)
                 else:
-                    if a is not None:
-                        del o
-                        a = [a, ]
-                        yield from Arguments.make(a.pop()).extend(y)(__ditto)
-                    else:
-                        y[0] = True
-                        o = [o, ]
-                        yield o.pop()
+                    y[0] = True
+                    yield stack.pop()[0][0]
+            except BaseException as e:
+                if _exit(stack.pop(), e) is not True:
+                    raise
+            else:
+                _exit(stack.pop(), None)
 
         def _ditto(*args, **kwargs):
             y = [False, ]
@@ -413,10 +415,12 @@ class Arguments:
         self.args = list(args)
         self.kwargs = dict(kwargs)
 
+    # 追加不定长参数
     def extend(self, *args):
         self.args.extend(args)
         return self
 
+    # 更新关键字参数
     def update(self, **kwargs):
         self.kwargs.update(kwargs)
         return self
