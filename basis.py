@@ -113,14 +113,28 @@ class uint:
         assert isinstance(other, uint)
         return self.value <= other.value
 
-    def __str__(self):
-        return str(self.value)
-
-    def __repr__(self):
-        return str(self.value)
-
     def __len__(self):
         return 4
 
     def __getitem__(self, index):
         return self.value.to_bytes(4, 'little')[index]
+
+    def __setitem__(self, index, value):
+        ba = bytearray(self.value.to_bytes(4, 'little'))
+        ba[index] = value
+        self.value = int.from_bytes(ba, 'little')
+
+    def __neg__(self):
+        return uint(-self.value)
+
+    def __pos__(self):
+        return uint(+self.value)
+
+    def __invert__(self):
+        return uint(~self.value)
+
+    def __str__(self):
+        return str(self.value)
+
+    def __repr__(self):
+        return str(self.value)
