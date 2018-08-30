@@ -3,8 +3,8 @@ class uint:
     def __init__(self, generics):
         if isinstance(generics, int):
             self.value = generics & 0xFFFFFFFF
-        elif isinstance(generics, (bytes, bytearray,)):
-            self.value = int.from_bytes(generics, 'little') & 0xFFFFFFFF
+        else:
+            self.value = int.from_bytes(bytes(generics), 'little') & 0xFFFFFFFF
 
     def __add__(self, other):
         assert isinstance(other, uint)
