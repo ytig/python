@@ -171,11 +171,6 @@ class uint:
     def __getitem__(self, index):
         return self.value.to_bytes(4, 'little')[index]
 
-    def __setitem__(self, index, value):
-        ba = bytearray(self.value.to_bytes(4, 'little'))
-        ba[index] = value
-        self.value = int.from_bytes(ba, 'little')
-
     def __neg__(self):
         return uint(-self.value)
 
