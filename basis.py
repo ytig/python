@@ -4,7 +4,7 @@ import collections
 
 class uint:
     @staticmethod
-    def new(generics):
+    def make(generics):
         if isinstance(generics, uint):
             return generics
         else:
@@ -19,53 +19,54 @@ class uint:
             self.value = int.from_bytes(bytes(generics, 'ascii'), 'little') & 0xFFFFFFFF
         elif isinstance(generics, collections.Iterable):
             self.value = int.from_bytes(bytes(generics), 'little') & 0xFFFFFFFF
-        raise TypeError
+        else:
+            raise TypeError
 
     def __add__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value + other.value)
 
     def __sub__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value - other.value)
 
     def __mul__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value * other.value)
 
     def __div__(self, other):
         return self // other
 
     def __floordiv__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value // other.value)
 
     def __mod__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value % other.value)
 
     def __pow__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value**other.value)
 
     def __lshift__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value << other.value)
 
     def __rshift__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value >> other.value)
 
     def __and__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value & other.value)
 
     def __xor__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value ^ other.value)
 
     def __or__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return uint(self.value | other.value)
 
     def __iaddr__(self, other):
@@ -104,7 +105,7 @@ class uint:
     def __ior__(self, other):
         return self | other
 
-    def __raddr__(self, other):
+    def __radd__(self, other):
         return uint(other) + self
 
     def __rsub__(self, other):
@@ -141,27 +142,27 @@ class uint:
         return uint(other) | self
 
     def __eq__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return self.value == other.value
 
     def __ne__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return self.value != other.value
 
     def __gt__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return self.value > other.value
 
     def __lt__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return self.value < other.value
 
     def __ge__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return self.value >= other.value
 
     def __le__(self, other):
-        other = uint.new(other)
+        other = uint.make(other)
         return self.value <= other.value
 
     def __len__(self):
