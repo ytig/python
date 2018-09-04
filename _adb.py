@@ -5,6 +5,12 @@ import pexpect
 from _pexpect import spawn
 
 
+def _popen(handle):
+    def run(cmd):
+        return handle(os.popen(cmd).read())
+    return run
+
+
 def _expect(*expects):
     def run(cmd):
         process = spawn(cmd)
@@ -19,7 +25,7 @@ class adb:
     # 设备
     @staticmethod
     def devices():
-        return [s[:-7] for s in filter(lambda s: s.endswith('\tdevice'), os.popen('adb devices').read().split('\n'))]
+        return _popen(lambda text: [s[:-7] for s in filter(lambda s: s.endswith('\tdevice'), text.split('\n'))])('adb devices')
 
     # 连接
     @staticmethod
@@ -98,17 +104,16 @@ class adb:
     def broadcast(self, intent, options='-a', extra={}):
         subcommand = 'broadcast %s %s' % (options, intent,)
 
-        def run(cmd):
-            text = os.popen(cmd).read()
-            ret = {'code': 0, 'data': '', }
-            match = re.search(r'result=(d+)', text)
+        def handle(text):
+            ret = {'code': -1, 'data': '', }
+            match = re.search(r'result=(\d+)', text)
             if match is not None:
                 ret['code'] = match.group(1)
             match = re.search(r'data="(.*?)"', text)
             if match is not None:
                 ret['data'] = match.group(1)
             return ret
-        return self.am(subcommand, extra, run=run)
+        return self.am(subcommand, extra, run=_popen(handle))
 
     # 强退
     def force_stop(self, package):
