@@ -5,13 +5,13 @@ import pexpect
 from _pexpect import spawn
 
 
-def _popen(handle):
+def popen(handle):
     def run(cmd):
         return handle(os.popen(cmd).read())
     return run
 
 
-def _expect(*expects):
+def expect(*expects):
     def run(cmd):
         process = spawn(cmd)
         ret = process.expect(list(expects))
@@ -25,12 +25,12 @@ class ADB:
     # 设备
     @staticmethod
     def devices():
-        return _popen(lambda text: [s[:-7] for s in filter(lambda s: s.endswith('\tdevice'), text.split('\n'))])('adb devices')
+        return popen(lambda text: [s[:-7] for s in filter(lambda s: s.endswith('\tdevice'), text.split('\n'))])('adb devices')
 
     # 连接
     @staticmethod
     def connect(addr):
-        return _expect('connected to', 'already connected to', 'unable to connect to')('adb connect %s' % (addr,))
+        return expect('connected to', 'already connected to', 'unable to connect to')('adb connect %s' % (addr,))
 
     def __init__(self, serial):
         self.serial = serial
@@ -45,11 +45,11 @@ class ADB:
 
     # 权限
     def root(self):
-        return self.execute('root', run=_expect('restarting adbd as root', 'adbd is already running as root'))
+        return self.execute('root', run=expect('restarting adbd as root', 'adbd is already running as root'))
 
     # 限权
     def unroot(self):
-        return self.execute('unroot', run=_expect('restarting adbd as non root', 'adbd not running as root'))
+        return self.execute('unroot', run=expect('restarting adbd as non root', 'adbd not running as root'))
 
     # 上传
     def push(self, local, remote):
@@ -67,11 +67,11 @@ class ADB:
 
     # 安装
     def install(self, path):
-        return self.execute('install %s' % (path,), run=_expect('Success', 'Failure'))
+        return self.execute('install %s' % (path,), run=expect('Success', 'Failure'))
 
     # 卸载
     def uninstall(self, package):
-        return self.execute('uninstall %s' % (package,), run=_expect('Success', 'Failure'))
+        return self.execute('uninstall %s' % (package,), run=expect('Success', 'Failure'))
 
     # 脚本
     def shell(self, cmd, **kwargs):
@@ -93,12 +93,12 @@ class ADB:
     # 界面
     def start(self, intent, options='-n', extra={}):
         subcommand = 'start %s %s' % (options, intent,)
-        return self.am(subcommand, extra, run=_expect('Starting', 'Warning', 'Error'))
+        return self.am(subcommand, extra, run=expect('Starting', 'Warning', 'Error'))
 
     # 服务
     def startservice(self, intent, options='-n', extra={}):
         subcommand = 'startservice %s %s' % (options, intent,)
-        return self.am(subcommand, extra, run=_expect('Starting', 'Warning', 'Error'))
+        return self.am(subcommand, extra, run=expect('Starting', 'Warning', 'Error'))
 
     # 广播
     def broadcast(self, intent, options='-a', extra={}):
@@ -113,7 +113,7 @@ class ADB:
             if match is not None:
                 ret['data'] = match.group(1)
             return ret
-        return self.am(subcommand, extra, run=_popen(handle))
+        return self.am(subcommand, extra, run=popen(handle))
 
     # 强退
     def force_stop(self, package):
