@@ -21,7 +21,7 @@ def _expect(*expects):
     return run
 
 
-class adb:
+class ADB:
     # 设备
     @staticmethod
     def devices():
