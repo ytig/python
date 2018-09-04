@@ -33,9 +33,9 @@ class adb:
     def execute(self, cmd, run=os.system):
         return run('adb -s %s %s' % (self.serial, cmd,))
 
-    # 脚本
-    def shell(self, cmd, **kwargs):
-        return self.execute('shell %s' % (cmd,), **kwargs)
+    # 重启
+    def reboot(self):
+        return self.execute('reboot')
 
     # 权限
     def root(self):
@@ -66,6 +66,10 @@ class adb:
     # 卸载
     def uninstall(self, package):
         return self.execute('uninstall %s' % (package,), run=_expect('Success', 'Failure'))
+
+    # 脚本
+    def shell(self, cmd, **kwargs):
+        return self.execute('shell %s' % (cmd,), **kwargs)
 
     # 意图
     def am(self, subcommand, extra, **kwargs):
