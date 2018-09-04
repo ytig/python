@@ -65,6 +65,10 @@ class ADB:
             remote = local
         return self.execute('forward %s %s' % (local, remote,))
 
+    # 已装
+    def packages(self):
+        return self.execute('shell pm list packages', run=popen(lambda text: [s[8:] for s in filter(lambda s: s.startswith('package:'), text.split('\n'))]))
+
     # 安装
     def install(self, path):
         return self.execute('install %s' % (path,), run=expect('Success', 'Failure'))
