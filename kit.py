@@ -31,7 +31,7 @@ def doc(module=None):
                 string = f.read()
                 for pattern in (r'(?<=""")[\s\S]*?(?=""")', r"(?<=''')[\s\S]*?(?=''')",):
                     match = re.search(pattern, string)
-                    if match:
+                    if match is not None:
                         return match.group().strip('\n')
     return None
 
@@ -365,7 +365,7 @@ class frames(list):
                         continue
                     if getattr(owner, '__globals__', None) is not self[index].f_globals:
                         continue
-                    if not re.search(pattern, getattr(owner, '__qualname__', '')):
+                    if re.search(pattern, getattr(owner, '__qualname__', '')) is None:
                         continue
                     b = True
                     ret['args'] = list()
