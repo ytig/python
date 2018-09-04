@@ -19,7 +19,7 @@ class adb:
     # 设备
     @staticmethod
     def devices():
-        return []
+        return [s[:-7] for s in filter(lambda s: s.endswith('\tdevice'), os.popen('adb devices').read().split('\n'))]
 
     # 连接
     @staticmethod
