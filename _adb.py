@@ -69,6 +69,10 @@ class ADB:
     def packages(self):
         return self.execute('shell pm list packages', run=popen(lambda text: [s[8:] for s in filter(lambda s: s.startswith('package:'), text.split('\n'))]))
 
+    # 用户
+    def uid(self, package):
+        return self.execute('shell cat /data/system/packages.list', run=popen(lambda text: ([int(s.split(' ')[1]) for s in filter(lambda s: s.startswith(package), text.split('\n'))] or [None, ])[0]))
+
     # 安装
     def install(self, path):
         return self.execute('install %s' % (path,), run=expect('Success', 'Failure'))
