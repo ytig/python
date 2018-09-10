@@ -184,6 +184,11 @@ class ADB:
     def input_long_click(self, x, y, t=range(500, 1000)):
         return self.execute('shell input swipe %s %s %s %s %s' % (_random(x), _random(y), _random(x), _random(y), _random(t)))
 
+    # 单击
+    def input_click_element(self, element):
+        bounds = [int(i) for i in element.get('bounds').replace('[', '').replace(']', ',').split(',')[:-1]]
+        return self.input_click((bounds[0] + bounds[2]) // 2, (bounds[1] + bounds[3]) // 2)
+
     # 滑动
     def input_scroll(self, x1, y1, x2, y2, t):
         return self.execute('shell input swipe %s %s %s %s %s' % (_random(x1), _random(y1), _random(x2), _random(y2), _random(t)))
