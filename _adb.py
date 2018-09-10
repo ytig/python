@@ -206,7 +206,6 @@ class ADB:
         x1 = x - _random(range(r // 3, r // 2))
         x2 = x + _random(range(r // 3, r // 2))
         t = max(int(_random(range(240, 360)) * (x2 - x1) / unit), 120)
-        print(x1, y, x2, y, t)
         return self.input_scroll(x1, y, x2, y, t)
 
     # 上滑
