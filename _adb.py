@@ -163,6 +163,19 @@ class ADB:
         else:
             return lxml.etree.fromstring(string.encode('utf-8'))
 
+    # 尺寸
+    def size(self):
+        def handle(text):
+            start = '    init='
+            _start = 'cur='
+            for line in text.split('\n'):
+                if line.startswith(start):
+                    for word in line.split(' '):
+                        if word.startswith(_start):
+                            return [int(i) for i in word[len(_start):].split('x')]
+            raise EOFError
+        return self.execute('shell dumpsys window displays', run=popen(handle))
+
     # 单击
     def input_click(self, x, y):
         return self.execute('shell input tap %s %s' % (_random(x), _random(y),))
