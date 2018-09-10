@@ -165,33 +165,33 @@ class ADB:
 
     # 单击
     def input_click(self, x, y):
-        return self.execute('adb shell input tap %s %s' % (_random(x), _random(y),))
+        return self.execute('shell input tap %s %s' % (_random(x), _random(y),))
 
     # 双击
     def input_double_click(self, x, y, duration=range(150, 350)):
-        self.execute('adb shell input tap %s %s' % (_random(x), _random(y),))
+        self.execute('shell input tap %s %s' % (_random(x), _random(y),))
         time.sleep(_random(duration) / 1000)
-        return self.execute('adb shell input tap %s %s' % (_random(x), _random(y),))
+        return self.execute('shell input tap %s %s' % (_random(x), _random(y),))
 
     # 长按
     def input_long_click(self, x, y, duration=range(500, 1000)):
-        return self.execute('adb shell input swipe %s %s %s %s %s' % (_random(x), _random(y), _random(x), _random(y), _random(duration)))
+        return self.execute('shell input swipe %s %s %s %s %s' % (_random(x), _random(y), _random(x), _random(y), _random(duration)))
 
     # 滑动
     def input_scroll(self, x1, y1, x2, y2, duration=range(150, 350)):
-        return self.execute('adb shell input swipe %s %s %s %s %s' % (_random(x1), _random(y1), _random(x2), _random(y2), _random(duration)))
+        return self.execute('shell input swipe %s %s %s %s %s' % (_random(x1), _random(y1), _random(x2), _random(y2), _random(duration)))
 
     # 横滑
     def input_scrollx(self, y, x1, x2, duration=range(150, 350)):
-        return self.execute('adb shell input swipe %s %s %s %s %s' % (_random(x1), _random(y), _random(x2), _random(y), _random(duration)))
+        return self.execute('shell input swipe %s %s %s %s %s' % (_random(x1), _random(y), _random(x2), _random(y), _random(duration)))
 
     # 纵滑
     def input_scrolly(self, x, y1, y2, duration=range(150, 350)):
-        return self.execute('adb shell input swipe %s %s %s %s %s' % (_random(x), _random(y1), _random(x), _random(y2), _random(duration)))
+        return self.execute('shell input swipe %s %s %s %s %s' % (_random(x), _random(y1), _random(x), _random(y2), _random(duration)))
 
     # 输入
     def input_text(self, string):
-        return self.execute('adb shell input text %s' % (string,))
+        return self.execute('shell input text %s' % (string,))
 
     # 按键
     def input_keyevent(self, keycode):
