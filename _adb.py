@@ -189,40 +189,40 @@ class ADB:
         return self.execute('shell input swipe %s %s %s %s %s' % (_random(x1), _random(y1), _random(x2), _random(y2), _random(t)))
 
     # 左滑
-    def input_scroll_left(self, x, y, r=None):
+    def input_scroll_left(self, x, y, r):
         unit = self.size()[0]
-        if r is None:
-            r = unit // 2
+        if isinstance(r, float):
+            r = int(unit * r)
         x1 = x + _random(range(r // 3, r // 2))
         x2 = x - _random(range(r // 3, r // 2))
         t = max(int(_random(range(240, 360)) * (x1 - x2) / unit), 120)
         return self.input_scroll(x1, y, x2, y, t)
 
     # 右滑
-    def input_scroll_right(self, x, y, r=None):
+    def input_scroll_right(self, x, y, r):
         unit = self.size()[0]
-        if r is None:
-            r = unit // 2
+        if isinstance(r, float):
+            r = int(unit * r)
         x1 = x - _random(range(r // 3, r // 2))
         x2 = x + _random(range(r // 3, r // 2))
         t = max(int(_random(range(240, 360)) * (x2 - x1) / unit), 120)
         return self.input_scroll(x1, y, x2, y, t)
 
     # 上滑
-    def input_scroll_up(self, x, y, r=None):
+    def input_scroll_up(self, x, y, r):
         unit = self.size()[0]
-        if r is None:
-            r = unit // 2
+        if isinstance(r, float):
+            r = int(unit * r)
         y1 = x + _random(range(r // 3, r // 2))
         y2 = x - _random(range(r // 3, r // 2))
         t = max(int(_random(range(240, 360)) * (y1 - y2) / unit), 120)
         return self.input_scroll(x, y1, x, y2, t)
 
     # 下滑
-    def input_scroll_down(self, x, y, r=None):
+    def input_scroll_down(self, x, y, r):
         unit = self.size()[0]
-        if r is None:
-            r = unit // 2
+        if isinstance(r, float):
+            r = int(unit * r)
         y1 = x - _random(range(r // 3, r // 2))
         y2 = x + _random(range(r // 3, r // 2))
         t = max(int(_random(range(240, 360)) * (y2 - y1) / unit), 120)
