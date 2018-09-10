@@ -207,16 +207,16 @@ class ADB:
     # 上滑
     def input_scroll_up(self, x, y, r):
         v = self.size()[0] / _random(range(1, 250))
-        y1 = x + _random(range(r // 3, r // 2))
-        y2 = x - _random(range(r // 3, r // 2))
+        y1 = y + _random(range(r // 3, r // 2))
+        y2 = y - _random(range(r // 3, r // 2))
         t = int((y1 - y2) / v)
         return self.input_scroll(x, y1, x, y2, 100 + t)
 
     # 下滑
     def input_scroll_down(self, x, y, r):
         v = self.size()[0] / _random(range(1, 250))
-        y1 = x - _random(range(r // 3, r // 2))
-        y2 = x + _random(range(r // 3, r // 2))
+        y1 = y - _random(range(r // 3, r // 2))
+        y2 = y + _random(range(r // 3, r // 2))
         t = int((y2 - y1) / v)
         return self.input_scroll(x, y1, x, y2, 100 + t)
 
