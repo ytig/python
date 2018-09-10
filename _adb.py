@@ -1,6 +1,10 @@
 #!/usr/local/bin/python3
 import re
 import os
+import time
+import random
+import collections
+import lxml
 import pexpect
 from _pexpect import spawn
 
@@ -19,6 +23,13 @@ def expect(*expects):
         process.interact()
         return ret
     return run
+
+
+def _random(generics):
+    if isinstance(generics, collections.Iterable):
+        generics = list(generics)
+        generics = generics[int(len(generics) * random.random())]
+    return generics
 
 
 class ADB:
@@ -126,3 +137,86 @@ class ADB:
     # 强退
     def force_stop(self, package):
         return self.execute('shell am force-stop %s' % (package,))
+
+    # 窗口
+    def current_force(self):
+        def handle(text):
+            start = '  mCurrentFocus='
+            for line in text.split('\n'):
+                if line.startswith(start):
+                    return line.split(' ')[-1][:-1]
+            raise EOFError
+        return self.execute('shell dumpsys window', run=popen(handle))
+
+    # 视图
+    def uiautomator(self, raw=False):
+        def handle(text):
+            start = 'UI hierchary dumped to: '
+            for line in text.split('\n'):
+                if line.startswith(start):
+                    return line[len(start):]
+            raise EOFError
+        path = self.execute('shell uiautomator dump', run=popen(handle))
+        string = self.execute('shell cat %s' % (path,), run=popen(lambda text: text))
+        if raw:
+            return string
+        else:
+            return lxml.etree.fromstring(string.encode('utf-8'))
+
+    # 单击
+    def input_click(self, x, y):
+        return self.execute('adb shell input tap %s %s' % (_random(x), _random(y),))
+
+    # 双击
+    def input_double_click(self, x, y, duration=range(150, 350)):
+        self.execute('adb shell input tap %s %s' % (_random(x), _random(y),))
+        time.sleep(_random(duration) / 1000)
+        return self.execute('adb shell input tap %s %s' % (_random(x), _random(y),))
+
+    # 长按
+    def input_long_click(self, x, y, duration=range(500, 1000)):
+        return self.execute('adb shell input swipe %s %s %s %s %s' % (_random(x), _random(y), _random(x), _random(y), _random(duration)))
+
+    # 滑动
+    def input_scroll(self, x1, y1, x2, y2, duration=range(150, 350)):
+        return self.execute('adb shell input swipe %s %s %s %s %s' % (_random(x1), _random(y1), _random(x2), _random(y2), _random(duration)))
+
+    # 横滑
+    def input_scrollx(self, y, x1, x2, duration=range(150, 350)):
+        return self.execute('adb shell input swipe %s %s %s %s %s' % (_random(x1), _random(y), _random(x2), _random(y), _random(duration)))
+
+    # 纵滑
+    def input_scrolly(self, x, y1, y2, duration=range(150, 350)):
+        return self.execute('adb shell input swipe %s %s %s %s %s' % (_random(x), _random(y1), _random(x), _random(y2), _random(duration)))
+
+    # 输入
+    def input_text(self, string):
+        return self.execute('adb shell input text %s' % (string,))
+
+    # 按键
+    def input_keyevent(self, keycode):
+        return self.execute('shell input keyevent %s' % (keycode,))
+
+    # 菜单
+    def input_menu(self):
+        return self.execute('shell input keyevent 82')
+
+    # 桌面
+    def input_home(self):
+        return self.execute('shell input keyevent 3')
+
+    # 返回
+    def input_back(self):
+        return self.execute('shell input keyevent 4')
+
+    # 电源
+    def input_power(self):
+        return self.execute('shell input keyevent 26')
+
+    # 升音
+    def input_volume_up(self):
+        return self.execute('shell input keyevent 24')
+
+    # 降音
+    def input_volume_down(self):
+        return self.execute('shell input keyevent 25')
