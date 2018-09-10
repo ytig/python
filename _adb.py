@@ -139,7 +139,7 @@ class ADB:
         return self.execute('shell am force-stop %s' % (package,))
 
     # 窗口
-    def current_force(self):
+    def current_focus(self):
         def handle(text):
             start = '  mCurrentFocus='
             for line in text.split('\n'):
