@@ -180,11 +180,6 @@ class ADB:
     def input_click(self, x, y):
         return self.execute('shell input tap %s %s' % (_random(x), _random(y),))
 
-    # 单击
-    def input_click_element(self, element):
-        bounds = [int(i) for i in element.get('bounds').replace('[', '').replace(']', ',').split(',')[:-1]]
-        return self.input_click((bounds[0] + bounds[2]) // 2, (bounds[1] + bounds[3]) // 2)
-
     # 长按
     def input_long_click(self, x, y, t=range(500, 1000)):
         return self.execute('shell input swipe %s %s %s %s %s' % (_random(x), _random(y), _random(x), _random(y), _random(t)))
@@ -264,3 +259,27 @@ class ADB:
     # 降音
     def input_volume_down(self):
         return self.execute('shell input keyevent 25')
+
+
+class Rect:
+    # 坐标解析
+    @staticmethod
+    def from_uiautomator(element):
+        bounds = [int(i) for i in element.get('bounds').replace('[', '').replace(']', ',').split(',')[:-1]]
+        return Rect(*bounds)
+
+    def __init__(self, left, top, right, bottom):
+        self.left = int(left)
+        self.top = int(top)
+        self.right = int(right)
+        self.bottom = int(bottom)
+
+    # 横轴中心
+    @property
+    def center_x(self):
+        return (self.left + self.right) // 2
+
+    # 纵轴中心
+    @property
+    def center_y(self):
+        return (self.top + self.bottom) // 2
