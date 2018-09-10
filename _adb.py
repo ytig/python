@@ -190,35 +190,35 @@ class ADB:
 
     # 左滑
     def input_scroll_left(self, x, y, r):
-        v = self.size()[0] / _random(range(240, 360))
+        v = self.size()[0] / _random(range(125, 250))
         x1 = x + _random(range(r // 3, r // 2))
         x2 = x - _random(range(r // 3, r // 2))
         t = int((x1 - x2) / v)
-        return self.input_scroll(x1, y, x2, y, max(t, 120))
+        return self.input_scroll(x1, y, x2, y, 100 + t)
 
     # 右滑
     def input_scroll_right(self, x, y, r):
-        v = self.size()[0] / _random(range(240, 360))
+        v = self.size()[0] / _random(range(125, 250))
         x1 = x - _random(range(r // 3, r // 2))
         x2 = x + _random(range(r // 3, r // 2))
         t = int((x2 - x1) / v)
-        return self.input_scroll(x1, y, x2, y, max(t, 120))
+        return self.input_scroll(x1, y, x2, y, 100 + t)
 
     # 上滑
     def input_scroll_up(self, x, y, r):
-        v = self.size()[0] / _random(range(240, 360))
+        v = self.size()[0] / _random(range(125, 250))
         y1 = x + _random(range(r // 3, r // 2))
         y2 = x - _random(range(r // 3, r // 2))
         t = int((y1 - y2) / v)
-        return self.input_scroll(x, y1, x, y2, max(t, 120))
+        return self.input_scroll(x, y1, x, y2, 100 + t)
 
     # 下滑
     def input_scroll_down(self, x, y, r):
-        v = self.size()[0] / _random(range(240, 360))
+        v = self.size()[0] / _random(range(125, 250))
         y1 = x - _random(range(r // 3, r // 2))
         y2 = x + _random(range(r // 3, r // 2))
         t = int((y2 - y1) / v)
-        return self.input_scroll(x, y1, x, y2, max(t, 120))
+        return self.input_scroll(x, y1, x, y2, 100 + t)
 
     # 输入
     def input_text(self, string):
