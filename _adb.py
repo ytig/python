@@ -1,9 +1,6 @@
 #!/usr/local/bin/python3
 import re
 import os
-import time
-import random
-import collections
 import lxml
 import pexpect
 from _pexpect import spawn
@@ -25,14 +22,14 @@ def expect(*expects):
     return run
 
 
-def _random(generics):
-    if isinstance(generics, collections.Iterable):
-        generics = list(generics)
-        generics = generics[int(len(generics) * random.random())]
-    return generics
-
-
 class ADB:
+    KEYEVENT_HOME = 3  # 桌面
+    KEYEVENT_BACK = 4  # 返回
+    KEYEVENT_VOLUME_UP = 24  # 升音
+    KEYEVENT_VOLUME_DOWN = 25  # 降音
+    KEYEVENT_POWER = 26  # 电源
+    KEYEVENT_MENU = 82  # 菜单
+
     # 设备
     @staticmethod
     def devices():
@@ -176,49 +173,13 @@ class ADB:
             raise EOFError
         return self.execute('shell dumpsys window displays', run=popen(handle))
 
-    # 单击
-    def input_click(self, x, y):
-        return self.execute('shell input tap %s %s' % (_random(x), _random(y),))
-
-    # 长按
-    def input_long_click(self, x, y, t=range(500, 1000)):
-        return self.execute('shell input swipe %s %s %s %s %s' % (_random(x), _random(y), _random(x), _random(y), _random(t)))
+    # 点击
+    def input_tap(self, x, y):
+        return self.execute('shell input tap %s %s' % (x, y,))
 
     # 滑动
-    def input_scroll(self, x1, y1, x2, y2, t):
-        return self.execute('shell input swipe %s %s %s %s %s' % (_random(x1), _random(y1), _random(x2), _random(y2), _random(t)))
-
-    # 左滑
-    def input_scroll_left(self, x, y, r):
-        v = self.size()[0] / _random(range(1, 250))
-        x1 = x + _random(range(r // 3, r // 2))
-        x2 = x - _random(range(r // 3, r // 2))
-        t = int((x1 - x2) / v)
-        return self.input_scroll(x1, y, x2, y, 100 + t)
-
-    # 右滑
-    def input_scroll_right(self, x, y, r):
-        v = self.size()[0] / _random(range(1, 250))
-        x1 = x - _random(range(r // 3, r // 2))
-        x2 = x + _random(range(r // 3, r // 2))
-        t = int((x2 - x1) / v)
-        return self.input_scroll(x1, y, x2, y, 100 + t)
-
-    # 上滑
-    def input_scroll_up(self, x, y, r):
-        v = self.size()[0] / _random(range(1, 250))
-        y1 = y + _random(range(r // 3, r // 2))
-        y2 = y - _random(range(r // 3, r // 2))
-        t = int((y1 - y2) / v)
-        return self.input_scroll(x, y1, x, y2, 100 + t)
-
-    # 下滑
-    def input_scroll_down(self, x, y, r):
-        v = self.size()[0] / _random(range(1, 250))
-        y1 = y - _random(range(r // 3, r // 2))
-        y2 = y + _random(range(r // 3, r // 2))
-        t = int((y2 - y1) / v)
-        return self.input_scroll(x, y1, x, y2, 100 + t)
+    def input_swipe(self, x1, y1, x2, y2, t):
+        return self.execute('shell input swipe %s %s %s %s %s' % (x1, y1, x2, y2, t,))
 
     # 输入
     def input_text(self, string):
@@ -227,30 +188,6 @@ class ADB:
     # 按键
     def input_keyevent(self, keycode):
         return self.execute('shell input keyevent %s' % (keycode,))
-
-    # 菜单
-    def input_menu(self):
-        return self.execute('shell input keyevent 82')
-
-    # 桌面
-    def input_home(self):
-        return self.execute('shell input keyevent 3')
-
-    # 返回
-    def input_back(self):
-        return self.execute('shell input keyevent 4')
-
-    # 电源
-    def input_power(self):
-        return self.execute('shell input keyevent 26')
-
-    # 升音
-    def input_volume_up(self):
-        return self.execute('shell input keyevent 24')
-
-    # 降音
-    def input_volume_down(self):
-        return self.execute('shell input keyevent 25')
 
 
 class Rect:
