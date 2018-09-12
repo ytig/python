@@ -212,3 +212,12 @@ class Rect:
     @property
     def center_y(self):
         return (self.top + self.bottom) // 2
+
+    # 转换字典
+    def to_dict(self):
+        return {
+            'left': self.left,
+            'top': self.top,
+            'right': self.right,
+            'bottom': self.bottom,
+        }
