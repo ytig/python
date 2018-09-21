@@ -138,11 +138,11 @@ class ADB:
     # 窗口
     def current_focus(self):
         def handle(text):
-            start = '  mCurrentFocus='
+            start = '  mCurrentFocus=Window'
             for line in text.split('\n'):
                 if line.startswith(start):
                     return line.split(' ')[-1][:-1]
-            raise EOFError
+            return ''
         return self.execute('shell dumpsys window', run=popen(handle))
 
     # 视图
