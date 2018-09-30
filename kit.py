@@ -49,7 +49,8 @@ def hlp(key, value=None):
 # 标准输入
 def input(prompt):
     print(prompt, end='', flush=True)
-    return os.popen('read -e input;echo ${input};').read().strip('\n')
+    with os.popen('read -e input;echo ${input};') as f:
+        return f.read().strip('\n')
 
 
 # 切换目录
