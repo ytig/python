@@ -1,12 +1,177 @@
 #!/usr/local/bin/python3
 import json
 import inspect
+import threading
 import http.cookiejar
 import requests
-from decorator import Lock, ilock, ithrow
+from decorator import ilock
 
 
-# 序列化
+class ThreadList:
+    def __init__(self):
+        self.__lists = dict()
+
+    # 当前列表
+    @ilock()
+    @property
+    def current(self):
+        key = threading.current_thread().name
+        if key not in self.__lists:
+            self.__lists[key] = list()
+        return self.__lists[key]
+
+    def __add__(self, *args, **kwargs):
+        return self.current.__add__(*args, **kwargs)
+
+    def __contains__(self, *args, **kwargs):
+        return self.current.__contains__(*args, **kwargs)
+
+    def __delitem__(self, *args, **kwargs):
+        return self.current.__delitem__(*args, **kwargs)
+
+    def __eq__(self, *args, **kwargs):
+        return self.current.__eq__(*args, **kwargs)
+
+    def __format__(self, *args, **kwargs):
+        return self.current.__format__(*args, **kwargs)
+
+    def __ge__(self, *args, **kwargs):
+        return self.current.__ge__(*args, **kwargs)
+
+    def __getitem__(self, *args, **kwargs):
+        return self.current.__getitem__(*args, **kwargs)
+
+    def __gt__(self, *args, **kwargs):
+        return self.current.__gt__(*args, **kwargs)
+
+    def __iadd__(self, *args, **kwargs):
+        return self.current.__iadd__(*args, **kwargs)
+
+    def __imul__(self, *args, **kwargs):
+        return self.current.__imul__(*args, **kwargs)
+
+    def __iter__(self, *args, **kwargs):
+        return self.current.__iter__(*args, **kwargs)
+
+    def __le__(self, *args, **kwargs):
+        return self.current.__le__(*args, **kwargs)
+
+    def __len__(self, *args, **kwargs):
+        return self.current.__len__(*args, **kwargs)
+
+    def __lt__(self, *args, **kwargs):
+        return self.current.__lt__(*args, **kwargs)
+
+    def __mul__(self, *args, **kwargs):
+        return self.current.__mul__(*args, **kwargs)
+
+    def __ne__(self, *args, **kwargs):
+        return self.current.__ne__(*args, **kwargs)
+
+    def __repr__(self, *args, **kwargs):
+        return self.current.__repr__(*args, **kwargs)
+
+    def __reversed__(self, *args, **kwargs):
+        return self.current.__reversed__(*args, **kwargs)
+
+    def __rmul__(self, *args, **kwargs):
+        return self.current.__rmul__(*args, **kwargs)
+
+    def __setitem__(self, *args, **kwargs):
+        return self.current.__setitem__(*args, **kwargs)
+
+    def __sizeof__(self, *args, **kwargs):
+        return self.current.__sizeof__(*args, **kwargs)
+
+    def __str__(self, *args, **kwargs):
+        return self.current.__str__(*args, **kwargs)
+
+    def append(self, *args, **kwargs):
+        return self.current.append(*args, **kwargs)
+
+    def clear(self, *args, **kwargs):
+        return self.current.clear(*args, **kwargs)
+
+    def copy(self, *args, **kwargs):
+        return self.current.copy(*args, **kwargs)
+
+    def count(self, *args, **kwargs):
+        return self.current.count(*args, **kwargs)
+
+    def extend(self, *args, **kwargs):
+        return self.current.extend(*args, **kwargs)
+
+    def index(self, *args, **kwargs):
+        return self.current.index(*args, **kwargs)
+
+    def insert(self, *args, **kwargs):
+        return self.current.insert(*args, **kwargs)
+
+    def pop(self, *args, **kwargs):
+        return self.current.pop(*args, **kwargs)
+
+    def remove(self, *args, **kwargs):
+        return self.current.remove(*args, **kwargs)
+
+    def reverse(self, *args, **kwargs):
+        return self.current.reverse(*args, **kwargs)
+
+    def sort(self, *args, **kwargs):
+        return self.current.sort(*args, **kwargs)
+
+
+class Socket(requests.Session):
+    def __init__(self):
+        super().__init__()
+        self._all_plugs = list()
+        self._one_plugs = ThreadList()
+
+    # 使用永久插件
+    def uses(self, plug):
+        self._all_plugs.append(plug)
+        return self
+
+    # 停用永久插件
+    def disuses(self, plug):
+        self._all_plugs.remove(plug)
+        return self
+
+    # 使用临时插件
+    def use(self, plug):
+        self._one_plugs.append(plug)
+        return self
+
+    # 停用临时插件
+    def disuse(self, plug):
+        self._one_plugs.remove(plug)
+        return self
+
+    def request(self, *args, **kwargs):
+        method = super().request
+        plugs = list()
+        plugs.extend(self._all_plugs)
+        plugs.extend(self._one_plugs)
+        self._one_plugs.clear()
+        ba = inspect.signature(method).bind(*args, **kwargs)
+        for plug in plugs:
+            plug.request(self, ba.arguments)
+        ret = method(*ba.args, **ba.kwargs)
+        for plug in reversed(plugs):
+            plug.response(self, ret)
+        return ret
+
+
+class Plug:
+    # 请求前
+    def request(self, session, arguments):
+        pass
+
+    # 请求后
+    def response(self, session, response):
+        pass
+
+
+# Cookie序列化
 def cookies2string(cookies, catch=False):
     string = ''
     if cookies:
@@ -44,9 +209,9 @@ def cookies2string(cookies, catch=False):
     return string
 
 
-# 反序列化
+# Cookie反序列化
 def string2cookies(string, catch=False):
-    cookies = requests.cookies.cookiejar_from_dict({})
+    cookies = requests.cookies.cookiejar_from_dict(None)
     if string:
         try:
             _cookies = json.loads(string)
@@ -61,42 +226,3 @@ def string2cookies(string, catch=False):
             if not catch:
                 raise
     return cookies
-
-
-class Client(requests.Session):
-    # 动态代理
-    def _proxies(self):
-        pass
-
-    # 读写缓存
-    def _cookies(self, string):
-        pass
-
-    @ilock()
-    @ithrow()
-    def __cookies(self):
-        cookies = string2cookies(self._cookies(None))
-        if cookies:
-            if self.cookies:
-                cookies.update(self.cookies)
-                self._cookies(cookies2string(cookies))
-            self.cookies.update(cookies)
-
-    def request(self, *args, **kwargs):
-        self.__cookies()
-        method = super().request
-        ba = inspect.signature(method).bind(*args, **kwargs)
-        if 'proxies' not in ba.arguments:
-            proxies = self._proxies()
-            if proxies is not None:
-                ba.arguments['proxies'] = proxies
-        response = method(*ba.args, **ba.kwargs)
-        if response.cookies:
-            with Lock(self):
-                cookies = string2cookies(self._cookies(None))
-                cookies.update(response.cookies)
-                self._cookies(cookies2string(cookies))
-        return response
-
-    def __del__(self):
-        self.close()
