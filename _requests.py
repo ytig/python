@@ -132,8 +132,11 @@ class Socket(requests.Session):
         return self
 
     # 停用永久插件
-    def disuses(self, plug):
-        self._all_plugs.remove(plug)
+    def disuses(self, plug=None):
+        if plug is None:
+            self._all_plugs.clear()
+        else:
+            self._all_plugs.remove(plug)
         return self
 
     # 使用临时插件
@@ -142,8 +145,11 @@ class Socket(requests.Session):
         return self
 
     # 停用临时插件
-    def disuse(self, plug):
-        self._one_plugs.remove(plug)
+    def disuse(self, plug=None):
+        if plug is None:
+            self._one_plugs.clear()
+        else:
+            self._one_plugs.remove(plug)
         return self
 
     def request(self, *args, **kwargs):
