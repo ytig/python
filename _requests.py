@@ -4,7 +4,7 @@ import inspect
 import threading
 import http.cookiejar
 import requests
-from decorator import ilock
+from decorator import Lock, ilock, Throw
 
 
 class ThreadList:
@@ -177,58 +177,67 @@ class Plug:
         pass
 
 
-# Cookie序列化
-def cookies2string(cookies, catch=False):
-    string = ''
-    if cookies:
-        try:
-            _cookies = {}
-            for domain, paths, in cookies._cookies.items():
-                _cookies[domain] = {}
+class CookiePlug(Plug):
+    # Cookie键值化
+    @staticmethod
+    def cookie2dict(c):
+        d = {}
+        if c:
+            for domain, paths, in c._cookies.items():
                 for path, names, in paths.items():
-                    _cookies[domain][path] = {}
                     for name, cookie, in names.items():
-                        _cookies[domain][path][name] = {
-                            'version': cookie.version,
-                            'name': cookie.name,
-                            'value': cookie.value,
-                            'port': cookie.port,
-                            'port_specified': cookie.port_specified,
-                            'domain': cookie.domain,
-                            'domain_specified': cookie.domain_specified,
-                            'domain_initial_dot': cookie.domain_initial_dot,
-                            'path': cookie.path,
-                            'path_specified': cookie.path_specified,
-                            'secure': cookie.secure,
-                            'expires': cookie.expires,
-                            'discard': cookie.discard,
-                            'comment': cookie.comment,
-                            'comment_url': cookie.comment_url,
-                            'rest': cookie._rest,
-                            'rfc2109': cookie.rfc2109,
-                        }
-            string = json.dumps(_cookies)
-        except BaseException:
-            string = ''
-            if not catch:
-                raise
-    return string
+                        d[json.dumps([domain, path, name, ])] = json.dumps([
+                            cookie.version,
+                            cookie.name,
+                            cookie.value,
+                            cookie.port,
+                            cookie.port_specified,
+                            cookie.domain,
+                            cookie.domain_specified,
+                            cookie.domain_initial_dot,
+                            cookie.path,
+                            cookie.path_specified,
+                            cookie.secure,
+                            cookie.expires,
+                            cookie.discard,
+                            cookie.comment,
+                            cookie.comment_url,
+                            cookie._rest,
+                            cookie.rfc2109,
+                        ])
+        return d
 
+    # Cookie实例化
+    @staticmethod
+    def dict2cookie(d):
+        c = requests.cookies.cookiejar_from_dict(None)
+        if d:
+            for key, value, in d.items():
+                domain, path, name, = json.loads(key)
+                if domain not in c._cookies:
+                    c._cookies[domain] = {}
+                if path not in c._cookies[domain]:
+                    c._cookies[domain][path] = {}
+                c._cookies[domain][path][name] = http.cookiejar.Cookie(*json.loads(value))
+        return c
 
-# Cookie反序列化
-def string2cookies(string, catch=False):
-    cookies = requests.cookies.cookiejar_from_dict(None)
-    if string:
-        try:
-            _cookies = json.loads(string)
-            for domain, paths, in _cookies.items():
-                cookies._cookies[domain] = {}
-                for path, names, in paths.items():
-                    cookies._cookies[domain][path] = {}
-                    for name, cookie, in names.items():
-                        cookies._cookies[domain][path][name] = http.cookiejar.Cookie(**cookie)
-        except BaseException:
-            cookies._cookies = {}
-            if not catch:
-                raise
-    return cookies
+    # Cookie读取
+    @classmethod
+    def load(cls, session):
+        cookies = CookiePlug.dict2cookie(session.load_cookie_dict())
+        if cookies:
+            session.cookies.update(cookies)
+
+    # Cookie保存
+    @classmethod
+    def save(cls, session, response):
+        if response.cookies:
+            session.save_cookie_dict(CookiePlug.cookie2dict(response.cookies))
+
+    def request(self, session, arguments):
+        with Lock(session):
+            with Throw(session):
+                type(self).load(session)
+
+    def response(self, session, response):
+        type(self).save(session, response)
