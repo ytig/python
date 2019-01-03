@@ -236,8 +236,9 @@ class CookiePlug(Plug):
 
     def request(self, session, arguments):
         with Lock(session):
-            with Throw(session):
-                type(self).load(session)
+            with Throw(session) as r:
+                if not r:
+                    type(self).load(session)
 
     def response(self, session, response):
         type(self).save(session, response)
