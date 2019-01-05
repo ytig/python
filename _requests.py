@@ -4,6 +4,7 @@ import inspect
 import threading
 import http.cookiejar
 import requests
+from kit import frames
 from decorator import Lock, ilock, Throw
 
 
@@ -152,6 +153,14 @@ class Socket(requests.Session):
             self._one_plugs.remove(plug)
         return self
 
+    def prepare_request(self, *args, **kwargs):
+        ret = super().prepare_request(*args, **kwargs)
+        with frames(keep=lambda f: f.f_code is Socket.request.__code__) as f:
+            if f.has():
+                for plug in f[0].f_locals['plugs']:
+                    plug.prepare(self, ret)
+        return ret
+
     def request(self, *args, **kwargs):
         method = super().request
         plugs = list()
@@ -170,6 +179,10 @@ class Socket(requests.Session):
 class Plug:
     # 请求前
     def request(self, session, arguments):
+        pass
+
+    # 请求中
+    def prepare(self, session, request):
         pass
 
     # 请求后
