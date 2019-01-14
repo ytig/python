@@ -42,7 +42,7 @@ class Server(Flask):
         key = cls.SECRET
         if key and data:
             try:
-                data = data.encode('utf-8')
+                data = data.encode()
                 data += b'\xe0'
                 data += (-len(data) % 16) * b'\x00'
                 data = AES.new(key).encrypt(data)
@@ -60,7 +60,7 @@ class Server(Flask):
                 data = bytes.fromhex(data)
                 data = AES.new(key).decrypt(data)
                 data = data[:data.rindex(b'\xe0')]
-                data = data.decode('utf-8')
+                data = data.decode()
             except BaseException:
                 data = ''
         return data
