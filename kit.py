@@ -301,6 +301,14 @@ def apply(*args, **kwargs):
     raise NotImplementedError
 
 
+# 执行函数
+def call(*args, **kwargs):
+    assert len(args) > 0
+    func = args[0]
+    args = args[1:]
+    return func(*args, **kwargs)
+
+
 # 获取闭包
 def getnonlocals(func, name):
     return dict(zip(func.__code__.co_freevars, func.__closure__))[name].cell_contents
