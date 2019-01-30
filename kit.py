@@ -14,41 +14,10 @@ WORKSPACE = None  # 工作区目录
 COUNT = itertools.count(1)  # 无限递增迭代
 
 
-# 文件描述
-def doc(module=None):
-    if module is None:
-        for m in sys.modules.values():
-            if getattr(m, '__name__', '') == '__main__':
-                module = m
-                break
-    if module is not None:
-        doc = getattr(module, '__doc__', '')
-        if doc:
-            return doc.strip('\n')
-        file = getattr(module, '__file__', '')
-        if file:
-            with open(file) as f:
-                string = f.read()
-                for pattern in (r'(?<=""")[\s\S]*?(?=""")', r"(?<=''')[\s\S]*?(?=''')",):
-                    match = re.search(pattern, string)
-                    if match is not None:
-                        return match.group().strip('\n')
-    return None
-
-
-# 帮助信息
-def hlp(key, value=None):
-    if '-' + key in sys.argv[1:]:
-        if value is None:
-            value = doc()
-        if value is not None:
-            print(value)
-        exit()
-
-
 # 标准输入
-def input(prompt):
-    print(prompt, end='', flush=True)
+def input(prompt=None):
+    if prompt is not None:
+        print(prompt, end='', flush=True)
     with os.popen('read -e input;echo ${input};') as f:
         return f.read().strip('\n')
 
