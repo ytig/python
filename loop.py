@@ -12,9 +12,9 @@ from logger import Log
 # 睡眠进程
 def sleep(seconds):
     if seconds < 0:
-        return subprocess.Popen(['sleep', '224'])
+        return subprocess.Popen(['sleep', '224', ])
     else:
-        return subprocess.Popen(['sleep', '%s' % (seconds,)])
+        return subprocess.Popen(['sleep', '%s' % (seconds,), ])
 
 
 class Loop(threading.Thread):
