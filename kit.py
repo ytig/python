@@ -19,7 +19,7 @@ def input(prompt=None):
     if prompt is not None:
         print(prompt, end='', flush=True)
     with os.popen('read -e input;echo ${input};') as f:
-        return f.read().strip('\n')
+        return f.read().rstrip('\n')
 
 
 # 切换目录
