@@ -76,6 +76,7 @@ class Mailbox:
             'send': threading.Event(),
             'recv': dict(),
         }
+        self.eof = False
 
     # 订阅
     @ilock()
@@ -102,7 +103,10 @@ class Mailbox:
         tid = threadid()
         with Lock(self):
             if tid in self.field1['recv']:
-                send = self.field1['send']
+                if not self.eof:
+                    send = self.field1['send']
+                else:
+                    send = self.field0['send']
             elif tid in self.field0['recv']:
                 send = self.field0['send']
             else:
@@ -123,6 +127,8 @@ class Mailbox:
             send.data = data
             send.set()
             recvs = self.field0['recv'].values()
+            if data is None:
+                self.eof = True
         for recv in recvs:
             recv.wait()
 
