@@ -52,7 +52,7 @@ class SendThread(threading.Thread):
                 else:
                     self.wait.clear()
             if data is not None:
-                self.sender.send(data)
+                self.sender.send(data)  # not none
             self.wait.wait()
 
 
@@ -109,12 +109,12 @@ class RecvThread(threading.Thread):
                     break
             data = self.recver.recv()
             if data is not None:
-                self.mailbox.send(data)
+                self.mailbox.send(data)  # not none
             else:
                 with Lock(self):
                     self.wait.clear()
                 self.wait.wait(timeout=type(self.recver).REST)
-        self.mailbox.send(None)
+        self.mailbox.send(None)  # eof none
 
 
 class Recver:
