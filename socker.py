@@ -304,8 +304,7 @@ class Socker(metaclass=ABMeta):
                 if data is None:
                     self.recv_t.mailbox.done()
                     raise EOFError
-                data = recv(data)
-                if data is not None:
+                if recv(data):
                     self.recv_t.mailbox.done()
                     return data
                 self.recv_t.mailbox.want()
