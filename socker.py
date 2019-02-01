@@ -1,8 +1,9 @@
 #!/usr/local/bin/python3
 import socket
 import threading
+from kit import threadid
 from decorator import Lock, ilock
-from ab import ABMeta
+from ab import weakmethod, ABMeta
 
 
 # 地址格式转换
@@ -19,7 +20,7 @@ def convert_address(address):
 class SendThread(threading.Thread):
     def __init__(self, sender):
         super().__init__()
-        self.queue = []
+        self.queue = list()
         self.wait = threading.Event()
         self.shutdown = None
         self.sender = sender
@@ -66,17 +67,45 @@ class Sender:
 
 
 class Mailbox:
-    def want(self):
-        pass
+    def __init__(self):
+        self.data = b''
+        self.send_event = threading.Event()
+        self.tids = set()
+        self.recv_events = dict()
 
+    @ilock()
+    def want(self):
+        tid = threadid()
+        self.tids.add(tid)
+        if tid in self.recv_events:
+            self.recv_events.pop(tid).set()
+
+    @ilock()
     def done(self):
-        pass
+        tid = threadid()
+        if tid in self.tids:
+            self.tids.remove(tid)
+        if tid in self.recv_events:
+            self.recv_events.pop(tid).set()
 
     def recv(self):
-        pass
+        self.send_event.wait()
+        return self.data
 
     def send(self, data):
-        pass
+        with Lock(self):
+            self.data = data
+            self.send_event.set()
+            recv_events = list()
+            for tid in self.tids:
+                event = threading.Event()
+                recv_events.append(event)
+                self.recv_events[tid] = event
+        for event in recv_events:
+            event.wait()
+        if data is not None:
+            with Lock(self):
+                self.send_event.clear()
 
 
 class RecvThread(threading.Thread):
@@ -156,21 +185,60 @@ class Recver:
             return packs[0] + sep
 
 
+class MailThread(threading.Thread):
+    def __init__(self, mailbox):
+        super().__init__()
+        self.handlers = list()
+        self.mailbox = mailbox
+        self.mailbox.want()
+
+    # 数据监听
+    @ilock()
+    def register(self, handler):
+        self.handlers.append(handler)
+
+    def run(self):
+        while True:
+            data = self.mailbox.recv()
+            if data is not None:
+                self.mailbox.want()
+                with Lock(self):
+                    handlers = self.handlers.copy()
+                while handlers:
+                    handlers.pop(0)(data)
+            else:
+                self.mailbox.done()
+                break
+
+
 class Socker(metaclass=ABMeta):
     def __init__(self, address, sender=Sender, recver=Recver):
-        self.sock = socket.create_connection(convert_address(address))
-        self.send = SendThread(sender(self.sock))
-        self.recv = RecvThread(recver(self.sock))
-        self.is_start = False
-        self.is_close = False
+        try:
+            self.sock = socket.create_connection(convert_address(address))
+            self.send = SendThread(sender(self.sock))
+            self.recv = RecvThread(recver(self.sock))
+        except BaseException:
+            self.is_start = False
+            self.is_close = True
+            raise
+        else:
+            self.is_start = False
+            self.is_close = False
+
+    # 处理数据（线程）
+    def handle(self, data):
+        pass
 
     # 开启线程
     @ilock()
     def start(self):
         if self.is_start or self.is_close:
             return False
+        mail = MailThread(self.recv.mailbox)
+        mail.register(weakmethod(self, 'handle'))
         self.send.start()
         self.recv.start()
+        mail.start()
         self.is_start = True
         return True
 
@@ -185,6 +253,9 @@ class Socker(metaclass=ABMeta):
         self.sock.close()
         self.is_close = True
         return True
+
+    def __aft__(self):
+        self.__del__()
 
     def __del__(self):
         self.close()
