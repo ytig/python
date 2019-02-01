@@ -211,8 +211,8 @@ class MailThread(threading.Thread):
     def __init__(self, mailbox):
         super().__init__()
         self.handlers = list()
-        self.mailbox = mailbox
         self.wanted = threading.Event()
+        self.mailbox = mailbox
 
     # 数据监听
     @ilock()
