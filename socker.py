@@ -296,6 +296,7 @@ class Socker(metaclass=ABMeta):
         else:
             self.recv_t.mailbox.want()
             self.send_t.send(data)
+            self.recv_t.wake()
             while True:
                 data = self.recv_t.mailbox.recv()
                 if data is None:
