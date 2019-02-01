@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import socket
 import threading
-from decorator import Lock
+from decorator import Lock, ilock, ithrow
 from ab import ABMeta
 
 
@@ -164,7 +164,13 @@ class Socker(metaclass=ABMeta):
         self.recv = RecvThread(recver(self.sock))
         self.recv.start()
 
-    def __del__(self):
+    # 关闭连接
+    @ilock()
+    @ithrow()
+    def close(self):
         self.recv.close()
         self.send.close()
         self.sock.close()
+
+    def __del__(self):
+        self.close()
