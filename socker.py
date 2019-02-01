@@ -83,9 +83,9 @@ class Mailbox:
         tid = threadid()
         if tid not in self.field1['recv']:
             self.field1['recv'][tid] = threading.Event()
-        event = self.field0['recv'].get(tid)
-        if event is not None:
-            event.set()
+        recv = self.field0['recv'].get(tid)
+        if recv is not None:
+            recv.set()
 
     # 完毕
     @ilock()
@@ -93,25 +93,23 @@ class Mailbox:
         tid = threadid()
         if tid in self.field1['recv']:
             self.field1['recv'].pop(tid)
-        event = self.field0['recv'].get(tid)
-        if event is not None:
-            event.set()
+        recv = self.field0['recv'].get(tid)
+        if recv is not None:
+            recv.set()
 
     # 接收
     def recv(self):
         tid = threadid()
         with Lock(self):
             if tid in self.field1['recv']:
-                assert self.field1['recv'][tid] is not None
-                event = self.field1['send']
+                send = self.field1['send']
             elif tid in self.field0['recv']:
-                assert self.field0['recv'][tid] is not None
-                event = self.field0['send']
+                send = self.field0['send']
             else:
-                event = None
-        assert event is not None
-        event.wait()
-        return event.data
+                send = None
+        assert send is not None
+        send.wait()
+        return send.data
 
     # 发送
     def send(self, data):
@@ -124,9 +122,9 @@ class Mailbox:
             send = self.field0['send']
             send.data = data
             send.set()
-            recv = self.field0['recv'].values()
-        for e in recv:
-            e.wait()
+            recvs = self.field0['recv'].values()
+        for recv in recvs:
+            recv.wait()
 
 
 class RecvThread(threading.Thread):
