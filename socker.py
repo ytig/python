@@ -265,12 +265,7 @@ class Socker(metaclass=ABMeta):
     def start(self):
         if self.is_start or self.is_close:
             return False
-        mail = MailThread(self.recv.mailbox)
-        mail.register(weakmethod(self, 'handle'))
-        mail.start()
-        mail.wanted.wait()
-        self.send.start()
-        self.recv.start()
+        self._start()
         self.is_start = True
         return True
 
@@ -280,11 +275,22 @@ class Socker(metaclass=ABMeta):
         if self.is_close:
             return False
         if self.is_start:
-            self.recv.close()
-            self.send.close()
+            self._close()
         self.sock.close()
         self.is_close = True
         return True
+
+    def _start(self):
+        mail = MailThread(self.recv.mailbox)
+        mail.register(weakmethod(self, 'handle'))
+        mail.start()
+        mail.wanted.wait()
+        self.send.start()
+        self.recv.start()
+
+    def _close(self):
+        self.recv.close()
+        self.send.close()
 
     def __enter__(self):
         self.start()
