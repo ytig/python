@@ -68,44 +68,66 @@ class Sender:
 
 class Mailbox:
     def __init__(self):
-        self.data = b''
-        self.send_event = threading.Event()
-        self.tids = set()
-        self.recv_events = dict()
+        self.field0 = {
+            'send': threading.Event(),
+            'recv': dict(),
+        }
+        self.field1 = {
+            'send': threading.Event(),
+            'recv': dict(),
+        }
 
+    # 注册
     @ilock()
     def want(self):
         tid = threadid()
-        self.tids.add(tid)
-        if tid in self.recv_events:
-            self.recv_events.pop(tid).set()
+        assert tid not in self.field1['recv']
+        self.field1['recv'][tid] = threading.Event()
+        event = self.field0['recv'].get(tid)
+        if event is not None:
+            event.set()
 
+    # 注销
     @ilock()
     def done(self):
         tid = threadid()
-        if tid in self.tids:
-            self.tids.remove(tid)
-        if tid in self.recv_events:
-            self.recv_events.pop(tid).set()
+        assert tid not in self.field1['recv']
+        self.field1['recv'][tid] = None
+        event = self.field0['recv'].get(tid)
+        if event is not None:
+            event.set()
 
+    # 接收
     def recv(self):
-        self.send_event.wait()
-        return self.data
+        tid = threadid()
+        with Lock(self):
+            if tid in self.field1['recv']:
+                assert self.field1['recv'][tid] is not None
+                event = self.field1['send']
+            elif tid in self.field0['recv']:
+                assert self.field0['recv'][tid] is not None
+                event = self.field0['send']
+            else:
+                event = None
+        assert event is not None
+        event.wait()
+        return event.data
 
+    # 发送
     def send(self, data):
         with Lock(self):
-            self.data = data
-            self.send_event.set()
-            recv_events = list()
-            for tid in self.tids:
-                event = threading.Event()
-                recv_events.append(event)
-                self.recv_events[tid] = event
-        for event in recv_events:
-            event.wait()
-        if data is not None:
-            with Lock(self):
-                self.send_event.clear()
+            self.field0 = self.field1
+            self.field1 = {
+                'send': threading.Event(),
+                'recv': dict(),
+            }
+            event = self.field0['send']
+            event.data = data
+            event.set()
+            events = self.field0['recv'].values()
+        for e in events:
+            if e is not None:
+                e.wait()
 
 
 class RecvThread(threading.Thread):
@@ -190,7 +212,7 @@ class MailThread(threading.Thread):
         super().__init__()
         self.handlers = list()
         self.mailbox = mailbox
-        self.mailbox.want()
+        self.wanted = threading.Event()
 
     # 数据监听
     @ilock()
@@ -198,6 +220,8 @@ class MailThread(threading.Thread):
         self.handlers.append(handler)
 
     def run(self):
+        self.mailbox.want()
+        self.wanted.set()
         while True:
             data = self.mailbox.recv()
             if data is not None:
@@ -236,9 +260,10 @@ class Socker(metaclass=ABMeta):
             return False
         mail = MailThread(self.recv.mailbox)
         mail.register(weakmethod(self, 'handle'))
+        mail.start()
+        mail.wanted.wait()
         self.send.start()
         self.recv.start()
-        mail.start()
         self.is_start = True
         return True
 
