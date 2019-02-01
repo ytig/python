@@ -246,8 +246,8 @@ class Socker(metaclass=ABMeta):
     def __init__(self, address, sender=Sender, recver=Recver):
         try:
             self.sock = socket.create_connection(convert_address(address))
-            self.send = SendThread(sender(self.sock))
-            self.recv = RecvThread(recver(self.sock))
+            self.send_t = SendThread(sender(self.sock))
+            self.recv_t = RecvThread(recver(self.sock))
         except BaseException:
             self.is_start = False
             self.is_close = True
@@ -281,16 +281,16 @@ class Socker(metaclass=ABMeta):
         return True
 
     def _start(self):
-        mail = MailThread(self.recv.mailbox)
+        mail = MailThread(self.recv_t.mailbox)
         mail.register(weakmethod(self, 'handle'))
         mail.start()
         mail.wanted.wait()
-        self.send.start()
-        self.recv.start()
+        self.send_t.start()
+        self.recv_t.start()
 
     def _close(self):
-        self.recv.close()
-        self.send.close()
+        self.recv_t.close()
+        self.send_t.close()
 
     def __enter__(self):
         self.start()
