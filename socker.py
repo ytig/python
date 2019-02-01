@@ -256,7 +256,25 @@ class Socker(metaclass=ABMeta):
             self.is_start = False
             self.is_close = False
 
-    # 处理数据（线程）
+    # 发送数据
+    def send(self, data, recv=None):
+        if recv is None:
+            self.send_t.send(data)
+        else:
+            self.recv_t.mailbox.want()
+            self.send_t.send(data)
+            while True:
+                data = self.recv_t.mailbox.recv()
+                if data is None:
+                    self.recv_t.mailbox.done()
+                    raise EOFError
+                data = recv(data)
+                if data is not None:
+                    self.recv_t.mailbox.done()
+                    return data
+                self.recv_t.mailbox.want()
+
+    # 处理数据（线程触发）
     def handle(self, data):
         pass
 
