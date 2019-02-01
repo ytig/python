@@ -18,12 +18,13 @@ def convert_address(address):
 
 
 class SendThread(threading.Thread):
-    def __init__(self, sender):
+    def __init__(self, sender, waker=None):
         super().__init__()
         self.queue = list()
         self.wait = threading.Event()
         self.shutdown = None
         self.sender = sender
+        self.waker = waker
 
     # 发送数据
     def send(self, data):
@@ -54,6 +55,8 @@ class SendThread(threading.Thread):
                     self.wait.clear()
             if data is not None:
                 self.sender.send(data)  # not none
+                if self.waker is not None:
+                    self.waker()
             self.wait.wait()
 
 
@@ -275,12 +278,12 @@ class Socker(metaclass=ABMeta):
     def __init__(self, address, sender=Sender, recver=Recver):
         try:
             self.sock = socket.create_connection(convert_address(address))
-            self.send_t = SendThread(sender(self.sock))
             self.recv_t = RecvThread(recver(self.sock))
-            self._beat_t = BeatThread(type(self).REST)
-            self._beat_t.register(weakmethod(self, 'beats'))
+            self.send_t = SendThread(sender(self.sock), waker=weakmethod(self.recv_t, 'wake'))
             self._mail_t = MailThread(self.recv_t.mailbox)
             self._mail_t.register(weakmethod(self, 'handle'))
+            self._beat_t = BeatThread(type(self).REST)
+            self._beat_t.register(weakmethod(self, 'beats'))
         except BaseException:
             self.is_start = False
             self.is_close = True
@@ -296,7 +299,6 @@ class Socker(metaclass=ABMeta):
         else:
             self.recv_t.mailbox.want()
             self.send_t.send(data)
-            self.recv_t.wake()
             while True:
                 data = self.recv_t.mailbox.recv()
                 if data is None:
