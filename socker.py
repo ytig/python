@@ -235,6 +235,10 @@ class MailThread(threading.Thread):
                     handlers.pop(0)(data)
             else:
                 self.mailbox.done()
+                with Lock(self):
+                    handlers = self.handlers.copy()
+                while handlers:
+                    handlers.pop(0)(None)
                 break
 
 
