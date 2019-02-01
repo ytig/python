@@ -77,7 +77,7 @@ class Mailbox:
             'recv': dict(),
         }
 
-    # 注册
+    # 订阅
     @ilock()
     def want(self):
         tid = threadid()
@@ -87,7 +87,7 @@ class Mailbox:
         if event is not None:
             event.set()
 
-    # 注销
+    # 完毕
     @ilock()
     def done(self):
         tid = threadid()
