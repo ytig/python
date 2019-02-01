@@ -283,6 +283,11 @@ def getnonlocals(func, name):
     return dict(zip(func.__code__.co_freevars, func.__closure__))[name].cell_contents
 
 
+# 线程标识
+def threadid():
+    return threading.current_thread().name
+
+
 # 栈帧
 class frames(list):
     # 追溯模式

@@ -4,7 +4,7 @@ import inspect
 import threading
 import http.cookiejar
 import requests
-from kit import frames
+from kit import threadid, frames
 from decorator import Lock, ilock, Throw
 
 
@@ -16,10 +16,10 @@ class ThreadList:
     @ilock()
     @property
     def current(self):
-        key = threading.current_thread().name
-        if key not in self.__lists:
-            self.__lists[key] = list()
-        return self.__lists[key]
+        tid = threadid()
+        if tid not in self.__lists:
+            self.__lists[tid] = list()
+        return self.__lists[tid]
 
     def __add__(self, *args, **kwargs):
         return self.current.__add__(*args, **kwargs)

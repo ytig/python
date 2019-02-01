@@ -3,7 +3,7 @@ import json
 import inspect
 import threading
 import atexit
-from kit import unique, hasvar, getvar, setvar, frames
+from kit import unique, hasvar, getvar, setvar, threadid, frames
 
 
 class Closure:
@@ -23,15 +23,15 @@ class _Lock:
         self.stack = list()
 
     def __enter__(self):
-        tn = threading.current_thread().name
+        tid = threadid()
         with _Lock.LOCK:
-            a = tn not in self.stack
+            a = tid not in self.stack
             if not a:
-                self.stack.append(tn)
+                self.stack.append(tid)
         if a:
             self.lock.acquire()
             with _Lock.LOCK:
-                self.stack.append(tn)
+                self.stack.append(tid)
 
     def __exit__(self, t, v, tb):
         with _Lock.LOCK:
