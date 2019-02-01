@@ -81,8 +81,8 @@ class Mailbox:
     @ilock()
     def want(self):
         tid = threadid()
-        assert tid not in self.field1['recv']
-        self.field1['recv'][tid] = threading.Event()
+        if tid not in self.field1['recv']:
+            self.field1['recv'][tid] = threading.Event()
         event = self.field0['recv'].get(tid)
         if event is not None:
             event.set()
@@ -91,8 +91,8 @@ class Mailbox:
     @ilock()
     def done(self):
         tid = threadid()
-        assert tid not in self.field1['recv']
-        self.field1['recv'][tid] = None
+        if tid in self.field1['recv']:
+            self.field1['recv'].pop(tid)
         event = self.field0['recv'].get(tid)
         if event is not None:
             event.set()
@@ -121,13 +121,12 @@ class Mailbox:
                 'send': threading.Event(),
                 'recv': dict(),
             }
-            event = self.field0['send']
-            event.data = data
-            event.set()
-            events = self.field0['recv'].values()
-        for e in events:
-            if e is not None:
-                e.wait()
+            send = self.field0['send']
+            send.data = data
+            send.set()
+            recv = self.field0['recv'].values()
+        for e in recv:
+            e.wait()
 
 
 class RecvThread(threading.Thread):
