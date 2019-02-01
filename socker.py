@@ -210,6 +210,33 @@ class Recver:
             return packs[0] + sep
 
 
+class BeatThread(threading.Thread):
+    def __init__(self, interval):
+        super().__init__()
+        self.handlers = list()
+        self.closer = threading.Event()
+        self.closed = threading.Event()
+        self.interval = interval
+
+    # 心跳监听
+    @ilock()
+    def register(self, handler):
+        self.handlers.append(handler)
+
+    # 终止心跳
+    def close(self):
+        self.closer.set()
+        self.closed.wait()
+
+    def run(self):
+        while not self.closer.wait(timeout=self.interval):
+            with Lock(self):
+                handlers = self.handlers.copy()
+            while handlers:
+                handlers.pop(0)()
+        self.closed.set()
+
+
 class MailThread(threading.Thread):
     def __init__(self, mailbox):
         super().__init__()
@@ -243,11 +270,17 @@ class MailThread(threading.Thread):
 
 
 class Socker(metaclass=ABMeta):
+    REST = None  # 心跳间隙
+
     def __init__(self, address, sender=Sender, recver=Recver):
         try:
             self.sock = socket.create_connection(convert_address(address))
             self.send_t = SendThread(sender(self.sock))
             self.recv_t = RecvThread(recver(self.sock))
+            self._beat_t = BeatThread(type(self).REST)
+            self._beat_t.register(weakmethod(self, 'beats'))
+            self._mail_t = MailThread(self.recv_t.mailbox)
+            self._mail_t.register(weakmethod(self, 'handle'))
         except BaseException:
             self.is_start = False
             self.is_close = True
@@ -274,6 +307,10 @@ class Socker(metaclass=ABMeta):
                     return data
                 self.recv_t.mailbox.want()
 
+    # 心跳事件（线程触发）
+    def beats(self):
+        pass
+
     # 处理数据（线程触发）
     def handle(self, data):
         pass
@@ -299,16 +336,16 @@ class Socker(metaclass=ABMeta):
         return True
 
     def _start(self):
-        mail = MailThread(self.recv_t.mailbox)
-        mail.register(weakmethod(self, 'handle'))
-        mail.start()
-        mail.wanted.wait()
-        self.send_t.start()
+        self._mail_t.start()
+        self._mail_t.wanted.wait()  # 避免漏包
         self.recv_t.start()
+        self.send_t.start()
+        self._beat_t.start()
 
     def _close(self):
-        self.recv_t.close()
+        self._beat_t.close()
         self.send_t.close()
+        self.recv_t.close()
 
     def __enter__(self):
         self.start()
