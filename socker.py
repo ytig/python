@@ -286,6 +286,13 @@ class Socker(metaclass=ABMeta):
         self.is_close = True
         return True
 
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, t, v, tb):
+        self.close()
+
     def __aft__(self):
         self.__del__()
 
