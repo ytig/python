@@ -246,16 +246,17 @@ class BeatThread(threading.Thread):
         self.closed.wait()
 
     def run(self):
+        self._beat(False)
         while not self.closer.wait(timeout=self.interval):
-            self._beat()
+            self._beat(True)
         self.closed.set()
 
-    def _beat(self):
+    def _beat(self, repeat):
         with Lock(self):
             handlers = self.handlers.copy()
         for handler in handlers:
             try:
-                handler()
+                handler(repeat)
             except BaseException as e:
                 Log.e(loge(e))
 
@@ -336,11 +337,20 @@ class Socker(metaclass=ABMeta):
                 self.recv_t.mailbox.want()
 
     # 心跳事件（线程触发）
-    def beats(self):
+    def beats(self, repeat):
+        with Lock(self):
+            pass  # wait start
+        self._beats()
+
+    def _beats(self):
         pass
 
     # 处理数据（线程触发）
     def handle(self, data):
+        if data is not None:
+            self._handle(data)
+
+    def _handle(self, data):
         pass
 
     # 开启线程
@@ -351,6 +361,13 @@ class Socker(metaclass=ABMeta):
         self._start()
         self.is_start = True
         return True
+
+    def _start(self):
+        self._mail_t.start()
+        self._mail_t.wanted.wait()  # 避免漏包
+        self.recv_t.start()
+        self.send_t.start()
+        self._beat_t.start()
 
     # 关闭连接
     @ilock()
@@ -363,13 +380,6 @@ class Socker(metaclass=ABMeta):
         self.is_close = True
         return True
 
-    def _start(self):
-        self._mail_t.start()
-        self._mail_t.wanted.wait()  # 避免漏包
-        self.recv_t.start()
-        self.send_t.start()
-        self._beat_t.start()
-
     def _close(self):
         self._beat_t.close()
         self.send_t.close()
@@ -377,7 +387,6 @@ class Socker(metaclass=ABMeta):
 
     def __enter__(self):
         self.start()
-        return self
 
     def __exit__(self, t, v, tb):
         self.close()
