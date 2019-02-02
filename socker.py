@@ -1,9 +1,10 @@
 #!/usr/local/bin/python3
 import socket
 import threading
-from kit import threadid
+from kit import threadid, loge
 from decorator import Lock, ilock
 from ab import weakmethod, ABMeta
+from logger import Log
 
 
 # 地址格式转换
@@ -18,7 +19,7 @@ def convert_address(address):
 
 
 class SendThread(threading.Thread):
-    def __init__(self, sender, waker=None):
+    def __init__(self, sender, waker):
         super().__init__()
         self.queue = list()
         self.wait = threading.Event()
@@ -54,10 +55,16 @@ class SendThread(threading.Thread):
                 else:
                     self.wait.clear()
             if data is not None:
-                self.sender.send(data)  # not none
-                if self.waker is not None:
-                    self.waker()
+                self._send(data)  # not none
             self.wait.wait()
+
+    def _send(self, data):
+        try:
+            self.sender.send(data)
+            if self.waker is not None:
+                self.waker()
+        except BaseException as e:
+            Log.e(loge(e))
 
 
 class Sender:
@@ -137,12 +144,13 @@ class Mailbox:
 
 
 class RecvThread(threading.Thread):
-    def __init__(self, recver):
+    def __init__(self, recver, interval):
         super().__init__()
         self.mailbox = Mailbox()  # 信箱
         self.wait = threading.Event()
         self.shutdown = None
         self.recver = recver
+        self.interval = interval
 
     # 接收唤醒
     def wake(self):
@@ -164,14 +172,20 @@ class RecvThread(threading.Thread):
                 if self.shutdown is not None:
                     self.shutdown.set()
                     break
-            data = self.recver.recv()
+            data = self._recv()
             if data is not None:
                 self.mailbox.send(data)  # not none
             else:
                 with Lock(self):
                     self.wait.clear()
-                self.wait.wait(timeout=type(self.recver).REST)
+                self.wait.wait(timeout=self.interval)
         self.mailbox.send(None)  # eof none
+
+    def _recv(self):
+        try:
+            return self.recver.recv()
+        except BaseException as e:
+            Log.e(loge(e))
 
 
 class Recver:
@@ -233,11 +247,17 @@ class BeatThread(threading.Thread):
 
     def run(self):
         while not self.closer.wait(timeout=self.interval):
-            with Lock(self):
-                handlers = self.handlers.copy()
-            while handlers:
-                handlers.pop(0)()
+            self._beat()
         self.closed.set()
+
+    def _beat(self):
+        with Lock(self):
+            handlers = self.handlers.copy()
+        for handler in handlers:
+            try:
+                handler()
+            except BaseException as e:
+                Log.e(loge(e))
 
 
 class MailThread(threading.Thread):
@@ -259,17 +279,20 @@ class MailThread(threading.Thread):
             data = self.mailbox.recv()
             if data is not None:
                 self.mailbox.want()
-                with Lock(self):
-                    handlers = self.handlers.copy()
-                while handlers:
-                    handlers.pop(0)(data)
+                self._mail(data)
             else:
                 self.mailbox.done()
-                with Lock(self):
-                    handlers = self.handlers.copy()
-                while handlers:
-                    handlers.pop(0)(None)
+                self._mail(None)
                 break
+
+    def _mail(self, data):
+        with Lock(self):
+            handlers = self.handlers.copy()
+        for handler in handlers:
+            try:
+                handler(data)
+            except BaseException as e:
+                Log.e(loge(e))
 
 
 class Socker(metaclass=ABMeta):
@@ -278,19 +301,22 @@ class Socker(metaclass=ABMeta):
     def __init__(self, address, sender=Sender, recver=Recver):
         try:
             self.sock = socket.create_connection(convert_address(address))
-            self.recv_t = RecvThread(recver(self.sock))
-            self.send_t = SendThread(sender(self.sock), waker=weakmethod(self.recv_t, 'wake'))
+        except BaseException:
+            self.is_close = True
+            raise
+        else:
+            self.is_close = False
+        self.is_start = False
+        try:
+            self.recv_t = RecvThread(recver(self.sock), recver.REST)
+            self.send_t = SendThread(sender(self.sock), weakmethod(self.recv_t, 'wake'))
             self._mail_t = MailThread(self.recv_t.mailbox)
             self._mail_t.register(weakmethod(self, 'handle'))
             self._beat_t = BeatThread(type(self).REST)
             self._beat_t.register(weakmethod(self, 'beats'))
         except BaseException:
-            self.is_start = False
-            self.is_close = True
+            self.close()
             raise
-        else:
-            self.is_start = False
-            self.is_close = False
 
     # 发送数据
     def send(self, data, recv=None):
