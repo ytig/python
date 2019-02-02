@@ -230,15 +230,15 @@ class Recver:
 class BeatThread(threading.Thread):
     def __init__(self, interval):
         super().__init__()
-        self.handlers = list()
+        self.listeners = list()
         self.closer = threading.Event()
         self.closed = threading.Event()
         self.interval = interval
 
     # 心跳监听
     @ilock()
-    def register(self, handler):
-        self.handlers.append(handler)
+    def register(self, listener):
+        self.listeners.append(listener)
 
     # 终止心跳
     def close(self):
@@ -253,10 +253,10 @@ class BeatThread(threading.Thread):
 
     def _beat(self, repeat):
         with Lock(self):
-            handlers = self.handlers.copy()
-        for handler in handlers:
+            listeners = self.listeners.copy()
+        for listener in listeners:
             try:
-                handler(repeat)
+                listener(repeat)
             except BaseException as e:
                 Log.e(loge(e))
 
@@ -264,14 +264,14 @@ class BeatThread(threading.Thread):
 class MailThread(threading.Thread):
     def __init__(self, mailbox):
         super().__init__()
-        self.handlers = list()
+        self.listeners = list()
         self.wanted = threading.Event()
         self.mailbox = mailbox
 
     # 数据监听
     @ilock()
-    def register(self, handler):
-        self.handlers.append(handler)
+    def register(self, listener):
+        self.listeners.append(listener)
 
     def run(self):
         self.mailbox.want()
@@ -288,10 +288,10 @@ class MailThread(threading.Thread):
 
     def _mail(self, data):
         with Lock(self):
-            handlers = self.handlers.copy()
-        for handler in handlers:
+            listeners = self.listeners.copy()
+        for listener in listeners:
             try:
-                handler(data)
+                listener(data)
             except BaseException as e:
                 Log.e(loge(e))
 
