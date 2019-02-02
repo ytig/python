@@ -387,6 +387,7 @@ class Socker(metaclass=ABMeta):
 
     def __enter__(self):
         self.start()
+        return self
 
     def __exit__(self, t, v, tb):
         self.close()
