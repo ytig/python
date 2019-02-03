@@ -165,18 +165,27 @@ class RecvThread(threading.Thread):
                 if self.shutdown is not None:
                     self.shutdown.set()
                     break
-            data = self._recv()
+            try:
+                data = self._recv()
+            except EOFError:
+                with Lock(self):
+                    if self.shutdown is None:
+                        self.shutdown = threading.Event()
+                    self.shutdown.set()
+                break
             if data is not None:
-                self.mailbox.send(data)  # not none
+                self.mailbox.send(data)
             else:
                 with Lock(self):
                     self.wait.clear()
                 self.wait.wait(timeout=self.interval)
-        self.mailbox.send(None)  # eof none
+        self.mailbox.send(None)
 
     def _recv(self):
         try:
             return self.recver.recv()
+        except EOFError:
+            raise
         except BaseException as e:
             Log.e(loge(e))
 
@@ -197,6 +206,8 @@ class Recver:
             if data:
                 self.buffer += data
                 pack = self._pack()
+        if pack is None and self.eof:
+            raise EOFError
         return pack
 
     def _recv(self):
