@@ -259,6 +259,7 @@ class MailThread(threading.Thread):
         super().__init__()
         self.listeners = list()
         self.wanted = threading.Event()
+        self.closed = threading.Event()
         self.mailbox = mailbox
 
     # 数据监听
@@ -278,6 +279,7 @@ class MailThread(threading.Thread):
                 self.mailbox.done()
                 self._mail(None)
                 break
+        self.closed.set()
 
     def _mail(self, data):
         with Lock(self):
@@ -378,6 +380,7 @@ class Socker(metaclass=ABMeta):
         self._beat_t.close()
         self.send_t.close()
         self.recv_t.close()
+        self._mail_t.closed.wait()
 
     def __enter__(self):
         self.start()
