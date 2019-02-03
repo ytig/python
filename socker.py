@@ -28,34 +28,30 @@ class SendThread(threading.Thread):
         self.waker = waker
 
     # 发送数据
+    @ilock()
     def send(self, data):
-        assert data is not None
-        with Lock(self):
-            assert self.shutdown is None
-            self.queue.append(data)
-            self.wait.set()
+        self.queue.append(data)
+        self.wait.set()
 
     # 终止发送
     def close(self):
         with Lock(self):
-            assert self.shutdown is None
-            self.shutdown = threading.Event()
-            self.wait.set()
+            if self.shutdown is None:
+                self.shutdown = threading.Event()
+                self.wait.set()
         self.shutdown.wait()
 
     def run(self):
         while True:
-            data = None
             with Lock(self):
                 if self.shutdown is not None:
                     self.shutdown.set()
                     break
-                if self.queue:
-                    data = self.queue.pop(0)
-                else:
-                    self.wait.clear()
-            if data is not None:
-                self._send(data)  # not none
+                queue = self.queue.copy()
+                self.queue.clear()
+                self.wait.clear()
+            while queue:
+                self._send(queue.pop(0))
             self.wait.wait()
 
     def _send(self, data):
@@ -94,9 +90,8 @@ class Mailbox:
         tid = threadid()
         if tid not in self.field1['recv']:
             self.field1['recv'][tid] = threading.Event()
-        recv = self.field0['recv'].get(tid)
-        if recv is not None:
-            recv.set()
+        if tid in self.field0['recv']:
+            self.field0['recv'][tid].set()
 
     # 完毕
     @ilock()
@@ -104,9 +99,8 @@ class Mailbox:
         tid = threadid()
         if tid in self.field1['recv']:
             self.field1['recv'].pop(tid)
-        recv = self.field0['recv'].get(tid)
-        if recv is not None:
-            recv.set()
+        if tid in self.field0['recv']:
+            self.field0['recv'][tid].set()
 
     # 接收
     def recv(self):
@@ -121,7 +115,7 @@ class Mailbox:
                 send = self.field0['send']
             else:
                 send = None
-        assert send is not None
+        assert send is not None, 'miss call want'
         send.wait()
         return send.data
 
@@ -153,17 +147,16 @@ class RecvThread(threading.Thread):
         self.interval = interval
 
     # 接收唤醒
+    @ilock()
     def wake(self):
-        with Lock(self):
-            assert self.shutdown is None
-            self.wait.set()
+        self.wait.set()
 
     # 终止接收
     def close(self):
         with Lock(self):
-            assert self.shutdown is None
-            self.shutdown = threading.Event()
-            self.wait.set()
+            if self.shutdown is None:
+                self.shutdown = threading.Event()
+                self.wait.set()
         self.shutdown.wait()
 
     def run(self):
@@ -339,7 +332,6 @@ class Socker(metaclass=ABMeta):
                     return data
                 self.recv_t.mailbox.want()
 
-    # 心跳事件（线程触发）
     def beats(self, repeat):
         with Lock(self):
             pass  # wait start
@@ -348,7 +340,6 @@ class Socker(metaclass=ABMeta):
     def _beats(self):
         pass
 
-    # 处理数据（线程触发）
     def handle(self, data):
         if data is not None:
             self._handle(data)
