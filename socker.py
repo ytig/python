@@ -298,8 +298,10 @@ class MailThread(threading.Thread):
 
 class Socker(metaclass=ABMeta):
     REST = None  # 心跳间隙
+    SENDER = Sender  # 发送者
+    RECVER = Recver  # 接收者
 
-    def __init__(self, address, sender=Sender, recver=Recver):
+    def __init__(self, address):
         try:
             self.sock = socket.create_connection(convert_address(address))
         except BaseException:
@@ -309,11 +311,12 @@ class Socker(metaclass=ABMeta):
             self.is_close = False
         self.is_start = False
         try:
-            self.recv_t = RecvThread(recver(self.sock), recver.REST)
-            self.send_t = SendThread(sender(self.sock), weakmethod(self.recv_t, 'wake'))
+            cls = type(self)
+            self.recv_t = RecvThread(cls.RECVER(self.sock), cls.RECVER.REST)
+            self.send_t = SendThread(cls.SENDER(self.sock), weakmethod(self.recv_t, 'wake'))
             self._mail_t = MailThread(self.recv_t.mailbox)
             self._mail_t.register(weakmethod(self, 'handle'))
-            self._beat_t = BeatThread(type(self).REST)
+            self._beat_t = BeatThread(cls.REST)
             self._beat_t.register(weakmethod(self, 'beats'))
         except BaseException:
             self.close()
