@@ -163,7 +163,7 @@ class RecvThread(threading.Thread):
         while True:
             with Lock(self):
                 if self.shutdown is not None:
-                    self.shutdown.set()
+                    shutdown = self.shutdown
                     break
             try:
                 data = self._recv()
@@ -171,8 +171,8 @@ class RecvThread(threading.Thread):
                 with Lock(self):
                     if self.shutdown is None:
                         self.shutdown = threading.Event()
-                    self.shutdown.set()
-                break
+                    shutdown = self.shutdown
+                    break
             if data is not None:
                 self.mailbox.send(data)
             else:
@@ -180,6 +180,7 @@ class RecvThread(threading.Thread):
                     self.wait.clear()
                 self.wait.wait(timeout=self.interval)
         self.mailbox.send(None)
+        shutdown.set()
 
     def _recv(self):
         try:
@@ -287,8 +288,8 @@ class MailThread(threading.Thread):
                 self.mailbox.want()
                 self._mail(data)
             else:
-                self.mailbox.done()
                 self._mail(None)
+                self.mailbox.done()
                 break
         self.closed.set()
 
