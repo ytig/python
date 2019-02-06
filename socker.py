@@ -28,9 +28,10 @@ class SendThread(threading.Thread):
         self.waker = waker
 
     # 发送数据
-    @ilock()
     def send(self, data):
-        self.queue.append(data)
+        with Lock(self):
+            assert self.shutdown is None, 'send has been closed'
+            self.queue.append(data)
         self.wait.set()
 
     # 终止发送
@@ -38,21 +39,22 @@ class SendThread(threading.Thread):
         with Lock(self):
             if self.shutdown is None:
                 self.shutdown = threading.Event()
-                self.wait.set()
+        self.wait.set()
         self.shutdown.wait()
 
     def run(self):
-        while True:
+        shutdown = False
+        while not shutdown:
+            self.wait.wait()
             with Lock(self):
                 if self.shutdown is not None:
-                    self.shutdown.set()
-                    break
+                    shutdown = True
                 queue = self.queue.copy()
                 self.queue.clear()
                 self.wait.clear()
             while queue:
                 self._send(queue.pop(0))
-            self.wait.wait()
+        self.shutdown.set()
 
     def _send(self, data):
         try:
@@ -115,7 +117,7 @@ class Mailbox:
                 send = self.field0['send']
             else:
                 send = None
-        assert send is not None, 'miss call want'
+        assert send is not None, 'lack of calling want'
         send.wait()
         return send.data
 
