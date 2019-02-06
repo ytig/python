@@ -3,7 +3,7 @@ import socket
 import threading
 from kit import threadid, loge
 from decorator import Lock, ilock
-from ab import weakmethod, ABMeta
+from ab import weakmethod
 from logger import Log
 
 
@@ -302,31 +302,39 @@ class MailThread(threading.Thread):
                 Log.e(loge(e))
 
 
-class Socker(metaclass=ABMeta):
+class Socker:
     REST = None  # 心跳间隙
     SENDER = Sender  # 发送者
     RECVER = Recver  # 接收者
 
-    def __init__(self, address):
-        try:
-            self.sock = socket.create_connection(convert_address(address))
-        except BaseException:
-            self.is_close = True
-            raise
-        else:
-            self.is_close = False
-        self.is_start = False
-        try:
-            cls = type(self)
-            self.recv_t = RecvThread(cls.RECVER(self.sock), cls.RECVER.REST)
-            self.send_t = SendThread(cls.SENDER(self.sock), weakmethod(self.recv_t, 'wake'))
-            self._mail_t = MailThread(self.recv_t.mailbox)
-            self._mail_t.register(weakmethod(self, 'handle'))
-            self._beat_t = BeatThread(cls.REST)
-            self._beat_t.register(weakmethod(self, 'beats'))
-        except BaseException:
-            self.close()
-            raise
+    def __init__(self):
+        self._started = False
+        self._closed = False
+
+    # 开启连接
+    @ilock(k='switch')
+    def start(self, address):
+        if self._started or self._closed:
+            return False
+        cls = type(self)
+        self.sock = socket.create_connection(convert_address(address))
+        self.recv_t = RecvThread(cls.RECVER(self.sock), cls.RECVER.REST)
+        self._mail_t = MailThread(self.recv_t.mailbox)
+        self._mail_t.register(weakmethod(self, 'handle'))
+        self.send_t = SendThread(cls.SENDER(self.sock), weakmethod(self.recv_t, 'wake'))
+        self._beat_t = BeatThread(cls.REST)
+        self._beat_t.register(weakmethod(self, 'beats'))
+        self.send_t.start()
+        self._mail_t.start()
+        self._mail_t.wanted.wait()  # 避免漏包
+        self.recv_t.start()
+        self._start()
+        self._beat_t.start()
+        self._started = True
+        return True
+
+    def _start(self):
+        pass
 
     # 发送数据
     def send(self, data, recv=None):
@@ -346,8 +354,6 @@ class Socker(metaclass=ABMeta):
                 self.recv_t.mailbox.want()
 
     def beats(self, repeat):
-        with Lock(self):
-            pass  # wait start
         self._beats()
 
     def _beats(self):
@@ -360,48 +366,26 @@ class Socker(metaclass=ABMeta):
     def _handle(self, data):
         pass
 
-    # 开启线程
-    @ilock()
-    def start(self):
-        if self.is_start or self.is_close:
-            return False
-        self._start()
-        self.is_start = True
-        return True
-
-    def _start(self):
-        self._mail_t.start()
-        self._mail_t.wanted.wait()  # 避免漏包
-        self.recv_t.start()
-        self.send_t.start()
-        self._beat_t.start()
-
     # 关闭连接
-    @ilock()
+    @ilock(k='switch')
     def close(self):
-        if self.is_close:
+        if self._closed:
             return False
-        if self.is_start:
+        if self._started:
+            self._beat_t.close()
             self._close()
-        self.sock.close()
-        self.is_close = True
+            self.recv_t.close()
+            self._mail_t.closed.wait()
+            self.send_t.close()
+            self.sock.close()
+        self._closed = True
         return True
 
     def _close(self):
-        self._beat_t.close()
-        self.send_t.close()
-        self.recv_t.close()
-        self._mail_t.closed.wait()
+        pass
 
     def __enter__(self):
-        self.start()
         return self
 
     def __exit__(self, t, v, tb):
-        self.close()
-
-    def __aft__(self):
-        self.__del__()
-
-    def __del__(self):
         self.close()
