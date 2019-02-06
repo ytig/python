@@ -203,10 +203,16 @@ class Recver:
             pack = self._pack()
             if pack is not None:
                 return pack
-            try:
-                data = self.sock.recv(1024, socket.MSG_DONTWAIT)
-            except BlockingIOError:
-                return None
+            if self.sock.timeout is None:
+                try:
+                    data = self.sock.recv(1024, socket.MSG_DONTWAIT)
+                except BlockingIOError:
+                    return None
+            else:
+                try:
+                    data = self.sock.recv(1024)
+                except socket.timeout:
+                    return None
             if data:
                 self.buffer += data
             else:
