@@ -201,28 +201,19 @@ class Recver:
 
     # 接收
     def recv(self):
-        pack = self._pack()
-        if pack is None:
-            data = self._recv()
-            if data:
-                self.buffer += data
-                pack = self._pack()
-        if pack is None and self.eof:
-            raise EOFError
-        return pack
-
-    def _recv(self):
-        buffer = b''
         while not self.eof:
+            pack = self._pack()
+            if pack is not None:
+                return pack
             try:
                 data = self.sock.recv(1024, socket.MSG_DONTWAIT)
-                if data:
-                    buffer += data
-                else:
-                    self.eof = True
             except BlockingIOError:
-                break
-        return buffer
+                return None
+            if data:
+                self.buffer += data
+            else:
+                self.eof = True
+        raise EOFError
 
     def _pack(self):
         sep = b'\n'
