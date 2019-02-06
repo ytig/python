@@ -147,7 +147,6 @@ class RecvThread(threading.Thread):
         self.interval = interval
 
     # 接收唤醒
-    @ilock()
     def wake(self):
         self.wait.set()
 
@@ -156,14 +155,13 @@ class RecvThread(threading.Thread):
         with Lock(self):
             if self.shutdown is None:
                 self.shutdown = threading.Event()
-                self.wait.set()
+        self.wait.set()
         self.shutdown.wait()
 
     def run(self):
         while True:
             with Lock(self):
                 if self.shutdown is not None:
-                    shutdown = self.shutdown
                     break
             try:
                 data = self._recv()
@@ -171,16 +169,14 @@ class RecvThread(threading.Thread):
                 with Lock(self):
                     if self.shutdown is None:
                         self.shutdown = threading.Event()
-                    shutdown = self.shutdown
                     break
             if data is not None:
                 self.mailbox.send(data)
             else:
-                with Lock(self):
-                    self.wait.clear()
+                self.wait.clear()
                 self.wait.wait(timeout=self.interval)
         self.mailbox.send(None)
-        shutdown.set()
+        self.shutdown.set()
 
     def _recv(self):
         try:
