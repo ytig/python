@@ -7,15 +7,20 @@ from ab import weakmethod
 from logger import Log
 
 
-# 地址格式转换
-def convert_address(address):
+# 创建连接
+def create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     if isinstance(address, (list, tuple,)):
         host, port = address
-        return (host, int(port),)
+        port = int(port)
     elif isinstance(address, str):
         host, port = address.split(':')
-        return (host, int(port),)
-    raise TypeError
+        port = int(port)
+    elif isinstance(address, (bytes, bytearray,)):
+        host, port = address.split(b':')
+        port = int(port)
+    else:
+        raise TypeError
+    return socket.create_connection((host, port,), timeout=timeout)
 
 
 class SendThread(threading.Thread):
@@ -309,11 +314,14 @@ class Socker:
 
     # 开启连接
     @ilock(k='switch')
-    def start(self, address):
+    def start(self, socket_or_address):
         if self._started or self._closed:
             return False
         cls = type(self)
-        self.sock = socket.create_connection(convert_address(address))
+        if isinstance(socket_or_address, socket.socket):
+            self.sock = socket_or_address
+        else:
+            self.sock = create_connection(socket_or_address)
         self.recv_t = RecvThread(cls.RECVER(self.sock), cls.RECVER.REST)
         self._mail_t = MailThread(self.recv_t.mailbox)
         self._mail_t.register(weakmethod(self, 'handle'))
