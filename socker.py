@@ -322,7 +322,7 @@ class Socker:
         self._mail_t = MailThread(self.recv_t.mailbox)
         self._mail_t.register(weakmethod(self, 'handle'))
         self.send_t = SendThread(cls.SENDER(self.sock), weakmethod(self.recv_t, 'wake'))
-        self._beat_t = BeatThread(weakmethod(self, 'beats'), cls.REST)
+        self._beat_t = BeatThread(weakmethod(self, 'beat'), cls.REST)
         self.send_t.start()
         self._mail_t.start()
         self._mail_t.wanted.wait()  # 避免漏包
@@ -352,10 +352,10 @@ class Socker:
                     return data
                 self.recv_t.mailbox.want()
 
-    def beats(self, repeat):
-        self._beats()
+    def beat(self, repeat):
+        self._beat()
 
-    def _beats(self):
+    def _beat(self):
         pass
 
     def handle(self, data):
