@@ -145,12 +145,14 @@ class Mailbox:
 
 
 class RecvThread(threading.Thread):
-    def __init__(self, recver, interval):
+    def __init__(self, recver, handler, interval):
         super().__init__()
-        self.mailbox = Mailbox()  # 信箱
         self.wait = threading.Event()
-        self.shutdown = None
+        self.closer = threading.Event()
+        self.closed = threading.Event()
+        self.mailbox = Mailbox()
         self.recver = recver
+        self.handle_t = HandleThread(handler, weakmethod(self, '_wake'))
         self.interval = interval
 
     # 接收唤醒
@@ -159,37 +161,86 @@ class RecvThread(threading.Thread):
 
     # 终止接收
     def close(self):
-        with Lock(self):
-            if self.shutdown is None:
-                self.shutdown = threading.Event()
+        self.closer.set()
         self.wait.set()
-        self.shutdown.wait()
+        self.closed.wait()
+        self.handle_t.closed.wait()
+
+    def start(self):
+        self.handle_t.start()
+        return super().start()
 
     def run(self):
         while True:
-            with Lock(self):
-                if self.shutdown is not None:
+            if self.closer.wait(timeout=0):
+                if self.handle_t.empty():
                     break
             try:
                 data = self._recv()
             except EOFError:
-                with Lock(self):
-                    if self.shutdown is None:
-                        self.shutdown = threading.Event()
-                    break
+                break
             if data is not None:
                 self.mailbox.send(data)
+                self.handle_t.handle(data)
+                del data
             else:
                 self.wait.clear()
                 self.wait.wait(timeout=self.interval)
         self.mailbox.send(None)
-        self.shutdown.set()
+        self.handle_t.handle(None)
+        self.closed.set()
+
+    def _wake(self):
+        if self.closer.wait(timeout=0):
+            self.wait.set()
 
     def _recv(self):
         try:
             return self.recver.recv()
         except EOFError:
             raise
+        except BaseException as e:
+            Log.e(loge(e))
+
+
+class HandleThread(threading.Thread):
+    def __init__(self, handler, waker):
+        super().__init__()
+        self.wait = threading.Event()
+        self.closed = threading.Event()
+        self.queue = list()
+        self.handler = handler
+        self.waker = waker
+
+    # 处理数据
+    def handle(self, data):
+        with Lock(self):
+            self.queue.append(data)
+        self.wait.set()
+
+    # 队列状态
+    def empty(self):
+        with Lock(self):
+            return not self.queue
+
+    def run(self):
+        while True:
+            self.wait.wait()
+            with Lock(self):
+                data = self.queue[0]
+            self._handle(data)
+            del data
+            with Lock(self):
+                if self.queue.pop(0) is None:
+                    break
+                if not self.queue:
+                    self.wait.clear()
+                    self.waker()
+        self.closed.set()
+
+    def _handle(self, data):
+        try:
+            self.handler(data)
         except BaseException as e:
             Log.e(loge(e))
 
@@ -262,43 +313,6 @@ class BeatThread(threading.Thread):
             Log.e(loge(e))
 
 
-class MailThread(threading.Thread):
-    def __init__(self, mailbox):
-        super().__init__()
-        self.listeners = list()
-        self.wanted = threading.Event()
-        self.closed = threading.Event()
-        self.mailbox = mailbox
-
-    # 数据监听
-    @ilock()
-    def register(self, listener):
-        self.listeners.append(listener)
-
-    def run(self):
-        self.mailbox.want()
-        self.wanted.set()
-        while True:
-            data = self.mailbox.recv()
-            if data is not None:
-                self.mailbox.want()
-                self._mail(data)
-            else:
-                self._mail(None)
-                self.mailbox.done()
-                break
-        self.closed.set()
-
-    def _mail(self, data):
-        with Lock(self):
-            listeners = self.listeners.copy()
-        for listener in listeners:
-            try:
-                listener(data)
-            except BaseException as e:
-                Log.e(loge(e))
-
-
 class Socker:
     REST = None  # 心跳间隙
     SENDER = Sender  # 发送者
@@ -318,14 +332,10 @@ class Socker:
             self.sock = socket_or_address
         else:
             self.sock = create_connection(socket_or_address)
-        self.recv_t = RecvThread(cls.RECVER(self.sock), cls.RECVER.REST)
-        self._mail_t = MailThread(self.recv_t.mailbox)
-        self._mail_t.register(weakmethod(self, 'handle'))
+        self.recv_t = RecvThread(cls.RECVER(self.sock), weakmethod(self, 'handle'), cls.RECVER.REST)
         self.send_t = SendThread(cls.SENDER(self.sock), weakmethod(self.recv_t, 'wake'))
         self._beat_t = BeatThread(weakmethod(self, 'beat'), cls.REST)
         self.send_t.start()
-        self._mail_t.start()
-        self._mail_t.wanted.wait()  # 避免漏包
         self.recv_t.start()
         self._start()
         self._beat_t.start()
@@ -374,7 +384,6 @@ class Socker:
             self._beat_t.close()
             self._close()
             self.recv_t.close()
-            self._mail_t.closed.wait()
             self.send_t.close()
             self.sock.close()
         self._closed = True
