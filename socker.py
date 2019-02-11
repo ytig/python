@@ -26,9 +26,9 @@ def create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
 class SendThread(threading.Thread):
     def __init__(self, sender, waker):
         super().__init__()
-        self.queue = list()
         self.wait = threading.Event()
         self.closed = None
+        self.queue = list()
         self.sender = sender
         self.waker = waker
 
