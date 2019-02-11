@@ -64,10 +64,10 @@ class SendThread(threading.Thread):
     def _send(self, data):
         try:
             self.sender.send(data)
-            if self.waker is not None:
-                self.waker()
         except BaseException as e:
             Log.e(loge(e))
+        else:
+            self.waker()
 
 
 class Sender:
