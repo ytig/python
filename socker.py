@@ -237,17 +237,12 @@ class Recver:
 
 
 class BeatThread(threading.Thread):
-    def __init__(self, interval):
+    def __init__(self, beater, interval):
         super().__init__()
-        self.listeners = list()
         self.closer = threading.Event()
         self.closed = threading.Event()
+        self.beater = beater
         self.interval = interval
-
-    # 心跳监听
-    @ilock()
-    def register(self, listener):
-        self.listeners.append(listener)
 
     # 终止心跳
     def close(self):
@@ -261,13 +256,10 @@ class BeatThread(threading.Thread):
         self.closed.set()
 
     def _beat(self, repeat):
-        with Lock(self):
-            listeners = self.listeners.copy()
-        for listener in listeners:
-            try:
-                listener(repeat)
-            except BaseException as e:
-                Log.e(loge(e))
+        try:
+            self.beater(repeat)
+        except BaseException as e:
+            Log.e(loge(e))
 
 
 class MailThread(threading.Thread):
@@ -330,8 +322,7 @@ class Socker:
         self._mail_t = MailThread(self.recv_t.mailbox)
         self._mail_t.register(weakmethod(self, 'handle'))
         self.send_t = SendThread(cls.SENDER(self.sock), weakmethod(self.recv_t, 'wake'))
-        self._beat_t = BeatThread(cls.REST)
-        self._beat_t.register(weakmethod(self, 'beats'))
+        self._beat_t = BeatThread(weakmethod(self, 'beats'), cls.REST)
         self.send_t.start()
         self._mail_t.start()
         self._mail_t.wanted.wait()  # 避免漏包
