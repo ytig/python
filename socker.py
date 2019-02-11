@@ -28,38 +28,38 @@ class SendThread(threading.Thread):
         super().__init__()
         self.queue = list()
         self.wait = threading.Event()
-        self.shutdown = None
+        self.closed = None
         self.sender = sender
         self.waker = waker
 
     # 发送数据
     def send(self, data):
         with Lock(self):
-            assert self.shutdown is None, 'send has been closed'
+            assert self.closed is None, 'send has been closed'
             self.queue.append(data)
         self.wait.set()
 
     # 终止发送
     def close(self):
         with Lock(self):
-            if self.shutdown is None:
-                self.shutdown = threading.Event()
+            if self.closed is None:
+                self.closed = threading.Event()
         self.wait.set()
-        self.shutdown.wait()
+        self.closed.wait()
 
     def run(self):
-        shutdown = False
-        while not shutdown:
+        closed = False
+        while not closed:
             self.wait.wait()
             with Lock(self):
-                if self.shutdown is not None:
-                    shutdown = True
+                if self.closed is not None:
+                    closed = True
                 queue = self.queue.copy()
                 self.queue.clear()
                 self.wait.clear()
             while queue:
                 self._send(queue.pop(0))
-        self.shutdown.set()
+        self.closed.set()
 
     def _send(self, data):
         try:
