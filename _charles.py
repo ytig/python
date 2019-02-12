@@ -1,8 +1,10 @@
 #!/usr/local/bin/python3
 import threading
 import socket
+from kit import loge
 from decorator import Lock
 from socker import create_connection
+from logger import Log
 
 
 class SocketWrapper:
@@ -90,3 +92,35 @@ class ForwardServer:
                 ForwardThread(client, server).start()
                 ForwardThread(server, client).start()
                 del client, server,
+
+
+class SocketViewer(SocketWrapper):
+    # 显示分包
+    @classmethod
+    def view(cls, pack):
+        Log.i(pack)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.buffer = b''
+
+    def recv(self):
+        cls = type(self)
+        data = super().recv()
+        if data is not None:
+            try:
+                self.buffer += data
+                while True:
+                    pack = self._pack()
+                    if pack is None:
+                        break
+                    cls.view(pack)
+            except BaseException as e:
+                Log.e(loge(e))
+        return data
+
+    def _pack(self):
+        if self.buffer:
+            buffer = self.buffer
+            self.buffer = b''
+            return buffer
