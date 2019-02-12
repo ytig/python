@@ -69,21 +69,21 @@ class ForwardThread(threading.Thread):
 
 
 class ForwardServer:
-    def __init__(self, local, remote, client=SocketWrapper, server=SocketWrapper):
-        self.port_l = local
-        self.address_r = remote
-        self.client_w = client
-        self.server_w = server
+    def __init__(self, forward, port=8887, client=SocketWrapper, server=SocketWrapper):
+        self.forward = forward
+        self.port = port
+        self.client = client
+        self.server = server
 
     # 运行转发服务
     def run(self):
         sock = socket.socket()
-        sock.bind(('localhost', self.port_l,))
+        sock.bind(('localhost', self.port,))
         sock.listen(32)
         while True:
-            client = self.client_w(sock.accept()[0])
+            client = self.client(sock.accept()[0])
             try:
-                server = self.server_w(create_connection(self.address_r))
+                server = self.server(create_connection(self.forward))
             except BaseException:
                 client.close()
                 del client
