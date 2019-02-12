@@ -95,17 +95,11 @@ class ForwardServer:
 
 
 class SocketViewer(SocketWrapper):
-    # 显示分包
-    @classmethod
-    def view(cls, pack):
-        Log.i(pack)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.buffer = b''
 
     def recv(self):
-        cls = type(self)
         data = super().recv()
         if data is not None:
             try:
@@ -114,7 +108,7 @@ class SocketViewer(SocketWrapper):
                     pack = self._pack()
                     if pack is None:
                         break
-                    cls.view(pack)
+                    self._view(pack)
             except BaseException as e:
                 Log.e(loge(e))
         return data
@@ -124,3 +118,6 @@ class SocketViewer(SocketWrapper):
             buffer = self.buffer
             self.buffer = b''
             return buffer
+
+    def _view(self, pack):
+        Log.i(pack)
