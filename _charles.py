@@ -21,14 +21,14 @@ class SocketWrapper:
             try:
                 data = sock.recv(1024, socket.MSG_DONTWAIT)
             except BlockingIOError:
-                return None
+                raise TimeoutError
             except ConnectionResetError:
                 data = b''
         else:
             try:
                 data = sock.recv(1024)
             except socket.timeout:
-                return None
+                raise TimeoutError
             except ConnectionResetError:
                 data = b''
         if not data:
@@ -63,6 +63,8 @@ class ForwardThread(threading.Thread):
         while True:
             try:
                 self.sender.send(self.recver.recv())
+            except TimeoutError:
+                pass
             except EOFError:
                 self.recver.close()
                 break
@@ -99,16 +101,15 @@ class SocketViewer(SocketWrapper):
 
     def recv(self):
         data = super().recv()
-        if data is not None:
-            try:
-                self.buffer += data
-                while True:
-                    pack = self._pack()
-                    if pack is None:
-                        break
-                    self._view(pack)
-            except BaseException as e:
-                Log.e(loge(e))
+        try:
+            self.buffer += data
+            while True:
+                pack = self._pack()
+                if pack is None:
+                    break
+                self._view(pack)
+        except BaseException as e:
+            Log.e(loge(e))
         return data
 
     def _pack(self):
