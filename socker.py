@@ -351,16 +351,18 @@ class Socker:
             self.send_t.send(data)
         else:
             self.recv_t.mailbox.want()
-            self.send_t.send(data)
-            while True:
-                data = self.recv_t.mailbox.recv()
-                if data is None:
-                    self.recv_t.mailbox.done()
-                    raise EOFError
-                if recv(data):
-                    self.recv_t.mailbox.done()
-                    return data
-                self.recv_t.mailbox.want()
+            try:
+                self.send_t.send(data)
+                del data
+                while True:
+                    data = self.recv_t.mailbox.recv()
+                    if data is None:
+                        raise EOFError
+                    if recv(data):
+                        return data
+                    self.recv_t.mailbox.want()
+            finally:
+                self.recv_t.mailbox.done()
 
     def beat(self, repeat):
         self._beat()
