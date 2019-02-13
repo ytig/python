@@ -1,9 +1,10 @@
 #!/usr/local/bin/python3
 import json
 import pymysql
+import threading
 from remedy import *
 from kit import hasvar, getvar, setvar
-from decorator import Lock, ilock
+from decorator import _Lock, Lock, ilock
 from wa import withas
 
 
@@ -125,3 +126,51 @@ class Data:
         # 保存
         def save(self, key, value):
             return self.saves({key: value, })
+
+
+class Data2:
+    def __init__(self):
+        self._data = {}
+        self._wait = {}
+
+    # 增
+    @ilock()
+    def insert(self, key, value):
+        if key in self._data:
+            raise KeyError
+        value = type(self).SelectForUpdate(value)
+        self._data[key] = value
+        if key in self._wait:
+            wait = self._wait.pop(key)
+            wait.value = value
+            wait.set()
+
+    # 删
+    @ilock()
+    def delete(self, key):
+        if key in self._data:
+            return self._data.pop(key)
+
+    # 改查
+    def select_for_update(self, key, timeout=None):
+        with Lock(self):
+            if key in self._data:
+                return self._data[key]
+            else:
+                if key not in self._wait:
+                    self._wait[key] = threading.Event()
+                wait = self._wait[key]
+        if wait.wait(timeout=timeout):
+            return wait.value
+
+    class SelectForUpdate:
+        def __init__(self, value):
+            self._lock = _Lock()
+            self._value = value
+
+        def __enter__(self):
+            self._lock.__enter__()
+            return self._value
+
+        def __exit__(self, t, v, tb):
+            self._lock.__exit__(t, v, tb)
