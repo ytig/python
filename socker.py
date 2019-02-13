@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import time
 import socket
 import threading
 from kit import threadid, loge
@@ -110,7 +111,7 @@ class Mailbox:
             self.field0['recv'][tid].set()
 
     # 接收
-    def recv(self):
+    def recv(self, timeout=None):
         tid = threadid()
         with Lock(self):
             if tid in self.field1['recv']:
@@ -123,7 +124,10 @@ class Mailbox:
             else:
                 send = None
         assert send is not None, 'lack of calling want'
-        send.wait()
+        if not send.wait(timeout=timeout):
+            raise TimeoutError
+        if send.data is None:
+            raise EOFError
         return send.data
 
     # 发送
@@ -348,7 +352,7 @@ class Socker:
         pass
 
     # 发送数据
-    def send(self, data, recv=None):
+    def send(self, data, recv=None, timeout=None):
         if recv is None:
             self.send_t.send(data)
         else:
@@ -357,9 +361,11 @@ class Socker:
                 self.send_t.send(data)
                 del data
                 while True:
-                    data = self.recv_t.mailbox.recv()
-                    if data is None:
-                        raise EOFError
+                    t = time.time()
+                    data = self.recv_t.mailbox.recv(timeout=timeout)
+                    dt = time.time() - t
+                    if timeout is not None:
+                        timeout -= dt
                     if recv(data):
                         return data
                     self.recv_t.mailbox.want()
