@@ -392,6 +392,11 @@ class frames(list):
         return ret
 
 
+# 当前异常
+def cure():
+    return sys.exc_info()[1]
+
+
 # 异常信息
 def loge(e):
     if isinstance(e, BaseException):
