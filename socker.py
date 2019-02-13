@@ -197,6 +197,8 @@ class RecvThread(threading.Thread):
     def _recv(self):
         try:
             return self.recver.recv()
+        except TimeoutError:
+            pass
         except EOFError:
             raise
         except BaseException as e:
@@ -263,14 +265,14 @@ class Recver:
                 try:
                     data = self.sock.recv(1024, socket.MSG_DONTWAIT)
                 except BlockingIOError:
-                    return None
+                    raise TimeoutError
                 except ConnectionResetError:
                     data = b''
             else:
                 try:
                     data = self.sock.recv(1024)
                 except socket.timeout:
-                    return None
+                    raise TimeoutError
                 except ConnectionResetError:
                     data = b''
             if data:
