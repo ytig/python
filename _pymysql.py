@@ -160,8 +160,9 @@ class Data2:
                 if key not in self._wait:
                     self._wait[key] = threading.Event()
                 wait = self._wait[key]
-        if wait.wait(timeout=timeout):
-            return wait.value
+        if not wait.wait(timeout=timeout):
+            raise TimeoutError
+        return wait.value
 
     class SelectForUpdate:
         def __init__(self, value):
