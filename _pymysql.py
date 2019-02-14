@@ -129,6 +129,15 @@ class Data:
 
 
 class Data2:
+    class Value(_Lock):
+        def __init__(self, value):
+            super().__init__()
+            self.value = value
+
+        def __enter__(self):
+            super().__enter__()
+            return self.value
+
     def __init__(self):
         self._data = {}
         self._wait = {}
@@ -138,7 +147,7 @@ class Data2:
     def insert(self, key, value):
         if key in self._data:
             raise KeyError
-        value = type(self).SelectForUpdate(value)
+        value = type(self).Value(value)
         self._data[key] = value
         if key in self._wait:
             wait = self._wait.pop(key)
@@ -151,8 +160,8 @@ class Data2:
         if key in self._data:
             return self._data.pop(key)
 
-    # 改查
-    def select_for_update(self, key, timeout=None):
+    # 改
+    def update(self, key, timeout=None):
         with Lock(self):
             if key in self._data:
                 return self._data[key]
@@ -164,14 +173,7 @@ class Data2:
             raise TimeoutError
         return wait.value
 
-    class SelectForUpdate:
-        def __init__(self, value):
-            self._lock = _Lock()
-            self._value = value
-
-        def __enter__(self):
-            self._lock.__enter__()
-            return self._value
-
-        def __exit__(self, t, v, tb):
-            self._lock.__exit__(t, v, tb)
+    # 查
+    def select(self, key, timeout=None):
+        with self.update(key, timeout=timeout) as value:
+            return json.loads(json.dumps(value))
