@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import copy
 import json
 import pymysql
 import threading
@@ -176,4 +177,4 @@ class Data2:
     # 查
     def select(self, key, timeout=None):
         with self.update(key, timeout=timeout) as value:
-            return json.loads(json.dumps(value))
+            return copy.deepcopy(value)
