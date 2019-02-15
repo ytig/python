@@ -45,8 +45,10 @@ class table(dict):
         for i in iterable:
             self[len(self) + 1] = i
 
-    def index_(self, value, start=0, stop=None):
-        if start < 0:
+    def index_(self, value, start=None, stop=None):
+        if start is None:
+            start = 0
+        elif start < 0:
             start += len(self)
         if stop is None:
             stop = len(self)
