@@ -22,22 +22,23 @@ class table(dict):
     def copy(self):
         return type(self)(self)
 
-    def lists(self):
+    def list(self):
         return [self[i + 1] for i in range(len(self))]
 
     def append_(self, object):
         self[len(self) + 1] = object
 
     def clear_(self):
-        return self.clear()
+        for i in range(len(self)):
+            del self[i + 1]
 
     def copy_(self):
         return self.copy()
 
     def count_(self, value):
         c = 0
-        for v in self.values():
-            if v == value:
+        for i in range(len(self)):
+            if self[i + 1] == value:
                 c += 1
         return c
 
