@@ -42,8 +42,12 @@ class table(dict):
         return c
 
     def extend_(self, iterable):
-        for i in iterable:
-            self[len(self) + 1] = i
+        if isinstance(iterable, table):
+            for i in range(len(iterable)):
+                self[len(self) + 1] = iterable[i + 1]
+        else:
+            for i in iterable:
+                self[len(self) + 1] = i
 
     def index_(self, value, start=None, stop=None):
         if start is None:
