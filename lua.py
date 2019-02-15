@@ -22,7 +22,7 @@ class table(dict):
     def copy(self):
         return type(self)(self)
 
-    def list(self):
+    def list_(self):
         return [self[i + 1] for i in range(len(self))]
 
     def append_(self, object):
