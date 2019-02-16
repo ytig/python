@@ -21,7 +21,8 @@ class table(dict):
         return type(self)(self)
 
     def list_(self):
-        return [self[i + 1] for i in range(len(self))]
+        for i in range(len(self)):
+            yield self[i + 1]
 
     def append_(self, object):
         self[len(self) + 1] = object
