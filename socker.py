@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import time
+import socks
 import socket
 import threading
 from kit import threadid, loge
@@ -11,17 +12,49 @@ from logger import Log
 # 地址转换
 def dest_pair(address):
     if isinstance(address, (tuple, list,)):
-        host, port, = address
-        port = int(port)
+        return address
     elif isinstance(address, str):
-        host, port, = address.split(':')
-        port = int(port)
-    elif isinstance(address, (bytes, bytearray,)):
-        host, port, = address.split(b':')
-        port = int(port)
+        try:
+            host, port, = address.split(':')
+            return (host, int(port),)
+        except BaseException:
+            pass
+    raise TypeError
+
+
+# 代理转换
+def socks_map(proxy):
+    if proxy is None or isinstance(proxy, dict):
+        return proxy
+    elif isinstance(proxy, str):
+        try:
+            type, _proxy, = proxy.split('://')
+            if '@' not in _proxy:
+                host, port, = _proxy.split(':')
+                username = None
+                password = None
+            else:
+                _proxy_l, _proxy_r, = _proxy.split('@')
+                host, port, = _proxy_r.split(':')
+                username, password, = _proxy_l.split(':')
+            return {
+                'proxy_type': socks.PROXY_TYPES[type.upper()],
+                'proxy_addr': host,
+                'proxy_port': int(port),
+                'proxy_username': username,
+                'proxy_password': password,
+            }
+        except BaseException:
+            pass
+    raise TypeError
+
+
+# 创建连接
+def create_connection(address, proxy=None):
+    if proxy is None:
+        return socket.create_connection(dest_pair(address))
     else:
-        raise TypeError
-    return (host, port,)
+        return socks.create_connection(dest_pair(address), **socks_map(proxy))
 
 
 class SendThread(threading.Thread):
@@ -337,7 +370,7 @@ class Socker:
         if isinstance(socket_or_address, socket.socket):
             self.sock = socket_or_address
         else:
-            self.sock = socket.create_connection(dest_pair(socket_or_address))
+            self.sock = create_connection(socket_or_address)
         self.recv_t = RecvThread(cls.RECVER(self.sock), weakmethod(self, 'handle'), cls.RECVER.REST)
         self.send_t = SendThread(cls.SENDER(self.sock), weakmethod(self.recv_t, 'wake'))
         self._beat_t = BeatThread(weakmethod(self, 'beat'), cls.REST)
