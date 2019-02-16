@@ -8,8 +8,8 @@ from ab import weakmethod
 from logger import Log
 
 
-# 创建连接
-def create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
+# 地址转换
+def dest_pair(address):
     if isinstance(address, (tuple, list,)):
         host, port, = address
         port = int(port)
@@ -21,7 +21,7 @@ def create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
         port = int(port)
     else:
         raise TypeError
-    return socket.create_connection((host, port,), timeout=timeout)
+    return (host, port,)
 
 
 class SendThread(threading.Thread):
@@ -337,7 +337,7 @@ class Socker:
         if isinstance(socket_or_address, socket.socket):
             self.sock = socket_or_address
         else:
-            self.sock = create_connection(socket_or_address)
+            self.sock = socket.create_connection(dest_pair(socket_or_address))
         self.recv_t = RecvThread(cls.RECVER(self.sock), weakmethod(self, 'handle'), cls.RECVER.REST)
         self.send_t = SendThread(cls.SENDER(self.sock), weakmethod(self.recv_t, 'wake'))
         self._beat_t = BeatThread(weakmethod(self, 'beat'), cls.REST)
