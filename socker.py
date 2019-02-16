@@ -11,13 +11,13 @@ from logger import Log
 # 创建连接
 def create_connection(address, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     if isinstance(address, (tuple, list,)):
-        host, port = address
+        host, port, = address
         port = int(port)
     elif isinstance(address, str):
-        host, port = address.split(':')
+        host, port, = address.split(':')
         port = int(port)
     elif isinstance(address, (bytes, bytearray,)):
-        host, port = address.split(b':')
+        host, port, = address.split(b':')
         port = int(port)
     else:
         raise TypeError

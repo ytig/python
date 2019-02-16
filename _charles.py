@@ -3,7 +3,6 @@ import threading
 import socket
 from kit import loge
 from decorator import Lock
-from socker import create_connection
 from logger import Log
 
 
@@ -77,13 +76,15 @@ class ForwardServer:
 
     # 运行转发服务
     def run(self, forward, port=8887):
+        _host, _port, = forward.split(':')
+        _port = int(_port)
         sock = socket.socket()
         sock.bind(('localhost', port,))
         sock.listen(32)
         while True:
             client = self.client(sock.accept()[0])
             try:
-                server = self.server(create_connection(forward))
+                server = self.server(socket.create_connection((_host, _port,)))
             except BaseException:
                 client.close()
                 del client
