@@ -11,9 +11,7 @@ def lua_compat(generics):
         d.pop(0)
         return lua_compat(d)
     elif isinstance(generics, dict) and not isinstance(generics, table):
-        for k in generics:
-            generics[k] = lua_compat(generics[k])
-        return table(generics)
+        return table((k, lua_compat(generics[k]),) for k in generics)
     else:
         return generics
 
@@ -104,7 +102,7 @@ class table(dict):
             else:
                 self[i] = self[i + 1]
         if not r:
-            raise ValueError('table.remove_(x): x not in table')
+            raise ValueError('table.remove(x): x not in table')
         del self[len(self)]
 
     def reverse_(self):
