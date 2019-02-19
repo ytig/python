@@ -134,6 +134,7 @@ class Data2:
         def __init__(self, value):
             super().__init__()
             self.value = value
+            self.deled = threading.Event()  # 被删除
 
         def __enter__(self):
             super().__enter__()
@@ -159,7 +160,9 @@ class Data2:
     @ilock()
     def delete(self, key):
         if key in self._data:
-            return self._data.pop(key)
+            value = self._data.pop(key)
+            value.deled.set()
+            return value
 
     # 改
     def update(self, key, timeout=None):
