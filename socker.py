@@ -196,6 +196,11 @@ class RecvThread(threading.Thread):
     def wake(self):
         self.wait.set()
 
+    # 处理标记
+    def mark(self):
+        with Lock(self):
+            return self.handle_t.mark()
+
     # 终止接收
     def close(self):
         self.closer.set()
@@ -217,14 +222,16 @@ class RecvThread(threading.Thread):
             except EOFError:
                 break
             if data is not None:
-                self.mailbox.send(data)
-                self.handle_t.handle(data)
+                with Lock(self):
+                    self.mailbox.send(data)
+                    self.handle_t.handle(data)
                 del data
             else:
                 self.wait.clear()
                 self.wait.wait(timeout=self.interval)
-        self.mailbox.send(None)
-        self.handle_t.handle(None)
+        with Lock(self):
+            self.mailbox.send(None)
+            self.handle_t.handle(None)
         self.closed.set()
 
     def _wake(self):
@@ -254,8 +261,16 @@ class HandleThread(threading.Thread):
     # 处理数据
     def handle(self, data):
         with Lock(self):
-            self.queue.append(data)
+            self.queue.append([data, ])
         self.wait.set()
+
+    # 处理标记
+    def mark(self):
+        with Lock(self):
+            if self.queue:
+                mark = threading.Event()
+                self.queue[-1].append(mark)
+                return mark
 
     # 队列状态
     def empty(self):
@@ -266,11 +281,15 @@ class HandleThread(threading.Thread):
         while True:
             self.wait.wait()
             with Lock(self):
-                data = self.queue[0]
+                data = self.queue[0].pop(0)
+            eof = data is None
             self._handle(data)
             del data
             with Lock(self):
-                if self.queue.pop(0) is None:
+                for mark in self.queue.pop(0):
+                    mark.set()
+                mark = None
+                if eof:
                     break
                 if not self.queue:
                     self.wait.clear()
@@ -404,6 +423,12 @@ class Socker:
                     self.recv_t.mailbox.want()
             finally:
                 self.recv_t.mailbox.done()
+
+    # 同步数据
+    def flush(self):
+        mark = self.recv_t.mark()
+        if mark is not None:
+            mark.wait()
 
     def beat(self, repeat):
         self._beat()
