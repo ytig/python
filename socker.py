@@ -266,6 +266,7 @@ class HandleThread(threading.Thread):
 
     # 处理标记
     def mark(self):
+        assert threading.current_thread() is not self, 'may lead to deadlock'
         with Lock(self):
             if self.queue:
                 mark = threading.Event()
