@@ -372,12 +372,16 @@ class BeatThread(threading.Thread):
             Log.e(loge(e))
 
 
-# 同步装饰器
-def sync(function):
+# 一举两得
+def stone(function):
     def wrapper(self, *args, **kwargs):
-        ret = function(self, *args, **kwargs)
-        self.flush()
-        return ret
+        try:
+            return function(self, *args, **kwargs)
+        finally:
+            try:
+                self.flush()
+            except BaseException:
+                pass
     return wrapper
 
 
