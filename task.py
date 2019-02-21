@@ -1,7 +1,18 @@
 #!/usr/local/bin/python3
+import inspect
 import threading
 from kit import hasvar, getvar, setvar, loge
 from decorator import Lock, ilock
+
+
+# 并发执行
+def execute(function, *arguments, t=0):
+    if not inspect.getfullargspec(function).args:
+        function = lambda _, f=function: f()
+    result = Tree(t=t).plant(*[Tree.Twig(function, args=(argument,)) for argument in arguments], seize=True)
+    if Tree.SEIZE in result:
+        raise RuntimeError(*[(arguments[i],) if result[i] is Tree.SEIZE else (arguments[i], result[i],) for i in range(len(arguments))])
+    return result
 
 
 class Queue:
