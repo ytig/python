@@ -372,6 +372,15 @@ class BeatThread(threading.Thread):
             Log.e(loge(e))
 
 
+# 同步装饰器
+def flush(function):
+    def wrapper(self, *args, **kwargs):
+        ret = function(self, *args, **kwargs)
+        self.flush()
+        return ret
+    return wrapper
+
+
 class Socker:
     REST = None  # 心跳间隙
     SENDER = Sender  # 发送者
