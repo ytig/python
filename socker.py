@@ -373,7 +373,7 @@ class BeatThread(threading.Thread):
 
 
 # 同步装饰器
-def flush(function):
+def sync(function):
     def wrapper(self, *args, **kwargs):
         ret = function(self, *args, **kwargs)
         self.flush()
