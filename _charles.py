@@ -1,9 +1,8 @@
 #!/usr/local/bin/python3
 import threading
 import socket
-from kit import loge
 from decorator import Lock
-from logger import Log
+from logger import loge, Log
 
 
 class SocketWrapper:
@@ -110,7 +109,7 @@ class SocketViewer(SocketWrapper):
                     break
                 self._view(pack)
         except BaseException as e:
-            Log.e(loge(e))
+            loge(e)
         return data
 
     def _pack(self):

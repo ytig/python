@@ -1,6 +1,15 @@
 #!/usr/local/bin/python3
 import sys
+import traceback
 from decorator import clock
+
+
+# 打印错误
+def loge(e):
+    if e is None:
+        e = sys.exc_info()[1]
+    assert isinstance(e, BaseException)
+    return Log.e(''.join(traceback.format_exception(type(e), e, e.__traceback__)).rstrip('\n'))
 
 
 class Printer:

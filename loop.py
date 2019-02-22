@@ -2,10 +2,9 @@
 import time
 import threading
 import itertools
-from kit import loge
 from decorator import Lock, ilock
 from shutdown import bregister
-from logger import Log
+from logger import loge
 
 
 class Loop(threading.Thread):
@@ -19,7 +18,7 @@ class Loop(threading.Thread):
 
     # 开始
     @ilock()
-    def enter(self, delay, action, args=(), kwargs={}, tag='', log=lambda e: Log.e(loge(e))):
+    def enter(self, delay, action, args=(), kwargs={}, tag='', log=loge):
         until = time.time() + max(0, delay)
         eid = next(self.__count)
         if not self.__actions or until < self.__actions[0]['until']:

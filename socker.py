@@ -3,10 +3,10 @@ import time
 import socks
 import socket
 import threading
-from kit import threadid, loge
+from kit import threadid
 from decorator import Lock, ilock
 from ab import weakmethod
-from logger import Log
+from logger import loge
 
 
 # 地址转换
@@ -99,7 +99,7 @@ class SendThread(threading.Thread):
         try:
             self.sender.send(data)
         except BaseException as e:
-            Log.e(loge(e))
+            loge(e)
         else:
             self.waker()
 
@@ -246,7 +246,7 @@ class RecvThread(threading.Thread):
         except EOFError:
             raise
         except BaseException as e:
-            Log.e(loge(e))
+            loge(e)
 
 
 class HandleThread(threading.Thread):
@@ -301,7 +301,7 @@ class HandleThread(threading.Thread):
         try:
             self.handler(data)
         except BaseException as e:
-            Log.e(loge(e))
+            loge(e)
 
 
 class Recver:
@@ -369,7 +369,7 @@ class BeatThread(threading.Thread):
         try:
             self.beater(repeat)
         except BaseException as e:
-            Log.e(loge(e))
+            loge(e)
 
 
 # 一举两得
