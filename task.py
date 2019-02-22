@@ -1,8 +1,9 @@
 #!/usr/local/bin/python3
 import inspect
 import threading
-from kit import hasvar, getvar, setvar, loge
+from kit import loge
 from decorator import Lock, ilock
+from logger import Log
 
 
 # 并发执行
@@ -15,51 +16,11 @@ def execute(function, *arguments, t=0):
     return result
 
 
-class Queue:
-    # 任务分发
-    def push(self):
-        cls = type(self)
-        with Lock(cls):
-            assert hasvar(cls, '__mutex__') or setvar(cls, '__mutex__', {'targets': [], 'running': 0, })
-            mutex = getvar(cls, '__mutex__')
-            mutex['targets'].append(self)
-            if mutex['running'] < 1:
-                threading.Thread(target=cls.__run).start()
-                mutex['running'] += 1
-
-    # 任务处理
-    def pop(self):
-        pass
-
-    # 打印日志
-    @staticmethod
-    def log(e):
-        logger.Log.e(loge(e))
-
-    @classmethod
-    def __run(cls):
-        while True:
-            with Lock(cls):
-                mutex = getvar(cls, '__mutex__')
-                if mutex['targets']:
-                    target = mutex['targets'].pop(0)
-                else:
-                    mutex['running'] -= 1
-                    break
-            try:
-                target.pop()
-            except BaseException as e:
-                try:
-                    cls.log(e)
-                except BaseException:
-                    pass
-
-
 class Tree:
     SEIZE = object()  # 占位符
 
     class Twig:
-        def __init__(self, target, args=(), kwargs={}, log=lambda e: logger.Log.e(loge(e))):
+        def __init__(self, target, args=(), kwargs={}, log=lambda e: Log.e(loge(e))):
             self.target = target
             self.args = args
             self.kwargs = kwargs
@@ -122,6 +83,3 @@ class Tree:
                     break
             target['ret'] = target['twig']()
             target['event'].set()
-
-
-import logger

@@ -1,43 +1,20 @@
 #!/usr/local/bin/python3
-import os
-import datetime
-from kit import workspace
+import sys
 from decorator import clock
-from task import Queue
 
 
-class Print(Queue):
-    KEEP = False  # 持久化
+class Printer:
+    # 打印
+    def print(self, *args, **kwargs):
+        print(*args, **kwargs)
 
-    def __init__(self, *args, **kwargs):
-        sep = kwargs.get('sep')
-        if not isinstance(sep, str):
-            sep = ' '
-        end = kwargs.get('end')
-        if not isinstance(end, str):
-            end = '\n'
-        flush = kwargs.get('flush')
-        if not isinstance(flush, bool):
-            flush = False
-        skip = kwargs.get('skip')
-        if not isinstance(skip, bool):
-            skip = False
-        print(*args, sep=sep, end=end, flush=flush)
-        if Print.KEEP and not skip:
-            iso = datetime.datetime.now().isoformat()
-            self.path = workspace() + '/.log/' + iso.split('T')[0]
-            self.text = sep.join([iso.split('T')[1]] + [str(i) for i in args]) + end
-            self.push()
-
-    def pop(self):
-        try:
-            dirname = os.path.dirname(self.path)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
-            with open(self.path, mode='a') as f:
-                f.write(self.text)
-        except BaseException:
-            pass
+    # 着色
+    def paint(self, *args, **kwargs):
+        file = kwargs.get('file')
+        if file is None:
+            file = sys.stdout
+        if file.isatty():
+            print(*args, **kwargs)
 
 
 class Log:
@@ -48,7 +25,7 @@ class Log:
     ERROR = 6  # 异常
     ASSERT = 7  # 断言
     LEVEL = INFO  # 日志级别
-    PRINT = Print  # 日志打印
+    LOGGER = Printer()  # 日志输出
 
     # 打印日志
     @staticmethod
@@ -58,12 +35,12 @@ class Log:
             return False
         color = {Log.WARN: 34, Log.ERROR: 31, }.get(level)
         if color is not None:
-            Log.PRINT('\033[0;%d;48m' % (color,), end='', flush=True, skip=True)
+            Log.LOGGER.paint('\033[0;%d;48m' % (color,), end='', flush=True)
         if tag is not None:
             args = ({Log.VERBOSE: 'V', Log.DEBUG: 'D', Log.INFO: 'I', Log.WARN: 'W', Log.ERROR: 'E', Log.ASSERT: 'A', }.get(level) + '/' + tag + ':', *args,)
-        Log.PRINT(*args, flush=True)
+        Log.LOGGER.print(*args, flush=True)
         if color is not None:
-            Log.PRINT('\033[0m', end='', flush=True, skip=True)
+            Log.LOGGER.paint('\033[0m', end='', flush=True)
         return True
 
     @staticmethod
