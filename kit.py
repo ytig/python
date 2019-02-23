@@ -325,7 +325,7 @@ class frames(list):
     # 模块检索
     def module(self, index=0):
         assert self.has(index=index)
-        for m in sys.modules.values():
+        for m in sys.modules.copy().values():
             if vars(m) is self[index].f_globals:
                 return m
         return None
