@@ -31,7 +31,7 @@ class Tree:
             if not self.ret[0]:
                 try:
                     self.ret = (True, self.target(*self.args, **self.kwargs),)
-                    del self.target, self.args, self.kwargs, self.log,
+                    self.target = self.args = self.kwargs = self.log = None
                 except BaseException as e:
                     try:
                         callable(self.log) and self.log(e)

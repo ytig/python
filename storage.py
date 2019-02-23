@@ -88,7 +88,7 @@ class _Storage:
                 for key, value, in self._reader.items():
                     file.write(encode((key, value,)) + '\n')
             os.remove(_path)
-        del self._writer
+        self._writer = None
 
 
 class Storage:
