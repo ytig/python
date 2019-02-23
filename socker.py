@@ -164,8 +164,11 @@ class Mailbox:
         return send.data
 
     # 发送
-    def send(self, data):
+    def send(self, data, *cc):
+        cc = list(cc)
         with Lock(self):
+            while cc:
+                cc.pop(0)(data)
             self.field0 = self.field1
             self.field1 = {
                 'send': threading.Event(),
@@ -196,11 +199,6 @@ class RecvThread(threading.Thread):
     def wake(self):
         self.wait.set()
 
-    # 处理标记
-    def mark(self):
-        with Lock(self):
-            return self.handle_t.mark()
-
     # 终止接收
     def close(self):
         self.closer.set()
@@ -222,16 +220,12 @@ class RecvThread(threading.Thread):
             except EOFError:
                 break
             if data is not None:
-                with Lock(self):
-                    self.mailbox.send(data)
-                    self.handle_t.handle(data)
+                self.mailbox.send(data, self.handle_t.handle)
                 del data
             else:
                 self.wait.clear()
                 self.wait.wait(timeout=self.interval)
-        with Lock(self):
-            self.mailbox.send(None)
-            self.handle_t.handle(None)
+        self.mailbox.send(None, self.handle_t.handle)
         self.closed.set()
 
     def _wake(self):
@@ -440,7 +434,7 @@ class Socker:
 
     # 同步数据
     def flush(self):
-        mark = self.recv_t.mark()
+        mark = self.recv_t.handle_t.mark()
         if mark is not None:
             mark.wait()
 
