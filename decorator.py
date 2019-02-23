@@ -3,7 +3,7 @@ import json
 import inspect
 import threading
 import atexit
-from kit import unique, hasvar, getvar, setvar, threadid, frames
+from kit import unique, hasvar, getvar, setvar, frames
 
 
 class Closure:
@@ -15,34 +15,8 @@ class Closure:
         return self.closure()
 
 
-class _Lock:
-    LOCK = threading.Lock()  # 构建锁
-
-    def __init__(self):
-        self.lock = threading.Lock()
-        self.stack = list()
-
-    def __enter__(self):
-        tid = threadid()
-        with _Lock.LOCK:
-            a = tid not in self.stack
-            if not a:
-                self.stack.append(tid)
-        if a:
-            self.lock.acquire()
-            with _Lock.LOCK:
-                self.stack.append(tid)
-
-    def __exit__(self, t, v, tb):
-        with _Lock.LOCK:
-            self.stack.pop()
-            r = len(self.stack) == 0
-        if r:
-            self.lock.release()
-
-
 class Lock:
-    LOCK = threading.Lock()  # 构建锁
+    LOCK = threading.RLock()  # 构建锁
 
     def __init__(self, generics, k=None):
         self.generics = generics
@@ -64,7 +38,7 @@ class Lock:
             assert hasvar(generics, name) or setvar(generics, name, dict())
             var = getvar(generics, name)
             if k not in var:
-                var[k] = _Lock()
+                var[k] = threading.RLock()
             return var[k]
 
     # 区块锁

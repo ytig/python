@@ -3,7 +3,6 @@ import time
 import socks
 import socket
 import threading
-from kit import threadid
 from decorator import Lock, ilock
 from ab import weakmethod
 from logger import loge
@@ -128,7 +127,7 @@ class Mailbox:
     # 订阅
     @ilock()
     def want(self):
-        tid = threadid()
+        tid = threading.get_ident()
         if tid not in self.field1['recv']:
             self.field1['recv'][tid] = threading.Event()
         if tid in self.field0['recv']:
@@ -137,7 +136,7 @@ class Mailbox:
     # 完毕
     @ilock()
     def done(self):
-        tid = threadid()
+        tid = threading.get_ident()
         if tid in self.field1['recv']:
             self.field1['recv'].pop(tid)
         if tid in self.field0['recv']:
@@ -145,7 +144,7 @@ class Mailbox:
 
     # 接收
     def recv(self, timeout=None):
-        tid = threadid()
+        tid = threading.get_ident()
         with Lock(self):
             if tid in self.field1['recv']:
                 if not self.eof:

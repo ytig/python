@@ -8,7 +8,7 @@ import inspect
 import threading
 import traceback
 import itertools
-_LOCK = threading.Lock()  # 全局锁
+_LOCK = threading.RLock()  # 全局锁
 CWDS = []  # 历史目录
 WORKSPACE = None  # 工作区目录
 COUNT = itertools.count(1)  # 无限递增迭代
@@ -281,11 +281,6 @@ def call(*args, **kwargs):
 # 获取闭包
 def getnonlocals(func, name):
     return dict(zip(func.__code__.co_freevars, func.__closure__))[name].cell_contents
-
-
-# 线程标识
-def threadid():
-    return threading.current_thread().name
 
 
 # 栈帧

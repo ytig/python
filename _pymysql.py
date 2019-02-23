@@ -5,7 +5,7 @@ import pymysql
 import threading
 from remedy import *
 from kit import hasvar, getvar, setvar
-from decorator import _Lock, Lock, ilock
+from decorator import Lock, ilock
 from wa import withas
 
 
@@ -130,7 +130,7 @@ class Data:
 
 
 class Data2:
-    class Value(_Lock):
+    class Value(threading._RLock):
         def __init__(self, value):
             super().__init__()
             self.value = value

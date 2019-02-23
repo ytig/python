@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import traceback
 import threading
-_LOCK = threading.Lock()  # 全局锁
+_LOCK = threading.RLock()  # 全局锁
 assert threading.current_thread() is threading.main_thread()
 if threading.main_thread().is_alive():
     _current_state = 0
