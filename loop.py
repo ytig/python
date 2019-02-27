@@ -20,11 +20,11 @@ class Loop(threading.Thread):
     @ilock()
     def enter(self, delay, action, args=(), kwargs={}, tag='', log=loge):
         until = time.monotonic() + max(delay, 0)
-        eid = next(self._count)
+        pid = next(self._count)
         if not self._actions or until < self._actions[0]['until']:
             self._event.set()
         self._actions.append({
-            'eid': eid,
+            'pid': pid,
             'until': until,
             'action': action,
             'args': args,
@@ -35,7 +35,7 @@ class Loop(threading.Thread):
         self._actions.sort(key=lambda d: d['until'])
         if not self.is_alive():
             self.start()
-        return eid
+        return pid
 
     # 取消
     @ilock()
@@ -48,7 +48,7 @@ class Loop(threading.Thread):
             elif callable(generics):
                 p = self._actions[i]['action'] is generics
             elif isinstance(generics, int):
-                p = self._actions[i]['eid'] == generics
+                p = self._actions[i]['pid'] == generics
             elif isinstance(generics, str):
                 p = self._actions[i]['tag'] == generics
             if p:
