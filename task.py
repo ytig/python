@@ -63,7 +63,7 @@ class Tree:
                 targets = [{'twig': twig, 'event': threading.Event(), } for twig in twigs]
                 self.targets.extend(targets)
                 for i in range(min(len(targets), self.t - self.running)):
-                    threading.Thread(target=self.__run).start()
+                    threading.Thread(target=self._run).start()
                     self.running += 1
             for target in targets:
                 target['event'].wait()
@@ -75,7 +75,7 @@ class Tree:
                     ret.pop(i)
         return ret
 
-    def __run(self):
+    def _run(self):
         while True:
             with Lock(self):
                 if self.targets:
