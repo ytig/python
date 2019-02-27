@@ -420,9 +420,9 @@ class Socker:
                 self.send_t.send(data)
                 del data
                 while True:
-                    t = time.time()
+                    m = time.monotonic()
                     data = self.recv_t.mailbox.recv(timeout=timeout)
-                    dt = time.time() - t
+                    dt = time.monotonic() - m
                     if timeout is not None:
                         timeout -= dt
                     if recv(data):

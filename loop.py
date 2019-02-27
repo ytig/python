@@ -19,7 +19,7 @@ class Loop(threading.Thread):
     # 开始
     @ilock()
     def enter(self, delay, action, args=(), kwargs={}, tag='', log=loge):
-        until = time.time() + max(0, delay)
+        until = time.monotonic() + max(delay, 0)
         eid = next(self.__count)
         if not self.__actions or until < self.__actions[0]['until']:
             self.__event.set()
@@ -67,7 +67,7 @@ class Loop(threading.Thread):
             timeout = None
             with Lock(self):
                 if self.__actions:
-                    timeout = self.__actions[0]['until'] - time.time()
+                    timeout = self.__actions[0]['until'] - time.monotonic()
                     if timeout <= 0:
                         pop = self.__actions.pop(0)
                 elif self.__shutdown:
