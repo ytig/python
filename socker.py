@@ -378,6 +378,43 @@ def stone(function):
     return wrapper
 
 
+# 流式收发
+def stream(generatorfunction):
+    def parse(y):
+        if y is None:
+            return (lambda data: True, None,)
+        elif callable(y):
+            return (y, None,)
+        elif isinstance(y, (tuple, list,)):
+            return y
+        raise TypeError
+
+    def wrapper(self, *args, **kwargs):
+        generator = generatorfunction(self, *args, **kwargs)
+        self.recv_t.mailbox.want()
+        try:
+            recv, timeout, = parse(generator.send(None))
+            while True:
+                m = time.monotonic()
+                try:
+                    data = [self.recv_t.mailbox.recv(timeout=timeout), ]
+                except TimeoutError as e:
+                    recv, timeout, = parse(generator.throw(type(e), e, e.__traceback__))
+                    continue
+                dt = time.monotonic() - m
+                if timeout is not None:
+                    timeout -= dt
+                if recv(data[0]):
+                    recv, timeout, = parse(generator.send(data.pop()))
+                data.clear()
+                self.recv_t.mailbox.want()
+        except StopIteration as e:
+            return e.value
+        finally:
+            self.recv_t.mailbox.done()
+    return wrapper
+
+
 class Socker:
     REST = None  # 心跳间隙
     SENDER = Sender  # 发送者
