@@ -418,8 +418,8 @@ class Socker:
             self.recv_t.mailbox.want()
             try:
                 self.send_t.send(data)
-                del data
                 while True:
+                    del data
                     m = time.monotonic()
                     data = self.recv_t.mailbox.recv(timeout=timeout)
                     dt = time.monotonic() - m
