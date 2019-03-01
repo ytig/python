@@ -119,6 +119,33 @@ class Mailbox:
         self.marks = dict()
         self.recv_black_l = list()
 
+    def _gc(self):
+        with Lock(self):
+            if not self.marks:
+                gc = len(self.queue) - 1
+            else:
+                gc = min(self.marks.values())
+            if gc > 0:
+                for _ in range(gc):
+                    self.queue.pop(0)
+                for k in self.marks:
+                    self.marks[k] -= gc
+
+    # 发送
+    def _send(self, data, *cc):
+        cc = list(cc)
+        with Lock(self):
+            while cc:
+                cc.pop(0)(data)
+            if data is not None:
+                if self.marks:
+                    self.queue[-1].data = data
+                    self.queue[-1].set()
+                    self.queue.append(threading.Event())
+            else:
+                self.queue[-1].data = None
+                self.queue[-1].set()
+
     # 订阅
     def want(self):
         tid = threading.get_ident()
@@ -129,11 +156,7 @@ class Mailbox:
             else:
                 if self.marks[tid] < len(self.queue) - 1:
                     self.marks[tid] += 1
-                    gc = min(self.marks.values())
-                    if gc > 0:
-                        self.queue = self.queue[gc:]
-                        for k in self.marks:
-                            self.marks[k] -= gc
+                    self._gc()
 
     # 完毕
     def done(self):
@@ -142,14 +165,7 @@ class Mailbox:
             assert tid not in self.recv_black_l, 'mailbox already in use'
             if tid in self.marks:
                 self.marks.pop(tid)
-                if not self.marks:
-                    gc = len(self.queue) - 1
-                else:
-                    gc = min(self.marks.values())
-                if gc > 0:
-                    self.queue = self.queue[gc:]
-                    for k in self.marks:
-                        self.marks[k] -= gc
+                self._gc()
 
     # 接收
     def recv(self, timeout=None):
@@ -175,21 +191,6 @@ class Mailbox:
         tid = threading.get_ident()
         with Lock(self):
             self.recv_black_l.remove(tid)
-
-    # 发送
-    def _send(self, data, *cc):
-        cc = list(cc)
-        with Lock(self):
-            while cc:
-                cc.pop(0)(data)
-            if data is not None:
-                if self.marks:
-                    self.queue[-1].data = data
-                    self.queue[-1].set()
-                    self.queue.append(threading.Event())
-            else:
-                self.queue[-1].data = None
-                self.queue[-1].set()
 
 
 class RecvThread(threading.Thread):
