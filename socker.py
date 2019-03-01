@@ -123,29 +123,33 @@ class Mailbox:
             'recv': dict(),
         }
         self.eof = False
+        self.recv_black_l = list()
 
     # 订阅
-    @ilock()
     def want(self):
         tid = threading.get_ident()
-        if tid not in self.field1['recv']:
-            self.field1['recv'][tid] = threading.Event()
-        if tid in self.field0['recv']:
-            self.field0['recv'][tid].set()
+        with Lock(self):
+            assert tid not in self.recv_black_l, 'mailbox is being used'
+            if tid not in self.field1['recv']:
+                self.field1['recv'][tid] = threading.Event()
+            if tid in self.field0['recv']:
+                self.field0['recv'][tid].set()
 
     # 完毕
-    @ilock()
     def done(self):
         tid = threading.get_ident()
-        if tid in self.field1['recv']:
-            self.field1['recv'].pop(tid)
-        if tid in self.field0['recv']:
-            self.field0['recv'][tid].set()
+        with Lock(self):
+            assert tid not in self.recv_black_l, 'mailbox is being used'
+            if tid in self.field1['recv']:
+                self.field1['recv'].pop(tid)
+            if tid in self.field0['recv']:
+                self.field0['recv'][tid].set()
 
     # 接收
     def recv(self, timeout=None):
         tid = threading.get_ident()
         with Lock(self):
+            assert tid not in self.recv_black_l, 'mailbox is being used'
             if tid in self.field1['recv']:
                 if not self.eof:
                     send = self.field1['send']
@@ -162,8 +166,20 @@ class Mailbox:
             raise EOFError
         return send.data
 
+    # 封锁
+    def __enter__(self):
+        tid = threading.get_ident()
+        with Lock(self):
+            self.recv_black_l.append(tid)
+
+    # 解锁
+    def __exit__(self, t, v, tb):
+        tid = threading.get_ident()
+        with Lock(self):
+            self.recv_black_l.remove(tid)
+
     # 发送
-    def send(self, data, *cc):
+    def _send(self, data, *cc):
         cc = list(cc)
         with Lock(self):
             while cc:
@@ -219,12 +235,12 @@ class RecvThread(threading.Thread):
             except EOFError:
                 break
             if data is not None:
-                self.mailbox.send(data, self.handle_t.handle)
+                self.mailbox._send(data, self.handle_t.handle)
                 del data
             else:
                 self.wait.clear()
                 self.wait.wait(timeout=self.interval)
-        self.mailbox.send(None, self.handle_t.handle)
+        self.mailbox._send(None, self.handle_t.handle)
         self.closed.set()
 
     def _wake(self):
