@@ -384,26 +384,16 @@ class BeatThread(threading.Thread):
 
 # 一举两得
 def stone(function):
-    assert inspect.isfunction(function)
-    if inspect.isgeneratorfunction(function):
-        def wrapper(self, *args, **kwargs):
+    assert inspect.isfunction(function) and not inspect.isgeneratorfunction(function)
+
+    def wrapper(self, *args, **kwargs):
+        try:
+            return function(self, *args, **kwargs)
+        finally:
             try:
-                value = yield from function(self, *args, **kwargs)
-                return value
-            finally:
-                try:
-                    self.flush()
-                except BaseException:
-                    pass
-    else:
-        def wrapper(self, *args, **kwargs):
-            try:
-                return function(self, *args, **kwargs)
-            finally:
-                try:
-                    self.flush()
-                except BaseException:
-                    pass
+                self.flush()
+            except BaseException:
+                pass
     return wrapper
 
 
