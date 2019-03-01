@@ -2,6 +2,7 @@
 import time
 import socks
 import socket
+import inspect
 import threading
 from decorator import Lock, ilock
 from ab import weakmethod
@@ -383,19 +384,33 @@ class BeatThread(threading.Thread):
 
 # 一举两得
 def stone(function):
-    def wrapper(self, *args, **kwargs):
-        try:
-            return function(self, *args, **kwargs)
-        finally:
+    assert inspect.isfunction(function)
+    if inspect.isgeneratorfunction(function):
+        def wrapper(self, *args, **kwargs):
             try:
-                self.flush()
-            except BaseException:
-                pass
+                value = yield from function(self, *args, **kwargs)
+                return value
+            finally:
+                try:
+                    self.flush()
+                except BaseException:
+                    pass
+    else:
+        def wrapper(self, *args, **kwargs):
+            try:
+                return function(self, *args, **kwargs)
+            finally:
+                try:
+                    self.flush()
+                except BaseException:
+                    pass
     return wrapper
 
 
 # 流式收发
 def stream(generatorfunction):
+    assert inspect.isgeneratorfunction(generatorfunction)
+
     def wrapper(self, *args, **kwargs):
         generator = generatorfunction(self, *args, **kwargs)
         self.recv_t.mailbox.want()
