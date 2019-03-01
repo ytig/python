@@ -396,35 +396,30 @@ def stone(function):
 
 # 流式收发
 def stream(generatorfunction):
-    def parse(y):
-        if y is None:
-            return (lambda data: True, None,)
-        elif callable(y):
-            return (y, None,)
-        elif isinstance(y, (tuple, list,)):
-            return y
-        raise TypeError
-
     def wrapper(self, *args, **kwargs):
         generator = generatorfunction(self, *args, **kwargs)
         self.recv_t.mailbox.want()
         try:
             with self.recv_t.mailbox:
-                recv, timeout, = parse(generator.send(None))
+                recv, timeout, = generator.send(None)
             while True:
                 m = time.monotonic()
                 try:
                     data = [self.recv_t.mailbox.recv(timeout=timeout), ]
-                except BaseException as e:
+                except TimeoutError as e:
                     with self.recv_t.mailbox:
-                        recv, timeout, = parse(generator.throw(type(e), e, e.__traceback__))
+                        recv, timeout, = generator.throw(type(e), e, e.__traceback__)
                     continue
+                except EOFError as e:
+                    with self.recv_t.mailbox:
+                        generator.throw(type(e), e, e.__traceback__)
+                    raise
                 dt = time.monotonic() - m
                 if timeout is not None:
                     timeout -= dt
                 with self.recv_t.mailbox:
-                    if recv(data[0]):
-                        recv, timeout, = parse(generator.send(data.pop()))
+                    if recv is None or recv(data[0]):
+                        recv, timeout, = generator.send(data.pop())
                 data.clear()
                 self.recv_t.mailbox.want()
         except StopIteration as e:
