@@ -415,7 +415,7 @@ def stream(generatorfunction):
                 m = time.monotonic()
                 try:
                     data = [self.recv_t.mailbox.recv(timeout=timeout), ]
-                except TimeoutError as e:
+                except BaseException as e:
                     with self.recv_t.mailbox:
                         recv, timeout, = parse(generator.throw(type(e), e, e.__traceback__))
                     continue
