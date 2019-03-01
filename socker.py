@@ -115,15 +115,8 @@ class Sender:
 
 class Mailbox:
     def __init__(self):
-        self.field0 = {
-            'send': threading.Event(),
-            'recv': dict(),
-        }
-        self.field1 = {
-            'send': threading.Event(),
-            'recv': dict(),
-        }
-        self.eof = False
+        self.queue = [threading.Event(), ]
+        self.marks = dict()
         self.recv_black_l = list()
 
     # 订阅
@@ -131,41 +124,45 @@ class Mailbox:
         tid = threading.get_ident()
         with Lock(self):
             assert tid not in self.recv_black_l, 'mailbox already in use'
-            if tid not in self.field1['recv']:
-                self.field1['recv'][tid] = threading.Event()
-            if tid in self.field0['recv']:
-                self.field0['recv'][tid].set()
+            if tid not in self.marks:
+                self.marks[tid] = len(self.queue) - 1
+            else:
+                if self.marks[tid] < len(self.queue) - 1:
+                    self.marks[tid] += 1
+                    gc = min(self.marks.values())
+                    if gc > 0:
+                        self.queue = self.queue[gc:]
+                        for k in self.marks:
+                            self.marks[k] -= gc
 
     # 完毕
     def done(self):
         tid = threading.get_ident()
         with Lock(self):
             assert tid not in self.recv_black_l, 'mailbox already in use'
-            if tid in self.field1['recv']:
-                self.field1['recv'].pop(tid)
-            if tid in self.field0['recv']:
-                self.field0['recv'][tid].set()
+            if tid in self.marks:
+                self.marks.pop(tid)
+                if not self.marks:
+                    gc = len(self.queue) - 1
+                else:
+                    gc = min(self.marks.values())
+                if gc > 0:
+                    self.queue = self.queue[gc:]
+                    for k in self.marks:
+                        self.marks[k] -= gc
 
     # 接收
     def recv(self, timeout=None):
         tid = threading.get_ident()
         with Lock(self):
             assert tid not in self.recv_black_l, 'mailbox already in use'
-            if tid in self.field1['recv']:
-                if not self.eof:
-                    send = self.field1['send']
-                else:
-                    send = self.field0['send']
-            elif tid in self.field0['recv']:
-                send = self.field0['send']
-            else:
-                send = None
-        assert send is not None, 'lack of calling want'
-        if not send.wait(timeout=timeout):
+            assert tid in self.marks, 'lack of calling want'
+            event = self.queue[self.marks[tid]]
+        if not event.wait(timeout=timeout):
             raise TimeoutError
-        if send.data is None:
+        if event.data is None:
             raise EOFError
-        return send.data
+        return event.data
 
     # 封锁
     def __enter__(self):
@@ -185,19 +182,14 @@ class Mailbox:
         with Lock(self):
             while cc:
                 cc.pop(0)(data)
-            self.field0 = self.field1
-            self.field1 = {
-                'send': threading.Event(),
-                'recv': dict(),
-            }
-            send = self.field0['send']
-            send.data = data
-            send.set()
-            recvs = self.field0['recv'].values()
-            if data is None:
-                self.eof = True
-        for recv in recvs:
-            recv.wait()
+            if data is not None:
+                if self.marks:
+                    self.queue[-1].data = data
+                    self.queue[-1].set()
+                    self.queue.append(threading.Event())
+            else:
+                self.queue[-1].data = None
+                self.queue[-1].set()
 
 
 class RecvThread(threading.Thread):
