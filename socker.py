@@ -129,7 +129,7 @@ class Mailbox:
     def want(self):
         tid = threading.get_ident()
         with Lock(self):
-            assert tid not in self.recv_black_l, 'mailbox is being used'
+            assert tid not in self.recv_black_l, 'mailbox already in use'
             if tid not in self.field1['recv']:
                 self.field1['recv'][tid] = threading.Event()
             if tid in self.field0['recv']:
@@ -139,7 +139,7 @@ class Mailbox:
     def done(self):
         tid = threading.get_ident()
         with Lock(self):
-            assert tid not in self.recv_black_l, 'mailbox is being used'
+            assert tid not in self.recv_black_l, 'mailbox already in use'
             if tid in self.field1['recv']:
                 self.field1['recv'].pop(tid)
             if tid in self.field0['recv']:
@@ -149,7 +149,7 @@ class Mailbox:
     def recv(self, timeout=None):
         tid = threading.get_ident()
         with Lock(self):
-            assert tid not in self.recv_black_l, 'mailbox is being used'
+            assert tid not in self.recv_black_l, 'mailbox already in use'
             if tid in self.field1['recv']:
                 if not self.eof:
                     send = self.field1['send']
