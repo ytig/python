@@ -409,19 +409,22 @@ def stream(generatorfunction):
         generator = generatorfunction(self, *args, **kwargs)
         self.recv_t.mailbox.want()
         try:
-            recv, timeout, = parse(generator.send(None))
+            with self.recv_t.mailbox:
+                recv, timeout, = parse(generator.send(None))
             while True:
                 m = time.monotonic()
                 try:
                     data = [self.recv_t.mailbox.recv(timeout=timeout), ]
                 except TimeoutError as e:
-                    recv, timeout, = parse(generator.throw(type(e), e, e.__traceback__))
+                    with self.recv_t.mailbox:
+                        recv, timeout, = parse(generator.throw(type(e), e, e.__traceback__))
                     continue
                 dt = time.monotonic() - m
                 if timeout is not None:
                     timeout -= dt
-                if recv(data[0]):
-                    recv, timeout, = parse(generator.send(data.pop()))
+                with self.recv_t.mailbox:
+                    if recv(data[0]):
+                        recv, timeout, = parse(generator.send(data.pop()))
                 data.clear()
                 self.recv_t.mailbox.want()
         except StopIteration as e:
@@ -478,8 +481,9 @@ class Socker:
                     dt = time.monotonic() - m
                     if timeout is not None:
                         timeout -= dt
-                    if recv(data):
-                        return data
+                    with self.recv_t.mailbox:
+                        if recv(data):
+                            return data
                     self.recv_t.mailbox.want()
             finally:
                 self.recv_t.mailbox.done()
