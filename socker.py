@@ -252,6 +252,11 @@ class RecvThread(threading.Thread):
 
     def _wake(self):
         if self.closer.wait(timeout=0):
+            with Lock(self):
+                if self.blocking:
+                    if self.handle_t.empty():
+                        self.blocking = False
+                        self._shutdown()
             self.wait.set()
 
     def _recv(self):
@@ -323,7 +328,11 @@ class HandleThread(threading.Thread):
                     break
                 if not self.queue:
                     self.wait.clear()
-                    self.waker()
+                    wake = True
+                else:
+                    wake = False
+            if wake:
+                self.waker()
         self.closed.set()
 
     def _handle(self, data):
