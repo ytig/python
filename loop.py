@@ -32,7 +32,7 @@ class Loop(threading.Thread):
             'tag': tag,
             'log': log,
         })
-        self._actions.sort(key=lambda d: d['until'])
+        self._actions.sort(key=lambda d: (d['until'], d['pid'],))
         if not self.is_alive():
             self.start()
         return pid
