@@ -112,6 +112,13 @@ class Sender:
     def send(self, data):
         return self.sock.sendall(data)
 
+    # 中断
+    def shutdown(self):
+        try:
+            self.sock.shutdown(socket.SHUT_WR)
+        except OSError:
+            pass
+
 
 class Mailbox:
     def __init__(self):
@@ -196,6 +203,7 @@ class Mailbox:
 class RecvThread(threading.Thread):
     def __init__(self, recver, handler, interval):
         super().__init__()
+        self.blocking = False
         self.wait = threading.Event()
         self.closer = threading.Event()
         self.closed = threading.Event()
@@ -210,6 +218,11 @@ class RecvThread(threading.Thread):
 
     # 终止接收
     def close(self):
+        with Lock(self):
+            if self.blocking:
+                if self.handle_t.empty():
+                    self.blocking = False
+                    self._shutdown()
         self.closer.set()
         self.wait.set()
         self.closed.wait()
@@ -242,12 +255,25 @@ class RecvThread(threading.Thread):
             self.wait.set()
 
     def _recv(self):
+        with Lock(self):
+            self.blocking = True
         try:
             return self.recver.recv()
         except TimeoutError:
             pass
         except EOFError:
             raise
+        except BaseException as e:
+            loge(e)
+        finally:
+            with Lock(self):
+                if not self.blocking:
+                    raise EOFError
+                self.blocking = False
+
+    def _shutdown(self):
+        try:
+            self.recver.shutdown()
         except BaseException as e:
             loge(e)
 
@@ -347,6 +373,13 @@ class Recver:
         if len(packs) == 2:
             self.buffer = packs[1]
             return packs[0] + sep
+
+    # 中断
+    def shutdown(self):
+        try:
+            self.sock.shutdown(socket.SHUT_RD)
+        except OSError:
+            pass
 
 
 class BeatThread(threading.Thread):
