@@ -234,7 +234,7 @@ class RecvThread(threading.Thread):
 
     def run(self):
         while True:
-            if self.closer.wait(timeout=0):
+            if self.closer.is_set():
                 if self.handle_t.empty():
                     break
             try:
@@ -251,7 +251,7 @@ class RecvThread(threading.Thread):
         self.closed.set()
 
     def _wake(self):
-        if self.closer.wait(timeout=0):
+        if self.closer.is_set():
             with Lock(self):
                 if self.blocking:
                     if self.handle_t.empty():
