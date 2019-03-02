@@ -3,97 +3,103 @@ import time
 import threading
 import itertools
 from decorator import Lock, ilock
-from shutdown import bregister
+from ab import weakmethod
+from shutdown import bregister, unregister
 from logger import loge
 
 
 class Loop(threading.Thread):
     def __init__(self, daemon=False):
         super().__init__(daemon=daemon)
-        self._actions = []
+        self._targets = []
         self._count = itertools.count(1)
-        self._event = threading.Event()
-        self._shutdown = False
-        bregister(self.shutdown)
+        self._wait = threading.Event()
+        self._closer = threading.Event()
+        self._closed = threading.Event()
+        self.__shutdown__ = weakmethod(self, 'shutdown')
+        bregister(self.__shutdown__)
 
-    # 开始
+    # 执行
     @ilock()
-    def enter(self, delay, action, args=(), kwargs={}, tag='', log=loge):
+    def post(self, target, args=(), kwargs={}, log=loge, delay=0, tag=''):
         until = time.monotonic() + max(delay, 0)
         pid = next(self._count)
-        if not self._actions or until < self._actions[0]['until']:
-            self._event.set()
-        self._actions.append({
-            'pid': pid,
+        if not self._targets or until < self._targets[0]['until']:
+            self._wait.set()
+        self._targets.append({
             'until': until,
-            'action': action,
+            'pid': pid,
+            'tag': tag,
+            'target': target,
             'args': args,
             'kwargs': kwargs,
-            'tag': tag,
             'log': log,
         })
-        self._actions.sort(key=lambda d: (d['until'], d['pid'],))
+        self._targets.sort(key=lambda d: (d['until'], d['pid'],))
         if not self.is_alive():
             self.start()
         return pid
 
-    # 取消
+    # 移除
     @ilock()
-    def cancel(self, generics):
+    def remove(self, generics):
         ret = 0
-        for i in range(len(self._actions) - 1, -1, -1):
+        for i in range(len(self._targets) - 1, -1, -1):
             p = False
             if generics is None:
                 p = True
-            elif callable(generics):
-                p = self._actions[i]['action'] is generics
             elif isinstance(generics, int):
-                p = self._actions[i]['pid'] == generics
+                p = self._targets[i]['pid'] == generics
             elif isinstance(generics, str):
-                p = self._actions[i]['tag'] == generics
+                p = self._targets[i]['tag'] == generics
+            elif callable(generics):
+                p = self._targets[i]['target'] is generics
             if p:
-                self._actions.pop(i)
+                self._targets.pop(i)
                 ret += 1
         return ret
 
-    @ilock()
+    # 终止
     def shutdown(self):
-        self._shutdown = True
-        self._event.set()
+        unregister(self.__shutdown__)
+        self._closer.set()
+        self._wait.set()
+        self._closed.wait()
 
     def run(self):
         while True:
             pop = None
             timeout = None
             with Lock(self):
-                if self._actions:
-                    timeout = self._actions[0]['until'] - time.monotonic()
+                if self._targets:
+                    timeout = self._targets[0]['until'] - time.monotonic()
                     if timeout <= 0:
-                        pop = self._actions.pop(0)
-                elif self._shutdown:
+                        pop = self._targets.pop(0)
+                elif self._closer.is_set():
                     break
                 if pop is None:
-                    self._event.clear()
+                    self._wait.clear()
             if pop is not None:
                 try:
-                    pop['action'](*pop['args'], **pop['kwargs'])
+                    pop['target'](*pop['args'], **pop['kwargs'])
                 except BaseException as e:
                     try:
                         callable(pop['log']) and pop['log'](e)
                     except BaseException:
                         pass
             else:
-                self._event.wait(timeout=timeout)
+                self._wait.wait(timeout=timeout)
+        self._closed.set()
 
 
 main_loop = Loop()  # 主循环
 
 
-# 开始
-def enter(*args, **kwargs):
-    return main_loop.enter(*args, **kwargs)
+# 执行
+def post(*args, **kwargs):
+    return main_loop.post(*args, **kwargs)
 
 
-# 取消
-def cancel(*args, **kwargs):
-    return main_loop.cancel(*args, **kwargs)
+# 移除
+def remove(*args, **kwargs):
+    return main_loop.remove(*args, **kwargs)
