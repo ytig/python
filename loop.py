@@ -98,8 +98,8 @@ class LoopThread(threading.Thread):
     def __init__(self, daemon=None):
         super().__init__(daemon=daemon)
         self.loop = Loop()
-        self.__shutdown__ = weakmethod(self, 'shutdown')
-        bregister(self.__shutdown__)
+        self._shutdown = weakmethod(self, 'shutdown')
+        bregister(self._shutdown)
 
     # 执行
     def post(self, *args, **kwargs):
@@ -113,7 +113,7 @@ class LoopThread(threading.Thread):
 
     # 终止
     def shutdown(self):
-        unregister(self.__shutdown__)
+        unregister(self._shutdown)
         self.loop.exit()
 
     @ilock()
