@@ -77,6 +77,7 @@ class Data:
 
     class Scope:
         def __init__(self, data, name):
+            assert isinstance(data, Data) and isinstance(name, str)
             self._data = data
             self._name = name
 
@@ -94,6 +95,7 @@ class Data:
 
         # 保存
         def saves(self, updates):
+            assert updates is None or all(isinstance(key, str) for key in updates)
             primary = self._data.primary
             if primary is not None:
                 with Database(**self._data._database) as cursor:
