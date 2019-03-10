@@ -50,7 +50,7 @@ class _Storage:
         self._reader = {}
         self._writer = open(path, mode='a')
         self._dirty = False
-        with open(path) as file:
+        with open(path, mode='r') as file:
             for line in file:
                 item = decode(line.strip('\n'))
                 if item[0] in self._reader:
