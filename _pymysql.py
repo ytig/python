@@ -77,7 +77,6 @@ class Data:
 
     class Scope:
         def __init__(self, data, name):
-            assert isinstance(data, Data) and isinstance(name, str)
             self._data = data
             self._name = name
 
@@ -88,20 +87,19 @@ class Data:
                 with Database(**self._data._database) as cursor:
                     cursor.execute('select data from ' + self._data._table + ' where id=%s', (primary,))
                     row = cursor.fetchone()
-                    return json.loads((row['data'] if row else None) or '{}').get(self._name, {})
+                    return json.loads((row['data'] if row else '') or '{}').get(self._name, {})
             else:
                 with Lock(self._data):
                     return json.loads(self._data._data or '{}').get(self._name, {})
 
         # 保存
         def saves(self, updates):
-            assert updates is None or all(isinstance(key, str) for key in updates)
             primary = self._data.primary
             if primary is not None:
                 with Database(**self._data._database) as cursor:
                     cursor.execute('select data from ' + self._data._table + ' where id=%s for update', (primary,))
                     row = cursor.fetchone()
-                    obj = json.loads((row['data'] if row else None) or '{}')
+                    obj = json.loads((row['data'] if row else '') or '{}')
                     if updates is None:
                         if self._name in obj:
                             obj.pop(self._name)
@@ -109,6 +107,7 @@ class Data:
                         obj[self._name] = value_not_none(safe_sum(obj.get(self._name, {}), updates))
                         if not obj[self._name]:
                             obj.pop(self._name)
+                    assert isjson(obj)
                     cursor.execute('update ' + self._data._table + ' set data=%s where id=%s', (json.dumps(obj) if obj else '', primary,))
             else:
                 with Lock(self._data):
@@ -120,6 +119,7 @@ class Data:
                         obj[self._name] = value_not_none(safe_sum(obj.get(self._name, {}), updates))
                         if not obj[self._name]:
                             obj.pop(self._name)
+                    assert isjson(obj)
                     self._data._data = json.dumps(obj) if obj else ''
 
         # 读取

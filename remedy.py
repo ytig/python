@@ -45,3 +45,22 @@ def key_in_list(generics, *keys):
 # 滤值
 def value_not_none(generics):
     return filter_items(generics, lambda i: i[-1] is not None)
+
+
+# 可序列化
+def isjson(obj):
+    if obj is None:
+        return True
+    if obj in (False, True,):
+        return True
+    if isinstance(obj, int):
+        return True
+    if isinstance(obj, float):
+        return obj == obj and obj != float('inf') and obj != float('-inf')
+    if isinstance(obj, str):
+        return True
+    if isinstance(obj, (tuple, list,)):
+        return all(isjson(i) for i in obj)
+    if isinstance(obj, dict):
+        return all(isinstance(k, str) for k in obj) and all(isjson(v) for v in obj.values())
+    return False
