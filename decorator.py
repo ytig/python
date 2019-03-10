@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-import json
+import pickle
 import inspect
 import threading
 import atexit
@@ -259,7 +259,7 @@ def instance():
         @staticmethod
         def __new__(*args, **kwargs):
             if args[0] is __class__:
-                sid = json.dumps((args[1:], sorted(kwargs.items(), key=lambda i: i[0]),))
+                sid = pickle.dumps((args[1:], sorted(kwargs.items(), key=lambda i: i[0]),))
                 with Lock(instance):
                     assert hasvar(instance, '__instance__') or setvar(instance, '__instance__', dict())
                     INSTANCES = getvar(instance, '__instance__')
