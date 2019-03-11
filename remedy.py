@@ -64,3 +64,70 @@ def isjson(obj):
     if isinstance(obj, dict):
         return all(isinstance(k, str) for k in obj) and all(isjson(v) for v in obj.values())
     return False
+
+
+# 负值（排序倒序）
+class negative:
+    def __init__(self, value):
+        if not isinstance(value, negative):
+            self.even = False
+            self.value = value
+        else:
+            self.even = not value.even
+            self.value = value.value
+
+    def comparable(self, other):
+        if not self.even:
+            return isinstance(other, negative) and not other.even
+        else:
+            return not isinstance(other, negative) or other.even
+
+    def __lt__(self, other):
+        assert self.comparable(other)
+        if not self.even:
+            return self.value > other.value
+        elif isinstance(other, negative):
+            return self.value < other.value
+        else:
+            return self.value < other
+
+    def __gt__(self, other):
+        assert self.comparable(other)
+        if not self.even:
+            return self.value < other.value
+        elif isinstance(other, negative):
+            return self.value > other.value
+        else:
+            return self.value > other
+
+    def __le__(self, other):
+        assert self.comparable(other)
+        if not self.even:
+            return self.value >= other.value
+        elif isinstance(other, negative):
+            return self.value <= other.value
+        else:
+            return self.value <= other
+
+    def __ge__(self, other):
+        assert self.comparable(other)
+        if not self.even:
+            return self.value <= other.value
+        elif isinstance(other, negative):
+            return self.value >= other.value
+        else:
+            return self.value >= other
+
+    def __eq__(self, other):
+        assert self.comparable(other)
+        if isinstance(other, negative):
+            return self.value == other.value
+        else:
+            return self.value == other
+
+    def __ne__(self, other):
+        assert self.comparable(other)
+        if isinstance(other, negative):
+            return self.value != other.value
+        else:
+            return self.value != other
