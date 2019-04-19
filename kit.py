@@ -5,6 +5,7 @@ import os
 import sys
 import types
 import inspect
+import weakref
 import threading
 import traceback
 import itertools
@@ -283,6 +284,22 @@ def getnonlocals(func, name):
     return dict(zip(func.__code__.co_freevars, func.__closure__))[name].cell_contents
 
 
+# 虚函数
+class weakmethod:
+    GC = object()  # 已回收
+
+    def __init__(self, obj, name):
+        self.ref = weakref.ref(obj)
+        self.name = name
+
+    def __call__(self, *args, **kwargs):
+        obj = self.ref()
+        if obj is not None:
+            return apply(obj, self.name, *args, **kwargs)
+        else:
+            return weakmethod.GC
+
+
 # 栈帧
 class frames(list):
     # 追溯模式
@@ -297,8 +314,8 @@ class frames(list):
             return ret
         return make
 
-    def __init__(self, back=0, keep=None, make=None):
-        super().__init__([i.frame for i in (make() if make else inspect.stack()[1:])[back:] if not keep or keep(i.frame)])
+    def __init__(self, back=0, keep=lambda f: True, make=lambda: inspect.stack()[2:]):
+        super().__init__([i.frame for i in make()[back:] if keep(i.frame)])
 
     def __enter__(self):
         return self

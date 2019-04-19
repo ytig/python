@@ -4,8 +4,8 @@ import socks
 import socket
 import inspect
 import threading
+from kit import weakmethod
 from decorator import Lock, ilock
-from ab import weakmethod
 from logger import loge
 
 

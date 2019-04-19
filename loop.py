@@ -2,8 +2,8 @@
 import time
 import threading
 import itertools
+from kit import weakmethod
 from decorator import Lock, ilock, ithrow
-from ab import weakmethod
 from shutdown import bregister, unregister
 from logger import loge
 
