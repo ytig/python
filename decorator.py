@@ -211,19 +211,15 @@ def mthrow(r=None):
 def instance():
     def decorator(__class__):
         cid = unique()
-        none = object()
 
-        def init(ret=getvar(__class__, '__init__', d=none)):
-            if ret is none:
-                for b in type.mro(__class__)[1:]:
-                    if b is object:
-                        ret = lambda self, *args, **kwargs: object.__dict__['__init__'](self, *args, **kwargs)
-                        break
-                    elif hasvar(b, '__init__'):
-                        ret = getvar(b, '__init__')
-                        break
-            assert callable(ret)
-            return ret
+        def super_init(self, var=getvar(__class__, '__init__')):
+            if var is not None:
+                var = var.__get__(self, type(self))
+            else:
+                var = super(__class__, self).__init__
+                if getattr(var, '__objclass__', None) is object:
+                    var = lambda self, *args, **kwargs: object.__init__(self, *args, **kwargs)
+            return var
 
         def __init__(self, *args, **kwargs):
             if type(self) is __class__:
@@ -232,7 +228,7 @@ def instance():
                         instances = getvar(instance, '__instance__')[cid]
                         assert self in instances.values()
                     try:
-                        assert hasvar(self, '__old__') or setvar(self, '__old__', init()(self, *args, **kwargs))
+                        assert hasvar(self, '__old__') or setvar(self, '__old__', super_init(self)(*args, **kwargs))
                         return getvar(self, '__old__')
                     except BaseException:
                         with Lock(instance):
@@ -241,25 +237,21 @@ def instance():
                                     del instances[k]
                         raise
             else:
-                return init()(self, *args, **kwargs)
+                return super_init(self)(*args, **kwargs)
         assert setvar(__class__, '__init__', __init__)
 
-        def new(ret=getvar(__class__, '__new__', d=none)):
-            if ret is none:
-                for b in type.mro(__class__)[1:]:
-                    if b is object:
-                        ret = staticmethod(lambda *args, **kwargs: object.__dict__['__new__'](args[0]))
-                        break
-                    elif hasvar(b, '__new__'):
-                        ret = getvar(b, '__new__')
-                        break
-            assert isinstance(ret, staticmethod) and callable(ret.__func__)
-            return ret.__func__
+        def super_new(mcls, var=getvar(__class__, '__new__')):
+            if var is not None:
+                var = var.__get__(None, mcls)
+            else:
+                var = super(__class__, mcls).__new__
+                if getattr(var, '__self__', None) is object:
+                    var = lambda mcls, *args, **kwargs: object.__new__(mcls)
+            return var
 
-        @staticmethod
-        def __new__(*args, **kwargs):
-            if args[0] is __class__:
-                sid = pickle.dumps((args[1:], sorted(kwargs.items(), key=lambda i: i[0]),))
+        def __new__(mcls, *args, **kwargs):
+            if mcls is __class__:
+                sid = pickle.dumps((args, sorted(kwargs.items(), key=lambda i: i[0]),))
                 with Lock(instance):
                     assert hasvar(instance, '__instance__') or setvar(instance, '__instance__', dict())
                     INSTANCES = getvar(instance, '__instance__')
@@ -267,10 +259,10 @@ def instance():
                         INSTANCES[cid] = dict()
                     instances = INSTANCES[cid]
                     if sid not in instances:
-                        instances[sid] = new()(*args, **kwargs)
+                        instances[sid] = super_new(mcls)(mcls, *args, **kwargs)
                     return instances[sid]
             else:
-                return new()(*args, **kwargs)
+                return super_new(mcls)(mcls, *args, **kwargs)
         assert setvar(__class__, '__new__', __new__)
         return __class__
     return decorator
