@@ -27,9 +27,9 @@ class BasicFormatter(logging.Formatter):
 
 
 class BasicHandler(logging.StreamHandler):
-    def __init__(self):
+    def __init__(self, formatter):
         super().__init__(stream=sys.stdout)
-        self.formatter = BasicFormatter(fmt='{levelname[0]}/{name}: {message}', style='{')
+        self.formatter = formatter
 
     def format(self, record):
         s = super().format(record)
@@ -41,12 +41,16 @@ class BasicHandler(logging.StreamHandler):
 
 
 # 配置
-def config(level=logging.INFO):
+def config(level=logging.INFO, asctime=False):
     logging._acquireLock()
     try:
         if len(logging.root.handlers) == 0:
             logging.root.name = ''
-            logging.basicConfig(handlers=(BasicHandler(),), level=level)
+            if not asctime:
+                h = BasicHandler(BasicFormatter(fmt='{levelname[0]}/{name}: {message}', style='{'))
+            else:
+                h = BasicHandler(BasicFormatter(fmt='{asctime}.{msecs:.0f} {levelname[0]}/{name}: {message}', datefmt='%m-%d %H:%M:%S', style='{'))
+            logging.basicConfig(handlers=(h,), level=level)
             return True
         else:
             return False
