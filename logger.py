@@ -6,7 +6,7 @@ import logging
 class BasicFormatter(logging.Formatter):
     def format(self, record):
         record.message = record.getMessage()
-        if record.name == 'root':
+        if record.name is None:
             s = record.message
         else:
             if self.usesTime():
@@ -42,7 +42,16 @@ class BasicHandler(logging.StreamHandler):
 
 # 配置
 def config(level=logging.INFO):
-    logging.basicConfig(handlers=(BasicHandler(),), level=level)
+    logging._acquireLock()
+    try:
+        if len(logging.root.handlers) == 0:
+            logging.root.name = None
+            logging.basicConfig(handlers=(BasicHandler(),), level=level)
+            return True
+        else:
+            return False
+    finally:
+        logging._releaseLock()
 
 
 # 调试
