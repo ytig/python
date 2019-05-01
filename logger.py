@@ -1,77 +1,80 @@
 #!/usr/local/bin/python3
 import sys
-import traceback
-from decorator import clock
+import logging
 
 
-# 打印错误
-def loge(e):
+class BasicFormatter(logging.Formatter):
+    def format(self, record):
+        record.message = record.getMessage()
+        if record.name == 'root':
+            s = record.message
+        else:
+            if self.usesTime():
+                record.asctime = self.formatTime(record, self.datefmt)
+            s = self.formatMessage(record)
+        if record.exc_info:
+            if not record.exc_text:
+                record.exc_text = self.formatException(record.exc_info)
+        if record.exc_text:
+            if s and s[-1:] != "\n":
+                s = s + "\n"
+            s = s + record.exc_text
+        if record.stack_info:
+            if s and s[-1:] != "\n":
+                s = s + "\n"
+            s = s + self.formatStack(record.stack_info)
+        return s
+
+
+class BasicHandler(logging.StreamHandler):
+    def __init__(self):
+        super().__init__(stream=sys.stdout)
+        self.formatter = BasicFormatter(fmt='{levelname[0]}/{name}: {message}', style='{')
+
+    def format(self, record):
+        s = super().format(record)
+        if self.stream.isatty():
+            color = {30: 34, 40: 31, }.get(record.levelno)
+            if color is not None:
+                s = '\033[0;%d;48m%s\033[0m' % (color, s,)
+        return s
+
+
+# 配置
+def config(level=logging.INFO):
+    logging.basicConfig(handlers=(BasicHandler(),), level=level)
+
+
+# 调试
+def debug(*args, tag=None):
+    logging.getLogger(name=tag).debug(' '.join(args))
+
+
+# 信息
+def info(*args, tag=None):
+    logging.getLogger(name=tag).info(' '.join(args))
+
+
+# 警告
+def warning(*args, tag=None):
+    logging.getLogger(name=tag).warning(' '.join(args))
+
+
+# 错误
+def error(*args, tag=None):
+    logging.getLogger(name=tag).error(' '.join(args))
+
+
+d = debug
+i = info
+w = warning
+e = error
+
+
+# 异常
+def exception(e):
     if e is None:
-        e = sys.exc_info()[1]
-    assert isinstance(e, BaseException)
-    return Log.e(''.join(traceback.format_exception(type(e), e, e.__traceback__)).rstrip('\n'))
-
-
-class Printer:
-    # 打印
-    def print(self, *args, **kwargs):
-        print(*args, **kwargs)
-
-    # 着色
-    def paint(self, *args, **kwargs):
-        file = kwargs.get('file')
-        if file is None:
-            file = sys.stdout
-        if file.isatty():
-            print(*args, **kwargs)
-
-
-class Log:
-    VERBOSE = 2  # 冗长
-    DEBUG = 3  # 调试
-    INFO = 4  # 信息
-    WARN = 5  # 警告
-    ERROR = 6  # 异常
-    ASSERT = 7  # 断言
-    LEVEL = INFO  # 日志级别
-    LOGGER = Printer()  # 日志输出
-
-    # 打印日志
-    @staticmethod
-    @clock(lambda: __class__)
-    def log(level, *args, tag=None):
-        if level < Log.LEVEL:
-            return False
-        color = {Log.WARN: 34, Log.ERROR: 31, }.get(level)
-        if color is not None:
-            Log.LOGGER.paint('\033[0;%d;48m' % (color,), end='', flush=True)
-        if tag is not None:
-            args = ({Log.VERBOSE: 'V', Log.DEBUG: 'D', Log.INFO: 'I', Log.WARN: 'W', Log.ERROR: 'E', Log.ASSERT: 'A', }.get(level) + '/' + tag + ':', *args,)
-        Log.LOGGER.print(*args, flush=True)
-        if color is not None:
-            Log.LOGGER.paint('\033[0m', end='', flush=True)
-        return True
-
-    @staticmethod
-    def v(*args, **kwargs):
-        return Log.log(Log.VERBOSE, *args, **kwargs)
-
-    @staticmethod
-    def d(*args, **kwargs):
-        return Log.log(Log.DEBUG, *args, **kwargs)
-
-    @staticmethod
-    def i(*args, **kwargs):
-        return Log.log(Log.INFO, *args, **kwargs)
-
-    @staticmethod
-    def w(*args, **kwargs):
-        return Log.log(Log.WARN, *args, **kwargs)
-
-    @staticmethod
-    def e(*args, **kwargs):
-        return Log.log(Log.ERROR, *args, **kwargs)
-
-    @staticmethod
-    def a(*args, **kwargs):
-        return Log.log(Log.ASSERT, *args, **kwargs)
+        logging.exception('')
+    else:
+        assert isinstance(e, BaseException)
+        logging.exception('', exc_info=e)

@@ -4,9 +4,9 @@ import socks
 import socket
 import inspect
 import threading
+import logger
 from kit import weakmethod
 from decorator import Lock, ilock
-from logger import loge
 
 
 # 地址转换
@@ -99,7 +99,7 @@ class SendThread(threading.Thread):
         try:
             self.sender.send(data)
         except BaseException as e:
-            loge(e)
+            logger.exception(e)
         else:
             self.waker()
 
@@ -269,7 +269,7 @@ class RecvThread(threading.Thread):
         except EOFError:
             raise
         except BaseException as e:
-            loge(e)
+            logger.exception(e)
         finally:
             with Lock(self):
                 if not self.blocking:
@@ -280,7 +280,7 @@ class RecvThread(threading.Thread):
         try:
             self.recver.shutdown()
         except BaseException as e:
-            loge(e)
+            logger.exception(e)
 
 
 class HandleThread(threading.Thread):
@@ -339,7 +339,7 @@ class HandleThread(threading.Thread):
         try:
             self.handler(data)
         except BaseException as e:
-            loge(e)
+            logger.exception(e)
 
 
 class Recver:
@@ -414,7 +414,7 @@ class BeatThread(threading.Thread):
         try:
             self.beater(repeat)
         except BaseException as e:
-            loge(e)
+            logger.exception(e)
 
 
 # 一举两得

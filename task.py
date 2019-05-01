@@ -1,8 +1,8 @@
 #!/usr/local/bin/python3
 import inspect
 import threading
+import logger
 from decorator import Lock, ilock
-from logger import loge
 
 
 # 并发执行
@@ -19,7 +19,7 @@ class Tree:
     SEIZE = object()  # 占位符
 
     class Twig:
-        def __init__(self, target, args=(), kwargs={}, log=loge):
+        def __init__(self, target, args=(), kwargs={}, log=logger.exception):
             self.target = target
             self.args = args
             self.kwargs = kwargs

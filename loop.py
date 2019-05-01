@@ -2,10 +2,10 @@
 import time
 import threading
 import itertools
+import logger
 from kit import weakmethod
 from decorator import Lock, ilock, ithrow
 from shutdown import bregister, unregister
-from logger import loge
 
 
 class Loop:
@@ -19,7 +19,7 @@ class Loop:
 
     # 执行
     @ilock()
-    def post(self, target, args=(), kwargs={}, log=loge, delay=0, tag=''):
+    def post(self, target, args=(), kwargs={}, log=logger.exception, delay=0, tag=''):
         assert not self.closed.is_set(), 'loop has been closed'
         until = time.monotonic() + max(delay, 0)
         pid = next(self.count)
