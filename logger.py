@@ -47,21 +47,29 @@ def config(level=logging.INFO):
 
 # 调试
 def debug(*args, tag=None):
+    if len(logging.root.handlers) == 0:
+        config()
     logging.getLogger(name=tag).debug(' '.join(args))
 
 
 # 信息
 def info(*args, tag=None):
+    if len(logging.root.handlers) == 0:
+        config()
     logging.getLogger(name=tag).info(' '.join(args))
 
 
 # 警告
 def warning(*args, tag=None):
+    if len(logging.root.handlers) == 0:
+        config()
     logging.getLogger(name=tag).warning(' '.join(args))
 
 
 # 错误
 def error(*args, tag=None):
+    if len(logging.root.handlers) == 0:
+        config()
     logging.getLogger(name=tag).error(' '.join(args))
 
 
@@ -73,6 +81,8 @@ e = error
 
 # 异常
 def exception(e):
+    if len(logging.root.handlers) == 0:
+        config()
     if e is None:
         logging.exception('')
     else:
