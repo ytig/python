@@ -6,7 +6,7 @@ import logging
 class BasicFormatter(logging.Formatter):
     def format(self, record):
         record.message = record.getMessage()
-        if record.name is None:
+        if not record.name:
             s = record.message
         else:
             if self.usesTime():
@@ -45,7 +45,7 @@ def config(level=logging.INFO):
     logging._acquireLock()
     try:
         if len(logging.root.handlers) == 0:
-            logging.root.name = None
+            logging.root.name = ''
             logging.basicConfig(handlers=(BasicHandler(),), level=level)
             return True
         else:
