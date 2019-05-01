@@ -58,28 +58,28 @@ def config(level=logging.INFO):
 def debug(*args, tag=None):
     if len(logging.root.handlers) == 0:
         config()
-    logging.getLogger(name=tag).debug(' '.join(args))
+    logging.getLogger(name=tag).debug(' '.join(str(arg) for arg in args))
 
 
 # 信息
 def info(*args, tag=None):
     if len(logging.root.handlers) == 0:
         config()
-    logging.getLogger(name=tag).info(' '.join(args))
+    logging.getLogger(name=tag).info(' '.join(str(arg) for arg in args))
 
 
 # 警告
 def warning(*args, tag=None):
     if len(logging.root.handlers) == 0:
         config()
-    logging.getLogger(name=tag).warning(' '.join(args))
+    logging.getLogger(name=tag).warning(' '.join(str(arg) for arg in args))
 
 
 # 错误
 def error(*args, tag=None):
     if len(logging.root.handlers) == 0:
         config()
-    logging.getLogger(name=tag).error(' '.join(args))
+    logging.getLogger(name=tag).error(' '.join(str(arg) for arg in args))
 
 
 d = debug
