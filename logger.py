@@ -49,7 +49,7 @@ def config(level=logging.INFO, asctime=False):
             if not asctime:
                 h = BasicHandler(BasicFormatter(fmt='{levelname[0]}/{name}: {message}', style='{'))
             else:
-                h = BasicHandler(BasicFormatter(fmt='{asctime}.{msecs:.0f} {levelname[0]}/{name}: {message}', datefmt='%m-%d %H:%M:%S', style='{'))
+                h = BasicHandler(BasicFormatter(fmt='{asctime}.{msecs:0>3.0f} {levelname[0]}/{name}: {message}', datefmt='%m-%d %H:%M:%S', style='{'))
             logging.basicConfig(handlers=(h,), level=level)
             return True
         else:
