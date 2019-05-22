@@ -361,14 +361,14 @@ class Recver:
                     data = self.sock.recv(1024, socket.MSG_DONTWAIT)
                 except BlockingIOError:
                     raise TimeoutError
-                except ConnectionResetError:
+                except ConnectionError:
                     data = b''
             else:
                 try:
                     data = self.sock.recv(1024)
                 except socket.timeout:
                     raise TimeoutError
-                except ConnectionResetError:
+                except ConnectionError:
                     data = b''
             if data:
                 self.buffer += data
