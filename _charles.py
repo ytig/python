@@ -20,14 +20,14 @@ class SocketWrapper:
                 data = sock.recv(1024, socket.MSG_DONTWAIT)
             except BlockingIOError:
                 raise TimeoutError
-            except ConnectionResetError:
+            except ConnectionError:
                 data = b''
         else:
             try:
                 data = sock.recv(1024)
             except socket.timeout:
                 raise TimeoutError
-            except ConnectionResetError:
+            except ConnectionError:
                 data = b''
         if not data:
             raise EOFError
