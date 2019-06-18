@@ -2,53 +2,84 @@
 import threading
 import socket
 import logger
-from decorator import Lock
+
+
+class RWLock:
+    def __init__(self):
+        self.rlock = threading.Lock()
+        self.wlock = threading.Lock()
+        self.refs = 0
+
+    def acquire_read(self):
+        with self.rlock:
+            self.refs += 1
+            if self.refs == 1:
+                self.wlock.acquire()
+
+    def release_read(self):
+        with self.rlock:
+            self.refs -= 1
+            if self.refs == 0:
+                self.wlock.release()
+
+    def acquire_write(self):
+        self.wlock.acquire()
+
+    def release_write(self):
+        self.wlock.release()
 
 
 class SocketWrapper:
     def __init__(self, sock):
-        self._sock = sock
+        self.sock = sock
+        self.lock = RWLock()
 
     # 接收
     def recv(self):
-        with Lock(self):
-            sock = self._sock
-        if sock is None:
-            raise EOFError
-        if sock.timeout is None:
-            try:
-                data = sock.recv(1024, socket.MSG_DONTWAIT)
-            except BlockingIOError:
-                raise TimeoutError
-            except ConnectionError:
-                data = b''
-        else:
-            try:
-                data = sock.recv(1024)
-            except socket.timeout:
-                raise TimeoutError
-            except ConnectionError:
-                data = b''
-        if not data:
-            raise EOFError
-        return data
+        self.lock.acquire_read()
+        try:
+            if self.sock is None:
+                raise EOFError
+            if self.sock.timeout is None:
+                try:
+                    data = self.sock.recv(1024, socket.MSG_DONTWAIT)
+                except BlockingIOError:
+                    raise TimeoutError
+                except ConnectionError:
+                    data = b''
+            else:
+                try:
+                    data = self.sock.recv(1024)
+                except socket.timeout:
+                    raise TimeoutError
+                except ConnectionError:
+                    data = b''
+            if not data:
+                raise EOFError
+            return data
+        finally:
+            self.lock.release_read()
 
     # 发送
     def send(self, data):
-        with Lock(self):
-            sock = self._sock
-        if sock is None:
-            raise EOFError
-        if data is not None:
-            sock.sendall(data)
+        self.lock.acquire_read()
+        try:
+            if self.sock is None:
+                raise EOFError
+            if data is not None:
+                self.sock.sendall(data)
+        finally:
+            self.lock.release_read()
 
     # 关闭
     def close(self):
-        with Lock(self):
-            sock = self._sock
-            self._sock = None
-        if sock is not None:
-            sock.close()
+        self.lock.acquire_write()
+        try:
+            if self.sock is not None:
+                self.sock.close()
+                self.sock = None
+        finally:
+            self.lock.release_write()
 
 
 class ForwardThread(threading.Thread):
@@ -65,6 +96,7 @@ class ForwardThread(threading.Thread):
                 pass
             except EOFError:
                 self.recver.close()
+                self.sender.close()
                 break
 
 
@@ -74,11 +106,13 @@ class ForwardServer:
         self.server = server
 
     # 运行转发服务
-    def run(self, forward, port=8887):
+    def run(self, forward, server='localhost:8887'):
         _host, _port, = forward.split(':')
         _port = int(_port)
+        host, port = server.split(':')
+        port = int(port)
         sock = socket.socket()
-        sock.bind(('localhost', port,))
+        sock.bind((host, port,))
         sock.listen(32)
         while True:
             client = self.client(sock.accept()[0])
