@@ -1,10 +1,17 @@
 <template>
-  <div class="container"></div>
+  <div class="container">
+    <i-title :name="'Registers'"></i-title>
+  </div>
 </template>
 
 <script>
+import iTitle from "@/views/Title";
+
 export default {
-  name: "Registers"
+  name: "Registers",
+  components: {
+    "i-title": iTitle
+  }
 };
 </script>
 
