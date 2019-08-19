@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="window">
     <i-title :name="'Memory'"></i-title>
   </div>
 </template>
@@ -18,7 +18,7 @@ export default {
 <style lang="less" scoped>
 @import "~@/styles/global.less";
 
-.container {
+.window {
   width: 530px; //todo
 }
 </style>

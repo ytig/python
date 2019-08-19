@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="window">
     <i-title :name="'Registers'"></i-title>
   </div>
 </template>
@@ -18,7 +18,7 @@ export default {
 <style lang="less" scoped>
 @import "~@/styles/global.less";
 
-.container {
+.window {
   height: 160px; //todo
 }
 </style>
