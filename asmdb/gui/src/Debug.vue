@@ -69,10 +69,18 @@ export default {
       flex-grow: 1;
     }
     #points-layout {
-      height: 160px;
       background: @color-dark-background;
       border-top: 1px solid @color-border;
       border-bottom: 1px solid @color-border;
+      display: flex;
+      #breakpoints {
+        flex-grow: 1;
+        height: 100%;
+        border-right: 1px solid @color-border;
+      }
+      #watchpoints {
+        height: 160px;
+      }
     }
   }
 
