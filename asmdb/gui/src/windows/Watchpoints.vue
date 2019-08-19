@@ -1,6 +1,6 @@
 <template>
   <div class="window">
-    <i-title :name="'Watchpoints'"></i-title>
+    <i-title :name="'watch'"></i-title>
   </div>
 </template>
 

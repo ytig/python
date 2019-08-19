@@ -1,6 +1,6 @@
 <template>
   <div>
-    <i-title :name="'Breakpoints'"></i-title>
+    <i-title :name="'break'"></i-title>
   </div>
 </template>
 
