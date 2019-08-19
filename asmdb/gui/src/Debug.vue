@@ -83,13 +83,11 @@ export default {
     display: flex;
     flex-direction: column;
     #registers {
-      height: 114px;
       border-bottom: 1px solid @color-border;
     }
     #heap-layout {
       flex-grow: 1;
       #stack {
-        width: 360px;
         height: 100%;
         border-right: 1px solid @color-border;
       }
