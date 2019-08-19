@@ -1,17 +1,17 @@
 <template>
   <div id="container">
-    <div id="left_layout">
+    <div id="left-layout">
       <i-bar id="bar"></i-bar>
       <i-assembly id="assembly"></i-assembly>
-      <div id="points_layout">
+      <div id="points-layout">
         <i-breakpoints id="breakpoints"></i-breakpoints>
         <i-watchpoints id="watchpoints"></i-watchpoints>
       </div>
       <i-python3 id="python3"></i-python3>
     </div>
-    <div id="right_layout">
+    <div id="right-layout">
       <i-registers id="registers"></i-registers>
-      <div id="heap_layout">
+      <div id="heap-layout">
         <i-stack id="stack"></i-stack>
         <i-memory id="memory"></i-memory>
       </div>
@@ -54,7 +54,7 @@ export default {
   display: flex;
   background: @color-background;
 
-  #left_layout {
+  #left-layout {
     flex-grow: 1;
     height: 100%;
     padding-bottom: 50px;
@@ -63,26 +63,39 @@ export default {
     #bar {
       height: 40px;
       background: @color-dark-background;
-      border-bottom: 1px solid @color-line;
+      border-bottom: 1px solid @color-border;
     }
     #assembly {
       flex-grow: 1;
     }
-    #points_layout {
+    #points-layout {
       height: 160px;
       background: @color-dark-background;
-      border-top: 1px solid @color-line;
-      border-bottom: 1px solid @color-line;
+      border-top: 1px solid @color-border;
+      border-bottom: 1px solid @color-border;
     }
   }
 
-  #right_layout {
+  #right-layout {
     width: 890px;
     height: 100%;
     box-shadow: 0 5px 5px @color-shadow;
+    display: flex;
+    flex-direction: column;
     #registers {
       height: 114px;
-      border-bottom: 1px solid @color-line;
+      border-bottom: 1px solid @color-border;
+    }
+    #heap-layout {
+      flex-grow: 1;
+      #stack {
+        width: 360px;
+        height: 100%;
+        border-right: 1px solid @color-border;
+      }
+      #memory {
+        height: 100%;
+      }
     }
   }
 }
