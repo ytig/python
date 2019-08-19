@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div class="container"></div>
 </template>
 
 <script>
@@ -8,5 +8,10 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less" scoped>
+@import "~@/styles/global.less";
+
+.container {
+  height: 40px; //todo
+}
 </style>

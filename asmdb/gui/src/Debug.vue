@@ -61,7 +61,6 @@ export default {
     display: flex;
     flex-direction: column;
     #bar {
-      height: 40px;
       background: @color-dark-background;
       border-bottom: 1px solid @color-border;
     }
@@ -77,9 +76,6 @@ export default {
         flex-grow: 1;
         height: 100%;
         border-right: 1px solid @color-border;
-      }
-      #watchpoints {
-        height: 160px;
       }
     }
   }
