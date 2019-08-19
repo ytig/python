@@ -1,5 +1,5 @@
 <template>
-  <div id="container">
+  <div id="root">
     <div id="left-layout">
       <i-bar id="bar"></i-bar>
       <i-assembly id="assembly"></i-assembly>
@@ -47,7 +47,7 @@ export default {
 <style lang="less" scoped>
 @import "~@/styles/global.less";
 
-#container {
+#root {
   position: fixed;
   width: 100%;
   height: 100%;
