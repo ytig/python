@@ -17,11 +17,13 @@ export default {
 @import "~@/styles/global.less";
 
 .title-container {
+  height: 36px;
   padding: 0px 12px;
   line-height: 36px;
   span {
     font-size: 18px;
     color: @color-title;
+    font-style: italic;
   }
 }
 </style>
