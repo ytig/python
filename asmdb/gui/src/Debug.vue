@@ -44,7 +44,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "~@/styles/global.less";
 
 #container {
@@ -85,7 +85,6 @@ export default {
   }
 
   #right-layout {
-    width: 890px;
     height: 100%;
     box-shadow: 0 5px 5px @color-shadow;
     display: flex;
@@ -95,6 +94,7 @@ export default {
     }
     #heap-layout {
       flex-grow: 1;
+      display: flex;
       #stack {
         height: 100%;
         border-right: 1px solid @color-border;
