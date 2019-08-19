@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: "Memory"
+  name: "Title"
 };
 </script>
 
