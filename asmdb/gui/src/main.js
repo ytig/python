@@ -1,5 +1,3 @@
-import '@/styles/global.css';
-
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 

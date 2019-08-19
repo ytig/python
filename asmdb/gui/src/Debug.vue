@@ -44,14 +44,46 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less">
+@import "~@/styles/global.less";
+
 #container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
-}
-#registers {
-  width: 100px;
-  height: 100px;
-  background: #000;
+  background: @color-background;
+
+  #left_layout {
+    flex-grow: 1;
+    height: 100%;
+    padding-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    #bar {
+      height: 40px;
+      background: @color-dark-background;
+      border-bottom: 1px solid @color-line;
+    }
+    #assembly {
+      flex-grow: 1;
+    }
+    #points_layout {
+      height: 160px;
+      background: @color-dark-background;
+      border-top: 1px solid @color-line;
+      border-bottom: 1px solid @color-line;
+    }
+  }
+
+  #right_layout {
+    width: 890px;
+    height: 100%;
+    box-shadow: 0 5px 5px @color-shadow;
+    #registers {
+      height: 114px;
+      border-bottom: 1px solid @color-line;
+    }
+  }
 }
 </style>
