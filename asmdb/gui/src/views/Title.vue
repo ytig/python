@@ -1,6 +1,6 @@
 <template>
   <div class="title-container">
-    <span>{{name}}</span>
+    <span class="user-select-none">{{name}}</span>
   </div>
 </template>
 
