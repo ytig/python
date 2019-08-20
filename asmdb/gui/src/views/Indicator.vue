@@ -29,8 +29,8 @@ export default {
   display: flex;
   > * {
     flex-grow: 1;
-    height: 36px;
-    line-height: 36px;
+    height: 40px;
+    line-height: 40px;
     text-align: center;
     font-size: 12px;
     background: @color-dark-background;
