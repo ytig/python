@@ -57,6 +57,7 @@ export default {
     border-right: 0px;
     color: @color-light-content;
     text-decoration: underline;
+    line-height: 42px;
     cursor: default;
   }
   > .indicator-item1 {
