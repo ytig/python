@@ -1,8 +1,8 @@
 <template>
   <div class="gird-container">
-    <!-- <div v-for="(key, val) in value" :key="val.id" :style="{'width':width+'px'}">
-      <slot :key="key" :val="key"></slot>
-    </div>-->
+    <div v-for="(item, index) in value" :key="item.id" :style="{'width':width+'px'}">
+      <slot :item="item" :index="index"></slot>
+    </div>
   </div>
 </template>
 
