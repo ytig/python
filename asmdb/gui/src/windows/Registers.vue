@@ -1,5 +1,5 @@
 <template>
-  <div class="window">
+  <div class="registers-container">
     <Title :name="'Registers'"></Title>
   </div>
 </template>
@@ -11,7 +11,7 @@ export default {};
 <style lang="less">
 @import "~@/styles/theme.less";
 
-.window {
+.registers-container {
   height: 160px; //todo
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="window"></div>
+  <div class="bar-container"></div>
 </template>
 
 <script>
@@ -9,7 +9,7 @@ export default {};
 <style lang="less">
 @import "~@/styles/theme.less";
 
-.window {
+.bar-container {
   height: 40px; //todo
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="window">
+  <div class="stack-container">
     <Title :name="'Stack'"></Title>
   </div>
 </template>
@@ -11,7 +11,7 @@ export default {};
 <style lang="less">
 @import "~@/styles/theme.less";
 
-.window {
+.stack-container {
   width: 360px; //todo
 }
 </style>

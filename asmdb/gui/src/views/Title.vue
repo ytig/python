@@ -13,6 +13,8 @@ export default {
 </script>
 
 <style lang="less">
+@import "~@/styles/theme.less";
+
 .title-container {
   height: 36px;
   padding: 0px 12px;

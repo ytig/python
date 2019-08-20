@@ -1,5 +1,5 @@
 <template>
-  <div class="window">
+  <div class="watchpoints-container">
     <Title :name="'watch'"></Title>
   </div>
 </template>
@@ -11,7 +11,7 @@ export default {};
 <style lang="less">
 @import "~@/styles/theme.less";
 
-.window {
+.watchpoints-container {
   width: 160px; //todo
   height: 160px; //todo
 }
