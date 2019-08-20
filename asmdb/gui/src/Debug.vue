@@ -10,8 +10,8 @@
       <Python3 id="python3"></Python3>
     </div>
     <div id="right-layout">
-      <Registers id="registers" :style="{'width':0}"></Registers>
-      <div id="heap-layout">
+      <Registers v-if="registersWidth" id="registers" :style="{width:registersWidth+'px'}"></Registers>
+      <div id="heap-layout" ref="heapLayout">
         <Stack id="stack"></Stack>
         <Memory id="memory"></Memory>
       </div>
@@ -20,7 +20,21 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data: function() {
+    return {
+      registersWidth: 0
+    };
+  },
+  mounted: function() {
+    this.requestLayout();
+  },
+  methods: {
+    requestLayout: function() {
+      this.registersWidth = this.$refs.heapLayout.offsetWidth;
+    }
+  }
+};
 </script>
 
 <style lang="less">
