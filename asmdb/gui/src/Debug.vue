@@ -1,47 +1,26 @@
 <template>
   <div id="root">
     <div id="left-layout">
-      <i-bar id="bar"></i-bar>
-      <i-assembly id="assembly"></i-assembly>
+      <Bar id="bar"></Bar>
+      <Assembly id="assembly"></Assembly>
       <div id="points-layout">
-        <i-breakpoints id="breakpoints"></i-breakpoints>
-        <i-watchpoints id="watchpoints"></i-watchpoints>
+        <Breakpoints id="breakpoints"></Breakpoints>
+        <Watchpoints id="watchpoints"></Watchpoints>
       </div>
-      <i-python3 id="python3"></i-python3>
+      <Python3 id="python3"></Python3>
     </div>
     <div id="right-layout">
-      <i-registers id="registers"></i-registers>
+      <Registers id="registers"></Registers>
       <div id="heap-layout">
-        <i-stack id="stack"></i-stack>
-        <i-memory id="memory"></i-memory>
+        <Stack id="stack"></Stack>
+        <Memory id="memory"></Memory>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import iAssembly from "@/windows/Assembly";
-import iBar from "@/windows/Bar";
-import iBreakpoints from "@/windows/Breakpoints";
-import iMemory from "@/windows/Memory";
-import iPython3 from "@/windows/Python3";
-import iRegisters from "@/windows/Registers";
-import iStack from "@/windows/Stack";
-import iWatchpoints from "@/windows/Watchpoints";
-
-export default {
-  name: "Debug",
-  components: {
-    "i-assembly": iAssembly,
-    "i-bar": iBar,
-    "i-breakpoints": iBreakpoints,
-    "i-memory": iMemory,
-    "i-python3": iPython3,
-    "i-registers": iRegisters,
-    "i-stack": iStack,
-    "i-watchpoints": iWatchpoints
-  }
-};
+export default {};
 </script>
 
 <style lang="less" scoped>

@@ -3,9 +3,7 @@
 </template>
 
 <script>
-export default {
-  name: "Python3"
-};
+export default {};
 </script>
 
 <style>

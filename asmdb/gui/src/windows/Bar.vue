@@ -3,9 +3,7 @@
 </template>
 
 <script>
-export default {
-  name: "Bar"
-};
+export default {};
 </script>
 
 <style lang="less" scoped>

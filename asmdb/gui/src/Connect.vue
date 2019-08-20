@@ -3,9 +3,7 @@
 </template>
 
 <script>
-export default {
-  name: "Connect"
-};
+export default {};
 </script>
 
 <style>

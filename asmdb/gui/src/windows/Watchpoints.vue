@@ -1,18 +1,11 @@
 <template>
   <div class="window">
-    <i-title :name="'watch'"></i-title>
+    <Title :name="'watch'"></Title>
   </div>
 </template>
 
 <script>
-import iTitle from "@/views/Title";
-
-export default {
-  name: "Watchpoints",
-  components: {
-    "i-title": iTitle
-  }
-};
+export default {};
 </script>
 
 <style lang="less" scoped>

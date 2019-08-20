@@ -1,18 +1,11 @@
 <template>
   <div>
-    <i-title :name="'break'"></i-title>
+    <Title :name="'break'"></Title>
   </div>
 </template>
 
 <script>
-import iTitle from "@/views/Title";
-
-export default {
-  name: "Breakpoints",
-  components: {
-    "i-title": iTitle
-  }
-};
+export default {};
 </script>
 
 <style>
