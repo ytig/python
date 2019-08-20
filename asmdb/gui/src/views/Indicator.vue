@@ -4,7 +4,7 @@
       v-for="(item,index) in Array(size)"
       :key="index"
       :class="'user-select-none indicator-item'+(index-value)"
-      @click="$emit()"
+      @click="onClickItem(index)"
     >{{index}}</div>
   </div>
 </template>
@@ -17,6 +17,12 @@ export default {
     },
     value: {
       type: Number
+    }
+  },
+  methods: {
+    onClickItem: function(index) {
+      this.value = index;
+      this.$emit("input", this.value);
     }
   }
 };
@@ -55,10 +61,10 @@ export default {
   }
   > .indicator-item1 {
     border-left: 1px solid @color-border;
-    border-radius: 10px 0px 0px 0px;
+    border-radius: 4px 0px 0px 0px;
   }
   > .indicator-item-1 {
-    border-radius: 0px 10px 0px 0px;
+    border-radius: 0px 4px 0px 0px;
   }
 }
 </style>
