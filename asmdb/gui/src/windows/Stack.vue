@@ -1,6 +1,9 @@
 <template>
   <div class="stack-container">
     <Title :name="'Stack'"></Title>
+    <div v-for="i in Array(40)" :key="i">
+      <span class="todo">1234 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f</span>
+    </div>
   </div>
 </template>
 
@@ -12,6 +15,9 @@ export default {};
 @import "~@/styles/theme.less";
 
 .stack-container {
-  width: 360px; //todo
+  .todo {
+    color: #abb2bf;
+    font-size: 12px;
+  }
 }
 </style>
