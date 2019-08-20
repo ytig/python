@@ -82,7 +82,7 @@ export default {
 
   #right-layout {
     height: 100%;
-    box-shadow: 0 5px 5px @color-shadow;
+    box-shadow: 0px 0px 6px @color-shadow;
     display: flex;
     flex-direction: column;
     #registers {
