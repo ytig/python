@@ -42,7 +42,7 @@ export default {
     background: @color-dark-background;
     border-top: 1px solid @color-border;
     border-right: 1px solid @color-border;
-    color: @color-content;
+    color: @color-dark-content;
     cursor: pointer;
   }
   > *:last-child {
