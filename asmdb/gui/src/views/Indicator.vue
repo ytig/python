@@ -3,7 +3,8 @@
     <div
       v-for="(item,index) in Array(size)"
       :key="index"
-      :class="'indicator-item'+(item-value)"
+      :class="'user-select-none indicator-item'+(index-value)"
+      @click="$emit()"
     >{{index}}</div>
   </div>
 </template>
@@ -26,19 +27,38 @@ export default {
 
 .indicator-container {
   display: flex;
-  > *:first-child {
-    border-left: 0px;
-  }
   > * {
     flex-grow: 1;
-    height: 40px;
-    line-height: 40px;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    font-size: 12px;
     background: @color-dark-background;
     border-top: 1px solid @color-border;
+    border-right: 1px solid @color-border;
+    color: @color-content;
+    cursor: pointer;
+  }
+  > *:last-child {
+    border-right: 0px;
+  }
+  > *:hover {
+    background: @color-light-background;
+  }
+  > .indicator-item0 {
+    background: transparent;
+    border-top: 0px;
+    border-right: 0px;
+    color: @color-light-content;
+    text-decoration: underline;
+    cursor: default;
+  }
+  > .indicator-item1 {
     border-left: 1px solid @color-border;
-    text-align: center;
-    color: #abb2bf;
-    font-size: 12px;
+    border-radius: 10px 0px 0px 0px;
+  }
+  > .indicator-item-1 {
+    border-radius: 0px 10px 0px 0px;
   }
 }
 </style>
