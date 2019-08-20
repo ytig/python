@@ -21,11 +21,9 @@ export default {
   padding: 0px 12px;
   line-height: 36px;
   span {
-    font-size: 16px;
+    font-size: 18px;
     color: @color-title;
-    font-family: Arial;
-    font-style: italic;
-    font-weight: bolder;
+    font-family: "Wawati SC";
   }
 }
 </style>
