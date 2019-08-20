@@ -1,8 +1,8 @@
 <template>
   <div class="registers-container">
     <Title :name="'Registers'"></Title>
-    <Gird :width="400" :value="[{'id':1},{'id':2},{'id':3},{'id':4}]" #default="props">
-      <div style="font-size:16px;color:#fff;">{{props.item.id}}</div>
+    <Gird :value="[{'id':1},{'id':2},{'id':3},{'id':4}]" #default="props">
+      <div style="width:400px;font-size:16px;color:#fff;">{{props.item.id}}</div>
     </Gird>
   </div>
 </template>
