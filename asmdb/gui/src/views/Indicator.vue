@@ -21,6 +21,9 @@ export default {
   },
   methods: {
     onClickItem: function(index) {
+      if (this.value == index) {
+        return;
+      }
       this.value = index;
       this.$emit("input", this.value);
     }
@@ -39,33 +42,14 @@ export default {
     line-height: 40px;
     text-align: center;
     font-size: 12px;
-    background: @color-dark-background;
-    border-top: 1px solid @color-border;
-    border-right: 1px solid @color-border;
+    border-top: 1px solid @color-light-border;
     color: @color-dark-content;
     cursor: pointer;
   }
-  > *:last-child {
-    border-right: 0px;
-  }
-  > *:hover {
-    background: @color-light-background;
-  }
   > .indicator-item0 {
-    background: transparent;
-    border-top: 0px;
-    border-right: 0px;
     color: @color-light-content;
     text-decoration: underline;
-    line-height: 42px;
     cursor: default;
-  }
-  > .indicator-item1 {
-    border-left: 1px solid @color-border;
-    border-radius: 4px 0px 0px 0px;
-  }
-  > .indicator-item-1 {
-    border-radius: 0px 4px 0px 0px;
   }
 }
 </style>
