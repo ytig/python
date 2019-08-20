@@ -10,7 +10,7 @@
       <Python3 id="python3"></Python3>
     </div>
     <div id="right-layout">
-      <Registers id="registers"></Registers>
+      <Registers id="registers" :style="{'width':0}"></Registers>
       <div id="heap-layout">
         <Stack id="stack"></Stack>
         <Memory id="memory"></Memory>
@@ -64,12 +64,10 @@ export default {};
     box-shadow: 0px 0px 6px @color-shadow;
     display: flex;
     flex-direction: column;
-    #registers {
-      border-bottom: 1px solid @color-border;
-    }
     #heap-layout {
       flex-grow: 1;
       display: flex;
+      border-top: 1px solid @color-border;
       #stack {
         height: 100%;
         border-right: 1px solid @color-border;
