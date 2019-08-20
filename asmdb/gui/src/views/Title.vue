@@ -21,9 +21,11 @@ export default {
   padding: 0px 12px;
   line-height: 36px;
   span {
-    font-size: 18px;
+    font-size: 16px;
     color: @color-title;
+    font-family: Arial;
     font-style: italic;
+    font-weight: bolder;
   }
 }
 </style>
