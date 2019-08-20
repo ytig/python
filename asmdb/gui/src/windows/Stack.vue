@@ -1,7 +1,7 @@
 <template>
   <div class="stack-container">
     <Title :name="'Stack'"></Title>
-    <div v-for="i in Array(38)" :key="i">
+    <div v-for="i in Array(39)" :key="i">
       <div class="todo">+0x190 &nbsp;00 01 02 03 04 05 06 07</div>
     </div>
     <div class="indicator">
