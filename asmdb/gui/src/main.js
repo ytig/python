@@ -5,6 +5,7 @@ import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
 import Gird from '@/views/Gird'
+import Indicator from '@/views/Indicator'
 import Title from "@/views/Title";
 import Assembly from "@/windows/Assembly";
 import Bar from "@/windows/Bar";
@@ -15,6 +16,7 @@ import Registers from "@/windows/Registers";
 import Stack from "@/windows/Stack";
 import Watchpoints from "@/windows/Watchpoints";
 Vue.component("Gird", Gird);
+Vue.component("Indicator", Indicator);
 Vue.component("Title", Title);
 Vue.component("Assembly", Assembly);
 Vue.component("Bar", Bar);

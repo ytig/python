@@ -4,14 +4,19 @@
     <div v-for="i in Array(39)" :key="i">
       <div class="todo">+0x190 &nbsp;00 01 02 03 04 05 06 07</div>
     </div>
-    <div class="indicator">
-      <div v-for="(item, index) in Array(10)" :key="index">{{index}}</div>
-    </div>
+    <div class="stack-fill"></div>
+    <Indicator :size="10" v-model="page"></Indicator>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  data: function() {
+    return {
+      page: 0
+    };
+  }
+};
 </script>
 
 <style lang="less">
@@ -25,24 +30,8 @@ export default {};
     color: #abb2bf;
     font-size: 12px;
   }
-  .indicator {
+  .stack-fill {
     flex-grow: 1;
-    display: flex;
-    align-items: flex-end;
-    > *:first-child {
-      border-left: 0px;
-    }
-    > * {
-      flex-grow: 1;
-      height: 40px;
-      line-height: 40px;
-      background: @color-dark-background;
-      border-top: 1px solid @color-border;
-      border-left: 1px solid @color-border;
-      text-align: center;
-      color: #abb2bf;
-      font-size: 12px;
-    }
   }
 }
 </style>
