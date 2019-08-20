@@ -8,8 +8,8 @@
 export default {};
 </script>
 
-<style lang="less" scoped>
-@import "~@/styles/global.less";
+<style lang="less">
+@import "~@/styles/theme.less";
 
 .window {
   height: 160px; //todo

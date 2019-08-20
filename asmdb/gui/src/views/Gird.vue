@@ -19,9 +19,7 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
-@import "~@/styles/global.less";
-
+<style lang="less">
 .gird-container {
   display: flex;
   flex-wrap: wrap;

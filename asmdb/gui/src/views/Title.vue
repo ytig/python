@@ -12,9 +12,7 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
-@import "~@/styles/global.less";
-
+<style lang="less">
 .title-container {
   height: 36px;
   padding: 0px 12px;

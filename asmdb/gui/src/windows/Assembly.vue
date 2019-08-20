@@ -8,5 +8,6 @@
 export default {};
 </script>
 
-<style>
+<style lang="less">
+@import "~@/styles/theme.less";
 </style>
