@@ -4,6 +4,7 @@
       v-for="(item,index) in Array(size)"
       :key="index"
       :class="'user-select-none indicator-item'+(index-value)"
+      :style="{flexGrow:1/(2+index)}"
       @click="onClickItem(index)"
     >{{index}}</div>
   </div>
@@ -37,7 +38,6 @@ export default {
 .indicator-container {
   display: flex;
   > * {
-    flex-grow: 1;
     height: 40px;
     line-height: 40px;
     text-align: center;
