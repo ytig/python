@@ -9,7 +9,7 @@
         </div>
       </div>
     </div>
-    <Indicator :size="10" :value="page" @input="page=arguments[0];invalidate()" :disable="disable2"></Indicator>
+    <Indicator :size="10" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
   </div>
 </template>
 
@@ -73,6 +73,10 @@ export default {
     onContinue: function() {
       this.disable = true;
       this.logic.onContinue();
+    },
+    onClickIndex: function(newPage) {
+      this.page = newPage;
+      this.invalidate();
     },
     invalidate: function() {
       var ref = this.$refs.stackLayout;
