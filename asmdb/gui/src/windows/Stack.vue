@@ -93,7 +93,8 @@ export default {
       var oldData = this.dict.oldData != null ? this.dict.oldData.slice(2 * start, 2 * end) : "";
       var newData = this.dict.newData != null ? this.dict.newData.slice(2 * start, 2 * end) : "";
       for (var i = 0; i < row; i++) {
-        var item = { addr: "+0x230", hexs: [] };
+        var addr = (page * row + i) * column;
+        var item = { addr: "+0x" + ("000" + addr.toString(16)).slice(-3), hexs: [] };
         for (var j = 0; j < column; j++) {
           var k = i * column + j;
           var new_data = newData.slice(2 * k, 2 * (k + 1));
