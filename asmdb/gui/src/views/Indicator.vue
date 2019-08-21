@@ -53,6 +53,7 @@ export default {
   }
   .indicator-disable {
     color: @color-dark-content !important;
+    text-decoration: none !important;
     cursor: not-allowed !important;
   }
 }

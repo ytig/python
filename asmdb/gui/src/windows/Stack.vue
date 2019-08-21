@@ -1,11 +1,15 @@
 <template>
   <div class="stack-container">
     <Navigation :name="'Stack'" :disable="disable"></Navigation>
-    <div v-for="i in Array(39)" :key="i">
-      <div class="todo">+0x190 &nbsp;00 01 02 03 04 05 06 07</div>
+    <div class="stack-layout">
+      <div v-if="itemsAtPage.length==0" class="stack-empty user-select-none">[no data]</div>
+      <div v-else>
+        <div v-for="item in itemsAtPage" :key="item.id">
+          <div class="todo">+0x190 &nbsp;00 01 02 03 04 05 06 07</div>
+        </div>
+      </div>
     </div>
-    <div class="stack-fill"></div>
-    <Indicator :size="10" v-model="page" :disable="disable"></Indicator>
+    <Indicator :size="10" v-model="page" :disable="items.length==0"></Indicator>
   </div>
 </template>
 
@@ -14,8 +18,29 @@ export default {
   data: function() {
     return {
       disable: true,
+      items: [],
       page: 0
     };
+  },
+  computed: {
+    itemsAtPage: function() {
+      //todo splice items
+      return this.items;
+    }
+  },
+  created: function() {
+    //todo listen regs
+  },
+  methods: {
+    onItemsChange: function(items) {
+      if (items == null) {
+        this.disable = true;
+      } else {
+        this.disable = false;
+        //todo changed info
+        this.items.splice(0, this.items.length, ...items);
+      }
+    }
   }
 };
 </script>
@@ -26,13 +51,15 @@ export default {
 .stack-container {
   display: flex;
   flex-direction: column;
-  .todo {
-    padding: 0px 12px;
-    color: #abb2bf;
-    font-size: 12px;
-  }
-  .stack-fill {
+  .stack-layout {
     flex-grow: 1;
+    width: 248px; //todo
+    padding: 0px 12px;
+    .stack-empty {
+      text-align: center;
+      color: @color-dark-content;
+      font-size: 12px;
+    }
   }
 }
 </style>
