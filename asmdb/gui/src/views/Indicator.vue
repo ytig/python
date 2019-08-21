@@ -3,7 +3,7 @@
     <div
       v-for="(item,index) in Array(size)"
       :key="index"
-      :class="'user-select-none indicator-item'+(index-value)"
+      :class="'user-select-none indicator-item'+(index-value)+(disable?' indicator-disable':'')"
       :style="{flexGrow:1/(2+index)}"
       @click="onClickItem(index)"
     >{{index}}</div>
@@ -20,6 +20,9 @@ export default {
   methods: {
     onClickItem: function(index) {
       if (this.value == index) {
+        return;
+      }
+      if (this.disable) {
         return;
       }
       this.value = index;
@@ -43,10 +46,14 @@ export default {
     color: @color-dark-content;
     cursor: pointer;
   }
-  > .indicator-item0 {
+  .indicator-item0 {
     color: @color-light-content;
     text-decoration: underline;
     cursor: default;
+  }
+  .indicator-disable {
+    color: @color-dark-content !important;
+    cursor: not-allowed !important;
   }
 }
 </style>

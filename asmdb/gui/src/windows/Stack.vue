@@ -5,7 +5,7 @@
       <div class="todo">+0x190 &nbsp;00 01 02 03 04 05 06 07</div>
     </div>
     <div class="stack-fill"></div>
-    <Indicator :size="10" v-model="page"></Indicator>
+    <Indicator :size="10" v-model="page" :disable="disable"></Indicator>
   </div>
 </template>
 
@@ -13,6 +13,7 @@
 export default {
   data: function() {
     return {
+      disable: true,
       page: 0
     };
   }
