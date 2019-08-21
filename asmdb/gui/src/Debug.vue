@@ -10,7 +10,7 @@
       <Python3 id="python3"></Python3>
     </div>
     <div id="right-layout">
-      <Registers v-if="registersWidth" id="registers" :style="{width:registersWidth+'px'}"></Registers>
+      <Registers id="registers"></Registers>
       <div id="heap-layout" ref="heapLayout">
         <Stack id="stack"></Stack>
         <Memory id="memory"></Memory>
@@ -20,28 +20,13 @@
 </template>
 
 <script>
-export default {
-  data: function() {
-    return {
-      registersWidth: 0
-    };
-  },
-  mounted: function() {
-    this.requestLayout();
-  },
-  methods: {
-    requestLayout: function() {
-      this.registersWidth = this.$refs.heapLayout.offsetWidth;
-    }
-  }
-};
+export default {};
 </script>
 
 <style lang="less">
 @import "~@/styles/theme.less";
 
 #root {
-  position: fixed;
   width: 100%;
   height: 100%;
   display: flex;
@@ -50,7 +35,6 @@ export default {
   #left-layout {
     flex-grow: 1;
     height: 100%;
-    padding-bottom: 50px;
     display: flex;
     flex-direction: column;
     #bar {
