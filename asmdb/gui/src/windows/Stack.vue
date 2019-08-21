@@ -4,8 +4,9 @@
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
       <div v-else>
-        <div v-for="(item, index) in items" :key="index">
-          <div class="todo">+0x190 &nbsp;00 01 02 03 04 05 06 07</div>
+        <div v-for="(item, index) in items" :key="index" class="stack-row">
+          <div>{{item.addr}}</div>
+          <div v-for="(_item,_index) in item.hexs" :key="_index">{{(_index%8==0?'&nbsp;':'')+'&nbsp;'+_item.hex}}</div>
         </div>
       </div>
     </div>
@@ -79,7 +80,7 @@ export default {
       var oldData = this.dict.oldData != null ? this.dict.oldData.slice(2 * start, 2 * end) : "";
       var newData = this.dict.newData != null ? this.dict.newData.slice(2 * start, 2 * end) : "";
       for (var i = 0; i < row; i++) {
-        var item = { addr: "+0x1230", hexs: [] };
+        var item = { addr: "+0x230", hexs: [] };
         for (var j = 0; j < column; j++) {
           var k = i * column + j;
           var new_data = newData.slice(2 * k, 2 * (k + 1));
@@ -116,6 +117,13 @@ export default {
     flex-grow: 1;
     width: 248px; //todo
     padding: 0px 12px;
+    .stack-row {
+      display: flex;
+      > * {
+        color: @color-text;
+        font-size: 12px;
+      }
+    }
   }
 }
 </style>
