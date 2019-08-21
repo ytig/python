@@ -43,16 +43,16 @@ export default {
     text-align: center;
     font-size: 12px;
     border-top: 1px solid @color-light-border;
-    color: @color-dark-content;
+    color: @color-dark-text;
     cursor: pointer;
   }
   .indicator-item0 {
-    color: @color-light-content;
+    color: @color-light-text;
     text-decoration: underline;
     cursor: default;
   }
   .indicator-disable {
-    color: @color-dark-content !important;
+    color: @color-dark-text !important;
     text-decoration: none !important;
     cursor: not-allowed !important;
   }

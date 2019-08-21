@@ -57,7 +57,7 @@ export default {
     padding: 0px 12px;
     .stack-empty {
       text-align: center;
-      color: @color-dark-content;
+      color: @color-dark-text;
       font-size: 12px;
     }
   }
