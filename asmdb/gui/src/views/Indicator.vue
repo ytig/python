@@ -13,12 +13,9 @@
 <script>
 export default {
   props: {
-    size: {
-      type: Number
-    },
-    value: {
-      type: Number
-    }
+    size: Number,
+    value: Number,
+    disable: Boolean
   },
   methods: {
     onClickItem: function(index) {
