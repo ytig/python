@@ -119,6 +119,9 @@ export default {
     padding: 0px 12px;
     .stack-row {
       display: flex;
+      > *:first-child {
+        color: @color-darker-text;
+      }
       > * {
         color: @color-text;
         font-size: 12px;
