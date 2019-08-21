@@ -1,6 +1,6 @@
 <template>
   <div class="indicator-container">
-    <div v-for="n in size" :key="n" :class="'user-select-none indicator-item'+(n-1-value)+(disable?' indicator-disable':'')" :style="{flexGrow:1/(n+1)}" @click="onClickItem(n-1)">{{n-1}}</div>
+    <div v-for="i in size" :key="i" :class="'user-select-none indicator-item'+(i-1-value)+(disable?' indicator-disable':'')" :style="{flexGrow:1/(i+1)}" @click="onClickItem(i-1)">{{i-1}}</div>
   </div>
 </template>
 
