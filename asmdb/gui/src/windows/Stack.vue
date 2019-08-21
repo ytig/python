@@ -56,10 +56,11 @@ export default {
     width: 248px; //todo
     padding: 0px 12px;
     .stack-empty {
+      padding-top: 12px;
       text-align: center;
       color: @color-dark-text;
       font-size: 12px;
-      text-shadow: 1px 2px 2px @color-text-shadow;
+      text-shadow: 1px 1px 2px @color-text-shadow;
     }
   }
 }
