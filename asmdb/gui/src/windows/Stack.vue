@@ -4,9 +4,9 @@
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
       <div v-else>
-        <div v-for="(item, index) in items" :key="index" class="stack-row">
-          <div>{{item.addr}}</div>
-          <div v-for="(_item, _index) in item.hexs" :key="_index" :class="_item.changed?'stack-changed':''">{{(_index%8==0?'&nbsp;':'')+'&nbsp;'+_item.hex}}</div>
+        <div v-for="item in items" :key="item.addr" class="stack-row">
+          <div>+0x{{("000"+item.addr.toString(16)).slice(-3)}}</div>
+          <div v-for="(_item, _index) in item.hexs" :key="item.addr+_index" :class="_item.changed?'stack-changed':''">{{(_index%8==0?'&nbsp;':'')+'&nbsp;'+_item.hex}}</div>
         </div>
       </div>
     </div>
@@ -93,8 +93,7 @@ export default {
       var oldData = this.dict.oldData != null ? this.dict.oldData.slice(2 * start, 2 * end) : "";
       var newData = this.dict.newData != null ? this.dict.newData.slice(2 * start, 2 * end) : "";
       for (var i = 0; i < row; i++) {
-        var addr = (page * row + i) * column;
-        var item = { addr: "+0x" + ("000" + addr.toString(16)).slice(-3), hexs: [] };
+        var item = { addr: (page * row + i) * column, hexs: [] };
         for (var j = 0; j < column; j++) {
           var k = i * column + j;
           var new_data = newData.slice(2 * k, 2 * (k + 1));
