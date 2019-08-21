@@ -5,8 +5,8 @@
 <script>
 export default {
   props: {
-    value: Number,
-    light: Boolean
+    oldBytes: Number,
+    newBytes: Number
   }
 };
 </script>
