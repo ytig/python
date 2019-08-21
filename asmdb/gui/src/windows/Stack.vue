@@ -43,7 +43,7 @@ export default {
   props: {
     column: {
       type: Number,
-      default: 2
+      default: 1
     }
   },
   computed: {
