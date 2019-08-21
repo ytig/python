@@ -59,6 +59,7 @@ export default {
       text-align: center;
       color: @color-dark-text;
       font-size: 12px;
+      text-shadow: 1px 2px 2px @color-text-shadow;
     }
   }
 }
