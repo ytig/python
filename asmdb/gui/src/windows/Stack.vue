@@ -1,6 +1,6 @@
 <template>
   <div class="stack-container">
-    <Navigation :name="'Stack'"></Navigation>
+    <Navigation :name="'Stack'" :disable="disable"></Navigation>
     <div v-for="i in Array(39)" :key="i">
       <div class="todo">+0x190 &nbsp;00 01 02 03 04 05 06 07</div>
     </div>
