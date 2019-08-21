@@ -24,10 +24,10 @@ export default {
     font-size: 18px;
     color: @color-text;
     font-family: "Wawati SC";
+    transition: color 0.2147s;
   }
   > span.navigation-disable {
     color: @color-darker-text;
-    text-decoration: line-through;
   }
 }
 </style>
