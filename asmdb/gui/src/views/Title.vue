@@ -21,7 +21,7 @@ export default {
   line-height: 36px;
   span {
     font-size: 18px;
-    color: @color-title;
+    color: @color-content;
     font-family: "Wawati SC";
   }
 }
