@@ -10,7 +10,7 @@
         </div>
       </div>
     </div>
-    <Indicator :size="10*column" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
+    <Indicator :size="10" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
   </div>
 </template>
 
