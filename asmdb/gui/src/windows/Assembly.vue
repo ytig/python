@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Title :name="'Assembly'"></Title>
+    <Navigation :name="'Assembly'"></Navigation>
   </div>
 </template>
 

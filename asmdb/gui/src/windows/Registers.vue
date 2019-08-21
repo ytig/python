@@ -1,6 +1,6 @@
 <template>
   <div class="registers-container">
-    <Title :name="'Registers'"></Title>
+    <Navigation :name="'Registers'"></Navigation>
     <Gird :value="[{'id':1},{'id':2},{'id':3},{'id':4}]" #default="props">
       <div style="width:400px;font-size:16px;color:#fff;">{{props.item.id}}</div>
     </Gird>

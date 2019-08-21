@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Title :name="'break'"></Title>
+    <Navigation :name="'break'"></Navigation>
   </div>
 </template>
 

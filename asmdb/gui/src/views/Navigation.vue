@@ -1,5 +1,5 @@
 <template>
-  <div class="title-container">
+  <div class="navigation-container">
     <span class="user-select-none">{{name}}</span>
   </div>
 </template>
@@ -7,7 +7,8 @@
 <script>
 export default {
   props: {
-    name: String
+    name: String,
+    disable: Boolean
   }
 };
 </script>
@@ -15,7 +16,7 @@ export default {
 <style lang="less">
 @import "~@/styles/theme.less";
 
-.title-container {
+.navigation-container {
   height: 36px;
   padding: 0px 12px;
   line-height: 36px;

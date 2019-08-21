@@ -1,6 +1,6 @@
 <template>
   <div class="memory-container">
-    <Title :name="'Memory'"></Title>
+    <Navigation :name="'Memory'"></Navigation>
     <div v-for="i in Array(42)" :key="i">
       <div
         class="todo"

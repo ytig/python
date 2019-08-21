@@ -1,6 +1,6 @@
 <template>
   <div class="watchpoints-container">
-    <Title :name="'watch'"></Title>
+    <Navigation :name="'watch'"></Navigation>
   </div>
 </template>
 
