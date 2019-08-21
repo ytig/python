@@ -1,11 +1,11 @@
 <template>
-  <div class="empty-container user-select-none">{{value}}</div>
+  <div class="empty-container user-select-none">{{text}}</div>
 </template>
 
 <script>
 export default {
   props: {
-    value: String
+    text: String
   }
 };
 </script>
