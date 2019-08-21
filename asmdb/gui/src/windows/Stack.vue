@@ -115,6 +115,8 @@ export default {
   flex-direction: column;
   .stack-layout {
     flex-grow: 1;
+    height: 0px;
+    overflow-y: scroll;
     width: 248px; //todo
     padding: 0px 12px;
     .stack-row {
