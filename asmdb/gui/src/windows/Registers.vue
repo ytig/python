@@ -1,6 +1,6 @@
 <template>
   <div class="registers-container">
-    <Navigation :name="'Registers'"></Navigation>
+    <Navigation :name="'Registers'" :disable="disable"></Navigation>
     <Gird :value="[{'id':1},{'id':2},{'id':3},{'id':4}]" #default="props">
       <div style="width:400px;font-size:16px;color:#fff;">{{props.item.id}}</div>
     </Gird>
@@ -8,7 +8,13 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data: function() {
+    return {
+      disable: true
+    };
+  }
+};
 </script>
 
 <style lang="less">

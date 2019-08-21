@@ -1,6 +1,6 @@
 <template>
   <div class="memory-container">
-    <Navigation :name="'Memory'"></Navigation>
+    <Navigation :name="'Memory'" :disable="true"></Navigation>
     <div v-for="i in Array(42)" :key="i">
       <div
         class="todo"
@@ -10,7 +10,13 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data: function() {
+    return {
+      disable: true
+    };
+  }
+};
 </script>
 
 <style lang="less">
