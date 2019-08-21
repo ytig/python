@@ -1,6 +1,6 @@
 <template>
   <div class="gird-container">
-    <div v-for="(item, index) in value" :key="item.id">
+    <div v-for="(item, index) in items" :key="item.id">
       <slot :item="item" :index="index"></slot>
     </div>
   </div>
@@ -9,7 +9,7 @@
 <script>
 export default {
   props: {
-    value: Array
+    items: Array
   }
 };
 </script>
