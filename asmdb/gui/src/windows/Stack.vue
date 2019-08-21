@@ -31,6 +31,12 @@ export default {
       }
     };
   },
+  props: {
+    column: {
+      type: Number,
+      default: 1
+    }
+  },
   created: function() {
     asmdb.registerEvent("stack", this);
   },
@@ -58,18 +64,42 @@ export default {
     },
     onContinue: function() {
       this.disable = true;
-      this.logic.onContinue(this);
     },
     onClickIndex: function(newPage) {
       this.page = newPage;
       this.invalidate();
     },
     invalidate: function() {
-      var ref = this.$refs.stackLayout;
       var page = this.page;
-      var pageSize = ref ? Math.floor(ref.clientHeight / 14) : 0;
+      var column = this.column * 8;
+      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / 14) : 0;
       var items = [];
-      //todo
+      var start = page * column * row;
+      var end = start + column * row;
+      var oldData = this.dict.oldData != null ? this.dict.oldData.slice(2 * start, 2 * end) : "";
+      var newData = this.dict.newData != null ? this.dict.newData.slice(2 * start, 2 * end) : "";
+      for (var i = 0; i < row; i++) {
+        var item = { id: i, list: [] };
+        for (var j = 0; j < column; j++) {
+          var k = i * column + j;
+          var new_data = newData.slice(2 * k, 2 * (k + 1));
+          if (!new_data) {
+            item = null;
+            break;
+          }
+          var old_data = oldData.slice(2 * k, 2 * (k + 1));
+          item.list[j] = {
+            hex: new_data,
+            changed: Boolean(old_data && new_data != old_data)
+          };
+        }
+        if (item == null) {
+          break;
+        }
+        if (item.list.length > 0) {
+          items[i] = item;
+        }
+      }
       this.items.splice(0, this.items.length, ...items);
     }
   }
