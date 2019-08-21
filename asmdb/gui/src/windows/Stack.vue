@@ -9,37 +9,52 @@
         </div>
       </div>
     </div>
-    <Indicator :size="10" v-model="page" :disable="items.length==0"></Indicator>
+    <Indicator :size="10" v-model="page" :disable="sp==null"></Indicator>
   </div>
 </template>
 
 <script>
+import asmdb from "@/scripts/asmdb.js";
+
 export default {
   data: function() {
     return {
       disable: true,
-      items: [],
-      page: 0
+      sp: null,
+      oldData: null,
+      newData: null,
+      page: 0,
+      pageCache: {}
     };
   },
   computed: {
     itemsAtPage: function() {
-      //todo splice items
-      return this.items;
+      //todo
+      return [];
     }
   },
   created: function() {
-    //todo listen regs
+    asmdb.registerEvent("stack", this);
+  },
+  destroyed: function() {
+    asmdb.unregisterEvent(this);
   },
   methods: {
-    onItemsChange: function(items) {
-      if (items == null) {
-        this.disable = true;
+    onBreak: function(sp, stack) {
+      this.disable = false;
+      if (this.sp != sp) {
+        this.pageCache[this.sp] = this.page;
+        this.sp = sp;
+        this.page = this.sp in this.pageCache ? this.pageCache[this.sp] : 0;
+        this.oldData = null;
+        this.newData = stack;
       } else {
-        this.disable = false;
-        //todo changed info
-        this.items.splice(0, this.items.length, ...items);
+        this.oldData = this.newData;
+        this.newData = stack;
       }
+    },
+    onContinue: function() {
+      this.disable = true;
     }
   }
 };
