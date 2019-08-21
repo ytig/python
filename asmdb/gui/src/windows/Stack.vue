@@ -42,7 +42,7 @@ export default {
     asmdb.registerEvent("stack", this);
   },
   destroyed: function() {
-    asmdb.unregisterEvent(this);
+    asmdb.unregisterEvent("stack", this);
   },
   methods: {
     onBreak: function(sp, stack) {

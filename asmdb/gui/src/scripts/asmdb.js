@@ -8,7 +8,7 @@ function registerEvent(type, object) {
   }, 2000);
 }
 
-function unregisterEvent(object) {
+function unregisterEvent(type, object) {
   //todo
 }
 
