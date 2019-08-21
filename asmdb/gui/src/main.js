@@ -4,6 +4,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
+import Bytes32 from '@/views/Bytes32'
 import Empty from '@/views/Empty'
 import Gird from '@/views/Gird'
 import Indicator from '@/views/Indicator'
@@ -16,6 +17,7 @@ import Python3 from "@/windows/Python3";
 import Registers from "@/windows/Registers";
 import Stack from "@/windows/Stack";
 import Watchpoints from "@/windows/Watchpoints";
+Vue.component("Bytes32", Bytes32);
 Vue.component("Empty", Empty);
 Vue.component("Gird", Gird);
 Vue.component("Indicator", Indicator);
