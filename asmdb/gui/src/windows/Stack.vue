@@ -43,12 +43,12 @@ export default {
   props: {
     column: {
       type: Number,
-      default: 1
+      default: 2
     }
   },
   computed: {
     windowWidth: function() {
-      return 24 + measureTextWidth(6 + 25 * this.column) + 2;
+      return 26 + measureTextWidth(6 + 25 * this.column);
     }
   },
   created: function() {
