@@ -16,37 +16,6 @@
 <script>
 import asmdb from "@/scripts/asmdb.js";
 
-class Logic {
-  constructor() {
-    this.sp = null;
-    this.oldData = null;
-    this.newData = null;
-    this.pageCache = {};
-  }
-
-  onBreak(sp, stack) {
-    console.log("onBreak");
-    //todo
-    // if (this._sp != sp) {
-    //     this._pageCache[this._sp] = this.page;
-    //     this._sp = sp;
-    //     this.page = this._sp in this._pageCache ? this._pageCache[this._sp] : 0;
-    //     this._oldData = null;
-    //     this._newData = stack;
-    //   } else {
-    //     this._oldData = this._newData;
-    //     this._newData = stack;
-    //   }
-  }
-
-  onContinue() {}
-
-  getItems(page, pageSize) {
-    console.log("getItems");
-    return [];
-  }
-}
-
 export default {
   data: function() {
     return {
@@ -54,7 +23,12 @@ export default {
       disable2: true,
       items: [],
       page: 0,
-      logic: new Logic()
+      dict: {
+        sp: null,
+        oldData: null,
+        newData: null,
+        pageCache: {}
+      }
     };
   },
   created: function() {
@@ -67,12 +41,24 @@ export default {
     onBreak: function(sp, stack) {
       this.disable = false;
       this.disable2 = false;
-      this.logic.onBreak(sp, stack);
+      var dict = this.dict;
+      if (dict.sp != sp) {
+        if (dict.sp != null) {
+          dict.pageCache[dict.sp] = this.page;
+        }
+        dict.sp = sp;
+        this.page = dict.sp in dict.pageCache ? dict.pageCache[dict.sp] : 0;
+        dict.oldData = null;
+        dict.newData = stack;
+      } else {
+        dict.oldData = dict.newData;
+        dict.newData = stack;
+      }
       this.invalidate();
     },
     onContinue: function() {
       this.disable = true;
-      this.logic.onContinue();
+      this.logic.onContinue(this);
     },
     onClickIndex: function(newPage) {
       this.page = newPage;
@@ -80,8 +66,11 @@ export default {
     },
     invalidate: function() {
       var ref = this.$refs.stackLayout;
+      var page = this.page;
       var pageSize = ref ? Math.floor(ref.clientHeight / 14) : 0;
-      this.items.splice(0, this.items.length, ...this.logic.getItems(this.page, pageSize));
+      var items = [];
+      //todo
+      this.items.splice(0, this.items.length, ...items);
     }
   }
 };
