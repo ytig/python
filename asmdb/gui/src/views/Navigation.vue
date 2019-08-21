@@ -22,7 +22,7 @@ export default {
   line-height: 36px;
   > span {
     font-size: 18px;
-    color: @color-content;
+    color: @color-light-content;
     font-family: "Wawati SC";
   }
   > span.navigation-disable {
