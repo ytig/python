@@ -19,8 +19,7 @@ export default {
       if (this.disable) {
         return;
       }
-      this.value = index;
-      this.$emit("input", this.value);
+      this.$emit("input", index);
     }
   }
 };
