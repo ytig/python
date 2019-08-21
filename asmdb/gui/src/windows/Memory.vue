@@ -1,11 +1,6 @@
 <template>
   <div class="memory-container">
     <Navigation :name="'Memory'" :disable="true"></Navigation>
-    <div v-for="i in Array(42)" :key="i">
-      <div
-        class="todo"
-      >0xbf001234 &nbsp;00 01 02 03 04 05 06 07 &nbsp;08 09 0a 0b 0c 0d 0e 0f &nbsp;........aaaaaaaa</div>
-    </div>
   </div>
 </template>
 
@@ -23,10 +18,6 @@ export default {
 @import "~@/styles/theme.less";
 
 .memory-container {
-  .todo {
-    padding: 0px 12px;
-    color: #abb2bf;
-    font-size: 12px;
-  }
+  width: 580px; //todo
 }
 </style>
