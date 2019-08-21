@@ -10,12 +10,20 @@
         </div>
       </div>
     </div>
-    <Indicator :size="10" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
+    <Indicator :size="10*column" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
   </div>
 </template>
 
 <script>
 import asmdb from "@/scripts/asmdb.js";
+
+function measureTextWidth(length) {
+  return length * 7.224609375;
+}
+
+function measureTextHeight() {
+  return 14;
+}
 
 export default {
   data: function() {
@@ -40,7 +48,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return Math.floor(24 + (6 + 25 * this.column) * 7.23) + 1;
+      return 24 + measureTextWidth(6 + 25 * this.column) + 2;
     }
   },
   created: function() {
@@ -78,7 +86,7 @@ export default {
     invalidate: function() {
       var page = this.page;
       var column = this.column * 8;
-      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / 14) : 0;
+      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
       var items = [];
       var start = page * column * row;
       var end = start + column * row;
