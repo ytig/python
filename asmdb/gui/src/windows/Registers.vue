@@ -2,7 +2,7 @@
   <div class="registers-container">
     <Navigation :name="'Registers'" :disable="disable"></Navigation>
     <Gird :items="items" #default="props">
-      <div style="width:400px;font-size:12px;color:#fff;">{{props.item.id}}</div>
+      <div style="width:400px;font-size:12px;color:#abb2bf;">{{props.item.id}} 0xaabbccdd 123</div>
     </Gird>
   </div>
 </template>
