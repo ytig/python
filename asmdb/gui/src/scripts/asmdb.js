@@ -2,7 +2,7 @@ function registerEvent(type, object) {
   //todo
   setTimeout(() => {
     object.onBreak(1, '');
-  }, 3000);
+  }, 1000);
 }
 
 function unregisterEvent(object) {
