@@ -26,6 +26,7 @@ export default {
     font-family: "Wawati SC";
   }
   > span.navigation-disable {
+    color: @color-darker-text;
     text-decoration: line-through;
   }
 }
