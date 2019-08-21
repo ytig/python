@@ -1,5 +1,5 @@
 <template>
-  <div class="stack-container">
+  <div class="stack-container" :style="{width:windowWidth+'px'}">
     <Navigation :name="'Stack'" :disable="disable"></Navigation>
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
@@ -36,6 +36,11 @@ export default {
     column: {
       type: Number,
       default: 1
+    }
+  },
+  computed: {
+    windowWidth: function() {
+      return Math.floor(24 + (6 + 25 * this.column) * 7.23) + 1;
     }
   },
   created: function() {
@@ -117,7 +122,6 @@ export default {
     flex-grow: 1;
     height: 0px;
     overflow-y: scroll;
-    width: 248px; //todo
     .stack-row {
       display: flex;
       > *:first-child {
