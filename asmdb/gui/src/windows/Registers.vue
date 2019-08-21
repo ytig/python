@@ -1,8 +1,8 @@
 <template>
   <div class="registers-container">
     <Navigation :name="'Registers'" :disable="disable"></Navigation>
-    <Gird :column="3" :items="items" #default="props">
-      <span style="font-size:12px;color:#abb2bf;">{{props.item.id}} 0xaabbccdd 123</span>
+    <Gird :column="4" :items="items" #default="props">
+      <div style="width:100%;font-size:12px;color:#abb2bf;text-align:center;">{{props.item.id}} 0xaabbccdd 123</div>
     </Gird>
   </div>
 </template>
