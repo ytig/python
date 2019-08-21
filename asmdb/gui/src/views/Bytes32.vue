@@ -74,14 +74,12 @@ export default {
     color: @color-text2;
   }
 }
-
 .bytes32-stack {
   cursor: pointer;
   > div {
     color: @color-text3;
   }
 }
-
 .bytes32-memory {
   cursor: pointer;
   > div {
