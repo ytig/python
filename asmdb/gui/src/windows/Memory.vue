@@ -1,6 +1,7 @@
 <template>
   <div class="memory-container">
     <Navigation :name="'Memory'" :disable="true"></Navigation>
+    <div></div>
   </div>
 </template>
 
@@ -18,6 +19,6 @@ export default {
 @import "~@/styles/theme.less";
 
 .memory-container {
-  width: 580px; //todo
+  width: 589px; //todo
 }
 </style>
