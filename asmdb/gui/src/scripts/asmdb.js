@@ -1,8 +1,8 @@
 function registerEvent(type, object) {
   //todo
-  setInterval(() => {
+  setTimeout(() => {
     object.onBreak(1, '');
-  }, 2000);
+  }, 3000);
 }
 
 function unregisterEvent(object) {
