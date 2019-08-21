@@ -6,7 +6,7 @@
       <div v-else>
         <div v-for="(item, index) in items" :key="index" class="stack-row">
           <div>{{item.addr}}</div>
-          <div v-for="(_item, _index) in item.hexs" :key="_index">{{(_index%8==0?'&nbsp;':'')+'&nbsp;'+_item.hex}}</div>
+          <div v-for="(_item, _index) in item.hexs" :key="_index" :class="_item.changed?'stack-changed':''">{{(_index%8==0?'&nbsp;':'')+'&nbsp;'+_item.hex}}</div>
         </div>
       </div>
     </div>
@@ -125,6 +125,9 @@ export default {
       > * {
         color: @color-text;
         font-size: 12px;
+      }
+      > .stack-changed {
+        color: @color-diff-text;
       }
     }
   }
