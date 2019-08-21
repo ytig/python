@@ -4,9 +4,12 @@
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
       <div v-else>
-        <div v-for="item in items" :key="item.addr" class="stack-row">
-          <div>+0x{{("000"+item.addr.toString(16)).slice(-3)}}</div>
-          <div v-for="(_item, _index) in item.hexs" :key="item.addr+_index" :class="_item.changed?'stack-changed':''">{{(_index%8==0?'&nbsp;':'')+'&nbsp;'+_item.hex}}</div>
+        <div v-for="i in Math.ceil(items.length/2/column)" :key="i-1" class="stack-row">
+          <div>+0x{{("000"+(page*pageSize*8*column+(i-1)*8*column).toString(16)).slice(-3)}}</div>
+          <div v-for="(item, j) in items.slice((i-1)*2*column,i*2*column)" :key="(i-1)*2*column+j-1" class="stack-column">
+            <div class="stack-empty">{{j%2==0?'&nbsp;&nbsp;':'&nbsp;'}}</div>
+            <Bytes32 :oldBytes="item[0]" :newBytes="item[1]"></Bytes32>
+          </div>
         </div>
       </div>
     </div>
@@ -25,6 +28,14 @@ function measureTextHeight() {
   return 14;
 }
 
+function parseHex(hex) {
+  var _hex = "";
+  for (var i = Math.floor(hex.length / 2) - 1; i >= 0; i--) {
+    _hex += hex.slice(2 * i, 2 * (i + 1));
+  }
+  return parseInt(_hex, 16);
+}
+
 export default {
   data: function() {
     return {
@@ -32,6 +43,7 @@ export default {
       disable2: true,
       items: [],
       page: 0,
+      pageSize: 0,
       dict: {
         sp: null,
         oldData: null,
@@ -84,35 +96,24 @@ export default {
       this.invalidate();
     },
     invalidate: function() {
+      this.pageSize = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
       var page = this.page;
       var column = this.column * 8;
-      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
+      var row = this.pageSize;
       var items = [];
       var start = page * column * row;
       var end = start + column * row;
       var oldData = this.dict.oldData != null ? this.dict.oldData.slice(2 * start, 2 * end) : "";
+      oldData = oldData.slice(0, oldData.length - (oldData.length % 8));
       var newData = this.dict.newData != null ? this.dict.newData.slice(2 * start, 2 * end) : "";
-      for (var i = 0; i < row; i++) {
-        var item = { addr: (page * row + i) * column, hexs: [] };
-        for (var j = 0; j < column; j++) {
-          var k = i * column + j;
-          var new_data = newData.slice(2 * k, 2 * (k + 1));
-          if (!new_data) {
-            item = null;
-            break;
-          }
-          var old_data = oldData.slice(2 * k, 2 * (k + 1));
-          item.hexs[j] = {
-            hex: new_data,
-            changed: Boolean(old_data && new_data != old_data)
-          };
+      newData = newData.slice(0, newData.length - (newData.length % 8));
+      for (var i = 0; i < newData.length / 8; i++) {
+        var new_data = parseHex(newData.slice(8 * i, 8 * (i + 1)));
+        var old_data = null;
+        if (i < oldData.length / 8) {
+          old_data = parseHex(oldData.slice(8 * i, 8 * (i + 1)));
         }
-        if (item == null) {
-          break;
-        }
-        if (item.hexs.length > 0) {
-          items[i] = item;
-        }
+        items[items.length] = [old_data, new_data];
       }
       this.items.splice(0, this.items.length, ...items);
     }
@@ -135,16 +136,16 @@ export default {
       > *:first-child {
         padding-left: 12px;
         color: @color-darker-text;
+        font-size: 12px;
       }
       > *:last-child {
         padding-right: 12px;
       }
-      > * {
-        color: @color-text;
-        font-size: 12px;
-      }
-      > .stack-changed {
-        color: @color-diff-text;
+      .stack-column {
+        display: flex;
+        > *:first-child {
+          font-size: 12px;
+        }
       }
     }
   }

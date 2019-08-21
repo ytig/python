@@ -1,22 +1,23 @@
 <template>
   <div class="bytes32-container">
-    <span :class="!sameAt(3)?'bytes32-changed':''">{{hexAt(3)}}</span>
-    <span>&nbsp;</span>
-    <span :class="!sameAt(2)?'bytes32-changed':''">{{hexAt(2)}}</span>
-    <span>&nbsp;</span>
-    <span :class="!sameAt(1)?'bytes32-changed':''">{{hexAt(1)}}</span>
-    <span>&nbsp;</span>
-    <span :class="!sameAt(0)?'bytes32-changed':''">{{hexAt(0)}}</span>
+    <div :class="!sameAt(3)?'bytes32-changed':''">{{hexAt(3)}}</div>
+    <div>&nbsp;</div>
+    <div :class="!sameAt(2)?'bytes32-changed':''">{{hexAt(2)}}</div>
+    <div>&nbsp;</div>
+    <div :class="!sameAt(1)?'bytes32-changed':''">{{hexAt(1)}}</div>
+    <div>&nbsp;</div>
+    <div :class="!sameAt(0)?'bytes32-changed':''">{{hexAt(0)}}</div>
   </div>
 </template>
 
 <script>
 function hexAt(int32, index) {
-  return "00";
+  var hex = ("00000000" + int32.toString(16)).slice(-8);
+  return hex.slice(2 * index, 2 * (index + 1));
 }
 
 function sameAt(int32, _int32, index) {
-  return false;
+  return hexAt(int32, index) == hexAt(_int32, index);
 }
 
 export default {
@@ -42,11 +43,12 @@ export default {
 @import "~@/styles/theme.less";
 
 .bytes32-container {
-  > span {
+  display: flex;
+  > div {
     color: @color-text;
     font-size: 12px;
   }
-  > span.bytes32-changed {
+  > div.bytes32-changed {
     color: @color-diff-text;
   }
 }
