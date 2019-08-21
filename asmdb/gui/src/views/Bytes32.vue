@@ -69,20 +69,23 @@ export default {
 }
 
 .bytes32-assembly {
+  cursor: pointer;
   > div {
-    color: @color-text2 !important;
+    color: @color-text2;
   }
 }
 
 .bytes32-stack {
+  cursor: pointer;
   > div {
-    color: @color-text3 !important;
+    color: @color-text3;
   }
 }
 
 .bytes32-memory {
+  cursor: pointer;
   > div {
-    color: @color-text4 !important;
+    color: @color-text4;
   }
 }
 </style>
