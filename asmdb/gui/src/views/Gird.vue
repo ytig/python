@@ -1,7 +1,9 @@
 <template>
   <div class="gird-container">
-    <div v-for="(item, index) in items" :key="item.id">
-      <slot :item="item" :index="index"></slot>
+    <div v-for="i in Math.ceil(items.length/3)" :key="i">
+      <div v-for="j in column" :key="i*column+j" :style="{width:(100/column)+'%'}">
+        <slot v-if="i*column+j<items.length" :item="items[i*column+j]" :index="i*column+j"></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -9,6 +11,7 @@
 <script>
 export default {
   props: {
+    column: Number,
     items: Array
   }
 };
@@ -16,8 +19,10 @@ export default {
 
 <style lang="less">
 .gird-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  > div {
+    > div {
+      display: inline-block;
+    }
+  }
 }
 </style>
