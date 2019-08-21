@@ -2,7 +2,7 @@
   <div class="stack-container">
     <Navigation :name="'Stack'" :disable="disable"></Navigation>
     <div class="stack-layout">
-      <div v-if="itemsAtPage.length==0" class="stack-empty user-select-none">[no data]</div>
+      <Empty v-if="itemsAtPage.length==0" :value="'[no data]'" style="padding-top:12px;"></Empty>
       <div v-else>
         <div v-for="item in itemsAtPage" :key="item.id">
           <div class="todo">+0x190 &nbsp;00 01 02 03 04 05 06 07</div>
@@ -55,13 +55,6 @@ export default {
     flex-grow: 1;
     width: 248px; //todo
     padding: 0px 12px;
-    .stack-empty {
-      padding-top: 12px;
-      text-align: center;
-      color: @color-dark-text;
-      font-size: 12px;
-      text-shadow: 1px 1px 2px @color-text-shadow;
-    }
   }
 }
 </style>
