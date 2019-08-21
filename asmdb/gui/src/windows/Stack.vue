@@ -118,11 +118,14 @@ export default {
     height: 0px;
     overflow-y: scroll;
     width: 248px; //todo
-    padding: 0px 12px;
     .stack-row {
       display: flex;
       > *:first-child {
+        padding-left: 12px;
         color: @color-darker-text;
+      }
+      > *:last-child {
+        padding-right: 12px;
       }
       > * {
         color: @color-text;
