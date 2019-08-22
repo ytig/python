@@ -1,23 +1,23 @@
 function registerEvent(type, object) {
   //todo
   setTimeout(() => {
-    var hex = "";
-    for (var i = 0; i < 10 * 2 * 344; i++) {
-      hex += "0123456789abcdef".charAt(Math.floor(16 * Math.random()));
+    var bytes = [];
+    for (var i = 0; i < 10 * 344; i++) {
+      bytes[bytes.length] = Math.floor(256 * Math.random())
     }
-    object.cache = hex;
-    object.onBreak(1, hex);
+    object.cache = bytes;
+    object.onBreak(1, bytes);
   }, 1000);
   setTimeout(() => {
-    var hex = "";
-    for (var i = 0; i < 10 * 2 * 344; i++) {
+    var bytes = [];
+    for (var i = 0; i < 10 * 344; i++) {
       if (Math.random() > 0.98) {
-        hex += "0123456789abcdef".charAt(Math.floor(16 * Math.random()));
+        bytes[bytes.length] = Math.floor(256 * Math.random())
       } else {
-        hex += object.cache.slice(i, i + 1);
+        bytes[bytes.length] = object.cache[bytes.length];
       }
     }
-    object.onBreak(1, hex);
+    object.onBreak(1, bytes);
   }, 2000);
 }
 
