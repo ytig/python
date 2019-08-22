@@ -29,8 +29,7 @@ export default {
     };
   },
   props: {
-    value: Object,
-    showString: Boolean
+    value: Object
   },
   watch: {
     value: 'invalidate'
@@ -99,7 +98,7 @@ export default {
         }
       }
       //string
-      if (this.showString) {
+      if (this.value.showString) {
         items[items.length] = {
           value: '&nbsp;',
           style: 'bytes-space user-select-none'
