@@ -19,14 +19,14 @@ export default {
       if (this.disable) {
         return;
       }
-      this.$emit("input", index);
+      this.$emit('input', index);
     }
   }
 };
 </script>
 
 <style lang="less">
-@import "~@/styles/theme.less";
+@import '~@/styles/theme.less';
 
 .indicator-container {
   display: flex;
@@ -39,12 +39,12 @@ export default {
     color: @color-dark-text;
     cursor: pointer;
   }
-  > *[css-offset="0"] {
+  > *[css-offset='0'] {
     color: @color-light-text;
     text-decoration: underline;
     cursor: default;
   }
-  > *[css-disable="true"] {
+  > *[css-disable='true'] {
     color: @color-dark-text !important;
     text-decoration: none !important;
     cursor: not-allowed !important;

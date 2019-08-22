@@ -14,7 +14,7 @@ export default {
 </script>
 
 <style lang="less">
-@import "~@/styles/theme.less";
+@import '~@/styles/theme.less';
 
 .navigation-container {
   height: 36px;
@@ -23,9 +23,9 @@ export default {
   > span {
     font-size: 18px;
     color: @color-text;
-    font-family: "Wawati SC";
+    font-family: 'Wawati SC';
   }
-  > span[css-disable="true"] {
+  > span[css-disable='true'] {
     color: @color-darker-text;
     text-decoration: line-through;
   }

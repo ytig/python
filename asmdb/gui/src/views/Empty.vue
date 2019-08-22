@@ -11,7 +11,7 @@ export default {
 </script>
 
 <style lang="less">
-@import "~@/styles/theme.less";
+@import '~@/styles/theme.less';
 
 .empty-container {
   text-align: center;

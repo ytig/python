@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import asmdb from "@/scripts/asmdb.js";
+import asmdb from '@/scripts/asmdb.js';
 
 function measureTextWidth(length) {
   return length * 7.224609375;
@@ -50,10 +50,10 @@ export default {
     }
   },
   created: function() {
-    asmdb.registerEvent("stack", this);
+    asmdb.registerEvent('stack', this);
   },
   destroyed: function() {
-    asmdb.unregisterEvent("stack", this);
+    asmdb.unregisterEvent('stack', this);
   },
   methods: {
     onBreak: function(sp, stack) {
@@ -97,7 +97,7 @@ export default {
           break;
         }
         var oldBytes = oldData.slice(i * column, (i + 1) * column);
-        var lineNumber = "+0x" + (start + i * column).toString(16).zfill(3);
+        var lineNumber = '+0x' + (start + i * column).toString(16).zfill(3);
         items[items.length] = {
           lineNumber: lineNumber,
           oldBytes: oldBytes,
@@ -111,7 +111,7 @@ export default {
 </script>
 
 <style lang="less">
-@import "~@/styles/theme.less";
+@import '~@/styles/theme.less';
 
 .stack-container {
   display: flex;

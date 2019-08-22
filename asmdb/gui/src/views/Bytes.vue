@@ -11,22 +11,22 @@ function usageOf(int) {
   //todo
   var i = int % 16;
   if (i == 0 || i == 1) {
-    return "2";
+    return '2';
   }
   if (i == 2) {
-    return "3";
+    return '3';
   }
   if (i == 3 || i == 4) {
-    return "4";
+    return '4';
   }
-  return "1";
+  return '1';
 }
 
 function newWatch(...props) {
   var watch = {};
   for (var i = 0; i < props.length; i++) {
     watch[props[i]] = {
-      handler: "invalidate"
+      handler: 'invalidate'
     };
   }
   return watch;
@@ -44,14 +44,14 @@ export default {
     newBytes: Array,
     showString: Boolean
   },
-  watch: newWatch("lineNumber", "oldBytes", "newBytes", "showString"),
+  watch: newWatch('lineNumber', 'oldBytes', 'newBytes', 'showString'),
   created: function() {
     this.invalidate();
   },
   methods: {
     onClickItem: function(index) {
       if (this.items[index] && this.items[index].event) {
-        this.$emit("clickitem", ...this.items[index].event);
+        this.$emit('clickitem', ...this.items[index].event);
       }
     },
     invalidate: function() {
@@ -59,7 +59,7 @@ export default {
       //line number
       items[items.length] = {
         value: this.lineNumber,
-        style: "bytes-line-number"
+        style: 'bytes-line-number'
       };
       //hex
       var curInt;
@@ -67,13 +67,13 @@ export default {
       for (var i = 0; i < this.newBytes.length; i++) {
         if (i % groupBy == 0) {
           items[items.length] = {
-            value: "&nbsp;",
-            style: "bytes-space"
+            value: '&nbsp;',
+            style: 'bytes-space'
           };
           if (i % 8 == 0) {
             items[items.length] = {
-              value: "&nbsp;",
-              style: "bytes-space"
+              value: '&nbsp;',
+              style: 'bytes-space'
             };
           }
           if (i + groupBy - 1 < this.newBytes.length) {
@@ -85,47 +85,47 @@ export default {
             curUsage = usageOf(curInt);
           } else {
             curInt = null;
-            curUsage = "1";
+            curUsage = '1';
           }
         } else {
           items[items.length] = {
-            value: "&nbsp;",
-            style: "bytes-space bytes-usage-" + curUsage
+            value: '&nbsp;',
+            style: 'bytes-space bytes-usage-' + curUsage
           };
-          if (curUsage != "1") {
+          if (curUsage != '1') {
             items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
           }
         }
         var isChanged = Boolean(this.oldBytes) && this.oldBytes[i] != this.newBytes[i];
         items[items.length] = {
           value: this.newBytes[i].toString(16).zfill(2),
-          style: "bytes-hex bytes-usage-" + curUsage + " bytes-changed-" + isChanged
+          style: 'bytes-hex bytes-usage-' + curUsage + ' bytes-changed-' + isChanged
         };
-        if (curUsage != "1") {
+        if (curUsage != '1') {
           items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
         }
       }
       //string
       if (this.showString) {
         items[items.length] = {
-          value: "&nbsp;",
-          style: "bytes-space user-select-none"
+          value: '&nbsp;',
+          style: 'bytes-space user-select-none'
         };
         items[items.length] = {
-          value: "&nbsp;",
-          style: "bytes-space user-select-none"
+          value: '&nbsp;',
+          style: 'bytes-space user-select-none'
         };
         for (var i = 0; i < this.newBytes.length; i++) {
           var byte = this.newBytes[i];
           if (byte >= 0x20 && byte <= 0x7e) {
             items[items.length] = {
               value: String.fromCharCode(byte),
-              style: "bytes-string user-select-none bytes-visible-" + true
+              style: 'bytes-string user-select-none bytes-visible-' + true
             };
           } else {
             items[items.length] = {
-              value: ".",
-              style: "bytes-string user-select-none bytes-visible-" + false
+              value: '.',
+              style: 'bytes-string user-select-none bytes-visible-' + false
             };
           }
         }
@@ -137,7 +137,7 @@ export default {
 </script>
 
 <style lang="less">
-@import "~@/styles/theme.less";
+@import '~@/styles/theme.less';
 
 .bytes-container {
   white-space: nowrap;

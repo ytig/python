@@ -12,7 +12,7 @@
 
 <script>
 function hexAt(int32, index) {
-  var hex = ("00000000" + int32.toString(16)).slice(-8);
+  var hex = ('00000000' + int32.toString(16)).slice(-8);
   return hex.slice(2 * index, 2 * (index + 1));
 }
 
@@ -29,15 +29,15 @@ export default {
     bytesType: function() {
       var i = this.newBytes % 16;
       if (i == 0 || i == 1) {
-        return "assembly";
+        return 'assembly';
       }
       if (i == 2) {
-        return "stack";
+        return 'stack';
       }
       if (i == 3 || i == 4) {
-        return "memory";
+        return 'memory';
       }
-      return "none";
+      return 'none';
     }
   },
   methods: {
@@ -55,7 +55,7 @@ export default {
 </script>
 
 <style lang="less">
-@import "~@/styles/theme.less";
+@import '~@/styles/theme.less';
 
 .bytes32-container {
   display: flex;
@@ -69,42 +69,42 @@ export default {
   }
 }
 
-.bytes32-container[css-type="none"] {
+.bytes32-container[css-type='none'] {
   cursor: default;
   > div {
     color: @color-text;
   }
-  > div[css-changed="true"] {
+  > div[css-changed='true'] {
     color: @color-background;
     background: @color-text;
   }
 }
 
-.bytes32-container[css-type="assembly"] {
+.bytes32-container[css-type='assembly'] {
   > div {
     color: @color-text2;
   }
-  > div[css-changed="true"] {
+  > div[css-changed='true'] {
     color: @color-background;
     background: @color-text2;
   }
 }
 
-.bytes32-container[css-type="stack"] {
+.bytes32-container[css-type='stack'] {
   > div {
     color: @color-text3;
   }
-  > div[css-changed="true"] {
+  > div[css-changed='true'] {
     color: @color-background;
     background: @color-text3;
   }
 }
 
-.bytes32-container[css-type="memory"] {
+.bytes32-container[css-type='memory'] {
   > div {
     color: @color-text4;
   }
-  > div[css-changed="true"] {
+  > div[css-changed='true'] {
     color: @color-background;
     background: @color-text4;
   }
