@@ -149,7 +149,7 @@ export default {
   }
 
   .bytes-hex {
-    letter-spacing: 1px;
+    padding: 0px 1px;
   }
   .bytes-hex.bytes-usage-1.bytes-changed-false {
     color: @color-text;
