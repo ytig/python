@@ -62,10 +62,10 @@ export default {
   cursor: pointer;
   > div {
     font-size: 12px;
-    padding: 1px;
+    padding: 0px 1px;
   }
   .bytes32-empty {
-    padding: 1px 0px;
+    padding: 0px 0px;
   }
 }
 

@@ -25,7 +25,7 @@ function measureTextWidth(length) {
 }
 
 function measureTextHeight() {
-  return 18;
+  return 14 + 4;
 }
 
 function parseHex(hex) {
@@ -134,7 +134,7 @@ export default {
     .stack-row {
       display: flex;
       align-items: center;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
       > *:first-child {
         padding-left: 12px;
         color: @color-darker-text;
