@@ -2,7 +2,7 @@
   <div class="registers-container">
     <Navigation :name="'Registers'" :disable="disable"></Navigation>
     <Gird :column="4" :items="items" #default="props">
-      <div style="width:100%;font-size:12px;color:#abb2bf;padding-left:12px;">{{props.item.id}} 0xaabbccdd 123</div>
+      <div style="width:100%;font-size:12px;color:#abb2bf;padding-left:12px;margin-bottom:4px;">{{props.item.id}} 0xaabbccdd 123</div>
     </Gird>
   </div>
 </template>
@@ -28,6 +28,6 @@ export default {
 @import '~@/styles/theme.less';
 
 .registers-container {
-  padding-bottom: 8px;
+  padding-bottom: 4px;
 }
 </style>
