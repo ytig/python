@@ -25,7 +25,7 @@ function measureTextWidth(length) {
 }
 
 function measureTextHeight() {
-  return 14;
+  return 18;
 }
 
 function parseHex(hex) {
@@ -60,7 +60,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return 26 + measureTextWidth(6 + 25 * this.column);
+      return 26 + measureTextWidth(6 + 25 * this.column) + 16 * this.column;
     }
   },
   created: function() {
@@ -133,6 +133,8 @@ export default {
     overflow-y: scroll;
     .stack-row {
       display: flex;
+      align-items: center;
+      margin-bottom: 2px;
       > *:first-child {
         padding-left: 12px;
         color: @color-darker-text;

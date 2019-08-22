@@ -1,12 +1,12 @@
 <template>
-  <div :class="'bytes32-container bytes32-'+bytesType">
-    <div :class="!sameAt(3)?'bytes32-changed':''">{{hexAt(3)}}</div>
-    <div>&nbsp;</div>
-    <div :class="!sameAt(2)?'bytes32-changed':''">{{hexAt(2)}}</div>
-    <div>&nbsp;</div>
-    <div :class="!sameAt(1)?'bytes32-changed':''">{{hexAt(1)}}</div>
-    <div>&nbsp;</div>
-    <div :class="!sameAt(0)?'bytes32-changed':''">{{hexAt(0)}}</div>
+  <div class="bytes32-container" :css-type="bytesType">
+    <div :css-changed="''+!sameAt(3)">{{hexAt(3)}}</div>
+    <div class="bytes32-empty">&nbsp;</div>
+    <div :css-changed="''+!sameAt(2)">{{hexAt(2)}}</div>
+    <div class="bytes32-empty">&nbsp;</div>
+    <div :css-changed="''+!sameAt(1)">{{hexAt(1)}}</div>
+    <div class="bytes32-empty">&nbsp;</div>
+    <div :css-changed="''+!sameAt(0)">{{hexAt(0)}}</div>
   </div>
 </template>
 
@@ -59,31 +59,54 @@ export default {
 
 .bytes32-container {
   display: flex;
+  cursor: pointer;
   > div {
-    color: @color-text;
     font-size: 12px;
+    padding: 1px;
   }
-  > div.bytes32-changed {
-    color: @color-text5;
+  .bytes32-empty {
+    padding: 1px 0px;
   }
 }
 
-.bytes32-assembly {
-  cursor: pointer;
+.bytes32-container[css-type="none"] {
+  cursor: default;
+  > div {
+    color: @color-text;
+  }
+  > div[css-changed="true"] {
+    color: @color-background;
+    background: fade(@color-text, 61.8%);
+  }
+}
+
+.bytes32-container[css-type="assembly"] {
   > div {
     color: @color-text2;
   }
+  > div[css-changed="true"] {
+    color: @color-background;
+    background: fade(@color-text2, 61.8%);
+  }
 }
-.bytes32-stack {
-  cursor: pointer;
+
+.bytes32-container[css-type="stack"] {
   > div {
     color: @color-text3;
   }
+  > div[css-changed="true"] {
+    color: @color-background;
+    background: fade(@color-text3, 61.8%);
+  }
 }
-.bytes32-memory {
-  cursor: pointer;
+
+.bytes32-container[css-type="memory"] {
   > div {
     color: @color-text4;
+  }
+  > div[css-changed="true"] {
+    color: @color-background;
+    background: fade(@color-text4, 61.8%);
   }
 }
 </style>
