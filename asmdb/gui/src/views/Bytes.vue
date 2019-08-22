@@ -5,6 +5,8 @@
 </template>
 
 <script>
+const groupBy = 4; //4or8
+
 function usageOf(int) {
   //todo
   var i = int % 16;
@@ -53,7 +55,6 @@ export default {
       }
     },
     invalidate: function() {
-      const groupBy = 4; //4or8
       var items = [];
       //line number
       items[items.length] = {
