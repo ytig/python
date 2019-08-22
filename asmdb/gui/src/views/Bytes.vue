@@ -105,13 +105,13 @@ export default {
           var byte = this.newBytes[i];
           if (byte >= 0x20 && byte <= 0x7e) {
             items[items.length] = {
-              value: "+",
-              style: "bytes-string"
+              value: String.fromCharCode(byte),
+              style: "bytes-string bytes-visible-" + true
             };
           } else {
             items[items.length] = {
               value: ".",
-              style: "bytes-string"
+              style: "bytes-string bytes-visible-" + false
             };
           }
         }
@@ -173,6 +173,13 @@ export default {
   .bytes-hex.bytes-usage-4.bytes-changed-true {
     color: @color-background;
     background: @color-text4;
+  }
+
+  .bytes-string.bytes-visible-true {
+    color: @color-text;
+  }
+  .bytes-string.bytes-visible-false {
+    color: @color-dark-text;
   }
 }
 </style>
