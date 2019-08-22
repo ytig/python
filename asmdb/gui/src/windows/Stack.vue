@@ -118,7 +118,7 @@ export default {
   .stack-layout {
     flex-grow: 1;
     height: 0px;
-    overflow-y: scroll;
+    overflow: scroll;
   }
 }
 </style>
