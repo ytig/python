@@ -1,6 +1,6 @@
 <template>
   <div class="navigation-container">
-    <span :class="'user-select-none'+(disable?' navigation-disable':'')">{{name}}</span>
+    <span class="user-select-none" :css-disable="''+disable">{{name}}</span>
   </div>
 </template>
 
@@ -25,7 +25,7 @@ export default {
     color: @color-text;
     font-family: "Wawati SC";
   }
-  > span.navigation-disable {
+  > span[css-disable="true"] {
     color: @color-darker-text;
     text-decoration: line-through;
   }
