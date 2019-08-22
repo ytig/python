@@ -22,16 +22,6 @@ function usageOf(int) {
   return '1';
 }
 
-function newWatch(...props) {
-  var watch = {};
-  for (var i = 0; i < props.length; i++) {
-    watch[props[i]] = {
-      handler: 'invalidate'
-    };
-  }
-  return watch;
-}
-
 export default {
   data: function() {
     return {
@@ -39,12 +29,12 @@ export default {
     };
   },
   props: {
-    lineNumber: String,
-    oldBytes: Array,
-    newBytes: Array,
+    value: Object,
     showString: Boolean
   },
-  watch: newWatch('lineNumber', 'oldBytes', 'newBytes', 'showString'),
+  watch: {
+    value: 'invalidate'
+  },
   created: function() {
     this.invalidate();
   },
@@ -58,13 +48,13 @@ export default {
       var items = [];
       //line number
       items[items.length] = {
-        value: this.lineNumber,
+        value: this.value.lineNumber,
         style: 'bytes-line-number'
       };
       //hex
       var curInt;
       var curUsage;
-      for (var i = 0; i < this.newBytes.length; i++) {
+      for (var i = 0; i < this.value.newBytes.length; i++) {
         if (i % groupBy == 0) {
           items[items.length] = {
             value: '&nbsp;',
@@ -76,11 +66,11 @@ export default {
               style: 'bytes-space'
             };
           }
-          if (i + groupBy - 1 < this.newBytes.length) {
+          if (i + groupBy - 1 < this.value.newBytes.length) {
             curInt = 0;
             for (var j = groupBy - 1; j >= 0; j--) {
               curInt *= 256;
-              curInt += this.newBytes[i + j];
+              curInt += this.value.newBytes[i + j];
             }
             curUsage = usageOf(curInt);
           } else {
@@ -97,11 +87,11 @@ export default {
           }
         }
         var isChanged = false;
-        if (Boolean(this.oldBytes) && i < this.oldBytes.length) {
-          isChanged = this.oldBytes[i] != this.newBytes[i];
+        if (Boolean(this.value.oldBytes) && i < this.value.oldBytes.length) {
+          isChanged = this.value.oldBytes[i] != this.value.newBytes[i];
         }
         items[items.length] = {
-          value: this.newBytes[i].toString(16).zfill(2),
+          value: this.value.newBytes[i].toString(16).zfill(2),
           style: 'bytes-hex bytes-usage-' + curUsage + ' bytes-changed-' + isChanged
         };
         if (curUsage != '1') {
@@ -118,8 +108,8 @@ export default {
           value: '&nbsp;',
           style: 'bytes-space user-select-none'
         };
-        for (var i = 0; i < this.newBytes.length; i++) {
-          var byte = this.newBytes[i];
+        for (var i = 0; i < this.value.newBytes.length; i++) {
+          var byte = this.value.newBytes[i];
           if (byte >= 0x20 && byte <= 0x7e) {
             items[items.length] = {
               value: String.fromCharCode(byte),

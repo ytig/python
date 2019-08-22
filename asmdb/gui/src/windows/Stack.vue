@@ -4,7 +4,7 @@
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
       <div v-else>
-        <Bytes v-for="item in items" :key="item.lineNumber" :lineNumber="item.lineNumber" :oldBytes="item.oldBytes" :newBytes="item.newBytes" :showString="false"></Bytes>
+        <Bytes v-for="item in items" :key="item.lineNumber" :value="item" :showString="false"></Bytes>
       </div>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
