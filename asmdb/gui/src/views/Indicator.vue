@@ -1,6 +1,6 @@
 <template>
   <div class="indicator-container">
-    <div v-for="i in size" :key="i" :class="'user-select-none indicator-item'+(i-1-value)+(disable?' indicator-disable':'')" :style="{flexGrow:1/(i+1)}" @click="onClickItem(i-1)">{{i-1}}</div>
+    <div v-for="i in size" :key="i" class="user-select-none" :style="{flexGrow:1/(i+1)}" @click="onClickItem(i-1)" :css-offset="''+(i-1-value)" :css-disable="''+disable">{{i-1}}</div>
   </div>
 </template>
 
@@ -39,12 +39,12 @@ export default {
     color: @color-dark-text;
     cursor: pointer;
   }
-  .indicator-item0 {
+  > *[css-offset="0"] {
     color: @color-light-text;
     text-decoration: underline;
     cursor: default;
   }
-  .indicator-disable {
+  > *[css-disable="true"] {
     color: @color-dark-text !important;
     text-decoration: none !important;
     cursor: not-allowed !important;
