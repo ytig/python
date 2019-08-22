@@ -1,6 +1,6 @@
 <template>
   <div class="bytes-container">
-    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value"></span>
+    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)"></span>
   </div>
 </template>
 
@@ -47,6 +47,11 @@ export default {
     this.invalidate();
   },
   methods: {
+    onClickItem: function(index) {
+      if (this.items[index] && this.items[index].event) {
+        this.$emit("clickitem", ...this.items[index].event);
+      }
+    },
     invalidate: function() {
       const groupBy = 4; //4or8
       var items = [];
@@ -56,6 +61,7 @@ export default {
         style: "bytes-line-number"
       };
       //hex
+      var curInt;
       var curUsage;
       for (var i = 0; i < this.newBytes.length; i++) {
         if (i % groupBy == 0) {
@@ -70,13 +76,14 @@ export default {
             };
           }
           if (i + groupBy - 1 < this.newBytes.length) {
-            var int = 0;
+            curInt = 0;
             for (var j = groupBy - 1; j >= 0; j--) {
-              int *= 256;
-              int += this.newBytes[i + j];
+              curInt *= 256;
+              curInt += this.newBytes[i + j];
             }
-            curUsage = usageOf(int);
+            curUsage = usageOf(curInt);
           } else {
+            curInt = null;
             curUsage = "1";
           }
         } else {
@@ -84,12 +91,18 @@ export default {
             value: "&nbsp;",
             style: "bytes-space bytes-usage-" + curUsage
           };
+          if (curUsage != "1") {
+            items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
+          }
         }
         var isChanged = Boolean(this.oldBytes) && this.oldBytes[i] != this.newBytes[i];
         items[items.length] = {
           value: this.newBytes[i].toString(16).zfill(2),
           style: "bytes-hex bytes-usage-" + curUsage + " bytes-changed-" + isChanged
         };
+        if (curUsage != "1") {
+          items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
+        }
       }
       //string
       if (this.showString) {
