@@ -92,7 +92,7 @@ export default {
       var newData = this.dict.newData.slice(start, end);
       var items = [];
       for (var i = 0; i < row; i++) {
-        var newBytes = oldData.slice(i * column, (i + 1) * column);
+        var newBytes = newData.slice(i * column, (i + 1) * column);
         if (newBytes.length < column) {
           break;
         }

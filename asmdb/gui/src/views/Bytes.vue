@@ -96,7 +96,10 @@ export default {
             items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
           }
         }
-        var isChanged = Boolean(this.oldBytes) && this.oldBytes[i] != this.newBytes[i];
+        var isChanged = false;
+        if (Boolean(this.oldBytes) && i < this.oldBytes.length) {
+          isChanged = this.oldBytes[i] != this.newBytes[i];
+        }
         items[items.length] = {
           value: this.newBytes[i].toString(16).zfill(2),
           style: 'bytes-hex bytes-usage-' + curUsage + ' bytes-changed-' + isChanged
