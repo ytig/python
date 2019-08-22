@@ -4,13 +4,7 @@
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
       <div v-else>
-        <div v-for="i in Math.ceil(items.length/2/column)" :key="i-1" class="stack-row">
-          <div>+0x{{("000"+(page*pageSize*8*column+(i-1)*8*column).toString(16)).slice(-3)}}</div>
-          <div v-for="(item, j) in items.slice((i-1)*2*column,i*2*column)" :key="(i-1)*2*column+j-1" class="stack-column">
-            <div class="stack-empty">{{j%2==0?'&nbsp;&nbsp;':'&nbsp;'}}</div>
-            <Bytes32 :oldBytes="item[0]" :newBytes="item[1]"></Bytes32>
-          </div>
-        </div>
+        <Bytes v-for="item in items" :key="item.lineNumber" :lineNumber="item.lineNumber" :oldBytes="item.oldBytes" :newBytes="item.newBytes" :showString="true"></Bytes>
       </div>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
@@ -25,15 +19,7 @@ function measureTextWidth(length) {
 }
 
 function measureTextHeight() {
-  return 14 + 4;
-}
-
-function parseHex(hex) {
-  var _hex = "";
-  for (var i = Math.floor(hex.length / 2) - 1; i >= 0; i--) {
-    _hex += hex.slice(2 * i, 2 * (i + 1));
-  }
-  return parseInt(_hex, 16);
+  return 18;
 }
 
 export default {
@@ -46,8 +32,8 @@ export default {
       pageSize: 0,
       dict: {
         sp: null,
-        oldData: null,
-        newData: null,
+        oldData: [],
+        newData: [],
         pageCache: {}
       }
     };
@@ -80,7 +66,7 @@ export default {
         }
         dict.sp = sp;
         this.page = dict.sp in dict.pageCache ? dict.pageCache[dict.sp] : 0;
-        dict.oldData = null;
+        dict.oldData = [];
         dict.newData = stack;
       } else {
         dict.oldData = dict.newData;
@@ -100,20 +86,23 @@ export default {
       var page = this.page;
       var column = this.column * 8;
       var row = this.pageSize;
-      var items = [];
       var start = page * column * row;
-      var end = start + column * row;
-      var oldData = this.dict.oldData != null ? this.dict.oldData.slice(2 * start, 2 * end) : "";
-      oldData = oldData.slice(0, oldData.length - (oldData.length % 8));
-      var newData = this.dict.newData != null ? this.dict.newData.slice(2 * start, 2 * end) : "";
-      newData = newData.slice(0, newData.length - (newData.length % 8));
-      for (var i = 0; i < newData.length / 8; i++) {
-        var new_data = parseHex(newData.slice(8 * i, 8 * (i + 1)));
-        var old_data = null;
-        if (i < oldData.length / 8) {
-          old_data = parseHex(oldData.slice(8 * i, 8 * (i + 1)));
+      var end = (page + 1) * column * row;
+      var oldData = this.dict.oldData.slice(start, end);
+      var newData = this.dict.newData.slice(start, end);
+      var items = [];
+      for (var i = 0; i < row; i++) {
+        var newBytes = oldData.slice(i * column, (i + 1) * column);
+        if (newBytes.length < column) {
+          break;
         }
-        items[items.length] = [old_data, new_data];
+        var oldBytes = oldData.slice(i * column, (i + 1) * column);
+        var lineNumber = "+0x" + (start + i * column).toString(16).zfill(3);
+        items[items.length] = {
+          lineNumber: lineNumber,
+          oldBytes: oldBytes,
+          newBytes: newBytes
+        };
       }
       this.items.splice(0, this.items.length, ...items);
     }
@@ -131,25 +120,6 @@ export default {
     flex-grow: 1;
     height: 0px;
     overflow-y: scroll;
-    .stack-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 4px;
-      > *:first-child {
-        padding-left: 12px;
-        color: @color-darker-text;
-        font-size: 12px;
-      }
-      > *:last-child {
-        padding-right: 12px;
-      }
-      .stack-column {
-        display: flex;
-        > *:first-child {
-          font-size: 12px;
-        }
-      }
-    }
   }
 }
 </style>

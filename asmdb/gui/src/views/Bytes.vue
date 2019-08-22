@@ -145,6 +145,13 @@ export default {
   > span {
     font-size: 12px;
   }
+  > span:first-child {
+    margin-left: 12px;
+  }
+  > span:last-child {
+    margin-right: 12px;
+  }
+
   .bytes-line-number {
     color: @color-darker-text;
   }
