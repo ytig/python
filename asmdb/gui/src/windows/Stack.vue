@@ -89,13 +89,12 @@ export default {
       var start = page * column * row;
       var end = (page + 1) * column * row;
       var oldData = this.dict.oldData.slice(start, end);
+      oldData = oldData.slice(0, oldData.length - (oldData.length % column));
       var newData = this.dict.newData.slice(start, end);
+      newData = newData.slice(0, newData.length - (newData.length % column));
       var items = [];
-      for (var i = 0; i < row; i++) {
+      for (var i = 0; i < newData.length / column; i++) {
         var newBytes = newData.slice(i * column, (i + 1) * column);
-        if (newBytes.length < column) {
-          break;
-        }
         var oldBytes = oldData.slice(i * column, (i + 1) * column);
         var lineNumber = '+0x' + (start + i * column).toString(16).zfill(3);
         items[items.length] = {
