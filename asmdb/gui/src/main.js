@@ -1,9 +1,11 @@
 import "@/styles/global.less";
+import "@/scripts/window.js";
 
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
+import Bytes from '@/views/Bytes'
 import Bytes32 from '@/views/Bytes32'
 import Empty from '@/views/Empty'
 import Gird from '@/views/Gird'
@@ -17,6 +19,7 @@ import Python3 from "@/windows/Python3";
 import Registers from "@/windows/Registers";
 import Stack from "@/windows/Stack";
 import Watchpoints from "@/windows/Watchpoints";
+Vue.component("Bytes", Bytes);
 Vue.component("Bytes32", Bytes32);
 Vue.component("Empty", Empty);
 Vue.component("Gird", Gird);
