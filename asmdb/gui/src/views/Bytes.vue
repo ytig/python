@@ -95,23 +95,23 @@ export default {
       if (this.showString) {
         items[items.length] = {
           value: "&nbsp;",
-          style: "bytes-space"
+          style: "bytes-space user-select-none"
         };
         items[items.length] = {
           value: "&nbsp;",
-          style: "bytes-space"
+          style: "bytes-space user-select-none"
         };
         for (var i = 0; i < this.newBytes.length; i++) {
           var byte = this.newBytes[i];
           if (byte >= 0x20 && byte <= 0x7e) {
             items[items.length] = {
               value: String.fromCharCode(byte),
-              style: "bytes-string bytes-visible-" + true
+              style: "bytes-string user-select-none bytes-visible-" + true
             };
           } else {
             items[items.length] = {
               value: ".",
-              style: "bytes-string bytes-visible-" + false
+              style: "bytes-string user-select-none bytes-visible-" + false
             };
           }
         }
