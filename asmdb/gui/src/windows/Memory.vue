@@ -1,7 +1,7 @@
 <template>
   <div class="memory-container">
     <Navigation :name="'Memory'" :disable="true"></Navigation>
-    <div></div>
+    <Bytes :value="{lineNumber:'0x00112233',newBytes:[1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8],showString:true}"></Bytes>
   </div>
 </template>
 
@@ -19,6 +19,5 @@ export default {
 @import '~@/styles/theme.less';
 
 .memory-container {
-  width: 589px; //todo
 }
 </style>
