@@ -194,7 +194,7 @@ export default {
     color: @color-text;
   }
   .bytes-string.bytes-visible-false {
-    color: @color-dark-text;
+    color: @color-darker-text;
   }
 }
 </style>
