@@ -76,7 +76,7 @@ export default {
   }
   > div[css-changed="true"] {
     color: @color-background;
-    background: fade(@color-text, 61.8%);
+    background: fade(@color-text, 74.1%);
   }
 }
 
@@ -86,7 +86,7 @@ export default {
   }
   > div[css-changed="true"] {
     color: @color-background;
-    background: fade(@color-text2, 61.8%);
+    background: fade(@color-text2, 74.1%);
   }
 }
 
@@ -96,7 +96,7 @@ export default {
   }
   > div[css-changed="true"] {
     color: @color-background;
-    background: fade(@color-text3, 61.8%);
+    background: fade(@color-text3, 74.1%);
   }
 }
 
@@ -106,7 +106,7 @@ export default {
   }
   > div[css-changed="true"] {
     color: @color-background;
-    background: fade(@color-text4, 61.8%);
+    background: fade(@color-text4, 74.1%);
   }
 }
 </style>

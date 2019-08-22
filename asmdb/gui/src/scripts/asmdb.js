@@ -2,7 +2,7 @@ function registerEvent(type, object) {
   //todo
   setTimeout(() => {
     var hex = "";
-    for (var i = 0; i < 2 * 50; i++) {
+    for (var i = 0; i < 344; i++) {
       hex += "0123456789abcdef".charAt(Math.floor(16 * Math.random()));
     }
     object.onBreak(1, hex);
