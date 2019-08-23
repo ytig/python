@@ -125,8 +125,8 @@ export default {
         }
       }
       //padding
-      items.slice(0, 0, { value: '', style: '' });
-      items[items.length] = { value: '', style: '' };
+      items.splice(0, 0, { value: '', style: '' });
+      items.splice(items.length, 0, { value: '', style: '' });
       this.items.splice(0, this.items.length, ...items);
     }
   }
