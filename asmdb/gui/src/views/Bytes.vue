@@ -111,7 +111,7 @@ export default {
         };
         for (var i = 0; i < this.value.newBytes.length; i++) {
           var byte = this.value.newBytes[i];
-          if (byte >= 0x20 && byte <= 0x7e) {
+          if (byte >= 0x21 && byte <= 0x7e) {
             items[items.length] = {
               value: String.fromCharCode(byte),
               style: 'bytes-string user-select-none bytes-visible-' + true
