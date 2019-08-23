@@ -1,5 +1,5 @@
 <template>
-  <div class="bytes-container">
+  <div class="bytes-container" :highlight="highlight">
     <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)"></span>
   </div>
 </template>
@@ -25,6 +25,7 @@ function usageOf(int) {
 export default {
   data: function() {
     return {
+      highlight: false,
       items: []
     };
   },
@@ -44,11 +45,12 @@ export default {
       }
     },
     invalidate: function() {
+      this.highlight = typeof this.value.highlightNumber == 'number';
       var items = [];
       //line number
       items[items.length] = {
         value: this.value.lineNumber,
-        style: 'bytes-line-number'
+        style: 'bytes-line-number' + (this.highlight ? ' bytes-highlight' : '')
       };
       //hex
       var curInt;
@@ -91,7 +93,7 @@ export default {
         }
         items[items.length] = {
           value: this.value.newBytes[i].toString(16).zfill(2),
-          style: 'bytes-hex bytes-usage-' + curUsage + ' bytes-changed-' + isChanged
+          style: 'bytes-hex bytes-usage-' + curUsage + ' bytes-changed-' + isChanged + (this.value.highlightNumber == i ? ' bytes-highlight' : '')
         };
         if (curUsage != '1') {
           items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
@@ -131,6 +133,9 @@ export default {
 <style lang="less">
 @import '~@/styles/theme.less';
 
+.bytes-container[highlight='true'] {
+  background: @color-selection-background;
+}
 .bytes-container {
   white-space: nowrap;
   margin-bottom: 4px;
@@ -147,9 +152,15 @@ export default {
   .bytes-line-number {
     color: @color-darker-text;
   }
+  .bytes-line-number.bytes-highlight {
+    color: @color-dark-text;
+  }
 
   .bytes-hex {
     padding: 0px 1px;
+  }
+  .bytes-hex.bytes-highlight {
+    text-decoration: underline;
   }
   .bytes-hex.bytes-usage-1.bytes-changed-false {
     color: @color-text;
