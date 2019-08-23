@@ -101,7 +101,8 @@ export default {
           lineNumber: lineNumber,
           oldBytes: oldBytes,
           newBytes: newBytes,
-          showString: false
+          showString: false,
+          highlightNumber: null
         };
       }
       this.items.splice(0, this.items.length, ...items);
