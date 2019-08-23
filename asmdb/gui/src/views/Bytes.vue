@@ -124,6 +124,8 @@ export default {
           }
         }
       }
+      items.slice(0, 0, { value: '', style: '' });
+      items[items.length] = { value: '', style: '' };
       this.items.splice(0, this.items.length, ...items);
     }
   }
@@ -134,7 +136,9 @@ export default {
 @import '~@/styles/theme.less';
 
 .bytes-container[highlight='true'] {
-  background: @color-selection-background;
+  > * {
+    background: @color-selection-background;
+  }
 }
 .bytes-container {
   white-space: nowrap;
@@ -143,10 +147,10 @@ export default {
     font-size: 12px;
   }
   > span:first-child {
-    margin-left: 12px;
+    padding-left: 12px;
   }
   > span:last-child {
-    margin-right: 12px;
+    padding-right: 12px;
   }
 
   .bytes-line-number {
@@ -167,7 +171,7 @@ export default {
   }
   .bytes-hex.bytes-usage-1.bytes-changed-true {
     color: @color-background;
-    background: @color-text;
+    background: @color-text !important;
   }
   .bytes-usage-2 {
     cursor: pointer;
@@ -177,7 +181,7 @@ export default {
   }
   .bytes-hex.bytes-usage-2.bytes-changed-true {
     color: @color-background;
-    background: @color-text2;
+    background: @color-text2 !important;
   }
   .bytes-usage-3 {
     cursor: pointer;
@@ -187,7 +191,7 @@ export default {
   }
   .bytes-hex.bytes-usage-3.bytes-changed-true {
     color: @color-background;
-    background: @color-text3;
+    background: @color-text3 !important;
   }
   .bytes-usage-4 {
     cursor: pointer;
@@ -197,7 +201,7 @@ export default {
   }
   .bytes-hex.bytes-usage-4.bytes-changed-true {
     color: @color-background;
-    background: @color-text4;
+    background: @color-text4 !important;
   }
 
   .bytes-string.bytes-visible-true {
