@@ -74,6 +74,7 @@ export default {
         var posn = this.hst.splice(this.hst.length - 1, 1)[0];
         this.itemSelection = posn.itemSelection;
         this.page = posn.page;
+        this.invalidate();
         return true;
       }
     },
