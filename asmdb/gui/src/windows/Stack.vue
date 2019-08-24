@@ -112,7 +112,7 @@ export default {
         var newBytes = newData.slice(i * column, (i + 1) * column);
         var oldBytes = oldData.slice(i * column, (i + 1) * column);
         var lineNumber = start + i * column;
-        var highlightNumber = this.itemSelection - lineNumber;
+        var highlightNumber = this.itemSelection != null ? this.itemSelection - lineNumber : -1;
         if (highlightNumber < 0 || highlightNumber >= column) {
           highlightNumber = null;
         }
