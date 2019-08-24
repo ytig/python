@@ -46,7 +46,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return 26 + measureTextWidth(6 + 25 * this.column) + 16 * this.column;
+      return 24 + measureTextWidth(6 + 25 * this.column) + 16 * this.column;
     }
   },
   created: function() {

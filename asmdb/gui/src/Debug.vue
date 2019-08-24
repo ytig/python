@@ -5,6 +5,7 @@
       <Assembly id="assembly"></Assembly>
       <div id="points-layout">
         <Breakpoints id="breakpoints"></Breakpoints>
+        <div id="points-split"></div>
         <Watchpoints id="watchpoints"></Watchpoints>
       </div>
       <Python3 id="python3"></Python3>
@@ -13,6 +14,7 @@
       <Registers id="registers"></Registers>
       <div id="heap-layout" ref="heapLayout">
         <Stack id="stack"></Stack>
+        <div id="heap-split"></div>
         <Memory id="memory"></Memory>
       </div>
     </div>
@@ -39,20 +41,23 @@ export default {};
     flex-direction: column;
     #bar {
       background: @color-dark-background;
-      border-bottom: 1px solid @color-border;
     }
     #assembly {
       flex-grow: 1;
+      border-top: 1px solid @color-border;
+      border-bottom: 1px solid @color-border;
     }
     #points-layout {
       background: @color-dark-background;
-      border-top: 1px solid @color-border;
-      border-bottom: 1px solid @color-border;
       display: flex;
       #breakpoints {
         flex-grow: 1;
         height: 100%;
-        border-right: 1px solid @color-border;
+      }
+      #points-split {
+        width: 1px;
+        height: 100%;
+        background: @color-border;
       }
     }
   }
@@ -68,7 +73,11 @@ export default {};
       border-top: 1px solid @color-border;
       #stack {
         height: 100%;
-        border-right: 1px solid @color-border;
+      }
+      #heap-split {
+        width: 1px;
+        height: 100%;
+        background: @color-border;
       }
       #memory {
         height: 100%;
