@@ -67,7 +67,8 @@ export default {
           return;
         }
       }
-      while (this.hst.length >= 3) {
+      const maxHst = 3;
+      while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
       var posn = { page: this.page };
