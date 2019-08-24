@@ -41,7 +41,7 @@ function requestFocus(object) {
 
 $(document).keyup(function (event) {
   if (cur >= 0) {
-    list[cur].onKeyboradClick(event);
+    list[cur].onKeyboardClick(event);
   }
 });
 

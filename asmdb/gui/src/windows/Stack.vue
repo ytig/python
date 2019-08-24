@@ -1,6 +1,6 @@
 <template>
-  <div class="stack-container" :style="{width:windowWidth+'px'}">
-    <Navigation :name="'Stack'" :focus="true" :disable="disable"></Navigation>
+  <div class="stack-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus">
+    <Navigation :name="'Stack'" :focus="focus" :disable="disable"></Navigation>
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
       <Bytes v-else v-for="item in items" :key="item.lineNumber" :value="item" @clickitem="onClickItem"></Bytes>
@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import keyboard from '@/scripts/keyboard.js';
 import asmdb from '@/scripts/asmdb.js';
 
 function measureTextWidth(length) {
@@ -23,6 +24,7 @@ function measureTextHeight() {
 export default {
   data: function() {
     return {
+      focus: false,
       disable: true,
       disable2: true,
       items: [],
@@ -49,17 +51,30 @@ export default {
     }
   },
   created: function() {
+    keyboard.registerWindow(this);
     asmdb.registerEvent('stack', this);
   },
   destroyed: function() {
     asmdb.unregisterEvent('stack', this);
+    keyboard.unregisterWindow(this);
   },
   methods: {
+    requestFocus: function() {
+      keyboard.requestFocus(this);
+    },
+    onFocusChanged: function(value) {
+      this.focus = value;
+    },
+    onKeyboardClick: function(event) {
+      if (event.keyCode == 8) {
+        this.hstGet();
+      }
+    },
     hstDel: function() {
       this.hst.splice(0, this.hst.length);
     },
     hstSet: function() {
-      const maxHst = 3;
+      const maxHst = 9;
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
@@ -92,6 +107,7 @@ export default {
       this.itemSelection = offset;
       this.page = index;
       this.invalidate();
+      this.requestFocus();
       return true;
     },
     onBreak: function(sp, stack) {
@@ -119,7 +135,7 @@ export default {
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
-      this.jumpTo(2147); //for test
+      this.jumpTo(Math.random() < 0.5 ? 2147 : 300); //for test
     },
     onClickIndex: function(newPage) {
       this.hstSet();
