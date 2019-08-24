@@ -28,8 +28,8 @@ export default {
       disable: true,
       disable2: true,
       items: [],
+      itemSelection: null,
       page: 0,
-      pageSize: 0,
       dict: {
         sp: null,
         oldData: [],
@@ -56,6 +56,20 @@ export default {
     asmdb.unregisterEvent('stack', this);
   },
   methods: {
+    jumpTo: function(address) {
+      if (this.dict.sp == null) {
+        return false;
+      }
+      var offset = address - this.dict.sp;
+      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
+      if (offset < 0 || offset >= this.page * row * this.column * 8) {
+        return false;
+      }
+      this.itemSelection = offset;
+      this.page = Math.floor(offset / (row * this.column * 8));
+      this.invalidate();
+      return true;
+    },
     onBreak: function(sp, stack) {
       this.disable = false;
       this.disable2 = false;
@@ -72,20 +86,21 @@ export default {
         dict.oldData = dict.newData;
         dict.newData = stack;
       }
+      this.itemSelection = null;
       this.invalidate();
     },
     onContinue: function() {
       this.disable = true;
     },
     onClickIndex: function(newPage) {
+      this.itemSelection = null;
       this.page = newPage;
       this.invalidate();
     },
     invalidate: function() {
-      this.pageSize = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
       var page = this.page;
       var column = this.column * 8;
-      var row = this.pageSize;
+      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
       var start = page * column * row;
       var end = (page + 1) * column * row;
       var oldData = this.dict.oldData.slice(start, end);
@@ -96,13 +111,18 @@ export default {
       for (var i = 0; i < newData.length / column; i++) {
         var newBytes = newData.slice(i * column, (i + 1) * column);
         var oldBytes = oldData.slice(i * column, (i + 1) * column);
-        var lineNumber = '+0x' + (start + i * column).toString(16).zfill(3);
+        var lineNumber = start + i * column;
+        var highlightNumber = this.itemSelection - lineNumber;
+        if (highlightNumber < 0 || highlightNumber >= column) {
+          highlightNumber = null;
+        }
+        lineNumber = '+0x' + lineNumber.toString(16).zfill(3);
         items[items.length] = {
           lineNumber: lineNumber,
           oldBytes: oldBytes,
           newBytes: newBytes,
           showString: false,
-          highlightNumber: null
+          highlightNumber: highlightNumber
         };
       }
       this.items.splice(0, this.items.length, ...items);
