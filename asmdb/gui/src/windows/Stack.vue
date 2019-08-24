@@ -94,6 +94,7 @@ export default {
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
+      this.jumpTo(2147); //for test
     },
     onClickIndex: function(newPage) {
       this.page = newPage;
