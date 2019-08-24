@@ -104,6 +104,7 @@ export default {
       } else {
         var posn = this.hst.splice(this.hst.length - 1, 1)[0];
         this.page = posn.page;
+        this.itemSelection = null;
         this.invalidate();
         return true;
       }
