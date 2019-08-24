@@ -93,8 +93,8 @@ export default {
       this.disable = true;
     },
     onClickIndex: function(newPage) {
-      this.itemSelection = null;
       this.page = newPage;
+      this.itemSelection = null;
       this.invalidate();
     },
     invalidate: function() {
