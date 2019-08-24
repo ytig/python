@@ -4,9 +4,7 @@
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:18px;"></Empty>
       <div v-else>
-        <div class="stack-margin"></div>
         <Bytes v-for="item in items" :key="item.lineNumber" :value="item" @clickitem="onClickItem"></Bytes>
-        <div class="stack-margin"></div>
       </div>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
@@ -85,7 +83,7 @@ export default {
         return false;
       }
       var offset = address - this.dict.sp;
-      var row = this.$refs.stackLayout ? Math.floor((this.$refs.stackLayout.clientHeight - 8) / measureTextHeight()) : 0;
+      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
       if (offset < 0 || offset >= 10 * row * this.column * 8) {
         return false;
       }
@@ -134,7 +132,7 @@ export default {
     invalidate: function() {
       var page = this.page;
       var column = this.column * 8;
-      var row = this.$refs.stackLayout ? Math.floor((this.$refs.stackLayout.clientHeight - 8) / measureTextHeight()) : 0;
+      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
       var start = page * column * row;
       var end = (page + 1) * column * row;
       var oldData = this.dict.oldData.slice(start, end);
@@ -175,9 +173,6 @@ export default {
     flex-grow: 1;
     height: 0px;
     overflow: scroll;
-    .stack-margin {
-      height: 2px;
-    }
   }
 }
 </style>
