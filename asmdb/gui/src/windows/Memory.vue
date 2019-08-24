@@ -54,7 +54,7 @@ export default {
       this.focus = value;
     },
     onKeyboardClick: function(event) {
-      //todo
+      console.log('todo keyboard event');
     }
   }
 };
