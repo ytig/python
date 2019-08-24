@@ -31,8 +31,8 @@ export default {
 .indicator-container {
   display: flex;
   > * {
-    height: 40px;
-    line-height: 40px;
+    height: 38px;
+    line-height: 38px;
     text-align: center;
     font-size: 12px;
     border-top: 1px solid @color-light-border;
