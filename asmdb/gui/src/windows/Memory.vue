@@ -1,9 +1,9 @@
 <template>
   <div class="memory-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus">
     <Navigation :name="'Memory'" :focus="focus" :disable="disable"></Navigation>
-    <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
-    <div v-else>
-      <Bytes :value="{lineNumber:'0x00112233',newBytes:[1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8],showString:true}"></Bytes>
+    <div ref="memoryLayout" class="memory-layout">
+      <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
+      <Bytes v-else v-for="i in 100" :key="i" :value="{lineNumber:'0x00112233',newBytes:[1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8],showString:true}"></Bytes>
     </div>
   </div>
 </template>
@@ -22,7 +22,7 @@ export default {
     return {
       focus: false,
       disable: true,
-      items: [],
+      items: [0],
       itemSelection: null,
       dict: {}
     };
@@ -64,5 +64,12 @@ export default {
 @import '~@/styles/theme.less';
 
 .memory-container {
+  display: flex;
+  flex-direction: column;
+  .memory-layout {
+    flex-grow: 1;
+    height: 0px;
+    overflow: scroll;
+  }
 }
 </style>
