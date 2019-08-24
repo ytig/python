@@ -1,3 +1,6 @@
+import $ from 'jquery';
+window.$ = $;
+
 String.prototype.zfill = function (size) {
   var str = this;
   while (str.length < size) {
