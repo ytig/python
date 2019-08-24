@@ -26,7 +26,7 @@ export default {
     position: absolute;
     width: 100%;
     height: 4px;
-    background: @@color-selection-background;
+    background: @color-selection-background;
   }
 
   > span {
