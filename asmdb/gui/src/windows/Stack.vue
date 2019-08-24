@@ -13,6 +13,7 @@
 
 <script>
 import asmdb from '@/scripts/asmdb.js';
+import History from '@/scripts/History.js';
 
 function measureTextWidth(length) {
   return length * 7.224609375;
@@ -30,6 +31,7 @@ export default {
       items: [],
       itemSelection: null,
       page: 0,
+      hst: new History(),
       dict: {
         sp: null,
         oldData: [],
@@ -56,6 +58,26 @@ export default {
     asmdb.unregisterEvent('stack', this);
   },
   methods: {
+    hstDel: function() {
+      this.hst.del();
+    },
+    hstSet: function() {
+      var hst = {
+        itemSelection: this.itemSelection,
+        page: this.page
+      };
+      this.hst.set(hst);
+    },
+    hstGet: function() {
+      if (!this.hst.has()) {
+        return false;
+      } else {
+        var hst = this.hst.get();
+        this.itemSelection = hst.itemSelection;
+        this.page = hst.page;
+        return true;
+      }
+    },
     jumpTo: function(address) {
       if (this.dict.sp == null) {
         return false;
@@ -65,6 +87,7 @@ export default {
       if (offset < 0 || offset >= 10 * row * this.column * 8) {
         return false;
       }
+      this.hstSet();
       this.itemSelection = offset;
       this.page = Math.floor(offset / (row * this.column * 8));
       this.invalidate();
@@ -73,6 +96,7 @@ export default {
     onBreak: function(sp, stack) {
       this.disable = false;
       this.disable2 = false;
+      this.hstDel();
       var dict = this.dict;
       if (dict.sp != sp) {
         if (dict.sp != null) {
@@ -97,6 +121,7 @@ export default {
       this.jumpTo(2147); //for test
     },
     onClickIndex: function(newPage) {
+      this.hstSet();
       this.page = newPage;
       this.itemSelection = null;
       this.invalidate();
