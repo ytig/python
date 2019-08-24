@@ -62,7 +62,7 @@ export default {
       }
       var offset = address - this.dict.sp;
       var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
-      if (offset < 0 || offset >= this.page * row * this.column * 8) {
+      if (offset < 0 || offset >= 10 * row * this.column * 8) {
         return false;
       }
       this.itemSelection = offset;
