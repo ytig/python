@@ -58,7 +58,7 @@ export default {
           }
           break;
         case 2:
-          console.log('todo');
+          console.log('todo right click');
           break;
       }
     },
