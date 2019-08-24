@@ -2,7 +2,7 @@ function registerEvent(type, object) {
   //todo
   setTimeout(() => {
     var bytes = [];
-    for (var i = 0; i < 10 * 344; i++) {
+    for (var i = 0; i < 10 * 256; i++) {
       bytes[bytes.length] = Math.floor(256 * Math.random())
     }
     object.cache = bytes;
@@ -10,7 +10,7 @@ function registerEvent(type, object) {
   }, 1000);
   setTimeout(() => {
     var bytes = [];
-    for (var i = 0; i < 10 * 344; i++) {
+    for (var i = 0; i < 10 * 256; i++) {
       if (Math.random() > 0.98) {
         bytes[bytes.length] = Math.floor(256 * Math.random())
       } else {

@@ -4,7 +4,7 @@
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
       <div v-else>
-        <Bytes v-for="item in items" :key="item.lineNumber" :value="item"></Bytes>
+        <Bytes v-for="item in items" :key="item.lineNumber" :value="item" @clickitem="onClickItem"></Bytes>
       </div>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
@@ -91,6 +91,9 @@ export default {
     },
     onContinue: function() {
       this.disable = true;
+    },
+    onClickItem: function(type, addr) {
+      console.log(type, addr);
     },
     onClickIndex: function(newPage) {
       this.page = newPage;
