@@ -13,7 +13,6 @@
 
 <script>
 import asmdb from '@/scripts/asmdb.js';
-import History from '@/scripts/History.js';
 
 function measureTextWidth(length) {
   return length * 7.224609375;
@@ -31,7 +30,7 @@ export default {
       items: [],
       itemSelection: null,
       page: 0,
-      hst: new History(),
+      hst: [],
       dict: {
         sp: null,
         oldData: [],
@@ -59,22 +58,22 @@ export default {
   },
   methods: {
     hstDel: function() {
-      this.hst.del();
+      this.hst.splice(0, this.hst.length);
     },
     hstSet: function() {
-      var hst = {
+      var posn = {
         itemSelection: this.itemSelection,
         page: this.page
       };
-      this.hst.set(hst);
+      this.hst.splice(this.hst.length, 0, posn);
     },
     hstGet: function() {
-      if (!this.hst.has()) {
+      if (this.hst.length <= 0) {
         return false;
       } else {
-        var hst = this.hst.get();
-        this.itemSelection = hst.itemSelection;
-        this.page = hst.page;
+        var posn = this.hst.splice(this.hst.length - 1, 1)[0];
+        this.itemSelection = posn.itemSelection;
+        this.page = posn.page;
         return true;
       }
     },
