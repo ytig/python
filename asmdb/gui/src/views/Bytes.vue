@@ -8,15 +8,16 @@
 const groupBy = 4; //4or8
 
 function usageOf(int) {
-  //todo
-  var i = int % 16;
-  if (i == 0 || i == 1) {
+  if (int >= 0x08048000 && int <= 0x08049000) {
     return '2';
   }
-  if (i == 2) {
+  if (int >= 0xbfcb4000 && int <= 0xbfcc9000) {
     return '3';
   }
-  if (i == 3 || i == 4) {
+  if (int >= 0x08ac5000 && int <= 0x08ae6000) {
+    return '4';
+  }
+  if (int >= 0x08049000 && int <= 0x0804a000) {
     return '4';
   }
   return '1';
