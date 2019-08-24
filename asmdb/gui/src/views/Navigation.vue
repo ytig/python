@@ -1,7 +1,7 @@
 <template>
   <div class="navigation-container">
-    <div :css-focus="focus"></div>
-    <span class="user-select-none" :css-disable="''+disable">{{name}}</span>
+    <div :css-focus="focus" :css-disable="disable"></div>
+    <span class="user-select-none" :css-focus="focus" :css-disable="disable">{{name}}</span>
   </div>
 </template>
 
