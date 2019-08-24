@@ -28,6 +28,6 @@ export default {
 @import '~@/styles/theme.less';
 
 .registers-container {
-  padding-bottom: 4px;
+  padding-bottom: 2px;
 }
 </style>
