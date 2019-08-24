@@ -23,11 +23,15 @@ export default {
   height: 40px;
   > div {
     position: absolute;
-    width: 100%;
-    height: 2px;
+    border: 0px solid @color-text;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
   }
   > div[css-focus='true'] {
-    background: @color-text;
+    border-width: 5px;
+  }
+  > div[css-disable='true'] {
+    border-color: @color-darker-text;
   }
   > span {
     position: absolute;
