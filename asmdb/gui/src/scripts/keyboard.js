@@ -39,9 +39,9 @@ function requestFocus(object) {
   }
 }
 
-$(document).keyup(function (event) {
+$(document).keydown(function (event) {
   if (cur >= 0) {
-    list[cur].onKeyboardClick(event);
+    list[cur].onKeyDown(event);
   }
 });
 

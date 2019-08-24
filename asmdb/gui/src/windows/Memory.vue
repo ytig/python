@@ -53,7 +53,7 @@ export default {
     onFocusChanged: function(value) {
       this.focus = value;
     },
-    onKeyboardClick: function(event) {
+    onKeyDown: function(event) {
       console.log('todo keyboard event');
     }
   }

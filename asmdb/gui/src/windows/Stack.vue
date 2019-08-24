@@ -65,16 +65,33 @@ export default {
     onFocusChanged: function(value) {
       this.focus = value;
     },
-    onKeyboardClick: function(event) {
-      if (event.keyCode == 8) {
-        this.hstGet();
+    onKeyDown: function(event) {
+      switch (event.keyCode) {
+        case 8:
+          this.hstGet();
+          break;
+        case 32:
+          if (!this.disable2 && this.page != 0) {
+            this.onClickIndex(0);
+          }
+          break;
+        case 37:
+          if (!this.disable2 && this.page - 1 >= 0) {
+            this.onClickIndex(this.page - 1);
+          }
+          break;
+        case 39:
+          if (!this.disable2 && this.page + 1 < 10) {
+            this.onClickIndex(this.page + 1);
+          }
+          break;
       }
     },
     hstDel: function() {
       this.hst.splice(0, this.hst.length);
     },
     hstSet: function() {
-      const maxHst = 9;
+      const maxHst = 999;
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
