@@ -92,8 +92,8 @@ export default {
     onContinue: function() {
       this.disable = true;
     },
-    onClickItem: function(type, addr) {
-      console.log(type, addr);
+    onClickItem: function(...args) {
+      this.$emit('clickitem', ...args);
     },
     onClickIndex: function(newPage) {
       this.page = newPage;
