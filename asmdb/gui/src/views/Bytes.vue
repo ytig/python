@@ -161,7 +161,7 @@ export default {
 }
 .bytes-container {
   white-space: nowrap;
-  margin-bottom: 4px;
+  margin: 4px 0px;
   > span {
     font-size: 12px;
   }

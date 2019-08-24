@@ -1,6 +1,5 @@
 <template>
-  <div class="navigation-container">
-    <div v-show="focus" class="navigation-focus"></div>
+  <div class="navigation-container" :css-focus="focus">
     <span class="user-select-none" :css-disable="''+disable">{{name}}</span>
   </div>
 </template>
@@ -19,18 +18,11 @@ export default {
 @import '~@/styles/theme.less';
 
 .navigation-container {
-  position: relative;
-  height: 36px;
-  line-height: 36px;
-  .navigation-focus {
-    position: absolute;
-    width: 100%;
-    height: 4px;
-    background: @color-selection-background;
-  }
-
+  height: 30px;
+  padding: 0px 12px;
+  display: flex;
+  align-items: flex-end;
   > span {
-    padding-left: 12px;
     font-size: 18px;
     color: @color-text;
     font-family: 'Wawati SC';
@@ -39,5 +31,8 @@ export default {
     color: @color-darker-text;
     text-decoration: line-through;
   }
+}
+.navigation-container[css-focus='true'] {
+  background: #67769620;
 }
 </style>
