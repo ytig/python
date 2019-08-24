@@ -21,22 +21,17 @@ export default {
 .navigation-container {
   position: relative;
   height: 40px;
-  overflow: hidden;
   > div {
     position: absolute;
-    width: 14px;
-    height: 14px;
-    left: -7px;
-    top: -7px;
-    transform: rotate(45deg);
-    background: @color-text;
-    opacity: 0;
+    border: 0px solid @color-text;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
   }
   > div[css-focus='true'] {
-    opacity: 1;
+    border-width: 5px;
   }
   > div[css-disable='true'] {
-    background: @color-darker-text;
+    border-color: @color-darker-text;
   }
   > span {
     position: absolute;
