@@ -20,8 +20,10 @@ export default {
 
 .navigation-container {
   position: relative;
-  height: 36px;
+  height: 40px;
   > div {
+    position: absolute;
+    width: 100%;
     height: 2px;
   }
   > div[css-focus='true'] {
@@ -29,8 +31,8 @@ export default {
   }
   > span {
     position: absolute;
-    top: 6px;
     left: 12px;
+    bottom: 5px;
     font-size: 18px;
     color: @color-text;
     font-family: 'Wawati SC';
