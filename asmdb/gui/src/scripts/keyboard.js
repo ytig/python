@@ -41,7 +41,9 @@ function requestFocus(object) {
 
 $(document).keydown(function (event) {
   if (cur >= 0) {
-    list[cur].onKeyDown(event);
+    if (list[cur].onKeyDown(event)) {
+      event.preventDefault();
+    }
   }
 });
 

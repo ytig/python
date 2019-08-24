@@ -85,7 +85,10 @@ export default {
             this.onClickIndex(this.page + 1);
           }
           break;
+        default:
+          return false;
       }
+      return true;
     },
     hstDel: function() {
       this.hst.splice(0, this.hst.length);
