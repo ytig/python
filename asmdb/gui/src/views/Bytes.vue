@@ -8,6 +8,7 @@
 const groupBy = 4; //4or8
 
 function usageOf(int) {
+  //todo check?
   if (int >= 0x08048000 && int <= 0x08049000) {
     return '2';
   }
