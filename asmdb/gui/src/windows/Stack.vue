@@ -61,10 +61,16 @@ export default {
       this.hst.splice(0, this.hst.length);
     },
     hstSet: function() {
-      var posn = {
-        itemSelection: this.itemSelection,
-        page: this.page
-      };
+      if (this.hst.length > 0) {
+        var posn = this.hst[this.hst.length - 1];
+        if (this.page == posn.page) {
+          return;
+        }
+      }
+      while (this.hst.length >= 3) {
+        this.hst.splice(0, 1);
+      }
+      var posn = { page: this.page };
       this.hst.splice(this.hst.length, 0, posn);
     },
     hstGet: function() {
@@ -72,7 +78,6 @@ export default {
         return false;
       } else {
         var posn = this.hst.splice(this.hst.length - 1, 1)[0];
-        this.itemSelection = posn.itemSelection;
         this.page = posn.page;
         this.invalidate();
         return true;
@@ -87,9 +92,6 @@ export default {
       if (offset < 0 || offset >= 10 * row * this.column * 8) {
         return false;
       }
-      if (this.itemSelection == offset) {
-        return true;
-      }
       this.hstSet();
       this.itemSelection = offset;
       this.page = Math.floor(offset / (row * this.column * 8));
@@ -99,9 +101,9 @@ export default {
     onBreak: function(sp, stack) {
       this.disable = false;
       this.disable2 = false;
-      this.hstDel();
       var dict = this.dict;
       if (dict.sp != sp) {
+        this.hstDel();
         if (dict.sp != null) {
           dict.pageCache[dict.sp] = this.page;
         }
