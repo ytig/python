@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import asmdb from '@/scripts/asmdb.js';
 const groupBy = 4; //4or8
 
 function measureTextWidth(length) {
@@ -34,6 +35,12 @@ export default {
     windowWidth: function() {
       return 24 + measureTextWidth(2 + (8 * groupBy) / 4 + 25 * this.column + 2 + 8 * this.column) + 16 * this.column;
     }
+  },
+  created: function() {
+    asmdb.registerEvent('memory', this);
+  },
+  destroyed: function() {
+    asmdb.unregisterEvent('memory', this);
   }
 };
 </script>

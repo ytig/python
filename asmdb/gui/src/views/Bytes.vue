@@ -1,6 +1,6 @@
 <template>
   <div class="bytes-container" :highlight="highlight">
-    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)"></span>
+    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @mousedown="onClickItem($event, index)"></span>
   </div>
 </template>
 
@@ -41,9 +41,16 @@ export default {
     this.invalidate();
   },
   methods: {
-    onClickItem: function(index) {
-      if (this.items[index] && this.items[index].event) {
-        this.$emit('clickitem', ...this.items[index].event);
+    onClickItem: function(event, index) {
+      switch (event.button) {
+        case 0:
+          if (this.items[index] && this.items[index].event) {
+            this.$emit('clickitem', ...this.items[index].event);
+          }
+          break;
+        case 2:
+          console.log('todo');
+          break;
       }
     },
     invalidate: function() {
