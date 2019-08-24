@@ -21,11 +21,11 @@ export default {
 .navigation-container {
   position: relative;
   height: 36px;
+  > div {
+    height: 2px;
+  }
   > div[css-focus='true'] {
-    position: absolute;
-    width: 100%;
-    height: 20px;
-    background: #5a637580;
+    background: @color-text;
   }
   > span {
     position: absolute;
