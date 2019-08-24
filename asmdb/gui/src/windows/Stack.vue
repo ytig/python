@@ -91,7 +91,7 @@ export default {
       this.hst.splice(0, this.hst.length);
     },
     hstSet: function() {
-      const maxHst = 999;
+      const maxHst = 666;
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
