@@ -61,12 +61,6 @@ export default {
       this.hst.splice(0, this.hst.length);
     },
     hstSet: function() {
-      if (this.hst.length > 0) {
-        var posn = this.hst[this.hst.length - 1];
-        if (this.page == posn.page) {
-          return;
-        }
-      }
       const maxHst = 3;
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
@@ -93,9 +87,12 @@ export default {
       if (offset < 0 || offset >= 10 * row * this.column * 8) {
         return false;
       }
-      this.hstSet();
+      var index = Math.floor(offset / (row * this.column * 8));
+      if (this.page != index) {
+        this.hstSet();
+      }
       this.itemSelection = offset;
-      this.page = Math.floor(offset / (row * this.column * 8));
+      this.page = index;
       this.invalidate();
       return true;
     },
