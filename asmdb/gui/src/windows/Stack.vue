@@ -1,11 +1,9 @@
 <template>
   <div class="stack-container" :style="{width:windowWidth+'px'}">
-    <Navigation :name="'Stack'" :disable="disable"></Navigation>
+    <Navigation :name="'Stack'" :focus="true" :disable="disable"></Navigation>
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
-      <div v-else>
-        <Bytes v-for="item in items" :key="item.lineNumber" :value="item" @clickitem="onClickItem"></Bytes>
-      </div>
+      <Bytes v-else v-for="item in items" :key="item.lineNumber" :value="item" @clickitem="onClickItem"></Bytes>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
   </div>
