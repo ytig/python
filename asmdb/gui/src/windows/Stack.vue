@@ -87,6 +87,9 @@ export default {
       if (offset < 0 || offset >= 10 * row * this.column * 8) {
         return false;
       }
+      if (this.itemSelection == offset) {
+        return true;
+      }
       this.hstSet();
       this.itemSelection = offset;
       this.page = Math.floor(offset / (row * this.column * 8));
