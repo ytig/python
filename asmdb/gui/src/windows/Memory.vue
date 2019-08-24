@@ -1,16 +1,36 @@
 <template>
-  <div class="memory-container">
+  <div class="memory-container" :style="{width:windowWidth+'px'}">
     <Navigation :name="'Memory'" :disable="true"></Navigation>
-    <Bytes :value="{lineNumber:'0x00112233',newBytes:[1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8],showString:true}"></Bytes>
+    <!-- <Bytes :value="{lineNumber:'0x00112233',newBytes:[1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8],showString:true}"></Bytes> -->
   </div>
 </template>
 
 <script>
+const groupBy = 4; //4or8
+
+function measureTextWidth(length) {
+  return length * 7.224609375;
+}
+
 export default {
   data: function() {
     return {
-      disable: true
+      disable: true,
+      items: [],
+      itemSelection: null,
+      dict: {}
     };
+  },
+  props: {
+    column: {
+      type: Number,
+      default: 2
+    }
+  },
+  computed: {
+    windowWidth: function() {
+      return 24 + measureTextWidth(2 + (8 * groupBy) / 4 + 25 * this.column + 2 + 8 * this.column) + 16 * this.column;
+    }
   }
 };
 </script>
