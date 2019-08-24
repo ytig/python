@@ -1,5 +1,8 @@
 import $ from 'jquery';
 window.$ = $;
+$(document).bind("contextmenu", function () {
+  return false;
+});
 
 String.prototype.zfill = function (size) {
   var str = this;
