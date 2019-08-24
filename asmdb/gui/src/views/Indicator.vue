@@ -1,6 +1,6 @@
 <template>
   <div class="indicator-container">
-    <div v-for="i in size" :key="i" class="user-select-none" :style="{flexGrow:1/(i+1)}" @click="onClickItem(i-1)" :css-offset="''+(i-1-value)" :css-disable="''+disable">{{i-1}}</div>
+    <div v-for="i in size" :key="i" class="user-select-none" :style="{flexGrow:1/(i+1)}" @click="onClickItem(i-1)" :css-offset="i-1-value" :css-disable="disable">{{i-1}}</div>
   </div>
 </template>
 
