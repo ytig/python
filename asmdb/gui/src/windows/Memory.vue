@@ -21,8 +21,8 @@ export default {
   data: function() {
     return {
       focus: false,
-      disable: false, //for test
-      items: [0], //for test
+      disable: true,
+      items: [],
       itemSelection: null,
       dict: {}
     };
