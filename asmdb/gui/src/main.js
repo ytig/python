@@ -5,6 +5,9 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
+import menu from '@/plugins/menu';
+Vue.use(menu);
+
 import Bytes from '@/views/Bytes'
 import Empty from '@/views/Empty'
 import Gird from '@/views/Gird'
