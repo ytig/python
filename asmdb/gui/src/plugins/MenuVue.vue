@@ -8,7 +8,7 @@
 export default {
   data: function() {
     return {
-      show: Boolean,
+      show: false,
       items: []
     };
   },
