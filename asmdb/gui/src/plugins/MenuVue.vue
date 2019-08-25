@@ -36,11 +36,11 @@ export default {
             break;
           }
         }
-        this.close();
       }
     },
     onClickItem: function(index) {
       console.log(index);
+      this.close();
     }
   }
 };
