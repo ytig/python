@@ -22,12 +22,7 @@ export default {
       this.items = [];
     },
     getEventIndex(event) {
-      for (var i = 0; i < this.$refs.menuContainer.childNodes.length; i++) {
-        if (this.$refs.menuContainer.childNodes[i] == event.target) {
-          return i;
-        }
-      }
-      return -1;
+      return new Array(...this.$refs.menuContainer.childNodes).indexOf(event.target);
     },
     onMouseDown: function(event) {
       var intercept = this.show;
