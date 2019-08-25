@@ -26,7 +26,7 @@ export default {
 </script>
 
 <style lang="less">
-@import '~@/styles/theme.less';
+@import '~@/styles/theme';
 
 .indicator-container {
   display: flex;
