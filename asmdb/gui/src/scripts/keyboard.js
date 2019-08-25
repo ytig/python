@@ -39,7 +39,7 @@ function requestFocus(object) {
   }
 }
 
-$(document).keydown(function (event) {
+document.addEventListener('keydown', function (event) {
   if (cur >= 0) {
     if (list[cur].onKeyDown(event)) {
       event.preventDefault();
