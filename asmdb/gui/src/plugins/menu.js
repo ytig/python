@@ -9,9 +9,11 @@ export default {
     document.body.appendChild(vm.$mount().$el);
     var intercept = false;
     document.addEventListener('mousedown', function (event) {
-      intercept = vm.onMouseDown(event);
-      if (intercept) {
-        event.stopPropagation();
+      if (event.button == 0) {
+        intercept = vm.onMouseDown(event);
+        if (intercept) {
+          event.stopPropagation();
+        }
       }
     }, true);
     document.addEventListener('click', function (event) {
