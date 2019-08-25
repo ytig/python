@@ -5,8 +5,8 @@ export default {
     if (Vue.prototype.$menu) {
       return;
     }
-    $(document).bind("contextmenu", function () {
-      return false;
+    document.addEventListener('contextmenu', function () {
+      event.preventDefault();
     });
     var vm = new(Vue.extend(MenuVue))();
     document.body.appendChild(vm.$mount().$el);
