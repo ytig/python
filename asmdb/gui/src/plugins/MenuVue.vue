@@ -21,20 +21,26 @@ export default {
       this.show = false;
       this.items = [];
     },
+    getEventIndex(event) {
+      for (var i = 0; i < this.$refs.menuContainer.childNodes.length; i++) {
+        if (this.$refs.menuContainer.childNodes[i] == event.target) {
+          return i;
+        }
+      }
+      return -1;
+    },
     onMouseDown: function(event) {
       var intercept = this.show;
-      if (this.$refs.menuContainer != event.target.parentNode) {
+      if (this.getEventIndex(event) == -1) {
         this.close();
       }
       return intercept;
     },
     onClick: function(event) {
       if (this.show) {
-        for (var i = 0; i < this.$refs.menuContainer.childNodes.length; i++) {
-          if (this.$refs.menuContainer.childNodes[i] == event.target) {
-            this.onClickItem(i);
-            break;
-          }
+        var index = this.getEventIndex(event);
+        if (index >= 0) {
+          this.onClickItem(index);
         }
       }
     },
