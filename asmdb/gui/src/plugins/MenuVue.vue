@@ -1,5 +1,5 @@
 <template>
-  <div v-show="show" class="menu-container">
+  <div ref="menuContainer" v-show="show" class="menu-container">
     <div v-for="(item, index) in items" :key="index">{{item}}</div>
   </div>
 </template>
@@ -23,17 +23,24 @@ export default {
     },
     onMouseDown: function(event) {
       var intercept = this.show;
-      if (true) {
-        //todo outside dismiss
+      if (this.$refs.menuContainer != event.target.parentNode) {
         this.close();
       }
       return intercept;
     },
     onClick: function(event) {
       if (this.show) {
-        //todo check click position
+        for (var i = 0; i < this.$refs.menuContainer.childNodes.length; i++) {
+          if (this.$refs.menuContainer.childNodes[i] == event.target) {
+            this.onClickItem(i);
+            break;
+          }
+        }
         this.close();
       }
+    },
+    onClickItem: function(index) {
+      console.log(index);
     }
   }
 };
