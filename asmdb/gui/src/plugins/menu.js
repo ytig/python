@@ -10,6 +10,9 @@ export default {
     });
     var vm = new(Vue.extend(MenuVue))();
     document.body.appendChild(vm.$mount().$el);
+    document.body.addEventListener('mousedown', (event) => {
+      vm.onMouseDown(event);
+    });
     Vue.prototype.$menu = vm;
   }
 }

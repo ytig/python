@@ -1,8 +1,6 @@
 <template>
   <div v-show="show" class="menu-container" @click="close">
-    <div class="menu-layout">
-      <div v-for="(item, index) in items" :key="index" @click="clickItem(index);$event.stopPropagation();">{{item}}</div>
-    </div>
+    <div v-for="(item, index) in items" :key="index" @click="onClickItem(index);$event.stopPropagation();">{{item}}</div>
   </div>
 </template>
 
@@ -23,7 +21,10 @@ export default {
       this.show = false;
       this.items = [];
     },
-    clickItem: function(index) {
+    onMouseDown: function(event) {
+      console.log('mouseDown');
+    },
+    onClickItem: function(index) {
       //emit
       this.close();
     }
@@ -36,16 +37,14 @@ export default {
 
 .menu-container {
   position: fixed;
+  display: inline-block;
   left: 0px;
   top: 0px;
-  width: 100%;
-  height: 100%;
-  .menu-layout {
-    display: inline-block;
-    > div {
-      font-size: 18px;
-      background: #fff;
-    }
+  // width: 100%;
+  // height: 100%;
+  > div {
+    font-size: 18px;
+    background: #fff;
   }
 }
 </style>
