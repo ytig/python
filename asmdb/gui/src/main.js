@@ -1,5 +1,5 @@
 import '@/styles/global.less';
-import '@/scripts/window.js';
+import '@/scripts/window';
 
 import Vue from 'vue';
 import VueRouter from 'vue-router';

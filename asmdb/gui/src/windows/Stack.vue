@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import keyboard from '@/scripts/keyboard.js';
-import asmdb from '@/scripts/asmdb.js';
+import keyboard from '@/scripts/keyboard';
+import asmdb from '@/scripts/asmdb';
 
 function measureTextWidth(length) {
   return length * 7.224609375;

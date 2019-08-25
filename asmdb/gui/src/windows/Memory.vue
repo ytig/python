@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import keyboard from '@/scripts/keyboard.js';
-import asmdb from '@/scripts/asmdb.js';
+import keyboard from '@/scripts/keyboard';
+import asmdb from '@/scripts/asmdb';
 const groupBy = 4; //4or8
 
 function measureTextWidth(length) {
