@@ -20,6 +20,7 @@ export default {
       if (intercept) {
         vm.onClick(event);
         event.stopPropagation();
+        intercept = false;
       }
     }, true);
     document.addEventListener('contextmenu', function (event) {
