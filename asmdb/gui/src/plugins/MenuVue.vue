@@ -62,14 +62,18 @@ export default {
   display: inline-block;
   background: #21252b;
   box-shadow: 0px 0px 6px @color-border-shadow;
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  min-width: 147px;
   > div {
     padding-left: 12px;
     padding-right: 12px;
     line-height: 22px;
     font-size: 12px;
     color: @color-text;
+  }
+  > div:hover {
+    background: #383e4a;
   }
 }
 </style>
