@@ -60,9 +60,16 @@ export default {
 .menu-container {
   position: fixed;
   display: inline-block;
+  border-radius: 4px;
+  background: #f0f0f0;
+  border: 1px solid #d2d2d2;
+  min-width: 200px;
   > div {
-    font-size: 18px;
-    background: #fff;
+    padding-left: 20px;
+    padding-right: 8px;
+    line-height: 22px;
+    font-size: 14px;
+    // color: @color-text;
   }
 }
 </style>

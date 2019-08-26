@@ -67,7 +67,7 @@ export default {
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
-        this.$menu.alert(event, [1, 2, 3]); //for test
+        this.$menu.alert(event, ['Go Back', 'Go Home', 'Last Page', 'Next Page']); //for test
       }
     },
     onKeyDown: function(event) {
