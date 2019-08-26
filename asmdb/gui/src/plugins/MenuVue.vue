@@ -1,5 +1,5 @@
 <template>
-  <div ref="menuContainer" v-show="show" class="menu-container">
+  <div ref="menuContainer" v-show="show" class="menu-container" :style="{left:left+'px',top:top+'px'}">
     <div v-for="(item, index) in items" :key="index">{{item}}</div>
   </div>
 </template>
@@ -8,12 +8,16 @@
 export default {
   data: function() {
     return {
+      left: 0,
+      top: 0,
       show: false,
       items: []
     };
   },
   methods: {
     alert: function(event, items) {
+      this.left = event.clientX;
+      this.top = event.clientY;
       this.show = true;
       this.items = items;
     },
@@ -56,10 +60,6 @@ export default {
 .menu-container {
   position: fixed;
   display: inline-block;
-  left: 0px;
-  top: 0px;
-  // width: 100%;
-  // height: 100%;
   > div {
     font-size: 18px;
     background: #fff;
