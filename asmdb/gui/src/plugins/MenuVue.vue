@@ -39,6 +39,9 @@ export default {
         }
       }
     },
+    onKeyDown: function(event) {
+      return this.show;
+    },
     onClickItem: function(index) {
       console.log(index);
       this.close();

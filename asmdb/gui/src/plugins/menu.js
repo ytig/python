@@ -26,6 +26,12 @@ export default {
     document.addEventListener('contextmenu', function (event) {
       event.preventDefault();
     });
+    document.addEventListener('keydown', function (event) {
+      if (vm.onKeyDown(event)) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+    }, true);
     Vue.prototype.$menu = vm;
   }
 }
