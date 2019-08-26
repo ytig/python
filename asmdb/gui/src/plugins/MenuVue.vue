@@ -66,7 +66,7 @@ export default {
 .menu-container {
   position: fixed;
   display: inline-block;
-  background: #21252b;
+  background: @color-dark-background;
   box-shadow: 0px 0px 6px @color-border-shadow;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -79,7 +79,7 @@ export default {
     color: @color-text;
   }
   > div:hover {
-    background: #383e4a;
+    background: @color-hover-background;
   }
 }
 </style>
