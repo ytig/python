@@ -27,16 +27,16 @@ export default {
     },
     onMouseDown: function(event) {
       var intercept = this.show;
-      var outside = true;
-      var el = event.target;
-      while (el) {
-        if (el == this.$refs.menuContainer) {
-          outside = false;
+      var inner = false;
+      var node = event.target;
+      while (node) {
+        if (node == this.$refs.menuContainer) {
+          inner = true;
           break;
         }
-        el = el.parentNode;
+        node = node.parentNode;
       }
-      if (outside) {
+      if (!inner) {
         this.close();
       }
       return intercept;
