@@ -13,7 +13,7 @@ export default {
     };
   },
   methods: {
-    alert: function(items) {
+    alert: function(event, items) {
       this.show = true;
       this.items = items;
     },

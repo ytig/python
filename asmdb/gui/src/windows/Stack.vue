@@ -1,5 +1,5 @@
 <template>
-  <div class="stack-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus">
+  <div class="stack-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp($event)">
     <Navigation :name="'Stack'" :focus="focus" :disable="disable"></Navigation>
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
@@ -64,6 +64,11 @@ export default {
     },
     onFocusChanged: function(value) {
       this.focus = value;
+    },
+    onMouseUp: function(event) {
+      if (event.button == 2) {
+        this.$menu.alert(event, [1, 2, 3]); //for test
+      }
     },
     onKeyDown: function(event) {
       switch (event.keyCode) {
