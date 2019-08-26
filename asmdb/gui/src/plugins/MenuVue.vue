@@ -25,19 +25,25 @@ export default {
       this.show = false;
       this.items = [];
     },
-    getEventIndex(event) {
-      return new Array(...this.$refs.menuContainer.childNodes).indexOf(event.target);
-    },
     onMouseDown: function(event) {
       var intercept = this.show;
-      if (this.getEventIndex(event) == -1) {
+      var outside = true;
+      var el = event.target;
+      while (el) {
+        if (el == this.$refs.menuContainer) {
+          outside = false;
+          break;
+        }
+        el = el.parentNode;
+      }
+      if (outside) {
         this.close();
       }
       return intercept;
     },
     onClick: function(event) {
       if (this.show) {
-        var index = this.getEventIndex(event);
+        var index = new Array(...this.$refs.menuContainer.childNodes).indexOf(event.target);
         if (index >= 0) {
           this.onClickItem(index);
         }
