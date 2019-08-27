@@ -68,10 +68,10 @@ export default {
     onMouseUp: function(event) {
       if (event.button == 2) {
         var items = [];
-        items[items.length] = ['Go Back', '⌫', this.hst.length > 0];
-        items[items.length] = ['Go Top', 'space', !this.disable2 && this.page != 0];
-        items[items.length] = ['Last Page', '←', !this.disable2 && this.page - 1 >= 0];
-        items[items.length] = ['Next Page', '→', !this.disable2 && this.page + 1 < 10];
+        items[items.length] = ['Go back', '⌫', this.hst.length > 0];
+        items[items.length] = ['Jump to SP', 'space', !this.disable2 && this.page != 0];
+        items[items.length] = ['Last page', '←', !this.disable2 && this.page - 1 >= 0];
+        items[items.length] = ['Next page', '→', !this.disable2 && this.page + 1 < 10];
         this.$menu.alert(event, items, this.onClickMenu);
       }
     },
