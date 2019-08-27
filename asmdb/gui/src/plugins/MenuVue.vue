@@ -91,13 +91,12 @@ export default {
     > span:first-child {
       font-family: 'PingFang SC';
       font-size: 12px;
-      color: @color-menu-dark-text;
-      text-decoration: line-through;
+      color: @color-darker-text;
     }
     > span:last-child {
       font-family: 'PingFang SC';
       font-size: 12px;
-      color: @color-menu-dark-text;
+      color: @color-darker-text;
     }
   }
   > div[css-enable] {
@@ -107,7 +106,9 @@ export default {
     }
     > span:first-child {
       color: @color-menu-text;
-      text-decoration: none;
+    }
+    > span:last-child {
+      color: @color-menu-dark-text;
     }
   }
   > div[css-enable]:hover {
