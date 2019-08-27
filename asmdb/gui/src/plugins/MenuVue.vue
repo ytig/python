@@ -81,7 +81,6 @@ export default {
   box-shadow: 0px 0px 6px @color-border-shadow;
   padding-top: 4px;
   padding-bottom: 4px;
-  width: 160px;
   > div {
     padding-left: 12px;
     padding-right: 6px;
@@ -92,10 +91,7 @@ export default {
       font-family: 'PingFang SC';
       font-size: 12px;
       color: @color-darker-text;
-      margin-right: 6px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      margin-right: 47px;
     }
     > span:last-child {
       font-family: 'PingFang SC';
