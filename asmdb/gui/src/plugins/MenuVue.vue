@@ -80,11 +80,15 @@ export default {
   padding-bottom: 4px;
   min-width: 147px;
   > div {
+    cursor: pointer;
     padding-left: 12px;
     padding-right: 6px;
     line-height: 22px;
     display: flex;
     justify-content: space-between;
+    > span {
+      cursor: pointer;
+    }
     > span:first-child {
       font-family: 'PingFang SC';
       font-size: 12px;
