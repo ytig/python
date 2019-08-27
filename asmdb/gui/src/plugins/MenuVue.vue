@@ -1,6 +1,9 @@
 <template>
   <div ref="menuContainer" v-show="show" class="menu-container" :style="{left:left+'px',top:top+'px'}">
-    <div v-for="(item, index) in items" :key="index">{{item}}</div>
+    <div v-for="(item, index) in items" :key="index">
+      <span>{{item[0]}}</span>
+      <span>{{item[1]}}</span>
+    </div>
   </div>
 </template>
 
@@ -11,19 +14,22 @@ export default {
       left: 0,
       top: 0,
       show: false,
-      items: []
+      items: [],
+      listener: null
     };
   },
   methods: {
-    alert: function(event, items) {
+    alert: function(event, items, listener) {
       this.left = event.clientX;
       this.top = event.clientY;
       this.show = true;
       this.items = items;
+      this.listener = listener;
     },
     close: function() {
       this.show = false;
       this.items = [];
+      this.listener = null;
     },
     onMouseDown: function(event) {
       var intercept = this.show;
@@ -43,7 +49,15 @@ export default {
     },
     onClick: function(event) {
       if (this.show) {
-        var index = new Array(...this.$refs.menuContainer.childNodes).indexOf(event.target);
+        var index = -1;
+        var node = event.target;
+        while (node) {
+          if (node.parentNode == this.$refs.menuContainer) {
+            index = new Array(...this.$refs.menuContainer.childNodes).indexOf(node);
+            break;
+          }
+          node = node.parentNode;
+        }
         if (index >= 0) {
           this.onClickItem(index);
         }
@@ -53,7 +67,7 @@ export default {
       return this.show;
     },
     onClickItem: function(index) {
-      console.log(index);
+      this.listener(index);
       this.close();
     }
   }
@@ -73,10 +87,20 @@ export default {
   min-width: 147px;
   > div {
     padding-left: 12px;
-    padding-right: 12px;
+    padding-right: 6px;
     line-height: 22px;
-    font-size: 12px;
-    color: @color-text;
+    display: flex;
+    justify-content: space-between;
+    > span:first-child {
+      font-family: 'PingFang SC';
+      font-size: 12px;
+      color: @color-menu-text;
+    }
+    > span:last-child {
+      font-family: 'PingFang SC';
+      font-size: 12px;
+      color: @color-menu-dark-text;
+    }
   }
   > div:hover {
     background: @color-hover-background;

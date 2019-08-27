@@ -67,33 +67,39 @@ export default {
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
-        this.$menu.alert(event, ['Go Back', 'Go Home', 'Last Page', 'Next Page']); //for test
+        this.$menu.alert(event, [['Go Back', '⌫'], ['Go Home', 'space'], ['Last Page', '←'], ['Next Page', '→']], this.onClickMenu);
       }
     },
-    onKeyDown: function(event) {
-      switch (event.keyCode) {
-        case 8:
+    onClickMenu: function(index) {
+      switch (index) {
+        case 0:
           this.hstGet();
           break;
-        case 32:
+        case 1:
           if (!this.disable2 && this.page != 0) {
             this.onClickIndex(0);
           }
           break;
-        case 37:
+        case 2:
           if (!this.disable2 && this.page - 1 >= 0) {
             this.onClickIndex(this.page - 1);
           }
           break;
-        case 39:
+        case 3:
           if (!this.disable2 && this.page + 1 < 10) {
             this.onClickIndex(this.page + 1);
           }
           break;
-        default:
-          return false;
       }
-      return true;
+    },
+    onKeyDown: function(event) {
+      var index = [8, 32, 37, 39].indexOf(event.keyCode);
+      if (index >= 0) {
+        this.onClickMenu(index);
+        return true;
+      } else {
+        return false;
+      }
     },
     hstDel: function() {
       this.hst.splice(0, this.hst.length);
