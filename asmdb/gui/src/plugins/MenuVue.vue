@@ -8,6 +8,16 @@
 </template>
 
 <script>
+function getChildIndex(parent, child) {
+  while (child) {
+    if (child.parentNode == parent) {
+      return new Array(...parent.childNodes).indexOf(child);
+    }
+    child = child.parentNode;
+  }
+  return -1;
+}
+
 export default {
   data: function() {
     return {
@@ -33,15 +43,7 @@ export default {
     },
     onMouseDown: function(event) {
       var intercept = this.show;
-      var inner = false;
-      var node = event.target;
-      while (node) {
-        if (node == this.$refs.menuContainer) {
-          inner = true;
-          break;
-        }
-        node = node.parentNode;
-      }
+      var inner = this.$refs.menuContainer == event.target || getChildIndex(this.$refs.menuContainer, event.target) >= 0;
       if (!inner) {
         this.close();
       }
@@ -49,15 +51,7 @@ export default {
     },
     onClick: function(event) {
       if (this.show) {
-        var index = -1;
-        var node = event.target;
-        while (node) {
-          if (node.parentNode == this.$refs.menuContainer) {
-            index = new Array(...this.$refs.menuContainer.childNodes).indexOf(node);
-            break;
-          }
-          node = node.parentNode;
-        }
+        var index = getChildIndex(this.$refs.menuContainer, event.target);
         if (index >= 0) {
           this.onClickItem(index);
         }
