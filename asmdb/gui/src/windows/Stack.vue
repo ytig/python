@@ -67,7 +67,12 @@ export default {
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
-        this.$menu.alert(event, [['Go Back', '⌫', true], ['Go Home', 'space'], ['Last Page', '←'], ['Next Page', '→']], this.onClickMenu);
+        var items = [];
+        items[items.length] = ['Go Back', '⌫', this.hst.length <= 0];
+        items[items.length] = ['Go Home', 'space', this.page == 0];
+        items[items.length] = ['Last Page', '←', this.page <= 0];
+        items[items.length] = ['Next Page', '→', this.page + 1 >= 10];
+        this.$menu.alert(event, items, this.onClickMenu);
       }
     },
     onClickMenu: function(index) {
