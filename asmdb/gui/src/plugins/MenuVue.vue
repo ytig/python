@@ -1,5 +1,5 @@
 <template>
-  <div ref="menuContainer" v-show="show" class="menu-container" :style="{left:left+'px',top:top+'px'}">
+  <div ref="menuContainer" v-show="show" class="menu-container" :style="{left:left+'px',top:top+'px',opacity:hide?0:1}">
     <div v-for="(item, index) in items" :key="index" :css-enable="item[2]">
       <span class="user-select-none">{{item[0]}}</span>
       <span class="user-select-none">{{item[1]}}</span>
@@ -23,6 +23,7 @@ export default {
     return {
       left: 0,
       top: 0,
+      hide: false,
       show: false,
       items: [],
       listener: null
@@ -32,9 +33,20 @@ export default {
     alert: function(event, items, listener) {
       this.left = event.clientX;
       this.top = event.clientY;
+      this.hide = true;
       this.show = true;
       this.items = items;
       this.listener = listener;
+      setTimeout(() => {
+        var view = this.$refs.menuContainer;
+        if (this.left + view.clientWidth > window.innerWidth) {
+          this.left = Math.max(this.left - view.clientWidth, 0);
+        }
+        if (this.top + view.clientHeight > window.innerHeight) {
+          this.top = Math.max(this.top - view.clientHeight, 0);
+        }
+        this.hide = false;
+      });
     },
     close: function() {
       this.show = false;
