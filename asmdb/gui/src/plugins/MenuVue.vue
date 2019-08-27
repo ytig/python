@@ -1,6 +1,6 @@
 <template>
   <div ref="menuContainer" v-show="show" class="menu-container" :style="{left:left+'px',top:top+'px'}">
-    <div v-for="(item, index) in items" :key="index" :css-disable="Boolean(item[2])">
+    <div v-for="(item, index) in items" :key="index" :css-enable="!Boolean(item[2])">
       <span class="user-select-none">{{item[0]}}</span>
       <span class="user-select-none">{{item[1]}}</span>
     </div>
@@ -61,7 +61,8 @@ export default {
       return this.show;
     },
     onClickItem: function(index) {
-      if (!this.items[index][2]) {
+      var enable = !this.items[index][2];
+      if (enable) {
         this.listener(index);
         this.close();
       }
@@ -82,19 +83,16 @@ export default {
   padding-bottom: 4px;
   min-width: 147px;
   > div {
-    cursor: pointer;
     padding-left: 12px;
     padding-right: 6px;
     line-height: 22px;
     display: flex;
     justify-content: space-between;
-    * {
-      cursor: pointer;
-    }
     > span:first-child {
       font-family: 'PingFang SC';
       font-size: 12px;
-      color: @color-menu-text;
+      color: @color-menu-dark-text;
+      text-decoration: line-through;
     }
     > span:last-child {
       font-family: 'PingFang SC';
@@ -102,21 +100,18 @@ export default {
       color: @color-menu-dark-text;
     }
   }
-  > div:hover {
-    background: @color-hover-background;
-  }
-  > div[css-disable] {
-    cursor: default;
+  > div[css-enable] {
+    cursor: pointer;
     * {
-      cursor: default;
+      cursor: pointer;
     }
     > span:first-child {
-      color: @color-menu-dark-text;
-      text-decoration: line-through;
+      color: @color-menu-text;
+      text-decoration: none;
     }
   }
-  > div[css-disable]:hover {
-    background: none;
+  > div[css-enable]:hover {
+    background: @color-hover-background;
   }
 }
 </style>
