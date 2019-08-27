@@ -1,6 +1,6 @@
 <template>
   <div ref="menuContainer" v-show="show" class="menu-container" :style="{left:left+'px',top:top+'px'}">
-    <div v-for="(item, index) in items" :key="index" :css-enable="!Boolean(item[2])">
+    <div v-for="(item, index) in items" :key="index" :css-enable="item[2]">
       <span class="user-select-none">{{item[0]}}</span>
       <span class="user-select-none">{{item[1]}}</span>
     </div>
@@ -61,7 +61,7 @@ export default {
       return this.show;
     },
     onClickItem: function(index) {
-      var enable = !this.items[index][2];
+      var enable = this.items[index][2];
       if (enable) {
         this.listener(index);
         this.close();
