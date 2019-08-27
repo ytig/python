@@ -44,7 +44,7 @@ export default {
     text-decoration: underline;
     cursor: default;
   }
-  > *[css-disable='true'] {
+  > *[css-disable] {
     color: @color-dark-text !important;
     text-decoration: none !important;
     cursor: not-allowed !important;
