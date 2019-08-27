@@ -67,7 +67,7 @@ export default {
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
-        this.$menu.alert(event, [['Go Back', '⌫'], ['Go Home', 'space'], ['Last Page', '←'], ['Next Page', '→']], this.onClickMenu);
+        this.$menu.alert(event, [['Go Back', '⌫', true], ['Go Home', 'space'], ['Last Page', '←'], ['Next Page', '→']], this.onClickMenu);
       }
     },
     onClickMenu: function(index) {

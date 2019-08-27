@@ -1,8 +1,8 @@
 <template>
   <div ref="menuContainer" v-show="show" class="menu-container" :style="{left:left+'px',top:top+'px'}">
-    <div v-for="(item, index) in items" :key="index">
-      <span>{{item[0]}}</span>
-      <span>{{item[1]}}</span>
+    <div v-for="(item, index) in items" :key="index" :css-disable="Boolean(item[2])">
+      <span class="user-select-none">{{item[0]}}</span>
+      <span class="user-select-none">{{item[1]}}</span>
     </div>
   </div>
 </template>
@@ -61,8 +61,10 @@ export default {
       return this.show;
     },
     onClickItem: function(index) {
-      this.listener(index);
-      this.close();
+      if (!this.items[index][2]) {
+        this.listener(index);
+        this.close();
+      }
     }
   }
 };
@@ -86,7 +88,7 @@ export default {
     line-height: 22px;
     display: flex;
     justify-content: space-between;
-    > span {
+    * {
       cursor: pointer;
     }
     > span:first-child {
@@ -102,6 +104,19 @@ export default {
   }
   > div:hover {
     background: @color-hover-background;
+  }
+  > div[css-disable] {
+    cursor: default;
+    * {
+      cursor: default;
+    }
+    > span:first-child {
+      color: @color-menu-dark-text;
+      text-decoration: line-through;
+    }
+  }
+  > div[css-disable]:hover {
+    background: none;
   }
 }
 </style>
