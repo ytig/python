@@ -24,7 +24,7 @@ export default {
   > span {
     font-size: 16px;
     color: @color-text;
-    font-family: 'Hannotate SC';
+    font-family: 'Wawati SC';
   }
   > span[css-focus='true'] {
     color: @color-light-text;
