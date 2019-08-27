@@ -90,7 +90,7 @@ export default {
   position: fixed;
   display: inline-block;
   background: @color-dark-background;
-  border-radius: 4px;
+  border-radius: 2px;
   box-shadow: 0px 2px 6px @color-border-shadow;
   padding-top: 4px;
   padding-bottom: 4px;
