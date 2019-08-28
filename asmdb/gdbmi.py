@@ -8,7 +8,10 @@ from pygdbmi.gdbmiparser import parse_response
 async def gdb_readlines(stream):
     lines = []
     while True:
-        lines.append(parse_response((await stream.readline()).decode()))
+        line = await stream.readline()
+        if not line:
+            return lines
+        lines.append(parse_response(line.decode()))
         if lines[-1]['type'] == 'done':
             return lines
 
