@@ -9,26 +9,11 @@ app = web.Application()
 app.router.add_static('/static', VUE_DIST + '/static')
 
 
-def add_get(path):
-    def decorator(afunc):
-        app.router.add_get(path, afunc)
-        return afunc
-    return decorator
-
-
-def add_post(path):
-    def decorator(afunc):
-        app.router.add_post(path, afunc)
-        return afunc
-    return decorator
-
-
-@add_get('/')
-async def redirect(request):
+async def index(request):
     return web.FileResponse(VUE_DIST + '/index.html')
+app.router.add_get('/', index)
 
 
-@add_get('/ws')
 async def websocket(request):
     token = request.cookies.get('token')
     response = web.WebSocketResponse()
@@ -41,6 +26,7 @@ async def websocket(request):
     finally:
         onclose(token, emit)
     return response
+app.router.add_get('/ws', websocket)
 
 
 web.run_app(app)
