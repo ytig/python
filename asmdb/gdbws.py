@@ -12,29 +12,52 @@ def onopen(token, emit):
 
 
 def onmessage(token, emit, data):
-    SESSIONS[token].request(emit, data)
+    asyncio.ensure_future(SESSIONS[token].request(emit, data))
 
 
 def onclose(token, emit):
     SESSIONS[token].logout(emit)
 
 
+def suit_js(obj):
+    if isinstance(obj, (tuple, list,)):
+        return list(suit_js(i) for i in obj)
+    if isinstance(obj, dict):
+        return dict((k, suit_js(v),) for k, v, in obj.items())
+    if isinstance(obj, (bytes, bytearray,)):
+        return base64.b64encode(obj).decode()
+    if isinstance(obj, BaseException):
+        return str(obj)
+    return obj
+
+
 class Session:
     def __init__(self, token):
         self._token = token
-        self._users = []
+        self._emits = []
+        self._ctrl = None
 
     def login(self, emit):
-        if not self._users:
+        if not self._emits:
             self._new()
-        self._users.append(emit)
+        self._emits.append(emit)
 
-    def request(self, emit, data):
-        pass
+    async def request(self, emit, data):  # todo
+        if data.get('type') == 'pull':
+            method = data['method']
+            params = data.get('params', ())
+            tag = data.get('tag')
+            try:
+                r = await getattr(self._ctrl, method)(*params)
+                if tag is not None:
+                    emit({'type': 'pull', 'tag': tag, 'r': suit_js(r), 'e': None, })
+            except BaseException as e:
+                if tag is not None:
+                    emit({'type': 'pull', 'tag': tag, 'r': None, 'e': suit_js(e), })
 
     def logout(self, emit):
-        self._users.remove(emit)
-        if not self._users:
+        self._emits.remove(emit)
+        if not self._emits:
             self._del()
 
     def _new(self):
@@ -42,12 +65,6 @@ class Session:
 
     def _del(self):
         pass
-
-
-def suit_js(data):
-    if isinstance(data, (bytes, bytearray,)):
-        return base64.b64encode(data).decode()
-    return data
 
 
 class GdbController(GdbDebugger):
