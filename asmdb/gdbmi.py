@@ -5,6 +5,14 @@ from asyncio import subprocess
 from pygdbmi.gdbmiparser import parse_response
 
 
+async def gdb_startup(config):
+    stdin = stdout = subprocess.PIPE
+    stderr = subprocess.DEVNULL
+    process = await asyncio.create_subprocess_exec('gdb', '--nx', '--interpreter=mi2', '--quiet', stdin=stdin, stdout=stdout, stderr=stderr)
+    await gdb_readlines(process.stdout)
+    return process
+
+
 async def gdb_readlines(stream):
     lines = []
     while True:
@@ -23,15 +31,13 @@ class GdbError(RuntimeError):
 class GdbDebugger:
     @classmethod
     async def anew(cls, config):
-        stdin = stdout = subprocess.PIPE
-        stderr = subprocess.DEVNULL
-        process = await asyncio.create_subprocess_exec('gdb', '--nx', '--interpreter=mi2', '--quiet', stdin=stdin, stdout=stdout, stderr=stderr)
-        await gdb_readlines(process.stdout)
-        return cls(process)
-
-    def __init__(self, process):
-        self.process = process
+        self = cls()
+        self.process = await gdb_startup(config)
         self.cmdlock = asyncio.Lock()
+        return self
+
+    async def adel(self):
+        self.process.kill()
 
     @property
     def processing(self):
@@ -54,15 +60,12 @@ class GdbDebugger:
 
     async def next(self):
         await self._command('nexti')
-        return True
 
     async def step(self):
         await self._command('stepi')
-        return True
 
     async def cont(self):
-        text = await self._command('continue')
-        return True
+        await self._command('continue')
 
     async def xb(self, start, end):
-        pass
+        return b'todo xb'
