@@ -6,7 +6,7 @@ from aiohttp import web
 from .gdbws import onopen, onmessage, onclose
 VUE_DIST = os.path.dirname(__file__) + '/gui/dist'
 app = web.Application()
-app.router.add_static('/static', os.path.join(VUE_DIST, 'static'))
+app.router.add_static('/static', VUE_DIST + '/static')
 
 
 def add_get(path):
@@ -25,7 +25,7 @@ def add_post(path):
 
 @add_get('/')
 async def redirect(request):
-    return web.FileResponse(os.path.join(VUE_DIST, 'index.html'))
+    return web.FileResponse(VUE_DIST + '/index.html')
 
 
 @add_get('/ws')
