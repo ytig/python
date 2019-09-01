@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import base64
 import asyncio
-from .gdbmi import GdbController, GdbError
+from .gdbcli import GdbController, GdbError
 SESSIONS = {}
 
 
