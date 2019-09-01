@@ -5,7 +5,15 @@ from asyncio import subprocess
 
 
 async def gdb_startup(config):
-    process = await asyncio.create_subprocess_exec('gdb', '--nx', '--quiet', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    xs = []
+    xs.append('set pagination off')
+    args = []
+    args.append('--nx')
+    args.append('-q')
+    for x in xs:
+        args.append('-ex')
+        args.append(x)
+    process = await asyncio.create_subprocess_exec('gdb', *args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     await gdb_readlines(process.stdout)
     return process
 
