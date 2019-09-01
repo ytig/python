@@ -8,14 +8,14 @@ SESSIONS = {}
 def onopen(token, emit):
     if token not in SESSIONS:
         session = Session(token)
-        session._onlock = asyncio.Lock()
+        session.onlock = asyncio.Lock()
         SESSIONS[token] = session
     emit.onopen = asyncio.ensure_future(_onopen(SESSIONS[token], emit))
     emit.onmessages = []
 
 
 async def _onopen(session, emit):
-    async with session._onlock:
+    async with session.onlock:
         await session.onopen(emit)
     emit.onopen = None
 
@@ -40,7 +40,7 @@ async def _onclose(session, emit):
         await emit.onopen
     while emit.onmessages:
         await emit.onmessages[0]
-    async with session._onlock:
+    async with session.onlock:
         await session.onclose(emit)
 
 
