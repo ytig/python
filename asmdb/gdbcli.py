@@ -7,6 +7,7 @@ from asyncio import subprocess
 async def gdb_startup(config):
     xs = []
     xs.append('set pagination off')
+    # todo
     args = []
     args.append('--nx')
     args.append('-q')
