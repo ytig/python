@@ -75,7 +75,7 @@ class Session:
                 print(repr(e))
         self._emits.append(emit)
         if self._ctrl:
-            # todo send push
+            # todo send type=push key val
             pass
         else:
             # todo send bad token
