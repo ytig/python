@@ -5,17 +5,14 @@ from asyncio import subprocess
 
 
 async def gdb_startup(config):
-    stdin = stdout = subprocess.PIPE
-    stderr = subprocess.DEVNULL
-    process = await asyncio.create_subprocess_exec('gdb', '--nx', '--quiet', stdin=stdin, stdout=stdout, stderr=stderr)
+    process = await asyncio.create_subprocess_exec('gdb', '--nx', '--quiet', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     await gdb_readlines(process.stdout)
     return process
 
 
 async def gdb_readlines(stream):
-    lines = b''
-    # todo
-    return lines
+    separator = b'(gdb) '
+    return (await stream.readuntil(separator=separator))[:-len(separator)]
 
 
 class GdbError(RuntimeError):
