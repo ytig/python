@@ -75,6 +75,7 @@ class Session:
         self._emits.remove(emit)
         if not self._emits:
             await self._ctrl.adel()
+            self._ctrl = None
 
 
 class WsGdbController(GdbController):
