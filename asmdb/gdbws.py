@@ -58,7 +58,7 @@ class Session:
         # todo send push
 
     async def onmessage(self, emit, data):
-        if data.get('type') == 'pull':
+        if data['type'] == 'pull':
             method = data['method']
             params = data.get('params', ())
             tag = data.get('tag')
