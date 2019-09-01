@@ -10,21 +10,23 @@ def onopen(token, emit):
         session = Session(token)
         session.onlock = asyncio.Lock()
         SESSIONS[token] = session
-    emit.onopen = asyncio.ensure_future(_onopen(SESSIONS[token], emit))
+    emit.onopen = asyncio.ensure_future(_onopen(token, emit))
     emit.onmessages = []
 
 
-async def _onopen(session, emit):
+async def _onopen(token, emit):
+    session = SESSIONS[token]
     async with session.onlock:
         await session.onopen(emit)
     emit.onopen = None
 
 
 def onmessage(token, emit, data):
-    emit.onmessages.append(asyncio.ensure_future(_onmessage(SESSIONS[token], emit, data)))
+    emit.onmessages.append(asyncio.ensure_future(_onmessage(token, emit, data)))
 
 
-async def _onmessage(session, emit, data):
+async def _onmessage(token, emit, data):
+    session = SESSIONS[token]
     if emit.onopen:
         await emit.onopen
     await session.onmessage(emit, data)
@@ -32,10 +34,11 @@ async def _onmessage(session, emit, data):
 
 
 def onclose(token, emit):
-    asyncio.ensure_future(_onclose(SESSIONS[token], emit))
+    asyncio.ensure_future(_onclose(token, emit))
 
 
-async def _onclose(session, emit):
+async def _onclose(token, emit):
+    session = SESSIONS[token]
     if emit.onopen:
         await emit.onopen
     while emit.onmessages:
