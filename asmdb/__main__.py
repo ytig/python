@@ -21,7 +21,7 @@ async def websocket(request):
     emit = lambda data: asyncio.ensure_future(response.send_json(data))
     onopen(token, emit)
     try:
-        async for msg in websocket:
+        async for msg in response:
             onmessage(token, emit, json.loads(msg.data))
     finally:
         onclose(token, emit)
