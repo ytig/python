@@ -27,7 +27,7 @@ def onclose(token, emit):
     asyncio.ensure_future(_transfer(*session._transfer))
 
 
-async def _transfer(lock, coros):
+async def _transfer(lock, coros):  # todo optimize lock
     async with lock:
         while coros:
             await coros.pop(0)
