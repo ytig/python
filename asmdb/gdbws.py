@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import json
 import base64
 import asyncio
 from .gdbcli import GdbController, GdbError
@@ -22,6 +23,7 @@ async def _onopen(token, emit):
 
 
 def onmessage(token, emit, data):
+    assert isinstance(data, dict)
     emit.onmessages.append(asyncio.ensure_future(_onmessage(token, emit, data)))
 
 
@@ -67,9 +69,17 @@ class Session:
 
     async def onopen(self, emit):
         if not self._emits:
-            self._ctrl = await WsGdbController.anew(self._token)
+            try:
+                self._ctrl = await WsGdbController.anew(json.loads(self._token))
+            except BaseException as e:
+                print(e)
         self._emits.append(emit)
-        # todo send push
+        if self._ctrl:
+            # todo send push
+            pass
+        else:
+            # todo send bad token
+            pass
 
     async def onmessage(self, emit, data):
         if data.get('type') == 'pull':
@@ -88,13 +98,22 @@ class Session:
     async def onclose(self, emit):
         self._emits.remove(emit)
         if not self._emits:
-            await self._ctrl.adel()
-            self._ctrl = None
+            if self._ctrl:
+                try:
+                    await self._ctrl.adel()
+                except BaseException as e:
+                    print(e)
+                self._ctrl = None
 
 
 class WsGdbController(GdbController):
     PULL = ('next', 'step', 'cont', 'xb',)
     PUSH = ('suspend',)
+
+    @classmethod
+    async def anew(cls, config):
+        self = await super().anew(config)
+        return self
 
     @property
     def suspend(self):
