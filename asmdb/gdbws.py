@@ -72,7 +72,7 @@ class Session:
             try:
                 self._ctrl = await WsGdbController.anew(json.loads(self._token))
             except BaseException as e:
-                print(e)
+                print(repr(e))
         self._emits.append(emit)
         if self._ctrl:
             # todo send push
@@ -102,7 +102,7 @@ class Session:
                 try:
                     await self._ctrl.adel()
                 except BaseException as e:
-                    print(e)
+                    print(repr(e))
                 self._ctrl = None
 
 
