@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import base64
 import asyncio
-from .gdbmi import GdbDebugger, GdbError
+from .gdbmi import GdbController, GdbError
 SESSIONS = {}
 
 
@@ -39,7 +39,7 @@ class Session:
 
     def login(self, emit):
         if not self._emits:
-            self._new()
+            asyncio.ensure_future(self._lifecycle())
         self._emits.append(emit)
 
     async def request(self, emit, data):  # todo
@@ -48,6 +48,7 @@ class Session:
             params = data.get('params', ())
             tag = data.get('tag')
             try:
+                assert method in WsGdbController.PULL, 'no method'
                 r = await getattr(self._ctrl, method)(*params)
                 if tag is not None:
                     emit({'type': 'pull', 'tag': tag, 'r': suit_js(r), 'e': None, })
@@ -58,14 +59,20 @@ class Session:
     def logout(self, emit):
         self._emits.remove(emit)
         if not self._emits:
-            self._del()
+            asyncio.ensure_future(self._lifecycle())
 
-    def _new(self):
-        pass
-
-    def _del(self):
+    def _lifecycle(self):
         pass
 
 
-class GdbController(GdbDebugger):
-    pass
+class WsGdbController(GdbController):
+    PULL = ('next', 'step', 'cont', 'xb',)
+    PUSH = ('suspend',)
+
+    @property
+    def suspend(self):
+        return False
+
+    @suspend.setter
+    def suspend(self, value):
+        pass

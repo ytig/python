@@ -28,7 +28,7 @@ class GdbError(RuntimeError):
     pass
 
 
-class GdbDebugger:
+class GdbController:
     @classmethod
     async def anew(cls, config):
         self = cls()
