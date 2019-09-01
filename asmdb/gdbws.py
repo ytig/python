@@ -37,9 +37,9 @@ class RWLock:
         self.refs = 0
 
     async def acquire_read(self):
-        self.refs += 1
-        if self.refs == 1:
+        if self.refs == 0:
             await self.lock.acquire()
+        self.refs += 1
 
     def release_read(self):
         self.refs -= 1
