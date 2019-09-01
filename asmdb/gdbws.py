@@ -7,16 +7,30 @@ SESSIONS = {}
 
 def onopen(token, emit):
     if token not in SESSIONS:
-        SESSIONS[token] = Session(token)
-    SESSIONS[token].login(emit)
+        session = Session(token)
+        session._transfer = (asyncio.Lock(), [],)
+        SESSIONS[token] = session
+    session = SESSIONS[token]
+    session._transfer[1].append(session.onopen(emit))
+    asyncio.ensure_future(_transfer(*session._transfer))
 
 
 def onmessage(token, emit, data):
-    asyncio.ensure_future(SESSIONS[token].request(emit, data))
+    session = SESSIONS[token]
+    session._transfer[1].append(session.onmessage(emit, data))
+    asyncio.ensure_future(_transfer(*session._transfer))
 
 
 def onclose(token, emit):
-    SESSIONS[token].logout(emit)
+    session = SESSIONS[token]
+    session._transfer[1].append(session.onclose(emit))
+    asyncio.ensure_future(_transfer(*session._transfer))
+
+
+async def _transfer(lock, coros):
+    async with lock:
+        while coros:
+            await coros.pop(0)
 
 
 def suit_js(obj):
@@ -37,12 +51,13 @@ class Session:
         self._emits = []
         self._ctrl = None
 
-    def login(self, emit):
+    async def onopen(self, emit):
         if not self._emits:
-            asyncio.ensure_future(self._lifecycle())
+            self._ctrl = await WsGdbController.anew(self._token)
         self._emits.append(emit)
+        # todo send push
 
-    async def request(self, emit, data):  # todo
+    async def onmessage(self, emit, data):
         if data.get('type') == 'pull':
             method = data['method']
             params = data.get('params', ())
@@ -56,13 +71,10 @@ class Session:
                 if tag is not None:
                     emit({'type': 'pull', 'tag': tag, 'r': None, 'e': suit_js(e), })
 
-    def logout(self, emit):
+    async def onclose(self, emit):
         self._emits.remove(emit)
         if not self._emits:
-            asyncio.ensure_future(self._lifecycle())
-
-    def _lifecycle(self):
-        pass
+            await self._ctrl.adel()
 
 
 class WsGdbController(GdbController):
