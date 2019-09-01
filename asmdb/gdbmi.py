@@ -39,10 +39,6 @@ class GdbDebugger:
     async def adel(self):
         self.process.kill()
 
-    @property
-    def processing(self):
-        return self.cmdlock.locked()
-
     def sigint(self):
         if self.cmdlock.locked():
             self.process.send_signal(signal.SIGINT)
