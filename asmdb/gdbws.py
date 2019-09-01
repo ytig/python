@@ -5,18 +5,32 @@ from .gdbcli import GdbController, GdbError
 SESSIONS = {}
 
 
-def onopen(token, emit):  # todo
+def onopen(token, emit):
     if token not in SESSIONS:
-        SESSIONS[token] = Session(token)
-    asyncio.ensure_future(SESSIONS[token].onopen(emit))
+        session = Session(token)
+        session._transfer = (asyncio.Lock(), [],)
+        SESSIONS[token] = session
+    session = SESSIONS[token]
+    session._transfer[1].append(session.onopen(emit))
+    asyncio.ensure_future(_transfer(*session._transfer))
 
 
 def onmessage(token, emit, data):
-    asyncio.ensure_future(SESSIONS[token].onmessage(emit, data))
+    session = SESSIONS[token]
+    session._transfer[1].append(session.onmessage(emit, data))
+    asyncio.ensure_future(_transfer(*session._transfer))
 
 
 def onclose(token, emit):
-    asyncio.ensure_future(SESSIONS[token].onclose(emit))
+    session = SESSIONS[token]
+    session._transfer[1].append(session.onclose(emit))
+    asyncio.ensure_future(_transfer(*session._transfer))
+
+
+async def _transfer(lock, coros):  # todo optimize lock
+    async with lock:
+        while coros:
+            await coros.pop(0)
 
 
 def suit_js(obj):
