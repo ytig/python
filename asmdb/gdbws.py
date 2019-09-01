@@ -8,29 +8,40 @@ SESSIONS = {}
 def onopen(token, emit):
     if token not in SESSIONS:
         session = Session(token)
-        session._transfer = (asyncio.Lock(), [],)
+        session._onlock = asyncio.Lock()
         SESSIONS[token] = session
-    session = SESSIONS[token]
-    session._transfer[1].append(session.onopen(emit))
-    asyncio.ensure_future(_transfer(*session._transfer))
+    emit.onopen = asyncio.ensure_future(_onopen(SESSIONS[token], emit))
+    emit.onmessages = []
+
+
+async def _onopen(session, emit):
+    async with session._onlock:
+        await session.onopen(emit)
+    emit.onopen = None
 
 
 def onmessage(token, emit, data):
-    session = SESSIONS[token]
-    session._transfer[1].append(session.onmessage(emit, data))
-    asyncio.ensure_future(_transfer(*session._transfer))
+    emit.onmessages.append(asyncio.ensure_future(_onmessage(SESSIONS[token], emit, data)))
+
+
+async def _onmessage(session, emit, data):
+    if emit.onopen:
+        await emit.onopen
+    await session.onmessage(emit, data)
+    emit.onmessages.remove(asyncio.Task.current_task())
 
 
 def onclose(token, emit):
-    session = SESSIONS[token]
-    session._transfer[1].append(session.onclose(emit))
-    asyncio.ensure_future(_transfer(*session._transfer))
+    asyncio.ensure_future(_onclose(SESSIONS[token], emit))
 
 
-async def _transfer(lock, coros):  # todo optimize lock
-    async with lock:
-        while coros:
-            await coros.pop(0)
+async def _onclose(session, emit):
+    if emit.onopen:
+        await emit.onopen
+    while emit.onmessages:
+        await emit.onmessages[0]
+    async with session._onlock:
+        await session.onclose(emit)
 
 
 def suit_js(obj):
@@ -58,8 +69,8 @@ class Session:
         # todo send push
 
     async def onmessage(self, emit, data):
-        if data['type'] == 'pull':
-            method = data['method']
+        if data.get('type') == 'pull':
+            method = data.get('method')
             params = data.get('params', ())
             tag = data.get('tag')
             try:
