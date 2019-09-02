@@ -79,8 +79,7 @@ class Session:
                 val = getattr(self._ctrl, key)
                 self.notify(key, val, emit=emit)
         else:
-            # todo send bad token
-            pass
+            self.notify('ctrl', None, emit=emit)
 
     async def onmessage(self, emit, data):
         if data.get('type') == 'pull':
