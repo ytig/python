@@ -82,6 +82,43 @@ export default {
       } else {
         return false;
       }
+    },
+    hstDel: function() {
+      this.hst.splice(0, this.hst.length);
+    },
+    hstSet: function() {
+      const maxHst = 147;
+      while (this.hst.length >= maxHst) {
+        this.hst.splice(0, 1);
+      }
+      var posn = {}; //todo save
+      this.hst.splice(this.hst.length, 0, posn);
+    },
+    hstGet: function() {
+      if (this.hst.length <= 0) {
+        return false;
+      } else {
+        var posn = this.hst.splice(this.hst.length - 1, 1)[0];
+        //todo load
+        this.invalidate();
+        return true;
+      }
+    },
+    jumpTo: function(address) {
+      //todo
+    },
+    onBreak: function(ea, memory) {
+      this.disable = false;
+      //todo
+    },
+    onContinue: function() {
+      this.disable = true;
+    },
+    onClickItem: function(...args) {
+      this.$emit('clickitem', ...args);
+    },
+    invalidate: function() {
+      //todo
     }
   }
 };
