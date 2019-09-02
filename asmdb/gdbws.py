@@ -75,7 +75,7 @@ class Session:
                 print(repr(e))
         self._emits.append(emit)
         if self._ctrl:
-            for key in WsGdbController.PUSH:
+            for key in WsGdbController.PUSH_LIST:
                 val = getattr(self._ctrl, key)
                 self.notify(key, val, emit=emit)
         else:
@@ -87,7 +87,7 @@ class Session:
             params = data.get('params', ())
             tag = data.get('tag')
             try:
-                assert method in WsGdbController.PULL, 'no method'
+                assert method in WsGdbController.PULL_LIST, 'no method'
                 r = await getattr(self._ctrl, method)(*params)
                 if tag is not None:
                     emit({'type': 'pull', 'tag': tag, 'r': suit_js(r), 'e': None, })
@@ -139,8 +139,8 @@ def push_prop(name, default):
 
 
 class WsGdbController(GdbController):
-    PULL = ('next', 'step', 'cont', 'xb',)
-    PUSH = ('suspend',)
+    PULL_LIST = ('next', 'step', 'cont', 'xb',)
+    PUSH_LIST = ('suspend',)
     suspend = push_prop('suspend', False)
 
     @classmethod
