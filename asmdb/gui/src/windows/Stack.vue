@@ -5,7 +5,7 @@
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
       <Bytes v-else v-for="(item, index) in items" :key="index" :value="item" @clickitem="onClickItem"></Bytes>
     </div>
-    <Indicator :size="10" :value="page" @input="onClickIndex" :disable="disable2"></Indicator>
+    <Indicator :size="10" :value="page" @input="onClickIndex" :disable="sp==null"></Indicator>
   </div>
 </template>
 
@@ -26,17 +26,14 @@ export default {
     return {
       focus: false,
       disable: true,
-      disable2: true,
       items: [],
-      itemSelection: null,
       page: 0,
-      hst: [],
-      dict: {
-        sp: null,
-        oldData: [],
-        newData: [],
-        pageCache: {}
-      }
+      sp: null,
+      oldData: [],
+      newData: [],
+      itemSelection: null,
+      pageCache: {},
+      hst: []
     };
   },
   props: {
@@ -69,9 +66,9 @@ export default {
       if (event.button == 2) {
         var items = [];
         items[items.length] = ['Go back', '⌫', this.hst.length > 0];
-        items[items.length] = ['Jump to SP', 'space', !this.disable2 && this.page != 0];
-        items[items.length] = ['Last page', '←', !this.disable2 && this.page - 1 >= 0];
-        items[items.length] = ['Next page', '→', !this.disable2 && this.page + 1 < 10];
+        items[items.length] = ['Jump to SP', 'space', this.sp != null && this.page != 0];
+        items[items.length] = ['Last page', '←', this.sp != null && this.page - 1 >= 0];
+        items[items.length] = ['Next page', '→', this.sp != null && this.page + 1 < 10];
         this.$menu.alert(event, items, this.onClickMenu);
       }
     },
@@ -81,17 +78,17 @@ export default {
           this.hstGet();
           break;
         case 1:
-          if (!this.disable2 && this.page != 0) {
+          if (this.sp != null && this.page != 0) {
             this.onClickIndex(0);
           }
           break;
         case 2:
-          if (!this.disable2 && this.page - 1 >= 0) {
+          if (this.sp != null && this.page - 1 >= 0) {
             this.onClickIndex(this.page - 1);
           }
           break;
         case 3:
-          if (!this.disable2 && this.page + 1 < 10) {
+          if (this.sp != null && this.page + 1 < 10) {
             this.onClickIndex(this.page + 1);
           }
           break;
@@ -129,10 +126,10 @@ export default {
       }
     },
     jumpTo: function(address) {
-      if (this.dict.sp == null) {
+      if (this.sp == null) {
         return false;
       }
-      var offset = address - this.dict.sp;
+      var offset = address - this.sp;
       var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
       if (offset < 0 || offset >= 10 * row * this.column * 8) {
         return false;
@@ -149,20 +146,18 @@ export default {
     },
     onBreak: function(sp, stack) {
       this.disable = false;
-      this.disable2 = false;
-      var dict = this.dict;
-      if (dict.sp != sp) {
+      if (this.sp != sp) {
         this.hstDel();
-        if (dict.sp != null) {
-          dict.pageCache[dict.sp] = this.page;
+        if (this.sp != null) {
+          this.pageCache[this.sp] = this.page;
         }
-        dict.sp = sp;
-        this.page = dict.sp in dict.pageCache ? dict.pageCache[dict.sp] : 0;
-        dict.oldData = [];
-        dict.newData = stack;
+        this.sp = sp;
+        this.page = this.sp in this.pageCache ? this.pageCache[this.sp] : 0;
+        this.oldData = [];
+        this.newData = stack;
       } else {
-        dict.oldData = dict.newData;
-        dict.newData = stack;
+        this.oldData = this.newData;
+        this.newData = stack;
       }
       this.itemSelection = null;
       this.invalidate();
@@ -186,9 +181,9 @@ export default {
       var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
       var start = page * column * row;
       var end = (page + 1) * column * row;
-      var oldData = this.dict.oldData.slice(start, end);
+      var oldData = this.oldData.slice(start, end);
       oldData = oldData.slice(0, oldData.length - (oldData.length % column));
-      var newData = this.dict.newData.slice(start, end);
+      var newData = this.newData.slice(start, end);
       newData = newData.slice(0, newData.length - (newData.length % column));
       var items = [];
       for (var i = 0; i < newData.length / column; i++) {
