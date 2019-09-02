@@ -1,8 +1,8 @@
 <template>
-  <div class="memory-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus">
+  <div class="memory-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp($event)">
     <Navigation :name="'Memory'" :focus="focus" :disable="disable"></Navigation>
     <div ref="memoryLayout" class="memory-layout">
-      <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
+      <Empty v-if="items.length==0" :text="ea==null?'[no data]':'[pulling data]'" style="padding-top:12px;"></Empty>
       <Bytes v-else v-for="i in 100" :key="i" :value="{lineNumber:'0x00112233',newBytes:[1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8],showString:true}"></Bytes>
     </div>
   </div>
@@ -23,8 +23,11 @@ export default {
       focus: false,
       disable: true,
       items: [],
+      ea: null,
+      oldData: [],
+      newData: [],
       itemSelection: null,
-      dict: {}
+      hst: []
     };
   },
   props: {
@@ -53,8 +56,32 @@ export default {
     onFocusChanged: function(value) {
       this.focus = value;
     },
+    onMouseUp: function(event) {
+      if (event.button == 2) {
+        var items = [];
+        items[items.length] = ['Go back', '⌫', this.hst.length > 0];
+        items[items.length] = ['Search address', 'enter', true]; //todo
+        this.$menu.alert(event, items, this.onClickMenu);
+      }
+    },
+    onClickMenu: function(index) {
+      switch (index) {
+        case 0:
+          this.hstGet();
+          break;
+        case 1:
+          console.log('todo ea input');
+          break;
+      }
+    },
     onKeyDown: function(event) {
-      console.log('todo keyboard event');
+      var index = [8, 13].indexOf(event.keyCode);
+      if (index >= 0) {
+        this.onClickMenu(index);
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 };
