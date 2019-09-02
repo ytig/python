@@ -60,7 +60,7 @@ export default {
       if (event.button == 2) {
         var items = [];
         items[items.length] = ['Go back', '⌫', this.hst.length > 0];
-        items[items.length] = ['Search address', 'enter', true]; //todo
+        items[items.length] = ['Search address', '↩︎', true]; //todo
         this.$menu.alert(event, items, this.onClickMenu);
       }
     },
