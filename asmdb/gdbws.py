@@ -75,8 +75,9 @@ class Session:
                 print(repr(e))
         self._emits.append(emit)
         if self._ctrl:
-            # todo send type=push key val
-            pass
+            for key in WsGdbController.PUSH:
+                val = getattr(self._ctrl, key)
+                self.notify(key, val, emit=emit)
         else:
             # todo send bad token
             pass
@@ -105,20 +106,45 @@ class Session:
                     print(repr(e))
                 self._ctrl = None
 
+    def notify(self, key, val, emit=None):
+        if emit is None:
+            for emit in self._emits:
+                self.notify(key, val, emit=emit)
+        else:
+            emit({'type': 'push', 'key': key, 'val': val, })
+
+
+def push_prop(name, default):
+    _name = '_' + name
+
+    def fget(self):
+        return getattr(self, _name, default)
+
+    def notify(self):
+        for session in SESSIONS:
+            if session._ctrl is self:
+                session.notify(name, fget(self))
+
+    def fset(self, value):
+        try:
+            setattr(self, _name, value)
+        finally:
+            notify(self)
+
+    def fdel(self):
+        try:
+            delattr(self, _name)
+        finally:
+            notify(self)
+    return property(fget, fset, fdel)
+
 
 class WsGdbController(GdbController):
     PULL = ('next', 'step', 'cont', 'xb',)
     PUSH = ('suspend',)
+    suspend = push_prop('suspend', False)
 
     @classmethod
     async def anew(cls, config):
         self = await super().anew(config)
         return self
-
-    @property
-    def suspend(self):
-        return False
-
-    @suspend.setter
-    def suspend(self, value):
-        pass
