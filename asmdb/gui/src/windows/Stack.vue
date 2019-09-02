@@ -67,7 +67,7 @@ export default {
         var items = [];
         items[items.length] = ['Go back', '⌫', this.hst.length > 0];
         items[items.length] = ['Jump to SP', 'space', this.sp != null && this.page != 0];
-        items[items.length] = ['Last page', '←', this.sp != null && this.page - 1 >= 0];
+        items[items.length] = ['Previous page', '←', this.sp != null && this.page - 1 >= 0];
         items[items.length] = ['Next page', '→', this.sp != null && this.page + 1 < 10];
         this.$menu.alert(event, items, this.onClickMenu);
       }
