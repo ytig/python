@@ -111,7 +111,7 @@ class Session:
             for emit in self._emits:
                 self.notify(key, val, emit=emit)
         else:
-            emit({'type': 'push', 'key': key, 'val': val, })
+            emit({'type': 'push', 'key': key, 'val': suit_js(val), })
 
 
 def push_prop(name, default):
