@@ -102,9 +102,9 @@ export default {
         if (Boolean(this.value.oldBytes) && i < this.value.oldBytes.length) {
           isChanged = this.value.oldBytes[i] != this.value.newBytes[i];
         }
-        var charCode = this.value.newBytes.charCodeAt(i);
+        var byte = this.value.newBytes.charCodeAt(i);
         items[items.length] = {
-          value: charCode.toString(16).zfill(2),
+          value: byte.toString(16).zfill(2),
           style: 'bytes-hex bytes-usage-' + curUsage + ' bytes-changed-' + isChanged + (this.value.highlightNumber == i ? ' bytes-highlight' : '')
         };
         if (curUsage != '1') {
