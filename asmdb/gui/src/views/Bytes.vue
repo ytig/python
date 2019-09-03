@@ -82,7 +82,7 @@ export default {
             curInt = 0;
             for (var j = groupBy - 1; j >= 0; j--) {
               curInt *= 256;
-              curInt += this.value.newBytes[i + j];
+              curInt += this.value.newBytes.charCodeAt(i + j);
             }
             curUsage = usageOf(curInt);
           } else {
@@ -102,8 +102,9 @@ export default {
         if (Boolean(this.value.oldBytes) && i < this.value.oldBytes.length) {
           isChanged = this.value.oldBytes[i] != this.value.newBytes[i];
         }
+        var charCode = this.value.newBytes.charCodeAt(i);
         items[items.length] = {
-          value: this.value.newBytes[i].toString(16).zfill(2),
+          value: charCode.toString(16).zfill(2),
           style: 'bytes-hex bytes-usage-' + curUsage + ' bytes-changed-' + isChanged + (this.value.highlightNumber == i ? ' bytes-highlight' : '')
         };
         if (curUsage != '1') {
@@ -121,7 +122,7 @@ export default {
           style: 'bytes-space user-select-none'
         };
         for (var i = 0; i < this.value.newBytes.length; i++) {
-          var byte = this.value.newBytes[i];
+          var byte = this.value.newBytes.charCodeAt(i);
           if (byte >= 0x21 && byte <= 0x7e) {
             items[items.length] = {
               value: String.fromCharCode(byte),

@@ -29,8 +29,8 @@ export default {
       items: [],
       page: 0,
       sp: null,
-      oldData: [],
-      newData: [],
+      oldData: '',
+      newData: '',
       itemSelection: null,
       pageCache: {},
       hst: []
@@ -153,7 +153,7 @@ export default {
         }
         this.sp = sp;
         this.page = this.sp in this.pageCache ? this.pageCache[this.sp] : 0;
-        this.oldData = [];
+        this.oldData = '';
         this.newData = stack;
       } else {
         this.oldData = this.newData;
