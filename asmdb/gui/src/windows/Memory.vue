@@ -121,10 +121,10 @@ export default {
         this.oldAddr = this.newAddr;
         this.oldData = this.newData;
         this.newData = memory;
+        this.invalidate();
       } else {
         //todo
       }
-      this.invalidate();
     },
     onContinue: function() {
       this.disable = true;
