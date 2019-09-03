@@ -2,8 +2,8 @@
   <div class="memory-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp($event)">
     <Navigation :name="'Memory'" :focus="focus" :disable="disable"></Navigation>
     <div ref="memoryLayout" class="memory-layout">
-      <Empty v-if="items.length==0" :text="ea==null?'[no data]':'[pulling data]'" style="padding-top:12px;"></Empty>
-      <Bytes v-else v-for="i in 100" :key="i" :value="{lineNumber:'0x00112233',newBytes:[1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8],showString:true}"></Bytes>
+      <Empty v-if="items.length==0" :text="newAddr==null?'[no data]':'[pulling data]'" style="padding-top:12px;"></Empty>
+      <Bytes v-else v-for="(item, index) in items" :key="index" :value="item" @clickitem="onClickItem"></Bytes>
     </div>
   </div>
 </template>
@@ -12,7 +12,7 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 const groupBy = 4; //4or8
-const pieceOf = 256;
+const pieceOf = 512;
 
 function measureTextWidth(length) {
   return length * 7.224609375;
@@ -24,9 +24,10 @@ export default {
       focus: false,
       disable: true,
       items: [],
-      ea: null,
-      oldData: [],
-      newData: [],
+      oldAddr: null,
+      newAddr: 2048, //for test
+      oldData: '',
+      newData: '',
       itemSelection: null,
       hst: []
     };
@@ -109,14 +110,15 @@ export default {
       //todo
     },
     getRange: function() {
-      if (this.ea == null) {
+      if (this.newAddr == null) {
         return null;
       }
-      return [this.ea, this.ea + 4 * pieceOf];
+      return [this.newAddr, this.newAddr + 4 * pieceOf];
     },
-    onBreak: function(ea, memory) {
+    onBreak: function(addr, memory) {
       this.disable = false;
-      if (this.ea == ea) {
+      if (this.newAddr == addr) {
+        this.oldAddr = this.newAddr;
         this.oldData = this.newData;
         this.newData = memory;
       } else {
@@ -127,7 +129,7 @@ export default {
     onContinue: function() {
       this.disable = true;
     },
-    onXB: function(ea, memory) {
+    onXB: function(addr, memory) {
       //todo
     },
     onClickItem: function(...args) {
@@ -135,6 +137,20 @@ export default {
     },
     invalidate: function() {
       //todo
+      var column = this.column * 8;
+      var items = [];
+      for (var i = 0; i < this.newData.length / column; i++) {
+        var newBytes = this.newData.slice(i * column, (i + 1) * column);
+        var lineNumber = '0x' + (this.newAddr + i * column).toString(16).zfill(2 * groupBy);
+        items[items.length] = {
+          lineNumber: lineNumber,
+          oldBytes: '',
+          newBytes: newBytes,
+          showString: true,
+          highlightNumber: null
+        };
+      }
+      this.items.splice(0, this.items.length, ...items);
     }
   }
 };
