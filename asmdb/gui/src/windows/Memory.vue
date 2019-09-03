@@ -3,7 +3,7 @@
     <Navigation :name="'Memory'" :focus="focus" :disable="disable"></Navigation>
     <div ref="memoryLayout" class="memory-layout">
       <Empty v-if="items.length==0" :text="newAddr==null?'[no data]':'[pulling data]'" style="padding-top:12px;"></Empty>
-      <Bytes v-else v-for="(item, index) in items" :key="index" :value="item" @clickitem="onClickItem"></Bytes>
+      <Bytes v-else v-for="item in items" :key="item.lineNumber" :value="item" @clickitem="onClickItem"></Bytes>
     </div>
   </div>
 </template>
