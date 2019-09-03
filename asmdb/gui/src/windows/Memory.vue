@@ -12,6 +12,7 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 const groupBy = 4; //4or8
+const pieceOf = 256;
 
 function measureTextWidth(length) {
   return length * 7.224609375;
@@ -107,12 +108,27 @@ export default {
     jumpTo: function(address) {
       //todo
     },
+    getRange: function() {
+      if (this.ea == null) {
+        return null;
+      }
+      return [this.ea, this.ea + 4 * pieceOf];
+    },
     onBreak: function(ea, memory) {
       this.disable = false;
-      //todo
+      if (this.ea == ea) {
+        this.oldData = this.newData;
+        this.newData = memory;
+      } else {
+        //todo
+      }
+      this.invalidate();
     },
     onContinue: function() {
       this.disable = true;
+    },
+    onXB: function(ea, memory) {
+      //todo
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
