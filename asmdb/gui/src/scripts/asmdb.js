@@ -19,10 +19,11 @@ setTimeout(() => {
   }
   if (memory) {
     bytes = [];
-    for (var i = 0; i < 4 * 512; i++) {
+    var range = memory.getRange();
+    for (var i = 0; i < range[1] - range[0]; i++) {
       bytes[bytes.length] = Math.floor(256 * Math.random());
     }
-    memory.onBreak(2048, for_test(bytes));
+    memory.onBreak(range[0], for_test(bytes));
   }
 }, 1000);
 

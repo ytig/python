@@ -54,13 +54,12 @@ export default {
     },
     onScroll: function() {
       var container = this.$refs.container;
-      var scrollable = container.scrollHeight - container.clientHeight;
-      var line = 1 / 4;
-      if (container.scrollTop <= scrollable * line) {
+      if (container.scrollTop <= container.scrollHeight / 5) {
         console.log('scroll to top');
-      }
-      if (container.scrollTop >= scrollable * (1 - line)) {
+      } else if (container.scrollHeight - container.clientHeight - container.scrollTop <= container.scrollHeight / 5) {
         console.log('scroll to bottom');
+      } else {
+        console.log('scroll in middle');
       }
     }
   }

@@ -25,7 +25,7 @@ export default {
       disable: true,
       items: [],
       oldAddr: null,
-      newAddr: 2048, //for test
+      newAddr: 0, //for test
       oldData: '',
       newData: '',
       itemSelection: null,
@@ -113,7 +113,7 @@ export default {
       if (this.newAddr == null) {
         return null;
       }
-      return [this.newAddr, this.newAddr + 4 * pieceOf];
+      return [this.newAddr, this.newAddr + 5 * pieceOf];
     },
     onBreak: function(addr, memory) {
       this.disable = false;
@@ -122,9 +122,6 @@ export default {
         this.oldData = this.newData;
         this.newData = memory;
         this.invalidate();
-        setTimeout(() => {
-          this.onLoadMore();
-        }, 3000);
       } else {
         //todo
       }
@@ -134,8 +131,6 @@ export default {
     },
     onLoadMore: function(addr, memory) {
       //todo
-      this.newAddr -= 512;
-      this.invalidate();
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
