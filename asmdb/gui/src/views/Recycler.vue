@@ -54,13 +54,13 @@ export default {
     },
     onScroll: function() {
       var container = this.$refs.container;
+      var loadmore = 0;
       if (container.scrollTop <= container.scrollHeight / 5) {
-        console.log('scroll to top');
+        loadmore = -1;
       } else if (container.scrollHeight - container.clientHeight - container.scrollTop <= container.scrollHeight / 5) {
-        console.log('scroll to bottom');
-      } else {
-        console.log('scroll in middle');
+        loadmore = 1;
       }
+      this.$emit('loadmore', loadmore);
     }
   }
 };
