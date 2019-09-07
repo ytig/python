@@ -129,7 +129,7 @@ export default {
     onContinue: function() {
       this.disable = true;
     },
-    onXB: function(addr, memory) {
+    onLoadMore: function(addr, memory) {
       //todo
     },
     onClickItem: function(...args) {
