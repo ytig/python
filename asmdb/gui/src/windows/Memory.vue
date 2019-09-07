@@ -2,7 +2,7 @@
   <div class="memory-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp($event)">
     <Navigation :name="'Memory'" :focus="focus" :disable="disable"></Navigation>
     <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty>
-    <Recycler class="memory-recycler" :items="items" :kk="'lineNumber'" #default="props">
+    <Recycler class="memory-recycler" :items="items" #default="props">
       <Bytes :value="props.item" @clickitem="onClickItem"></Bytes>
     </Recycler>
   </div>
@@ -147,7 +147,9 @@ export default {
       for (var i = 0; i < this.newData.length / column; i++) {
         var newBytes = this.newData.slice(i * column, (i + 1) * column);
         var lineNumber = '0x' + (this.newAddr + i * column).toString(16).zfill(2 * groupBy);
+        var idx = this.newAddr / column + i;
         items[items.length] = {
+          idx: idx,
           lineNumber: lineNumber,
           oldBytes: '',
           newBytes: newBytes,

@@ -1,6 +1,6 @@
 <template>
-  <div class="recycler-container">
-    <div v-for="item in items" :key="item[kk]">
+  <div class="recycler-container" @scroll="onScroll">
+    <div v-for="item in items" :key="item.idx">
       <slot :item="item"></slot>
     </div>
   </div>
@@ -9,8 +9,17 @@
 <script>
 export default {
   props: {
-    kk: String,
     items: Array
+  },
+  watch: {
+    items: function() {
+      console.log('items changed');
+    }
+  },
+  methods: {
+    onScroll: function() {
+      console.log('scroll');
+    }
   }
 };
 </script>
