@@ -1,6 +1,7 @@
 <template>
-  <div class="navigation-container">
+  <div class="navigation-container" :css-gradient="gradient">
     <span class="user-select-none" :css-focus="focus" :css-disable="disable">{{name}}</span>
+    <div v-if="gradient" class="navigation-gradient"></div>
   </div>
 </template>
 
@@ -9,7 +10,8 @@ export default {
   props: {
     name: String,
     focus: Boolean,
-    disable: Boolean
+    disable: Boolean,
+    gradient: Boolean
   }
 };
 </script>
@@ -18,10 +20,11 @@ export default {
 @import '~@/styles/theme';
 
 .navigation-container {
+  position: relative;
   height: 40px;
-  line-height: 40px;
-  padding-left: 12px;
   > span {
+    line-height: 40px;
+    padding-left: 12px;
     font-size: 16px;
     color: @color-text;
     font-family: 'Wawati SC';
@@ -32,5 +35,15 @@ export default {
   > span[css-disable] {
     text-decoration: line-through;
   }
+  .navigation-gradient {
+    position: absolute;
+    top: 36px;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(@color-background, transparent);
+  }
+}
+.navigation-container[css-gradient] {
+  height: 36px;
 }
 </style>
