@@ -13,6 +13,7 @@ import Empty from '@/views/Empty'
 import Gird from '@/views/Gird'
 import Indicator from '@/views/Indicator'
 import Navigation from '@/views/Navigation';
+import Recycler from '@/views/Recycler';
 import Assembly from '@/windows/Assembly';
 import Bar from '@/windows/Bar';
 import Breakpoints from '@/windows/Breakpoints';
@@ -26,6 +27,7 @@ Vue.component('Empty', Empty);
 Vue.component('Gird', Gird);
 Vue.component('Indicator', Indicator);
 Vue.component('Navigation', Navigation);
+Vue.component('Recycler', Recycler);
 Vue.component('Assembly', Assembly);
 Vue.component('Bar', Bar);
 Vue.component('Breakpoints', Breakpoints);
