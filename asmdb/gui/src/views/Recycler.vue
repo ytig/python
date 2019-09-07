@@ -39,13 +39,7 @@ export default {
     hstGet: function() {
       var container = this.$refs.container;
       var scrollTop = 0;
-      if (!this.hst) {
-        for (var i = 0; i < container.children.length / 2; i++) {
-          var child = container.children[i];
-          scrollTop += child.scrollHeight;
-        }
-        container.scrollTop = scrollTop;
-      } else {
+      if (this.hst) {
         for (var i = 0; i < container.children.length; i++) {
           var child = container.children[i];
           if (child.getAttribute('idx') == this.hst[0]) {
@@ -56,6 +50,12 @@ export default {
           scrollTop += child.scrollHeight;
         }
       }
+      scrollTop = 0;
+      for (var i = 0; i < container.children.length / 2; i++) {
+        var child = container.children[i];
+        scrollTop += child.scrollHeight;
+      }
+      container.scrollTop = scrollTop;
     },
     onScroll: function() {
       console.log('scroll');
