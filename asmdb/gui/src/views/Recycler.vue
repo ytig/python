@@ -55,6 +55,7 @@ export default {
         var child = container.children[i];
         scrollTop += child.scrollHeight;
       }
+      scrollTop -= container.clientHeight / 2;
       container.scrollTop = scrollTop;
     },
     onScroll: function() {
