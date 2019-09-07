@@ -53,7 +53,15 @@ export default {
       container.scrollTop = (container.scrollHeight - container.clientHeight) / 2;
     },
     onScroll: function() {
-      console.log('scroll');
+      var container = this.$refs.container;
+      var scrollable = container.scrollHeight - container.clientHeight;
+      var line = 1 / 4;
+      if (container.scrollTop <= scrollable * line) {
+        console.log('scroll to top');
+      }
+      if (container.scrollTop >= scrollable * (1 - line)) {
+        console.log('scroll to bottom');
+      }
     }
   }
 };
