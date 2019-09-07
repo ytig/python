@@ -1,10 +1,10 @@
 <template>
   <div class="memory-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp($event)">
     <Navigation :name="'Memory'" :focus="focus" :disable="disable"></Navigation>
-    <div ref="memoryLayout" class="memory-layout">
-      <Empty v-if="items.length==0" :text="newAddr==null?'[no data]':'[pulling data]'" style="padding-top:12px;"></Empty>
-      <Bytes v-else v-for="item in items" :key="item.lineNumber" :value="item" @clickitem="onClickItem"></Bytes>
-    </div>
+    <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty>
+    <Recycler class="memory-recycler" :items="items" :kk="'lineNumber'" #default="props">
+      <Bytes :value="props.item" @clickitem="onClickItem"></Bytes>
+    </Recycler>
   </div>
 </template>
 
@@ -122,6 +122,9 @@ export default {
         this.oldData = this.newData;
         this.newData = memory;
         this.invalidate();
+        setTimeout(() => {
+          this.onLoadMore();
+        }, 3000);
       } else {
         //todo
       }
@@ -131,6 +134,8 @@ export default {
     },
     onLoadMore: function(addr, memory) {
       //todo
+      this.newAddr -= 512;
+      this.invalidate();
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
@@ -160,9 +165,16 @@ export default {
 @import '~@/styles/theme';
 
 .memory-container {
+  position: relative;
   display: flex;
   flex-direction: column;
-  .memory-layout {
+  .memory-empty {
+    position: absolute;
+    width: 100%;
+    top: 40px;
+    padding-top: 12px;
+  }
+  .memory-recycler {
     flex-grow: 1;
     height: 0px;
     overflow: scroll;

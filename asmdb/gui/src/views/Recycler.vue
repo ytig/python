@@ -1,7 +1,7 @@
 <template>
   <div class="recycler-container">
     <div v-for="item in items" :key="item[kk]">
-      <slot :item="items"></slot>
+      <slot :item="item"></slot>
     </div>
   </div>
 </template>
