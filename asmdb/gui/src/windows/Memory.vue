@@ -167,8 +167,8 @@ export default {
   flex-direction: column;
   .memory-empty {
     position: absolute;
-    width: 100%;
     top: 40px;
+    width: 100%;
     padding-top: 12px;
   }
   .memory-recycler {
