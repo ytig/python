@@ -134,9 +134,10 @@ export default {
     },
     onLoadMore: function(addr, memory) {
       //todo
-      this.newAddr += 512;
-      this.newData = this.newData.slice(512, this.newData.length);
-      for (var i = 0; i < 512; i++) {
+      var t = 512;
+      this.newAddr += t;
+      this.newData = this.newData.slice(t, this.newData.length);
+      for (var i = 0; i < t; i++) {
         this.newData += 't';
       }
       this.invalidate();
