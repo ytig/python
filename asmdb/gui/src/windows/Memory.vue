@@ -122,6 +122,9 @@ export default {
         this.oldData = this.newData;
         this.newData = memory;
         this.invalidate();
+        setTimeout(() => {
+          this.onLoadMore();
+        }, 2000);
       } else {
         //todo
       }
@@ -131,6 +134,12 @@ export default {
     },
     onLoadMore: function(addr, memory) {
       //todo
+      this.newAddr += 512;
+      this.newData = this.newData.slice(512, this.newData.length);
+      for (var i = 0; i < 512; i++) {
+        this.newData += 't';
+      }
+      this.invalidate();
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
