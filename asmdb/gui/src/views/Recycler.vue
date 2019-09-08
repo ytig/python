@@ -10,17 +10,35 @@
 export default {
   data: function() {
     return {
-      hst: null
+      hst: [],
+      posn: null
     };
   },
   props: {
     items: Array
   },
   beforeUpdate: function() {
-    this.hstSet();
+    if (!this.posn) {
+      this.hstGet() && this.hstGet();
+    }
   },
   updated: function() {
-    this.hstGet();
+    var posn = this.posn;
+    this.posn = null;
+    var container = this.$refs.container;
+    var scrollTop = 0;
+    if (posn) {
+      for (var i = 0; i < container.children.length; i++) {
+        var child = container.children[i];
+        if (child.getAttribute('idx') == posn[0]) {
+          scrollTop += posn[1];
+          container.scrollTop = scrollTop;
+          return;
+        }
+        scrollTop += child.scrollHeight;
+      }
+    }
+    container.scrollTop = (container.scrollHeight - container.clientHeight) / 2;
   },
   methods: {
     hstSet: function() {
@@ -30,27 +48,21 @@ export default {
         var child = container.children[i];
         scrollTop -= child.scrollHeight;
         if (scrollTop < 0) {
-          this.hst = [child.getAttribute('idx'), child.scrollHeight + scrollTop];
-          return;
+          var posn = [child.getAttribute('idx'), child.scrollHeight + scrollTop];
+          this.hst.splice(this.hst.length, 0, posn);
+          return true;
         }
       }
-      this.hst = null;
+      return false;
     },
     hstGet: function() {
-      var container = this.$refs.container;
-      var scrollTop = 0;
-      if (this.hst) {
-        for (var i = 0; i < container.children.length; i++) {
-          var child = container.children[i];
-          if (child.getAttribute('idx') == this.hst[0]) {
-            scrollTop += this.hst[1];
-            container.scrollTop = scrollTop;
-            return;
-          }
-          scrollTop += child.scrollHeight;
-        }
+      if (this.hst.length <= 0) {
+        return false;
+      } else {
+        var posn = this.hst.splice(this.hst.length - 1, 1)[0];
+        this.posn = posn;
+        return true;
       }
-      container.scrollTop = (container.scrollHeight - container.clientHeight) / 2;
     },
     onScroll: function() {
       var container = this.$refs.container;
