@@ -1,6 +1,6 @@
 <template>
   <div ref="container" class="recycler-container" @scroll="onScroll">
-    <div v-for="item in items" :key="item.idx" :idx="item.idx">
+    <div v-for="item in items" :key="item.idx % items.length" :idx="item.idx">
       <slot :item="item"></slot>
     </div>
   </div>
