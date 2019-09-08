@@ -46,7 +46,7 @@ export default {
   watch: {
     value: function(oldValue, newValue) {
       var eq = true;
-      for (var k in ['lineNumber', 'oldBytes', 'newBytes', 'showString', 'highlightNumber']) {
+      for (var k of ['lineNumber', 'oldBytes', 'newBytes', 'showString', 'highlightNumber']) {
         if (oldValue[k] != newValue[k]) {
           eq = false;
           break;
