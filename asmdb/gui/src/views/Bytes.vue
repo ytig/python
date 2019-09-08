@@ -44,7 +44,18 @@ export default {
     value: Object
   },
   watch: {
-    value: 'invalidate'
+    value: function(oldValue, newValue) {
+      var eq = true;
+      for (var k in ['lineNumber', 'oldBytes', 'newBytes', 'showString', 'highlightNumber']) {
+        if (oldValue[k] != newValue[k]) {
+          eq = false;
+          break;
+        }
+      }
+      if (!eq) {
+        this.invalidate();
+      }
+    }
   },
   created: function() {
     this.invalidate();
