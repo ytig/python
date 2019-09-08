@@ -19,7 +19,7 @@ export default {
   },
   beforeUpdate: function() {
     if (!this.posn) {
-      this.hstGet() && this.hstGet();
+      this.hstSet() && this.hstGet();
     }
   },
   updated: function() {
