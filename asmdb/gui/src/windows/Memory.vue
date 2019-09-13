@@ -1,5 +1,5 @@
 <template>
-  <div class="memory-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp($event)">
+  <div class="memory-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
     <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty>
     <Recycler ref="recycler" class="memory-recycler" :items="items" #default="props">

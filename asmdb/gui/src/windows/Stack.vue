@@ -1,5 +1,5 @@
 <template>
-  <div class="stack-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp($event)">
+  <div class="stack-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Stack'" :focus="focus" :disable="disable"></Navigation>
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
