@@ -7,32 +7,6 @@
 </template>
 
 <script>
-function preventOverScroll(el) {
-  var prevent = 0;
-  el.addEventListener('wheel', event => {
-    if (event.cancelable) {
-      prevent = 0;
-    } else {
-      if (prevent * event.deltaY <= 0) {
-        prevent = 0;
-      } else {
-        el.style.overflowY = 'hidden';
-        setTimeout(() => {
-          el.style.overflowY = 'scroll';
-        });
-      }
-    }
-  });
-  el.addEventListener('scroll', event => {
-    if (el.scrollTop <= 0) {
-      prevent = -1;
-    }
-    if (el.scrollTop >= el.scrollHeight - el.clientHeight) {
-      prevent = 1;
-    }
-  });
-}
-
 class Scrolling {
   constructor() {
     this.tag = 0;
@@ -85,9 +59,6 @@ export default {
   },
   props: {
     items: Array
-  },
-  mounted: function() {
-    preventOverScroll(this.$refs.container);
   },
   beforeUpdate: function() {
     if (!this.posn) {
