@@ -17,7 +17,7 @@ function preventOverScroll(el) {
         prevent = 0;
       } else {
         el.style.overflowY = 'hidden';
-        requestAnimationFrame(() => {
+        setTimeout(() => {
           el.style.overflowY = 'scroll';
         });
       }
