@@ -10,6 +10,7 @@
 export default {
   data: function() {
     return {
+      ts: new Date().getTime(),
       hst: [],
       posn: null
     };
@@ -65,6 +66,7 @@ export default {
       }
     },
     onScroll: function() {
+      this.ts = new Date().getTime();
       var container = this.$refs.container;
       var loadmore = 0;
       if (container.scrollTop <= container.scrollHeight / 5) {
@@ -73,6 +75,17 @@ export default {
         loadmore = 1;
       }
       this.$emit('loadmore', loadmore);
+    },
+    postStop: function(runnable) {
+      var handler = () => {
+        var timeout = this.ts + 147 - new Date().getTime();
+        if (timeout <= 0) {
+          runnable();
+        } else {
+          setTimeout(handler, timeout);
+        }
+      };
+      handler();
     }
   }
 };

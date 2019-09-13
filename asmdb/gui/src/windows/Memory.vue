@@ -2,7 +2,7 @@
   <div class="memory-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp($event)">
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
     <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty>
-    <Recycler class="memory-recycler" :items="items" #default="props">
+    <Recycler ref="recycler" class="memory-recycler" :items="items" #default="props">
       <Bytes :value="props.item" @clickitem="onClickItem"></Bytes>
     </Recycler>
   </div>
@@ -134,13 +134,15 @@ export default {
     },
     onLoadMore: function(addr, memory) {
       //todo
-      var t = 512;
-      this.newAddr += t;
-      this.newData = this.newData.slice(t, this.newData.length);
-      for (var i = 0; i < t; i++) {
-        this.newData += 't';
-      }
-      this.invalidate();
+      this.$refs.recycler.postStop(() => {
+        var t = 512;
+        this.newAddr += t;
+        this.newData = this.newData.slice(t, this.newData.length);
+        for (var i = 0; i < t; i++) {
+          this.newData += 't';
+        }
+        this.invalidate();
+      });
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
