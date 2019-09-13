@@ -109,7 +109,8 @@ export default {
     },
     onScroll: function() {
       var container = this.$refs.container;
-      this.scrolling.onScroll(container.scrollTop <= 0 || container.scrollTop >= container.scrollHeight - container.clientHeight);
+      var edge = container.scrollTop <= 0 || container.scrollTop >= container.scrollHeight - container.clientHeight;
+      this.scrolling.onScroll(edge);
       var loadmore = 0;
       if (container.scrollTop <= container.scrollHeight / 5) {
         loadmore = -1;
