@@ -7,10 +7,52 @@
 </template>
 
 <script>
+class Scrolling {
+  constructor() {
+    this.tag = 0;
+    this.scrolling = 0;
+    this.runnables = [];
+  }
+
+  onScroll(edge) {
+    if (!edge) {
+      var tag = this.tag;
+      this.scrolling++;
+      setTimeout(() => {
+        if (tag != this.tag) {
+          return;
+        }
+        this.scrolling--;
+        if (this.scrolling == 0) {
+          this.runnables.reverse();
+          while (this.runnables.length > 0) {
+            this.runnables.pop()();
+          }
+        }
+      }, 147);
+    } else {
+      this.tag++;
+      this.scrolling = 0;
+      this.runnables.reverse();
+      while (this.runnables.length > 0) {
+        this.runnables.pop()();
+      }
+    }
+  }
+
+  postStop(runnable) {
+    if (!this.scrolling) {
+      runnable();
+    } else {
+      this.runnables.push(runnable);
+    }
+  }
+}
+
 export default {
   data: function() {
     return {
-      ts: new Date().getTime(),
+      scrolling: new Scrolling(),
       hst: [],
       posn: null
     };
@@ -66,8 +108,8 @@ export default {
       }
     },
     onScroll: function() {
-      this.ts = new Date().getTime();
       var container = this.$refs.container;
+      this.scrolling.onScroll(container.scrollTop <= 0 || container.scrollTop >= container.scrollHeight - container.clientHeight);
       var loadmore = 0;
       if (container.scrollTop <= container.scrollHeight / 5) {
         loadmore = -1;
@@ -77,15 +119,7 @@ export default {
       this.$emit('loadmore', loadmore);
     },
     postStop: function(runnable) {
-      var handler = () => {
-        var timeout = this.ts + 147 - new Date().getTime();
-        if (timeout <= 0) {
-          runnable();
-        } else {
-          setTimeout(handler, timeout);
-        }
-      };
-      handler();
+      this.scrolling.postStop(runnable);
     }
   }
 };
