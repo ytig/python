@@ -192,10 +192,10 @@ export default {
   }
 
   .bytes-border-top {
-    border-top: 1px solid @color-text;
+    border-top: 1px solid @color-icon-breakpoint;
   }
   .bytes-border-bottom {
-    border-bottom: 1px solid @color-text;
+    border-bottom: 1px solid @color-icon-breakpoint;
   }
 
   .bytes-line-number {
@@ -210,11 +210,11 @@ export default {
   }
   .bytes-hex.bytes-border-left {
     margin-left: -1px;
-    border-left: 1px solid @color-text;
+    border-left: 1px solid @color-icon-breakpoint;
   }
   .bytes-hex.bytes-border-right {
     margin-right: -1px;
-    border-right: 1px solid @color-text;
+    border-right: 1px solid @color-icon-breakpoint;
   }
   .bytes-hex.bytes-highlight {
     text-decoration: underline;
