@@ -23,7 +23,7 @@ export default {
       this.showing = true;
       this.text = '';
     },
-    onBlur: function(event) {
+    onBlur: function() {
       this.showing = false;
     }
   }
