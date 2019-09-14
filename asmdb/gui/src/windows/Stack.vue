@@ -200,7 +200,8 @@ export default {
           oldBytes: oldBytes,
           newBytes: newBytes,
           showString: false,
-          highlightNumber: highlightNumber
+          highlightNumber: highlightNumber,
+          watchingNumbers: [0, 1]
         };
       }
       this.items.splice(0, this.items.length, ...items);

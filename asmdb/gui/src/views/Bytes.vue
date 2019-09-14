@@ -68,6 +68,7 @@ export default {
     },
     invalidate: function() {
       this.highlight = typeof this.value.highlightNumber == 'number';
+      var watching = this.value.watchingNumbers || [];
       var items = [];
       //line number
       items[items.length] = {
@@ -77,16 +78,17 @@ export default {
       //hex
       var curInt;
       var curUsage;
+      var bordering = false;
       for (var i = 0; i < this.value.newBytes.length; i++) {
         if (i % groupBy == 0) {
           items[items.length] = {
             value: '&nbsp;',
-            style: ['bytes-space']
+            style: ['bytes-space', bordering ? 'bytes-border-top bytes-border-bottom' : '']
           };
           if (i % 8 == 0) {
             items[items.length] = {
               value: '&nbsp;',
-              style: ['bytes-space']
+              style: ['bytes-space', bordering ? 'bytes-border-top bytes-border-bottom' : '']
             };
           }
           if (i + groupBy - 1 < this.value.newBytes.length) {
@@ -103,7 +105,7 @@ export default {
         } else {
           items[items.length] = {
             value: '&nbsp;',
-            style: ['bytes-space', 'bytes-usage-' + curUsage]
+            style: ['bytes-space', 'bytes-usage-' + curUsage, , bordering ? 'bytes-border-top bytes-border-bottom' : '']
           };
           if (curUsage != '1') {
             items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
@@ -118,6 +120,17 @@ export default {
           value: byte.toString(16).zfill(2),
           style: ['bytes-hex', 'bytes-usage-' + curUsage, 'bytes-changed-' + isChanged, this.value.highlightNumber == i ? 'bytes-highlight' : '']
         };
+        if (i in watching) {
+          items[items.length - 1].style.push('bytes-border-top bytes-border-bottom');
+          if (!(i - 1 in watching)) {
+            items[items.length - 1].style.push('bytes-border-left');
+            bordering = true;
+          }
+          if (!(i + 1 in watching)) {
+            items[items.length - 1].style.push('bytes-border-right');
+            bordering = false;
+          }
+        }
         if (curUsage != '1') {
           items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
         }
