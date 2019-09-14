@@ -72,7 +72,7 @@ export default {
       //line number
       items[items.length] = {
         value: this.value.lineNumber,
-        style: 'bytes-line-number' + (this.highlight ? ' bytes-highlight' : '')
+        style: ['bytes-line-number', this.highlight ? 'bytes-highlight' : '']
       };
       //hex
       var curInt;
@@ -81,12 +81,12 @@ export default {
         if (i % groupBy == 0) {
           items[items.length] = {
             value: '&nbsp;',
-            style: 'bytes-space'
+            style: ['bytes-space']
           };
           if (i % 8 == 0) {
             items[items.length] = {
               value: '&nbsp;',
-              style: 'bytes-space'
+              style: ['bytes-space']
             };
           }
           if (i + groupBy - 1 < this.value.newBytes.length) {
@@ -103,7 +103,7 @@ export default {
         } else {
           items[items.length] = {
             value: '&nbsp;',
-            style: 'bytes-space bytes-usage-' + curUsage
+            style: ['bytes-space', 'bytes-usage-' + curUsage]
           };
           if (curUsage != '1') {
             items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
@@ -116,7 +116,7 @@ export default {
         var byte = this.value.newBytes.charCodeAt(i);
         items[items.length] = {
           value: byte.toString(16).zfill(2),
-          style: 'bytes-hex bytes-usage-' + curUsage + ' bytes-changed-' + isChanged + (this.value.highlightNumber == i ? ' bytes-highlight' : '')
+          style: ['bytes-hex', 'bytes-usage-' + curUsage, 'bytes-changed-' + isChanged, this.value.highlightNumber == i ? 'bytes-highlight' : '']
         };
         if (curUsage != '1') {
           items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
@@ -126,30 +126,30 @@ export default {
       if (this.value.showString) {
         items[items.length] = {
           value: '&nbsp;',
-          style: 'bytes-space user-select-none'
+          style: ['bytes-space', 'user-select-none']
         };
         items[items.length] = {
           value: '&nbsp;',
-          style: 'bytes-space user-select-none'
+          style: ['bytes-space', 'user-select-none']
         };
         for (var i = 0; i < this.value.newBytes.length; i++) {
           var byte = this.value.newBytes.charCodeAt(i);
           if (byte >= 0x21 && byte <= 0x7e) {
             items[items.length] = {
               value: String.fromCharCode(byte),
-              style: 'bytes-string user-select-none bytes-visible-' + true
+              style: ['bytes-string', 'user-select-none', 'bytes-visible-' + true]
             };
           } else {
             items[items.length] = {
               value: '.',
-              style: 'bytes-string user-select-none bytes-visible-' + false
+              style: ['bytes-string', 'user-select-none', 'bytes-visible-' + false]
             };
           }
         }
       }
       //padding
-      items.splice(0, 0, { value: '', style: '' });
-      items.splice(items.length, 0, { value: '', style: '' });
+      items.splice(0, 0, { value: '', style: [] });
+      items.splice(items.length, 0, { value: '', style: [] });
       this.items.splice(0, this.items.length, ...items);
     }
   }
