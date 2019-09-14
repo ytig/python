@@ -23,8 +23,11 @@ export default {
       this.showing = true;
       this.text = '';
     },
-    onBlur: function() {
+    dismiss: function() {
       this.showing = false;
+    },
+    onBlur: function() {
+      this.dismiss();
     }
   }
 };
