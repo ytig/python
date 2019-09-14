@@ -30,7 +30,7 @@ export default {
     font-family: 'Wawati SC';
   }
   > span[css-focus] {
-    color: @color-light-text;
+    color: @color-text-light;
   }
   > span[css-disable] {
     text-decoration: line-through;

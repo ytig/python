@@ -174,7 +174,7 @@ export default {
 
 .bytes-container[highlight='true'] {
   > * {
-    background: @color-selection-background;
+    background: @color-background-selection;
   }
 }
 .bytes-container {
@@ -199,10 +199,10 @@ export default {
   }
 
   .bytes-line-number {
-    color: @color-darker-text;
+    color: @color-text-darker;
   }
   .bytes-line-number.bytes-highlight {
-    color: @color-dark-text;
+    color: @color-text-dark;
   }
 
   .bytes-hex {
@@ -261,7 +261,7 @@ export default {
     color: @color-text;
   }
   .bytes-string.bytes-visible-false {
-    color: @color-darker-text;
+    color: @color-text-darker;
   }
 }
 </style>

@@ -40,7 +40,7 @@ export default {};
     display: flex;
     flex-direction: column;
     #bar {
-      background: @color-dark-background;
+      background: @color-background-dark;
     }
     #assembly {
       flex-grow: 1;
@@ -48,7 +48,7 @@ export default {};
       border-bottom: 1px solid @color-border;
     }
     #points-layout {
-      background: @color-dark-background;
+      background: @color-background-dark;
       display: flex;
       #breakpoints {
         flex-grow: 1;

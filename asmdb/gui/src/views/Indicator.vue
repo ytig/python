@@ -35,17 +35,17 @@ export default {
     padding-top: 8px;
     text-align: center;
     font-size: 12px;
-    border-top: 1px solid @color-light-border;
-    color: @color-dark-text;
+    border-top: 1px solid @color-border-light;
+    color: @color-text-dark;
     cursor: pointer;
   }
   > *[css-offset='0'] {
-    color: @color-light-text;
+    color: @color-text-light;
     text-decoration: underline;
     cursor: default;
   }
   > *[css-disable] {
-    color: @color-dark-text !important;
+    color: @color-text-dark !important;
     text-decoration: none !important;
     cursor: not-allowed !important;
   }

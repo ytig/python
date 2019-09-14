@@ -15,7 +15,7 @@ export default {
 
 .empty-container {
   text-align: center;
-  color: @color-dark-text;
+  color: @color-text-dark;
   font-size: 12px;
   text-shadow: 1px 1px 2px @color-text-shadow;
 }

@@ -89,7 +89,7 @@ export default {
 .menu-container {
   position: fixed;
   display: inline-block;
-  background: @color-dark-background;
+  background: @color-background-dark;
   box-shadow: 0px 2px 6px @color-border-shadow;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -102,13 +102,13 @@ export default {
     > span:first-child {
       font-family: 'PingFang SC';
       font-size: 12px;
-      color: @color-darker-text;
+      color: @color-text-darker;
       margin-right: 47px;
     }
     > span:last-child {
       font-family: 'PingFang SC';
       font-size: 12px;
-      color: @color-darker-text;
+      color: @color-text-darker;
     }
   }
   > div[css-enable] {
@@ -117,14 +117,14 @@ export default {
       cursor: pointer;
     }
     > span:first-child {
-      color: @color-menu-text;
+      color: @color-text-menu;
     }
     > span:last-child {
-      color: @color-menu-dark-text;
+      color: @color-text-menu-dark;
     }
   }
   > div[css-enable]:hover {
-    background: @color-hover-background;
+    background: @color-background-hover;
   }
 }
 </style>
