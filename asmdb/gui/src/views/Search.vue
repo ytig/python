@@ -1,6 +1,6 @@
 <template>
   <div v-show="showing" class="search-container">
-    <input ref="input" type="text" @blur="onBlur" />
+    <input ref="input" type="text" v-model="text" @blur="onBlur" />
   </div>
 </template>
 
@@ -8,17 +8,20 @@
 export default {
   data: function() {
     return {
-      showing: false
+      showing: false,
+      text: ''
     };
   },
   updated: function() {
+    var input = this.$refs.input;
     if (this.showing) {
-      this.$refs.input.focus();
+      input.focus();
     }
   },
   methods: {
     show: function() {
       this.showing = true;
+      this.text = '';
     },
     onBlur: function(event) {
       this.showing = false;
