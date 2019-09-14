@@ -120,13 +120,13 @@ export default {
           value: byte.toString(16).zfill(2),
           style: ['bytes-hex', 'bytes-usage-' + curUsage, 'bytes-changed-' + isChanged, this.value.highlightNumber == i ? 'bytes-highlight' : '']
         };
-        if (i in watching) {
+        if (watching.indexOf(i) >= 0) {
           items[items.length - 1].style.push('bytes-border-top bytes-border-bottom');
-          if (!(i - 1 in watching)) {
+          if (watching.indexOf(i - 1) < 0) {
             items[items.length - 1].style.push('bytes-border-left');
             bordering = true;
           }
-          if (!(i + 1 in watching)) {
+          if (watching.indexOf(i + 1) < 0) {
             items[items.length - 1].style.push('bytes-border-right');
             bordering = false;
           }
