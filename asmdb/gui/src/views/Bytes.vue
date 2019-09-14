@@ -166,7 +166,8 @@ export default {
 }
 .bytes-container {
   white-space: nowrap;
-  margin-bottom: 4px;
+  padding-top: 1px;
+  padding-bottom: 3px;
   > span {
     font-size: 12px;
   }
@@ -175,6 +176,13 @@ export default {
   }
   > span:last-child {
     padding-right: 12px;
+  }
+
+  .bytes-border-top {
+    border-top: 1px solid #f00;
+  }
+  .bytes-border-bottom {
+    border-bottom: 1px solid #f00;
   }
 
   .bytes-line-number {
@@ -186,6 +194,14 @@ export default {
 
   .bytes-hex {
     padding: 0px 1px;
+  }
+  .bytes-hex.bytes-border-left {
+    padding-left: 0px;
+    border-left: 1px solid #f00;
+  }
+  .bytes-hex.bytes-border-right {
+    padding-right: 0px;
+    border-right: 1px solid #f00;
   }
   .bytes-hex.bytes-highlight {
     text-decoration: underline;
