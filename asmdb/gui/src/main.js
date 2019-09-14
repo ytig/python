@@ -8,10 +8,10 @@ Vue.use(VueRouter);
 import menu from '@/plugins/menu';
 Vue.use(menu);
 
-import Bytes from '@/views/Bytes'
-import Empty from '@/views/Empty'
-import Gird from '@/views/Gird'
-import Indicator from '@/views/Indicator'
+import Bytes from '@/views/Bytes';
+import Empty from '@/views/Empty';
+import Gird from '@/views/Gird';
+import Indicator from '@/views/Indicator';
 import Navigation from '@/views/Navigation';
 import Recycler from '@/views/Recycler';
 import Search from '@/views/Search';
@@ -29,8 +29,8 @@ Vue.component('Gird', Gird);
 Vue.component('Indicator', Indicator);
 Vue.component('Navigation', Navigation);
 Vue.component('Recycler', Recycler);
-Vue.component('Recycler', Recycler);
 Vue.component('Search', Search);
+Vue.component('Assembly', Assembly);
 Vue.component('Bar', Bar);
 Vue.component('Breakpoints', Breakpoints);
 Vue.component('Memory', Memory);
