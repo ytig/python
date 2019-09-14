@@ -201,7 +201,7 @@ export default {
           newBytes: newBytes,
           showString: false,
           highlightNumber: highlightNumber,
-          watchingNumbers: [0, 1]
+          watchingNumbers: null
         };
       }
       this.items.splice(0, this.items.length, ...items);

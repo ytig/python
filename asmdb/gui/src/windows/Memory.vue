@@ -161,7 +161,8 @@ export default {
           oldBytes: '',
           newBytes: newBytes,
           showString: true,
-          highlightNumber: null
+          highlightNumber: null,
+          watchingNumbers: null
         };
       }
       this.items.splice(0, this.items.length, ...items);
