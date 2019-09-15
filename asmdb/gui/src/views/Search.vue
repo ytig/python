@@ -1,7 +1,7 @@
 <template>
   <div v-show="showing" class="search-container" :css-illegal="illegal">
     <div></div>
-    <input ref="input" type="text" v-model="text" @keypress="onKeyPress" @blur="onBlur" />
+    <input ref="input" type="text" :style="{width:inputWidth+'px'}" v-model="text" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
 
@@ -17,6 +17,9 @@ export default {
   computed: {
     illegal: function() {
       return this.text.length > 5;
+    },
+    inputWidth: function() {
+      return measureText(this.text, '12px Menlo');
     }
   },
   created: function() {
