@@ -94,15 +94,16 @@ export default {
   display: flex;
   align-items: center;
   > div {
-    width: 16px;
-    height: 16px;
     margin-left: 2px;
     margin-right: 2px;
+    width: 16px;
+    height: 16px;
     mask: url('~@/icons/search.png') no-repeat;
     mask-size: 100% 100%;
     background: @color-text-menu;
   }
   > input {
+    margin-right: 2px;
     font-size: 12px;
     color: @color-text-menu;
   }
