@@ -1,5 +1,5 @@
 <template>
-  <div v-show="showing" class="search-container">
+  <div v-show="showing" class="search-container" :css-illegal="illegal">
     <input ref="input" type="text" v-model="text" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
@@ -12,6 +12,11 @@ export default {
       intercept: false,
       text: ''
     };
+  },
+  computed: {
+    illegal: function() {
+      return this.text.length > 5;
+    }
   },
   created: function() {
     document.addEventListener('mousedown', this.onDomMouseDown, true);
@@ -71,8 +76,19 @@ export default {
   z-index: 1;
   left: 4px;
   top: 4px;
+  background: #653723;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  padding-top: 3px;
+  padding-bottom: 1px;
+  padding-left: 2px;
+  padding-right: 2px;
   > input {
     font-size: 12px;
+    color: @color-text;
   }
+}
+.search-container[css-illegal] {
+  border: 1px solid @color-icon-breakpoint;
 }
 </style>
