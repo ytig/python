@@ -1,6 +1,6 @@
 <template>
   <div v-show="showing" class="search-container" :css-illegal="illegal">
-    <img src="@/icons/search.png" />
+    <div></div>
     <input ref="input" type="text" v-model="text" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
@@ -90,11 +90,14 @@ export default {
   padding-top: 2px;
   display: flex;
   align-items: center;
-  > img {
+  > div {
     width: 16px;
     height: 16px;
     margin-left: 2px;
     margin-right: 2px;
+    background: @color-text;
+    mask: url('~@/icons/search.png') no-repeat;
+    mask-size: 100% 100%;
   }
   > input {
     font-size: 12px;
