@@ -34,9 +34,7 @@ export default {
   watch: {
     text: function(newValue, oldValue) {
       if (this.illegal) {
-        if (exec(newValue) != null) {
-          this.illegal = false;
-        }
+        this.illegal = exec(newValue) == null;
       }
     }
   },
