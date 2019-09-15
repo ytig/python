@@ -98,7 +98,7 @@ export default {
     position: absolute;
     z-index: -1;
     left: 2px;
-    top: 2px;
+    top: 3px;
     width: 16px;
     height: 16px;
     background: url('~@/icons/search.png') no-repeat;
