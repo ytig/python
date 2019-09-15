@@ -20,7 +20,14 @@ export default {
   },
   computed: {
     illegal: function() {
-      return this.text.length > 5;
+      if (!this.text) {
+        return false;
+      }
+      try {
+        return typeof eval(this.text) != 'number';
+      } catch (error) {
+        return true;
+      }
     },
     inputWidth: function() {
       return 1 + measureText(this.realText, '12px Menlo');
