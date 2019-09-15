@@ -19,7 +19,7 @@ export default {
       return this.text.length > 5;
     },
     inputWidth: function() {
-      return measureText(this.text, '12px Menlo');
+      return 1 + measureText(this.text, '12px Menlo');
     }
   },
   created: function() {
