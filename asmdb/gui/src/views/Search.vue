@@ -1,5 +1,6 @@
 <template>
   <div v-show="showing" class="search-container" :css-illegal="illegal">
+    <img src="@/icons/search.png" />
     <input ref="input" type="text" v-model="text" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
@@ -78,20 +79,25 @@ export default {
   z-index: 1;
   left: 4px;
   top: 4px;
-  background: #653723;
+  background: @color-background-popup;
   border: 1px solid transparent;
   border-radius: 2px;
-  padding-top: 3px;
-  padding-bottom: 1px;
-  padding-left: 2px;
-  padding-right: 2px;
   box-shadow: 1px 1px @color-border-shadow;
+  padding-top: 2px;
+  display: flex;
+  align-items: center;
+  > img {
+    width: 16px;
+    height: 16px;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
   > input {
     font-size: 12px;
     color: @color-text;
   }
 }
 .search-container[css-illegal] {
-  border: 1px solid @color-icon-breakpoint;
+  border: 1px solid @color-border-illegal;
 }
 </style>
