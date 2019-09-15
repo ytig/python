@@ -8,6 +8,11 @@
 <script>
 import Animation from '@/scripts/animation';
 
+function exec(source) {
+  //todo
+  return eval(source);
+}
+
 export default {
   data: function() {
     return {
@@ -24,7 +29,7 @@ export default {
         return false;
       }
       try {
-        return typeof eval(this.text) != 'number';
+        return typeof exec(this.text) != 'number';
       } catch (error) {
         return true;
       }
@@ -76,7 +81,7 @@ export default {
           this.anim.$target(1);
         } else {
           if (this.text) {
-            this.$emit('search', this.text);
+            this.$emit('search', exec(this.text));
           }
           this.dismiss();
         }

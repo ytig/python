@@ -63,7 +63,7 @@ export default {
       if (event.button == 2) {
         var items = [];
         items[items.length] = ['Go back', '⌫', this.hst.length > 0];
-        items[items.length] = ['Search address', '↩︎', true]; //todo
+        items[items.length] = ['Search address', '↩︎', true];
         this.$menu.alert(event, items, this.onClickMenu);
       }
     },
@@ -87,7 +87,7 @@ export default {
       }
     },
     onSearch: function(address) {
-      console.log('todo jump to ' + address);
+      this.jumpTo(address);
     },
     hstDel: function() {
       this.hst.splice(0, this.hst.length);
@@ -112,6 +112,7 @@ export default {
     },
     jumpTo: function(address) {
       //todo
+      console.log('todo jump to ' + address);
     },
     getRange: function() {
       if (this.newAddr == null) {
