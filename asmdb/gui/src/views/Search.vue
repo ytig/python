@@ -95,9 +95,9 @@ export default {
     height: 16px;
     margin-left: 2px;
     margin-right: 2px;
-    background: @color-text;
     mask: url('~@/icons/search.png') no-repeat;
     mask-size: 100% 100%;
+    background: @color-text;
   }
   > input {
     font-size: 12px;
