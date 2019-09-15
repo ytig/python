@@ -15,7 +15,7 @@ export default {
       intercept: false,
       text: '',
       realText: '',
-      anim: new Animation(1 / 224)
+      anim: new Animation(1 / 250)
     };
   },
   computed: {
@@ -30,7 +30,7 @@ export default {
       var K = 0.382;
       var T = 4;
       var output = Math.pow(K, (T * input - 0.25) / (T - 1)) * Math.sin(T * 2 * Math.PI * input);
-      return 4 + 7 * output;
+      return 4 + 10 * output;
     }
   },
   created: function() {
