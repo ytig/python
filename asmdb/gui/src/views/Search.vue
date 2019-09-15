@@ -44,7 +44,9 @@ export default {
     },
     onKeyPress: function(event) {
       if (event.keyCode == 13) {
-        this.$emit('search', this.text);
+        if (this.text) {
+          this.$emit('search', this.text);
+        }
         this.dismiss();
       }
     },
@@ -83,6 +85,7 @@ export default {
   padding-bottom: 1px;
   padding-left: 2px;
   padding-right: 2px;
+  box-shadow: 1px 1px @color-border-shadow;
   > input {
     font-size: 12px;
     color: @color-text;
