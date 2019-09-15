@@ -20,7 +20,7 @@ export default {
       return this.text.length > 5;
     },
     inputWidth: function() {
-      return measureText(this.realText, '12px Menlo') + 1;
+      return 1 + measureText(this.realText, '12px Menlo');
     }
   },
   created: function() {
