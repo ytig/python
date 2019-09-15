@@ -45,14 +45,14 @@ export default {
     },
     onKeyPress: function(event) {
       if (event.keyCode == 13) {
-        if (this.text) {
-          if (!this.illegal) {
+        if (this.illegal) {
+          console.log('todo anim');
+        } else {
+          if (this.text) {
             this.$emit('search', this.text);
-          } else {
-            console.log('todo anim');
           }
+          this.dismiss();
         }
-        this.dismiss();
       }
     },
     onBlur: function() {
