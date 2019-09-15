@@ -97,11 +97,11 @@ export default {
     margin-right: 2px;
     mask: url('~@/icons/search.png') no-repeat;
     mask-size: 100% 100%;
-    background: @color-text;
+    background: @color-text-menu;
   }
   > input {
     font-size: 12px;
-    color: @color-text;
+    color: @color-text-menu;
   }
 }
 .search-container[css-illegal] {
