@@ -146,7 +146,7 @@ export default {
     padding: 3px 2px 1px 20px;
     max-width: 224px;
     font-size: 12px;
-    color: @color-text-menu;
+    color: @color-text-light;
   }
   > input::selection {
     background: @color-background-selection2;
