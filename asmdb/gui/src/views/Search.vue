@@ -112,6 +112,9 @@ export default {
     font-size: 12px;
     color: @color-text-menu;
   }
+  > input::selection {
+    background: @color-background-selection2;
+  }
 }
 .search-container[css-illegal] {
   > input {
