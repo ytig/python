@@ -44,10 +44,10 @@ export default {
     value: Object
   },
   watch: {
-    value: function(oldValue, newValue) {
+    value: function(newValue, oldValue) {
       var eq = true;
       for (var k of ['lineNumber', 'oldBytes', 'newBytes', 'showString', 'highlightNumber']) {
-        if (oldValue[k] != newValue[k]) {
+        if (newValue[k] != oldValue[k]) {
           eq = false;
           break;
         }

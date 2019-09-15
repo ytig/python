@@ -9,8 +9,15 @@
 import Animation from '@/scripts/animation';
 
 function exec(source) {
-  //todo
-  return eval(source);
+  var result = null;
+  try {
+    result = eval(source);
+  } catch (error) {}
+  if (typeof result == 'number') {
+    return result;
+  } else {
+    return null;
+  }
 }
 
 export default {
@@ -18,22 +25,22 @@ export default {
     return {
       showing: false,
       intercept: false,
+      illegal: false,
       text: '',
       realText: '',
       anim: new Animation(1 / 250)
     };
   },
+  watch: {
+    text: function(newValue, oldValue) {
+      if (this.illegal) {
+        if (exec(newValue) != null) {
+          this.illegal = false;
+        }
+      }
+    }
+  },
   computed: {
-    illegal: function() {
-      if (!this.text) {
-        return false;
-      }
-      try {
-        return typeof exec(this.text) != 'number';
-      } catch (error) {
-        return true;
-      }
-    },
     inputWidth: function() {
       return 1 + measureText(this.realText, '12px Menlo');
     },
@@ -76,14 +83,18 @@ export default {
     },
     onKeyPress: function(event) {
       if (event.keyCode == 13) {
-        if (this.illegal) {
-          this.anim.$value(0);
-          this.anim.$target(1);
-        } else {
-          if (this.text) {
-            this.$emit('search', exec(this.text));
-          }
+        if (!this.text) {
           this.dismiss();
+        } else {
+          var result = exec(this.text);
+          if (result != null) {
+            this.$emit('search', result);
+            this.dismiss();
+          } else {
+            this.illegal = true;
+            this.anim.$value(0);
+            this.anim.$target(1);
+          }
         }
       }
     },
