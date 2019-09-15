@@ -12,6 +12,14 @@ export default {
       text: ''
     };
   },
+  created: function() {
+    document.addEventListener('click', this.onDomClick, true);
+    document.addEventListener('keydown', this.onDomKeyDown, true);
+  },
+  destroyed: function() {
+    document.removeEventListener('click', this.onDomClick, true);
+    document.removeEventListener('keydown', this.onDomKeyDown, true);
+  },
   updated: function() {
     var input = this.$refs.input;
     if (this.showing) {
@@ -28,6 +36,16 @@ export default {
     },
     onBlur: function() {
       this.dismiss();
+    },
+    onDomClick: function(event) {
+      if (this.showing) {
+        event.stopPropagation();
+      }
+    },
+    onDomKeyDown: function(event) {
+      if (this.showing) {
+        event.stopPropagation();
+      }
     }
   }
 };
