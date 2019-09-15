@@ -1,18 +1,21 @@
 <template>
-  <div v-show="showing" class="search-container" :css-illegal="illegal">
+  <div v-show="showing" class="search-container" :style="{left:containerLeft+'px'}" :css-illegal="illegal">
     <div></div>
     <input ref="input" type="text" :style="{width:inputWidth+'px'}" v-model="text" @input="onInput" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
 
 <script>
+import Animation from '@/scripts/animation';
+
 export default {
   data: function() {
     return {
       showing: false,
       intercept: false,
       text: '',
-      realText: ''
+      realText: '',
+      anim: new Animation(1 / 224)
     };
   },
   computed: {
@@ -21,6 +24,13 @@ export default {
     },
     inputWidth: function() {
       return 1 + measureText(this.realText, '12px Menlo');
+    },
+    containerLeft: function() {
+      var input = this.anim.value;
+      var K = 0.382;
+      var T = 4;
+      var output = Math.pow(K, (T * input - 0.25) / (T - 1)) * Math.sin(T * 2 * Math.PI * input);
+      return 4 + 7 * output;
     }
   },
   created: function() {
@@ -44,6 +54,7 @@ export default {
       this.showing = true;
       this.text = '';
       this.realText = '';
+      this.anim.$value(0);
     },
     dismiss: function() {
       this.showing = false;
@@ -54,7 +65,8 @@ export default {
     onKeyPress: function(event) {
       if (event.keyCode == 13) {
         if (this.illegal) {
-          console.log('todo anim');
+          this.anim.$value(0);
+          this.anim.$target(1);
         } else {
           if (this.text) {
             this.$emit('search', this.text);
