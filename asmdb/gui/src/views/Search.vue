@@ -9,6 +9,7 @@
 import Animation from '@/scripts/animation';
 
 function exec(source) {
+  //todo local&regs
   var result = null;
   try {
     result = eval(source);
