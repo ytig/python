@@ -101,9 +101,7 @@ export default {
     top: 2px;
     width: 16px;
     height: 16px;
-    mask: url('~@/icons/search.png') no-repeat;
-    mask-size: 100% 100%;
-    background: @color-text-menu;
+    background: url('~@/icons/search.png') no-repeat;
   }
   > input {
     box-sizing: content-box;
