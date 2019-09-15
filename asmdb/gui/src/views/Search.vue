@@ -1,7 +1,7 @@
 <template>
   <div v-show="showing" class="search-container" :css-illegal="illegal">
     <div></div>
-    <input ref="input" type="text" :style="{width:inputWidth+'px'}" v-model="text" @keypress="onKeyPress" @blur="onBlur" />
+    <input ref="input" type="text" :style="{width:inputWidth+'px'}" v-model="text" @input="onInput" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
 
@@ -11,7 +11,8 @@ export default {
     return {
       showing: false,
       intercept: false,
-      text: ''
+      text: '',
+      realText: ''
     };
   },
   computed: {
@@ -19,7 +20,7 @@ export default {
       return this.text.length > 5;
     },
     inputWidth: function() {
-      return 1 + measureText(this.text, '12px Menlo');
+      return 1 + measureText(this.realText, '12px Menlo');
     }
   },
   created: function() {
@@ -42,9 +43,13 @@ export default {
     show: function() {
       this.showing = true;
       this.text = '';
+      this.realText = '';
     },
     dismiss: function() {
       this.showing = false;
+    },
+    onInput: function() {
+      this.realText = this.$refs.input.value;
     },
     onKeyPress: function(event) {
       if (event.keyCode == 13) {
