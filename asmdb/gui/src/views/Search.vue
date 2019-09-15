@@ -46,7 +46,11 @@ export default {
     onKeyPress: function(event) {
       if (event.keyCode == 13) {
         if (this.text) {
-          this.$emit('search', this.text);
+          if (!this.illegal) {
+            this.$emit('search', this.text);
+          } else {
+            console.log('todo anim');
+          }
         }
         this.dismiss();
       }
