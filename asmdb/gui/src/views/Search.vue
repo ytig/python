@@ -20,7 +20,7 @@ export default {
       return this.text.length > 5;
     },
     inputWidth: function() {
-      return 1 + measureText(this.realText, '12px Menlo');
+      return measureText(this.realText, '12px Menlo') + 1;
     }
   },
   created: function() {
@@ -92,15 +92,13 @@ export default {
   left: 4px;
   top: 4px;
   background: @color-background-popup;
-  border: 1px solid transparent;
   border-radius: 2px;
   box-shadow: 1px 1px @color-border-shadow;
-  padding-top: 2px;
-  display: flex;
-  align-items: center;
   > div {
-    margin-left: 2px;
-    margin-right: 2px;
+    position: absolute;
+    z-index: -1;
+    left: 2px;
+    top: 2px;
     width: 16px;
     height: 16px;
     mask: url('~@/icons/search.png') no-repeat;
@@ -108,12 +106,17 @@ export default {
     background: @color-text-menu;
   }
   > input {
-    margin-right: 2px;
+    box-sizing: content-box;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    padding: 3px 2px 1px 20px;
     font-size: 12px;
     color: @color-text-menu;
   }
 }
 .search-container[css-illegal] {
-  border: 1px solid @color-border-illegal;
+  > input {
+    border: 1px solid @color-border-illegal;
+  }
 }
 </style>
