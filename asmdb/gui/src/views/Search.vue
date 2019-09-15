@@ -61,9 +61,10 @@ export default {
 @import '~@/styles/theme';
 
 .search-container {
-  position: fixed;
-  width: 100px;
-  height: 32px;
+  position: absolute;
+  z-index: 1;
+  left: 4px;
+  top: 4px;
   > input {
     font-size: 12px;
   }
