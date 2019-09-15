@@ -1,6 +1,6 @@
 <template>
   <div class="memory-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp">
-    <Search ref="search"></Search>
+    <Search ref="search" @search="onSearch"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
     <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty>
     <Recycler ref="recycler" class="memory-recycler" :items="items" #default="props">
@@ -85,6 +85,9 @@ export default {
       } else {
         return false;
       }
+    },
+    onSearch: function(address) {
+      console.log('todo jump to ' + address);
     },
     hstDel: function() {
       this.hst.splice(0, this.hst.length);

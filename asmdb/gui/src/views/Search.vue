@@ -1,6 +1,6 @@
 <template>
   <div v-show="showing" class="search-container">
-    <input ref="input" type="text" v-model="text" @blur="onBlur" />
+    <input ref="input" type="text" v-model="text" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
 
@@ -36,6 +36,12 @@ export default {
     },
     dismiss: function() {
       this.showing = false;
+    },
+    onKeyPress: function(event) {
+      if (event.keyCode == 13) {
+        this.$emit('search', this.text);
+        this.dismiss();
+      }
     },
     onBlur: function() {
       this.dismiss();
