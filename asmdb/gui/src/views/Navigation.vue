@@ -41,6 +41,7 @@ export default {
     width: 100%;
     height: 2px;
     background: linear-gradient(@color-background, transparent);
+    pointer-events: none;
   }
 }
 .navigation-container[css-gradient] {
