@@ -25,10 +25,11 @@ export default {
     canAdd: Boolean
   },
   mounted: function() {
-    this.$refs.container.parentNode.addEventListener('wheel', this.wheeling.onWheel);
+    this._parent = this.$refs.container.parentNode;
+    this._parent.addEventListener('wheel', this.wheeling.onWheel);
   },
   destroyed: function() {
-    this.$refs.container.parentNode.removeEventListener('wheel', this.wheeling.onWheel);
+    this._parent.removeEventListener('wheel', this.wheeling.onWheel);
   },
   methods: {
     onWheelDown: function() {
