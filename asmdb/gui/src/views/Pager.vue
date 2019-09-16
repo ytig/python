@@ -1,14 +1,46 @@
 <template>
-  <div class="pager-container"></div>
+  <div ref="container" class="pager-container"></div>
 </template>
 
 <script>
+class Wheeling {
+  constructor(handler) {
+    this.handler = handler;
+  }
+
+  onWheel(event) {
+    //todo
+    console.log(event.cancelable);
+  }
+}
+
 export default {
+  data: function() {
+    return {
+      wheeling: new Wheeling(this)
+    };
+  },
   props: {
     canSub: Boolean,
     canAdd: Boolean
   },
-  methods: {}
+  mounted: function() {
+    this.$refs.container.parentNode.addEventListener('wheel', this.wheeling.onWheel);
+  },
+  destroyed: function() {
+    this.$refs.container.parentNode.removeEventListener('wheel', this.wheeling.onWheel);
+  },
+  methods: {
+    onWheelDown: function(x, y) {
+      //todo
+    },
+    onWheelMove: function(dx, dy) {
+      //todo
+    },
+    onWheelUp: function(x, y) {
+      //todo
+    }
+  }
 };
 </script>
 
