@@ -48,7 +48,6 @@ export default {};
       border-bottom: 1px solid @color-border;
     }
     #points-layout {
-      background: @color-background-dark;
       display: flex;
       #breakpoints {
         flex-grow: 1;
