@@ -3,21 +3,34 @@
 </template>
 
 <script>
+import Animation from '@/scripts/animation';
+
 class Wheeling {
   constructor(handler) {
     this.handler = handler;
+    this.touching = false;
   }
 
   onWheel(event) {
-    //todo
-    console.log(event.cancelable);
+    if (event.cancelable) {
+      if (this.touching) {
+        this.handler.onWheelUp();
+      } else {
+        this.touching = true;
+      }
+      this.handler.onWheelDown();
+    }
+    if (this.touching) {
+      this.handler.onWheelMove(event.deltaX, event.deltaY);
+    }
   }
 }
 
 export default {
   data: function() {
     return {
-      wheeling: new Wheeling(this)
+      wheeling: new Wheeling(this),
+      anim: new Animation(1 / 250, null, 0.5)
     };
   },
   props: {
@@ -26,21 +39,31 @@ export default {
   },
   mounted: function() {
     this._parent = this.$refs.container.parentNode;
-    this._parent.addEventListener('wheel', this.wheeling.onWheel);
+    this._parent.addEventListener('wheel', this.onWheel);
   },
   destroyed: function() {
-    this._parent.removeEventListener('wheel', this.wheeling.onWheel);
+    this._parent.removeEventListener('wheel', this.onWheel);
     this._parent = null;
   },
   methods: {
+    onWheel: function(event) {
+      this.wheeling.onWheel(event);
+    },
     onWheelDown: function() {
-      //todo
+      this.anim.$value(this.anim.value);
     },
     onWheelMove: function(dx, dy) {
-      //todo
+      var d = dx / 300;
+      this.anim.$value(Math.min(Math.max(this.anim.value + d, 0), 1));
     },
     onWheelUp: function() {
-      //todo
+      if (this.anim.value == 0 && this.canSub) {
+        this.$emit('delta', -1);
+      }
+      if (this.anim.value == 1 && this.canAdd) {
+        this.$emit('delta', 1);
+      }
+      this.anim.$target(0.5);
     }
   }
 };
