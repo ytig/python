@@ -30,6 +30,7 @@ export default {
   },
   destroyed: function() {
     this._parent.removeEventListener('wheel', this.wheeling.onWheel);
+    this._parent = null;
   },
   methods: {
     onWheelDown: function() {
