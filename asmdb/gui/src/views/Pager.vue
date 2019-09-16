@@ -31,13 +31,13 @@ export default {
     this.$refs.container.parentNode.removeEventListener('wheel', this.wheeling.onWheel);
   },
   methods: {
-    onWheelDown: function(x, y) {
+    onWheelDown: function() {
       //todo
     },
     onWheelMove: function(dx, dy) {
       //todo
     },
-    onWheelUp: function(x, y) {
+    onWheelUp: function() {
       //todo
     }
   }
