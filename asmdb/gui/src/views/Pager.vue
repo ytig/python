@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="pager-container"></div>
+  <div ref="container" class="pager-container" :style="{left:(anim.value-0.5)*100+'px'}"></div>
 </template>
 
 <script>
@@ -9,19 +9,67 @@ class Wheeling {
   constructor(handler) {
     this.handler = handler;
     this.touching = false;
+    this.counter = 0;
+    this.histroy = [];
   }
 
   onWheel(event) {
     if (event.cancelable) {
-      if (this.touching) {
-        this.handler.onWheelUp();
-      } else {
-        this.touching = true;
-      }
-      this.handler.onWheelDown();
+      this.onWheelDown();
+      this.histroy.splice(0, this.histroy.length);
     }
+    var dx = event.deltaX;
+    var dy = event.deltaY;
+    this.onWheelMove(dx, dy);
+    var counter = ++this.counter;
+    setTimeout(() => {
+      if (counter == this.counter) {
+        this.onWheelUp();
+      }
+    }, 50);
+    this.histroy[this.histroy.length] = [dx, dy, new Date().getTime()];
+    if (this.histroy.length >= 4) {
+      var isAnim = true;
+      var oldSpeedX = Infinity;
+      var oldSpeedY = Infinity;
+      for (var i = 1; i < this.histroy.length; i++) {
+        var deltaTime = this.histroy[i][2] - this.histroy[i - 1][2];
+        if (deltaTime < 16 || deltaTime > 24) {
+          isAnim = false;
+          break;
+        }
+        var newSpeedX = Math.abs(this.histroy[i][0]) / deltaTime;
+        var newSpeedY = Math.abs(this.histroy[i][1]) / deltaTime;
+        if (newSpeedX >= oldSpeedX) {
+          isAnim = false;
+          break;
+        }
+        oldSpeedX = newSpeedX;
+        oldSpeedY = newSpeedY;
+      }
+      if (isAnim) {
+        this.onWheelUp();
+      }
+      this.histroy.splice(0, 1);
+    }
+  }
+
+  onWheelDown() {
+    this.onWheelUp();
+    this.touching = true;
+    this.handler.onWheelDown();
+  }
+
+  onWheelMove(dx, dy) {
     if (this.touching) {
-      this.handler.onWheelMove(event.deltaX, event.deltaY);
+      this.handler.onWheelMove(dx, dy);
+    }
+  }
+
+  onWheelUp() {
+    if (this.touching) {
+      this.handler.onWheelUp();
+      this.touching = false;
     }
   }
 }
@@ -53,7 +101,7 @@ export default {
       this.anim.$value(this.anim.value);
     },
     onWheelMove: function(dx, dy) {
-      var d = dx / 300;
+      var d = dx / 250;
       this.anim.$value(Math.min(Math.max(this.anim.value + d, 0), 1));
     },
     onWheelUp: function() {
@@ -77,5 +125,6 @@ export default {
   width: 100%;
   height: 100%;
   pointer-events: none;
+  background: #ffffff44;
 }
 </style>
