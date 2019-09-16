@@ -132,12 +132,12 @@ export default {
   box-shadow: 1px 1px @color-border-shadow;
   > div {
     position: absolute;
-    z-index: -1;
     left: 2px;
     top: 3px;
     width: 16px;
     height: 16px;
     background: url('~@/icons/search.png') no-repeat;
+    pointer-events: none;
   }
   > input {
     box-sizing: content-box;
