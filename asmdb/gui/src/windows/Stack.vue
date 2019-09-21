@@ -1,6 +1,6 @@
 <template>
   <div class="stack-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp">
-    <Pager :canSub="page>0" :canAdd="page<10-1" @delta="onClickIndex(page+arguments[0])"></Pager>
+    <Pager :canSub="page>0&&sp!=null" :canAdd="page<10-1&&sp!=null" @delta="onClickIndex(page+arguments[0])"></Pager>
     <Navigation :name="'Stack'" :focus="focus" :disable="disable"></Navigation>
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
