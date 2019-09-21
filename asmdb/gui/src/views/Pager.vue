@@ -155,14 +155,14 @@ export default {
       color: @color-text-menu;
     }
     > div:first-child {
-      left: -54px;
+      left: -52px;
       text-align: right;
-      padding-right: 6px;
+      padding-right: 8px;
     }
     > div:last-child {
-      left: 54px;
+      left: 52px;
       text-align: left;
-      padding-left: 6px;
+      padding-left: 8px;
     }
   }
 }
