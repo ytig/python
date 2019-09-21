@@ -1,5 +1,5 @@
 <template>
-  <div class="stack-container" :style="{width:windowWidth+'px'}" @mousedown="requestFocus" @mouseup="onMouseUp">
+  <div class="stack-container" :style="{width:windowWidth+'px'}" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Pager :canSub="page>0&&sp!=null" :canAdd="page<10-1&&sp!=null" @delta="onDelta"></Pager>
     <Navigation :name="'Stack'" :focus="focus" :disable="disable"></Navigation>
     <div ref="stackLayout" class="stack-layout">
@@ -171,7 +171,6 @@ export default {
       this.jumpTo(Math.random() < 0.5 ? 2147 : 300); //for test
     },
     onDelta: function(delta) {
-      this.requestFocus();
       this.onClickIndex(this.page + delta);
     },
     onClickIndex: function(newPage) {
