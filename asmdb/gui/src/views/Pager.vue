@@ -165,6 +165,11 @@ export default {
       flex-direction: column;
       justify-content: center;
       padding-top: 4px;
+      > span {
+        width: 32px;
+        text-align: center;
+        color: @color-text-darker;
+      }
       > span:nth-child(1) {
         font-family: 'Wawati SC';
         font-size: 12px;
@@ -172,11 +177,6 @@ export default {
       > span:nth-child(2) {
         font-family: 'PingFang SC';
         font-size: 16px;
-      }
-      > span {
-        width: 32px;
-        text-align: center;
-        color: @color-text-darker;
       }
     }
     .pager-circle[css-enable] {
