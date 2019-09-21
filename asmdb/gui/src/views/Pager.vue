@@ -14,38 +14,35 @@ class Wheeling {
   }
 
   onWheel(event) {
+    const frameStart = 12;
+    const frameLength = 4;
     if (event.cancelable) {
       this.onWheelDown();
       this.histroy.splice(0, this.histroy.length);
     }
-    var dx = event.deltaX;
-    var dy = event.deltaY;
-    this.onWheelMove(dx, dy);
+    this.onWheelMove(event.deltaX);
     var counter = ++this.counter;
     setTimeout(() => {
       if (counter == this.counter) {
         this.onWheelUp();
       }
     }, 50);
-    this.histroy[this.histroy.length] = [dx, dy, new Date().getTime()];
-    if (this.histroy.length >= 4) {
+    this.histroy[this.histroy.length] = {
+      deltaX: event.deltaX,
+      deltaY: event.deltaY,
+      timeStamp: event.timeStamp
+    };
+    if (this.histroy.length >= frameStart + frameLength) {
       var isAnim = true;
-      var oldSpeedX = Infinity;
-      var oldSpeedY = Infinity;
-      for (var i = 1; i < this.histroy.length; i++) {
-        var deltaTime = this.histroy[i][2] - this.histroy[i - 1][2];
-        if (deltaTime < 16 || deltaTime > 24) {
+      for (var i = frameStart; i < this.histroy.length; i++) {
+        var deltaY = this.histroy[i].deltaY;
+        if (Math.abs(deltaY) > 3) {
+          break;
+        }
+        if (deltaY != 0) {
           isAnim = false;
           break;
         }
-        var newSpeedX = Math.abs(this.histroy[i][0]) / deltaTime;
-        var newSpeedY = Math.abs(this.histroy[i][1]) / deltaTime;
-        if (newSpeedX >= oldSpeedX) {
-          isAnim = false;
-          break;
-        }
-        oldSpeedX = newSpeedX;
-        oldSpeedY = newSpeedY;
       }
       if (isAnim) {
         this.onWheelUp();
@@ -60,9 +57,9 @@ class Wheeling {
     this.handler.onWheelDown();
   }
 
-  onWheelMove(dx, dy) {
+  onWheelMove(dx) {
     if (this.touching) {
-      this.handler.onWheelMove(dx, dy);
+      this.handler.onWheelMove(dx);
     }
   }
 
@@ -100,7 +97,7 @@ export default {
     onWheelDown: function() {
       this.anim.$value(this.anim.value);
     },
-    onWheelMove: function(dx, dy) {
+    onWheelMove: function(dx) {
       var d = dx / 250;
       this.anim.$value(Math.min(Math.max(this.anim.value + d, 0), 1));
     },
