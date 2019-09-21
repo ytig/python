@@ -77,7 +77,7 @@ class Wheeling {
 export default {
   data: function() {
     return {
-      wheeling: new Wheeling(this, false),
+      wheeling: new Wheeling(this),
       anim: new Animation(1 / 250, null, 0.5)
     };
   },
