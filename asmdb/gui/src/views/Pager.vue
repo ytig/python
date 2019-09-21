@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="pager-container" :style="{left:(anim.value-0.5)*100+'px'}"></div>
+  <div ref="container" class="pager-container" :style="{left:scrollX+'px'}"></div>
 </template>
 
 <script>
@@ -78,7 +78,21 @@ export default {
   data: function() {
     return {
       wheeling: new Wheeling(this),
-      anim: new Animation(1 / 250, null, 0.5)
+      anim: new Animation(
+        (value, target) => {
+          var speed = (Math.pow(Math.abs(target - value), this.power) * Math.pow(0.1, 1 - this.power)) / ((1 - this.power) * this.duration);
+          return Math.max(speed, 1 / (60 * 60 * 1000));
+        },
+        (value, target) => {
+          this.scrollX = this.toCoordinate(value);
+        },
+        0.5
+      ),
+      range: 260,
+      touch: 0.346,
+      power: 0.75,
+      duration: 224,
+      scrollX: 0
     };
   },
   props: {
@@ -100,9 +114,20 @@ export default {
     onWheelDown: function() {
       this.anim.$value(this.anim.value);
     },
-    onWheelMove: function(delta) {
-      var d = delta / 250;
-      this.anim.$value(Math.min(Math.max(this.anim.value + d, 0), 1));
+    onWheelMove: function(dx) {
+      var scrollX = this.toCoordinate(this.anim.value);
+      var negative = scrollX < 0 || (scrollX == 0 && dx > 0);
+      if (negative) {
+        dx *= -1;
+        scrollX *= -1;
+      }
+      var x = this.range * this.touch * Math.pow(this.range / (this.range - scrollX), 1 / this.touch) - this.range * this.touch;
+      x = x * (x - dx) < 0 ? 0 : x - dx;
+      scrollX = this.range - this.range * Math.pow(1 + x / (this.range * this.touch), -this.touch);
+      if (negative) {
+        scrollX *= -1;
+      }
+      this.anim.$value(this.toValue(scrollX));
     },
     onWheelUp: function() {
       if (this.anim.value == 0 && this.canSub) {
@@ -112,6 +137,12 @@ export default {
         this.$emit('delta', 1);
       }
       this.anim.$target(0.5);
+    },
+    toCoordinate: function(value) {
+      return (value - 0.5) * 2 * this.range;
+    },
+    toValue: function(coordinate) {
+      return coordinate / (2 * this.range) + 0.5;
     }
   }
 };
