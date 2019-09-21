@@ -14,8 +14,6 @@ class Wheeling {
   }
 
   onWheel(event) {
-    const frameStart = 12;
-    const frameLength = 4;
     if (event.cancelable) {
       this.onWheelDown();
       this.histroy.splice(0, this.histroy.length);
@@ -30,6 +28,8 @@ class Wheeling {
         this.onWheelUp();
       }
     }, 50);
+    const frameStart = 12;
+    const frameLength = 4;
     this.histroy[this.histroy.length] = event.deltaY;
     if (this.histroy.length >= frameStart + frameLength) {
       var isAnim = true;
