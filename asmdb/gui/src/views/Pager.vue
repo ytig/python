@@ -1,8 +1,8 @@
 <template>
   <div ref="container" class="pager-container">
     <div :style="{left:(0.5-anim.value)*2*36+'px'}">
-      <div></div>
-      <div></div>
+      <div>Pre</div>
+      <div>Nxt</div>
     </div>
   </div>
 </template>
@@ -145,12 +145,20 @@ export default {
       border-radius: 999px;
       background: @color-background-dark;
       box-shadow: 0px 2px 6px @color-border-shadow;
+      line-height: 48px;
+      font-family: 'Wawati SC';
+      font-size: 12px;
+      color: @color-text-menu;
     }
     > div:first-child {
       left: -54px;
+      text-align: right;
+      padding-right: 6px;
     }
     > div:last-child {
       left: 54px;
+      text-align: left;
+      padding-left: 6px;
     }
   }
 }
