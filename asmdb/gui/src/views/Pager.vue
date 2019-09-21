@@ -164,7 +164,7 @@ export default {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding-top: 4px;
+      padding-top: 2px;
       > span {
         width: 32px;
         text-align: center;
