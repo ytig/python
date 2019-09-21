@@ -3,9 +3,11 @@
     <div :style="{left:(0.5-anim.value)*2*36+'px'}">
       <div class="pager-circle" :css-enable="lazySub||(anim.value==0&&canSub)">
         <span>Pre</span>
+        <span>↩</span>
       </div>
       <div class="pager-circle" :css-enable="lazyAdd||(anim.value==1&&canAdd)">
         <span>Nxt</span>
+        <span>↪</span>
       </div>
     </div>
   </div>
@@ -161,12 +163,19 @@ export default {
       box-shadow: 0px 2px 6px @color-border-shadow;
       display: flex;
       flex-direction: column;
-      > span {
-        width: 32px;
-        line-height: 48px;
-        text-align: center;
+      justify-content: center;
+      padding-top: 4px;
+      > span:nth-child(1) {
         font-family: 'Wawati SC';
         font-size: 12px;
+      }
+      > span:nth-child(2) {
+        font-family: 'PingFang SC';
+        font-size: 16px;
+      }
+      > span {
+        width: 32px;
+        text-align: center;
         color: @color-text-darker;
       }
     }
