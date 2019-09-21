@@ -2,10 +2,10 @@
   <div ref="container" class="pager-container">
     <div :style="{left:(0.5-anim.value)*2*36+'px'}">
       <div class="pager-circle" :css-enable="lazySub||(anim.value==0&&canSub)">
-        <div>Pre</div>
+        <span>Pre</span>
       </div>
       <div class="pager-circle" :css-enable="lazyAdd||(anim.value==1&&canAdd)">
-        <div>Nxt</div>
+        <span>Nxt</span>
       </div>
     </div>
   </div>
@@ -160,8 +160,10 @@ export default {
       background: @color-background-dark;
       box-shadow: 0px 2px 6px @color-border-shadow;
       display: flex;
-      > div {
+      flex-direction: column;
+      > span {
         width: 32px;
+        line-height: 48px;
         text-align: center;
         font-family: 'Wawati SC';
         font-size: 12px;
@@ -169,18 +171,21 @@ export default {
       }
     }
     .pager-circle[css-enable] {
-      > div {
+      > span {
         color: @color-text-menu;
       }
     }
     .pager-circle:first-child {
       left: -52px;
-      flex-direction: row-reverse;
-      align-items: center;
+      > span {
+        align-self: flex-end;
+      }
     }
     .pager-circle:last-child {
       left: 52px;
-      align-items: center;
+      > span {
+        align-self: flex-start;
+      }
     }
   }
 }
