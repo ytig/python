@@ -21,25 +21,20 @@ class Wheeling {
       this.histroy.splice(0, this.histroy.length);
     }
     this.onWheelMove(event.deltaX);
+    if (Math.abs(event.deltaY) > 3) {
+      this.onWheelUp();
+    }
     var counter = ++this.counter;
     setTimeout(() => {
       if (counter == this.counter) {
         this.onWheelUp();
       }
     }, 50);
-    this.histroy[this.histroy.length] = {
-      deltaX: event.deltaX,
-      deltaY: event.deltaY,
-      timeStamp: event.timeStamp
-    };
+    this.histroy[this.histroy.length] = event.deltaY;
     if (this.histroy.length >= frameStart + frameLength) {
       var isAnim = true;
       for (var i = frameStart; i < this.histroy.length; i++) {
-        var deltaY = this.histroy[i].deltaY;
-        if (Math.abs(deltaY) > 3) {
-          break;
-        }
-        if (deltaY != 0) {
+        if (this.histroy[i] != 0) {
           isAnim = false;
           break;
         }
