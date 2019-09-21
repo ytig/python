@@ -1,8 +1,12 @@
 <template>
   <div ref="container" class="pager-container">
     <div :style="{left:(0.5-anim.value)*2*36+'px'}">
-      <div :css-enable="lazySub||(anim.value==0&&canSub)">Pre</div>
-      <div :css-enable="lazyAdd||(anim.value==1&&canAdd)">Nxt</div>
+      <div :css-enable="lazySub||(anim.value==0&&canSub)">
+        <div>Pre</div>
+      </div>
+      <div :css-enable="lazyAdd||(anim.value==1&&canAdd)">
+        <div>Nxt</div>
+      </div>
     </div>
   </div>
 </template>
@@ -155,23 +159,28 @@ export default {
       border-radius: 999px;
       background: @color-background-dark;
       box-shadow: 0px 2px 6px @color-border-shadow;
-      line-height: 48px;
-      font-family: 'Wawati SC';
-      font-size: 12px;
-      color: @color-text-darker;
+      display: flex;
+      > div {
+        width: 32px;
+        text-align: center;
+        font-family: 'Wawati SC';
+        font-size: 12px;
+        color: @color-text-darker;
+      }
     }
     > div[css-enable] {
-      color: @color-text-menu;
+      > div {
+        color: @color-text-menu;
+      }
     }
     > div:first-child {
       left: -52px;
-      text-align: right;
-      padding-right: 8px;
+      flex-direction: row-reverse;
+      align-items: center;
     }
     > div:last-child {
       left: 52px;
-      text-align: left;
-      padding-left: 8px;
+      align-items: center;
     }
   }
 }
