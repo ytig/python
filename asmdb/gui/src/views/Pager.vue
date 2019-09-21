@@ -1,8 +1,8 @@
 <template>
   <div ref="container" class="pager-container">
     <div :style="{left:(0.5-anim.value)*2*36+'px'}">
-      <div :css-enable="anim.value==0&&canSub">Pre</div>
-      <div :css-enable="anim.value==1&&canAdd">Nxt</div>
+      <div :css-enable="lazySub||(anim.value==0&&canSub)">Pre</div>
+      <div :css-enable="lazyAdd||(anim.value==1&&canAdd)">Nxt</div>
     </div>
   </div>
 </template>
@@ -87,7 +87,9 @@ export default {
     };
     return {
       wheeling: new Wheeling(this),
-      anim: new Animation(speed, null, 0.5)
+      anim: new Animation(speed, null, 0.5),
+      lazySub: false,
+      lazyAdd: false
     };
   },
   props: {
@@ -108,6 +110,8 @@ export default {
     },
     onWheelDown: function() {
       this.anim.$value(this.anim.value);
+      this.lazySub = false;
+      this.lazyAdd = false;
     },
     onWheelMove: function(dx) {
       var d = dx / 144;
@@ -116,9 +120,11 @@ export default {
     onWheelUp: function() {
       if (this.anim.value == 0 && this.canSub) {
         this.$emit('delta', -1);
+        this.lazySub = true;
       }
       if (this.anim.value == 1 && this.canAdd) {
         this.$emit('delta', 1);
+        this.lazyAdd = true;
       }
       this.anim.$target(0.5);
     }
