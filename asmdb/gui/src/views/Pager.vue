@@ -114,7 +114,7 @@ export default {
       this.lazyAdd = false;
     },
     onWheelMove: function(dx) {
-      var d = dx / 144;
+      var d = dx / 108;
       this.anim.$value(Math.min(Math.max(this.anim.value + d, 0), 1));
     },
     onWheelUp: function() {
