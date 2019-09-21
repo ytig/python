@@ -110,7 +110,7 @@ export default {
       this.anim.$value(this.anim.value);
     },
     onWheelMove: function(dx) {
-      var d = dx / 160;
+      var d = dx / 144;
       this.anim.$value(Math.min(Math.max(this.anim.value + d, 0), 1));
     },
     onWheelUp: function() {
