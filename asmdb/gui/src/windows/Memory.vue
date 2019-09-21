@@ -3,7 +3,7 @@
     <Search ref="search" @search="onSearch"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
     <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty>
-    <Recycler ref="recycler" class="memory-recycler" :items="items" #default="props">
+    <Recycler ref="recycler" class="memory-recycler" :items="items" #default="props" @loadmore="onDelta">
       <Bytes :value="props.item" @clickitem="onClickItem"></Bytes>
     </Recycler>
   </div>
@@ -151,6 +151,10 @@ export default {
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
+    },
+    onDelta: function(delta) {
+      //todo
+      this.requestFocus();
     },
     invalidate: function() {
       //todo
