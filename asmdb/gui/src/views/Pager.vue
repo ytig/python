@@ -6,20 +6,28 @@
 import Animation from '@/scripts/animation';
 
 class Wheeling {
-  constructor(handler) {
+  constructor(handler, reverse) {
     this.handler = handler;
+    this.reverse = reverse;
     this.touching = false;
     this.counter = 0;
     this.histroy = [];
   }
 
   onWheel(event) {
+    if (!this.reverse) {
+      var deltaX = event.deltaX;
+      var deltaY = event.deltaY;
+    } else {
+      var deltaX = event.deltaY;
+      var deltaY = event.deltaX;
+    }
     if (event.cancelable) {
       this.onWheelDown();
       this.histroy.splice(0, this.histroy.length);
     }
-    this.onWheelMove(event.deltaX);
-    if (Math.abs(event.deltaY) > 3) {
+    this.onWheelMove(deltaX);
+    if (Math.abs(deltaY) > 3) {
       this.onWheelUp();
     }
     var counter = ++this.counter;
@@ -30,7 +38,7 @@ class Wheeling {
     }, 50);
     const frameStart = 12;
     const frameLength = 4;
-    this.histroy[this.histroy.length] = event.deltaY;
+    this.histroy[this.histroy.length] = deltaY;
     if (this.histroy.length >= frameStart + frameLength) {
       var isAnim = true;
       for (var i = frameStart; i < this.histroy.length; i++) {
@@ -52,9 +60,9 @@ class Wheeling {
     this.handler.onWheelDown();
   }
 
-  onWheelMove(dx) {
+  onWheelMove(delta) {
     if (this.touching) {
-      this.handler.onWheelMove(dx);
+      this.handler.onWheelMove(delta);
     }
   }
 
@@ -69,7 +77,7 @@ class Wheeling {
 export default {
   data: function() {
     return {
-      wheeling: new Wheeling(this),
+      wheeling: new Wheeling(this, false),
       anim: new Animation(1 / 250, null, 0.5)
     };
   },
@@ -92,8 +100,8 @@ export default {
     onWheelDown: function() {
       this.anim.$value(this.anim.value);
     },
-    onWheelMove: function(dx) {
-      var d = dx / 250;
+    onWheelMove: function(delta) {
+      var d = delta / 250;
       this.anim.$value(Math.min(Math.max(this.anim.value + d, 0), 1));
     },
     onWheelUp: function() {
