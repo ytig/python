@@ -81,9 +81,13 @@ class Wheeling {
 
 export default {
   data: function() {
+    var ease_in = Animation.ease_in(147);
+    var speed = function(value, target) {
+      return ease_in(1 - 2 * Math.abs(value - 0.5), 1);
+    };
     return {
       wheeling: new Wheeling(this),
-      anim: new Animation(1 / 224, null, 0.5)
+      anim: new Animation(speed, null, 0.5)
     };
   },
   props: {
