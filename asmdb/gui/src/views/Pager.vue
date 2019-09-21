@@ -1,10 +1,10 @@
 <template>
   <div ref="container" class="pager-container">
     <div :style="{left:(0.5-anim.value)*2*36+'px'}">
-      <div :css-enable="lazySub||(anim.value==0&&canSub)">
+      <div class="pager-circle" :css-enable="lazySub||(anim.value==0&&canSub)">
         <div>Pre</div>
       </div>
-      <div :css-enable="lazyAdd||(anim.value==1&&canAdd)">
+      <div class="pager-circle" :css-enable="lazyAdd||(anim.value==1&&canAdd)">
         <div>Nxt</div>
       </div>
     </div>
@@ -152,7 +152,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    > div {
+    .pager-circle {
       position: relative;
       width: 48px;
       height: 48px;
@@ -168,17 +168,17 @@ export default {
         color: @color-text-darker;
       }
     }
-    > div[css-enable] {
+    .pager-circle[css-enable] {
       > div {
         color: @color-text-menu;
       }
     }
-    > div:first-child {
+    .pager-circle:first-child {
       left: -52px;
       flex-direction: row-reverse;
       align-items: center;
     }
-    > div:last-child {
+    .pager-circle:last-child {
       left: 52px;
       align-items: center;
     }
