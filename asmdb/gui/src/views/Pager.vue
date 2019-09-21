@@ -1,5 +1,10 @@
 <template>
-  <div ref="container" class="pager-container"></div>
+  <div ref="container" class="pager-container">
+    <div :style="{left:(0.5-anim.value)*2*36+'px'}">
+      <div></div>
+      <div></div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -101,7 +106,7 @@ export default {
       this.anim.$value(this.anim.value);
     },
     onWheelMove: function(dx) {
-      var d = dx / 147;
+      var d = dx / 160;
       this.anim.$value(Math.min(Math.max(this.anim.value + d, 0), 1));
     },
     onWheelUp: function() {
@@ -121,6 +126,32 @@ export default {
 @import '~@/styles/theme';
 
 .pager-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   pointer-events: none;
+  > div {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    > div {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      background: @color-background-dark;
+      box-shadow: 0px 2px 6px @color-border-shadow;
+    }
+    > div:first-child {
+      left: -54px;
+    }
+    > div:last-child {
+      left: 54px;
+    }
+  }
 }
 </style>
