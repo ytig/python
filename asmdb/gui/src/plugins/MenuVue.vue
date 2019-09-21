@@ -72,6 +72,9 @@ export default {
     onKeyDown: function(event) {
       return this.show;
     },
+    onWheel: function(event) {
+      return this.show;
+    },
     onClickItem: function(index) {
       var enable = this.items[index][2];
       if (enable) {
