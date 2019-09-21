@@ -41,7 +41,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return 24 + measureTextWidth(2 + (8 * groupBy) / 4 + 25 * this.column + 2 + 8 * this.column) + 16 * this.column;
+      return Math.ceil(24 + measureTextWidth(2 + (8 * groupBy) / 4 + 25 * this.column + 2 + 8 * this.column) + 16 * this.column);
     }
   },
   created: function() {

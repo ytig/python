@@ -43,7 +43,7 @@ export default {
   },
   computed: {
     inputWidth: function() {
-      return 1 + measureText(this.realText, '12px Menlo');
+      return Math.ceil(1 + measureText(this.realText, '12px Menlo'));
     },
     containerLeft: function() {
       var input = this.anim.value;
