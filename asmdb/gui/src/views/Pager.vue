@@ -1,8 +1,8 @@
 <template>
   <div ref="container" class="pager-container">
     <div :style="{left:(0.5-anim.value)*2*36+'px'}">
-      <div :css-can="anim.value==0&&canSub">Pre</div>
-      <div :css-can="anim.value==1&&canAdd">Nxt</div>
+      <div :css-enable="anim.value==0&&canSub">Pre</div>
+      <div :css-enable="anim.value==1&&canAdd">Nxt</div>
     </div>
   </div>
 </template>
@@ -154,7 +154,7 @@ export default {
       font-size: 12px;
       color: @color-text-darker;
     }
-    > div[css-can] {
+    > div[css-enable] {
       color: @color-text-menu;
     }
     > div:first-child {
