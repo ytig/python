@@ -58,6 +58,9 @@ export default {
     },
     onFocusChanged: function(value) {
       this.focus = value;
+      if (!value) {
+        this.$refs.search.dismiss();
+      }
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
