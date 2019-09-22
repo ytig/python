@@ -115,7 +115,7 @@ export default {
     color: @color-text-darker;
   }
   > span:last-child {
-    color: @color-text-darker;
+    color: @color-text-dark;
     width: 0px;
     flex-grow: 1;
     overflow: hidden;
