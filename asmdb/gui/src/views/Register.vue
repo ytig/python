@@ -1,6 +1,7 @@
 <template>
   <div class="register-container">
     <span class="user-select-none">{{name}}</span>
+    <span v-for="i in (fill+1-name.length)" :key="i" class="user-select-none">&nbsp;</span>
     <span v-show="value!=null">{{value}}</span>
   </div>
 </template>
@@ -9,7 +10,8 @@
 export default {
   props: {
     name: String,
-    value: Number
+    value: Number,
+    fill: Number
   }
 };
 </script>
