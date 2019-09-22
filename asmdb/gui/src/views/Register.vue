@@ -80,6 +80,9 @@ export default {
     font-size: 12px;
     color: @color-text;
   }
+  > span:first-child {
+    color: @color-text-darker;
+  }
   > span[css-usage] {
     padding: 0px 2px;
   }
