@@ -22,6 +22,11 @@ setTimeout(() => {
       bytes[bytes.length] = Math.floor(256 * Math.random());
     }
     stack.onBreak(1, for_test(bytes));
+    stack.testBytes = bytes;
+    setTimeout(() => {
+      stack.testBytes[0] = 147;
+      stack.onBreak(1, for_test(stack.testBytes));
+    }, 3000);
   }
   if (memory) {
     bytes = [];
