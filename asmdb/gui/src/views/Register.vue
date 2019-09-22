@@ -59,7 +59,8 @@ export default {
       if (this.value.newValue == null) {
         return '';
       }
-      return '' + this.value.newValue;
+      //todo
+      return '';
     },
     cssUsage: function() {
       if (this.value.newValue == null) {
