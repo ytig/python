@@ -2,7 +2,7 @@
   <div class="registers-container" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
     <Empty class="registers-empty" v-if="empty" :text="'[no data]'"></Empty>
-    <Gird class="registers-gird" :style="{opacity:empty?0:1}" :column="4" :items="items" #default="props">
+    <Gird class="registers-gird" :style="{opacity:empty?0:1}" :column="column" :items="items" #default="props">
       <Register :value="props.item" @clickitem="onClickItem"></Register>
     </Gird>
   </div>
@@ -22,25 +22,29 @@ function regsOf() {
 
 export default {
   data: function() {
+    var column = 4;
     var items = [];
-    var lineFill = 0;
+    var lineFills = [];
+    var c = 0;
     for (var k of regsOf()) {
-      if (k.length > lineFill) {
-        lineFill = k.length;
-      }
+      lineFills[c] = Math.max(k.length, lineFills[c] || 0);
+      c = (c + 1) % column;
       items[items.length] = {
         lineName: k,
         oldValue: null,
         newValue: null
       };
     }
+    c = 0;
     for (var item of items) {
-      item.lineFill = lineFill;
+      item.lineFill = lineFills[c];
+      c = (c + 1) % column;
     }
     return {
       focus: false,
       disable: true,
       empty: true,
+      column: column,
       items: items
     };
   },
