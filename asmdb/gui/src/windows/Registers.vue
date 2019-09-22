@@ -2,7 +2,7 @@
   <div class="registers-container" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
     <Gird :column="4" :items="items" #default="props">
-      <Register :name="props.item.name" :value="props.item.value"></Register>
+      <Register :name="props.item.name" :value="props.item.value" :fill="props.item.fill"></Register>
     </Gird>
   </div>
 </template>
@@ -22,11 +22,18 @@ function regsOf() {
 export default {
   data: function() {
     var items = [];
+    var maxLen = 0;
     for (var k of regsOf()) {
+      if (k.length > maxLen) {
+        maxLen = k.length;
+      }
       items[items.length] = {
         name: k,
         value: null
       };
+    }
+    for (var item of items) {
+      item.fill = maxLen;
     }
     return {
       focus: false,
