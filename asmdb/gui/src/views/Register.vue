@@ -11,13 +11,6 @@
 <script>
 const asmType = 'arm32';
 
-function groupBy() {
-  switch (asmType) {
-    case 'arm32':
-      return 4;
-  }
-}
-
 function usageOf(int) {
   if (int % 32 == 0) {
     return '2';
@@ -53,7 +46,7 @@ export default {
       if (this.value.newValue == null) {
         return '';
       }
-      return '0x' + this.value.newValue.toString(16).zfill(2 * groupBy());
+      return '0x' + this.value.newValue.toString(16);
     },
     strValue: function() {
       if (this.value.newValue == null) {
