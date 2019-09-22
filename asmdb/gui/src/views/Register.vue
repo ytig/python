@@ -2,7 +2,7 @@
   <div class="register-container">
     <span class="user-select-none">{{value.lineName}}</span>
     <span v-for="i in (value.lineFill+1-value.lineName.length)" :key="i" class="user-select-none">&nbsp;</span>
-    <span :css-usage="cssUsage" :css-changed="cssChanged">{{hexValue}}</span>
+    <span :css-usage="cssUsage" :css-changed="cssChanged" @click="onClickItem">{{hexValue}}</span>
     <span>&nbsp;</span>
     <span>{{strValue}}</span>
   </div>
@@ -73,6 +73,14 @@ export default {
         return false;
       }
       return this.value.oldValue != this.value.newValue;
+    }
+  },
+  methods: {
+    onClickItem: function() {
+      var usage = parseInt(this.cssUsage) - 2;
+      if (usage >= 0) {
+        this.$emit('clickitem', usage, this.value.newValue);
+      }
     }
   }
 };
