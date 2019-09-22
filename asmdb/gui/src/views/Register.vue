@@ -64,7 +64,11 @@ export default {
       switch (usageOf(val)) {
         case '1':
           if (val >= 0x21 && val <= 0x7e) {
-            str = "'" + String.fromCharCode(val) + "'";
+            if (val == 0x27) {
+              str = "'\\''";
+            } else {
+              str = "'" + String.fromCharCode(val) + "'";
+            }
           }
           break;
         case '3': //todo
