@@ -12,8 +12,8 @@ import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 const asmType = 'arm32';
 
-function regsOf(type) {
-  switch (type) {
+function regsOf() {
+  switch (asmType) {
     case 'arm32':
       return ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'r13', 'r14', 'r15', 'r16'];
   }
@@ -22,7 +22,7 @@ function regsOf(type) {
 export default {
   data: function() {
     var items = [];
-    for (var k of regsOf(asmType)) {
+    for (var k of regsOf()) {
       items[items.length] = {
         name: k,
         value: null

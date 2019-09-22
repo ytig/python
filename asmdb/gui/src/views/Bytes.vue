@@ -5,7 +5,14 @@
 </template>
 
 <script>
-const groupBy = 4; //4or8
+const asmType = 'arm32';
+
+function groupBy() {
+  switch (asmType) {
+    case 'arm32':
+      return 4;
+  }
+}
 
 function usageOf(int) {
   if (int % 32 == 0) {
@@ -80,7 +87,7 @@ export default {
       var curUsage;
       var bordering = false;
       for (var i = 0; i < this.value.newBytes.length; i++) {
-        if (i % groupBy == 0) {
+        if (i % groupBy() == 0) {
           items[items.length] = {
             value: '&nbsp;',
             style: ['bytes-space', bordering ? 'bytes-border-top bytes-border-bottom' : '']
@@ -91,9 +98,9 @@ export default {
               style: ['bytes-space', bordering ? 'bytes-border-top bytes-border-bottom' : '']
             };
           }
-          if (i + groupBy - 1 < this.value.newBytes.length) {
+          if (i + groupBy() - 1 < this.value.newBytes.length) {
             curInt = 0;
-            for (var j = groupBy - 1; j >= 0; j--) {
+            for (var j = groupBy() - 1; j >= 0; j--) {
               curInt *= 256;
               curInt += this.value.newBytes.charCodeAt(i + j);
             }

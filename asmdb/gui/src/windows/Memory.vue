@@ -12,8 +12,15 @@
 <script>
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
-const groupBy = 4; //4or8
+const asmType = 'arm32';
 const pieceOf = 512;
+
+function groupBy() {
+  switch (asmType) {
+    case 'arm32':
+      return 4;
+  }
+}
 
 function measureTextWidth(length) {
   return length * 7.224609375;
@@ -41,7 +48,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return Math.ceil(24 + measureTextWidth(2 + (8 * groupBy) / 4 + 25 * this.column + 2 + 8 * this.column) + 16 * this.column);
+      return Math.ceil(24 + measureTextWidth(2 + (8 * groupBy()) / 4 + 25 * this.column + 2 + 8 * this.column) + 16 * this.column);
     }
   },
   created: function() {
@@ -164,7 +171,7 @@ export default {
       var items = [];
       for (var i = 0; i < this.newData.length / column; i++) {
         var newBytes = this.newData.slice(i * column, (i + 1) * column);
-        var lineNumber = '0x' + (this.newAddr + i * column).toString(16).zfill(2 * groupBy);
+        var lineNumber = '0x' + (this.newAddr + i * column).toString(16).zfill(2 * groupBy());
         var idx = this.newAddr / column + i;
         items[items.length] = {
           idx: idx,
