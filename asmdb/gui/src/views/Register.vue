@@ -112,7 +112,7 @@ export default {
     font-size: 12px;
   }
   > span:first-child {
-    color: @color-text-darker;
+    color: @color-text;
   }
   > span:last-child {
     color: @color-text-dark;
