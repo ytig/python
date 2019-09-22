@@ -1,6 +1,6 @@
 <template>
   <div class="register-container">
-    <span class="user-select-none">{{value.lineName}}</span>
+    <span>{{value.lineName}}</span>
     <span v-for="i in (value.lineFill+1-value.lineName.length)" :key="i" class="user-select-none">&nbsp;</span>
     <span :css-usage="cssUsage" :css-changed="cssChanged" @click="onClickItem">{{hexValue}}</span>
     <span class="user-select-none">&nbsp;</span>
