@@ -12,13 +12,20 @@ var memory = null;
 
 setTimeout(() => {
   if (registers) {
-    registers.onBreak({
-      'r0': 1234
-    });
+    var regs = {};
+    for (var i = 0; i < 17; i++) {
+      regs['r' + i] = Math.floor(0xffffffff * Math.random());
+    }
+    registers.onBreak(regs);
+    registers.testRegs = regs;
     setTimeout(() => {
-      registers.onBreak({
-        'r0': 4321
-      });
+      for (var i = 0; i < 17; i++) {
+        if (Math.random() < 0.8) {
+          continue;
+        }
+        regs['r' + i] = Math.floor(0xffffffff * Math.random());
+      }
+      registers.onBreak(registers.testRegs);
     }, 2500);
   }
   if (stack) {
