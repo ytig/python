@@ -12,20 +12,21 @@ var memory = null;
 
 setTimeout(() => {
   if (registers) {
+    var _regs = ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr'];
     var regs = {};
-    for (var i = 0; i < 17; i++) {
+    for (var i = 0; i < _regs.length; i++) {
       var max = Math.random() < 0.5 ? 0xffffffff : 0xff;
-      regs['r' + i] = Math.floor(max * Math.random());
+      regs[_regs[i]] = Math.floor(max * Math.random());
     }
     registers.onBreak(regs);
     registers.testRegs = regs;
     setTimeout(() => {
-      for (var i = 0; i < 17; i++) {
+      for (var i = 0; i < _regs.length; i++) {
         if (Math.random() < 0.8) {
           continue;
         }
         var max = Math.random() < 0.5 ? 0xffffffff : 0xff;
-        regs['r' + i] = Math.floor(max * Math.random());
+        regs[_regs[i]] = Math.floor(max * Math.random());
       }
       registers.onBreak(registers.testRegs);
     }, 2500);
