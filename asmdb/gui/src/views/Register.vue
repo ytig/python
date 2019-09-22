@@ -65,7 +65,7 @@ export default {
         case '1':
           if (val >= 0x21 && val <= 0x7e) {
             if (val == 0x27) {
-              str = "'\\''";
+              str = '"\'"';
             } else {
               str = "'" + String.fromCharCode(val) + "'";
             }
