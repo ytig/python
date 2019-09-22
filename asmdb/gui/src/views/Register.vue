@@ -11,30 +11,44 @@
 <script>
 const asmType = 'arm32';
 
-function usageOf(int) {
-  if (int % 32 == 0) {
+function usageOf(val) {
+  //todo
+  if (val % 32 == 0) {
     return '2';
   }
-  if (int % 32 == 1) {
+  if (val % 32 == 1) {
     return '3';
   }
-  if (int % 32 == 2) {
-    return '4';
-  }
-  //todo check?
-  if (int >= 0x08048000 && int <= 0x08049000) {
-    return '2';
-  }
-  if (int >= 0xbfcb4000 && int <= 0xbfcc9000) {
-    return '3';
-  }
-  if (int >= 0x08ac5000 && int <= 0x08ae6000) {
-    return '4';
-  }
-  if (int >= 0x08049000 && int <= 0x0804a000) {
+  if (val % 32 == 2) {
     return '4';
   }
   return '1';
+}
+
+function regsString(val) {
+  var str = '';
+  switch (usageOf(val)) {
+    case '1':
+      if (val >= 0x21 && val <= 0x7e) {
+        if (val == 0x27) {
+          str = '"\'"';
+        } else {
+          str = "'" + String.fromCharCode(val) + "'";
+        }
+      }
+      break;
+    case '3':
+      str = 'sp+123'; //todo
+      break;
+  }
+  return str;
+}
+function cpsrString(val) {
+  var n = (val & 0b10000000000000000000000000000000) == 0 ? 0 : 1;
+  var z = (val & 0b01000000000000000000000000000000) == 0 ? 0 : 1;
+  var c = (val & 0b00100000000000000000000000000000) == 0 ? 0 : 1;
+  var v = (val & 0b00010000000000000000000000000000) == 0 ? 0 : 1;
+  return 'n' + n + ' z' + z + ' c' + c + ' v' + v;
 }
 
 export default {
@@ -52,29 +66,27 @@ export default {
       if (this.value.newValue == null) {
         return '';
       }
-      var val = this.value.newValue;
-      var str = '';
-      switch (usageOf(val)) {
-        case '1':
-          if (val >= 0x21 && val <= 0x7e) {
-            if (val == 0x27) {
-              str = '"\'"';
-            } else {
-              str = "'" + String.fromCharCode(val) + "'";
-            }
-          }
-          break;
-        case '3': //todo
-          str = 'sp+123';
-          break;
+      switch (this.value.lineName) {
+        case 'sp':
+          return '';
+        case 'cpsr':
+          return cpsrString(this.value.newValue);
+        default:
+          return regsString(this.value.newValue);
       }
-      return str;
     },
     cssUsage: function() {
       if (this.value.newValue == null) {
         return '0';
       }
-      return usageOf(this.value.newValue);
+      switch (this.value.lineName) {
+        case 'sp':
+          return '3';
+        case 'cpsr':
+          return '1';
+        default:
+          return usageOf(this.value.newValue);
+      }
     },
     cssChanged: function() {
       if (this.value.oldValue == null) {
