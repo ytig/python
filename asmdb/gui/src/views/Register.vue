@@ -81,9 +81,9 @@ export default {
 @import '~@/styles/theme';
 
 .register-container {
-  padding-left: 12px;
   padding-right: 12px;
   padding-bottom: 4px;
+  display: flex;
   > span {
     font-size: 12px;
   }
@@ -92,6 +92,11 @@ export default {
   }
   > span:last-child {
     color: @color-text-darker;
+    width: 0px;
+    flex-grow: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   > span[css-usage] {
     padding: 0px 2px;

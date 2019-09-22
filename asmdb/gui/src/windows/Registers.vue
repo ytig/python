@@ -1,7 +1,7 @@
 <template>
   <div class="registers-container" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
-    <Gird :column="4" :items="items" #default="props">
+    <Gird class="registers-gird" :column="4" :items="items" #default="props">
       <Register :value="props.item"></Register>
     </Gird>
   </div>
@@ -84,5 +84,8 @@ export default {
 
 .registers-container {
   padding-bottom: 2px;
+  .registers-gird {
+    padding-left: 12px;
+  }
 }
 </style>
