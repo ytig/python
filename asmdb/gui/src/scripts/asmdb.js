@@ -6,10 +6,16 @@ function for_test(bytes) {
   return str;
 }
 
+var registers = null;
 var stack = null;
 var memory = null;
 
 setTimeout(() => {
+  if (registers) {
+    registers.onBreak({
+      'r0': 1234
+    })
+  }
   if (stack) {
     var bytes = [];
     for (var i = 0; i < 10 * 256; i++) {
@@ -30,6 +36,9 @@ setTimeout(() => {
 function registerEvent(type, object) {
   //todo
   switch (type) {
+    case 'registers':
+      registers = object;
+      break;
     case 'stack':
       stack = object;
       break;

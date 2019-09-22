@@ -1,24 +1,68 @@
 <template>
-  <div class="registers-container">
-    <Navigation :name="'Registers'" :disable="disable"></Navigation>
+  <div class="registers-container" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
+    <Navigation :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
     <Gird :column="4" :items="items" #default="props">
-      <div style="width:100%;font-size:12px;color:#abb2bf;padding-left:12px;margin-bottom:4px;">{{props.item.id}} 0xaabbccdd 123</div>
+      <div style="width:100%;font-size:12px;color:#abb2bf;padding-left:12px;margin-bottom:4px;">{{props.item[0]}} 0xaabbccdd 123</div>
     </Gird>
   </div>
 </template>
 
 <script>
+import keyboard from '@/scripts/keyboard';
+import asmdb from '@/scripts/asmdb';
+const asmType = 'arm32';
+
+function regsOf(type) {
+  switch (type) {
+    case 'arm32':
+      return ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'r13', 'r14', 'r15', 'r16'];
+  }
+}
+
 export default {
   data: function() {
     return {
+      focus: false,
       disable: true,
       items: []
     };
   },
   created: function() {
-    var i;
-    for (i = 0; i < 17; i++) {
-      this.items.splice(0, 0, { id: i }); //test
+    for (var k of regsOf(asmType)) {
+      this.items[this.items.length] = [k, null];
+    }
+    keyboard.registerWindow(this);
+    asmdb.registerEvent('registers', this);
+  },
+  destroyed: function() {
+    asmdb.unregisterEvent('registers', this);
+    keyboard.unregisterWindow(this);
+  },
+  methods: {
+    requestFocus: function() {
+      keyboard.requestFocus(this);
+    },
+    onFocusChanged: function(value) {
+      this.focus = value;
+    },
+    onMouseUp: function(event) {
+      if (event.button == 2) {
+        this.$menu.close();
+      }
+    },
+    onKeyDown: function(event) {
+      return false;
+    },
+    onBreak: function(registers) {
+      this.disable = false;
+      for (var pair of this.items) {
+        if (pair[0] in registers) {
+          pair[1] = registers[pair[0]];
+        }
+      }
+    },
+    onContinue: function() {
+      this.disable = true;
     }
   }
 };
