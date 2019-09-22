@@ -2,7 +2,7 @@
   <div class="registers-container" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
     <Gird :column="4" :items="items" #default="props">
-      <div style="width:100%;font-size:12px;color:#abb2bf;padding-left:12px;margin-bottom:4px;">{{props.item[0]}} 0xaabbccdd 123</div>
+      <Register :name="props.item.name" :value="props.item.value"></Register>
     </Gird>
   </div>
 </template>
@@ -21,16 +21,20 @@ function regsOf(type) {
 
 export default {
   data: function() {
+    var items = [];
+    for (var k of regsOf(asmType)) {
+      items[items.length] = {
+        name: k,
+        value: null
+      };
+    }
     return {
       focus: false,
       disable: true,
-      items: []
+      items: items
     };
   },
   created: function() {
-    for (var k of regsOf(asmType)) {
-      this.items[this.items.length] = [k, null];
-    }
     keyboard.registerWindow(this);
     asmdb.registerEvent('registers', this);
   },
@@ -55,9 +59,9 @@ export default {
     },
     onBreak: function(registers) {
       this.disable = false;
-      for (var pair of this.items) {
-        if (pair[0] in registers) {
-          pair[1] = registers[pair[0]];
+      for (var item of this.items) {
+        if (item.name in registers) {
+          item.value = registers[item.name];
         }
       }
     },
