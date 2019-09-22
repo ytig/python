@@ -3,6 +3,8 @@
     <span class="user-select-none">{{value.lineName}}</span>
     <span v-for="i in (value.lineFill+1-value.lineName.length)" :key="i" class="user-select-none">&nbsp;</span>
     <span :css-usage="cssUsage" :css-changed="cssChanged">{{hexValue}}</span>
+    <span>&nbsp;</span>
+    <span>{{strValue}}</span>
   </div>
 </template>
 
@@ -53,6 +55,12 @@ export default {
       }
       return '0x' + this.value.newValue.toString(16).zfill(2 * groupBy());
     },
+    strValue: function() {
+      if (this.value.newValue == null) {
+        return '';
+      }
+      return '' + this.value.newValue;
+    },
     cssUsage: function() {
       if (this.value.newValue == null) {
         return '0';
@@ -78,13 +86,22 @@ export default {
   padding-bottom: 4px;
   > span {
     font-size: 12px;
-    color: @color-text;
   }
   > span:first-child {
     color: @color-text-darker;
   }
+  > span:last-child {
+    color: @color-text-darker;
+  }
   > span[css-usage] {
     padding: 0px 2px;
+  }
+  > span[css-usage='1'] {
+    color: @color-text;
+  }
+  > span[css-usage='1'][css-changed] {
+    color: @color-background;
+    background: @color-text;
   }
   > span[css-usage='2'] {
     cursor: pointer;
