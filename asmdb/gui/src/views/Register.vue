@@ -59,8 +59,19 @@ export default {
       if (this.value.newValue == null) {
         return '';
       }
-      //todo
-      return '';
+      var val = this.value.newValue;
+      var str = '';
+      switch (usageOf(val)) {
+        case '1':
+          if (val >= 0x21 && val <= 0x7e) {
+            str = "'" + String.fromCharCode(val) + "'";
+          }
+          break;
+        case '3': //todo
+          str = 'sp+123';
+          break;
+      }
+      return str;
     },
     cssUsage: function() {
       if (this.value.newValue == null) {
