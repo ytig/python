@@ -14,7 +14,7 @@ setTimeout(() => {
   if (registers) {
     var regs = {};
     for (var i = 0; i < 17; i++) {
-      var max = Math.random() < 0.9 ? 0xffffffff : 0xff;
+      var max = Math.random() < 0.8 ? 0xffffffff : 0xff;
       regs['r' + i] = Math.floor(max * Math.random());
     }
     registers.onBreak(regs);
@@ -24,7 +24,7 @@ setTimeout(() => {
         if (Math.random() < 0.8) {
           continue;
         }
-        var max = Math.random() < 0.9 ? 0xffffffff : 0xff;
+        var max = Math.random() < 0.8 ? 0xffffffff : 0xff;
         regs['r' + i] = Math.floor(max * Math.random());
       }
       registers.onBreak(registers.testRegs);
