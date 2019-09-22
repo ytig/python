@@ -1,8 +1,8 @@
 <template>
   <div class="registers-container" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
-    <Empty v-if="empty" :text="'[no data]'" style="padding-top:12px;"></Empty>
-    <Gird :style="{opacity:empty?0:1}" class="registers-gird" :column="4" :items="items" #default="props">
+    <Empty class="registers-empty" v-if="empty" :text="'[no data]'"></Empty>
+    <Gird class="registers-gird" :style="{opacity:empty?0:1}" :column="4" :items="items" #default="props">
       <Register :value="props.item" @clickitem="onClickItem"></Register>
     </Gird>
   </div>
@@ -89,7 +89,14 @@ export default {
 @import '~@/styles/theme';
 
 .registers-container {
+  position: relative;
   padding-bottom: 2px;
+  .registers-empty {
+    position: absolute;
+    top: 40px;
+    width: 100%;
+    padding-top: 12px;
+  }
   .registers-gird {
     padding-left: 12px;
   }
