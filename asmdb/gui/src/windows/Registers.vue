@@ -2,7 +2,7 @@
   <div class="registers-container" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
     <Gird class="registers-gird" :column="4" :items="items" #default="props">
-      <Register :value="props.item"></Register>
+      <Register :value="props.item" @clickitem="onClickItem"></Register>
     </Gird>
   </div>
 </template>
@@ -74,6 +74,9 @@ export default {
     },
     onContinue: function() {
       this.disable = true;
+    },
+    onClickItem: function(...args) {
+      this.$emit('clickitem', ...args);
     }
   }
 };
