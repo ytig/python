@@ -25,6 +25,9 @@ setTimeout(() => {
     stack.testBytes = bytes;
     setTimeout(() => {
       stack.testBytes[0] = 147;
+      stack.testBytes[1] = 147;
+      stack.testBytes[2] = 147;
+      stack.testBytes[3] = 147;
       stack.onBreak(1, for_test(stack.testBytes));
     }, 3000);
   }
