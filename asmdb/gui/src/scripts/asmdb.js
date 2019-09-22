@@ -14,7 +14,12 @@ setTimeout(() => {
   if (registers) {
     registers.onBreak({
       'r0': 1234
-    })
+    });
+    setTimeout(() => {
+      registers.onBreak({
+        'r0': 4321
+      });
+    }, 2500);
   }
   if (stack) {
     var bytes = [];
@@ -29,7 +34,7 @@ setTimeout(() => {
       stack.testBytes[2] = 147;
       stack.testBytes[3] = 147;
       stack.onBreak(1, for_test(stack.testBytes));
-    }, 2000);
+    }, 2500);
   }
   if (memory) {
     bytes = [];

@@ -1,17 +1,15 @@
 <template>
   <div class="register-container">
-    <span class="user-select-none">{{name}}</span>
-    <span v-for="i in (fill+1-name.length)" :key="i" class="user-select-none">&nbsp;</span>
-    <span v-show="value!=null">{{value}}</span>
+    <span class="user-select-none">{{value.lineName}}</span>
+    <span v-for="i in (value.lineFill+1-value.lineName.length)" :key="i" class="user-select-none">&nbsp;</span>
+    <span v-show="value.newValue!=null">{{value.newValue}}</span>
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    name: String,
-    value: Number,
-    fill: Number
+    value: Object
   }
 };
 </script>
