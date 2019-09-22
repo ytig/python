@@ -1,7 +1,8 @@
 <template>
   <div class="registers-container" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
-    <Gird class="registers-gird" :column="4" :items="items" #default="props">
+    <Empty v-if="empty" :text="'[no data]'" style="padding-top:12px;"></Empty>
+    <Gird :style="{opacity:empty?0:1}" class="registers-gird" :column="4" :items="items" #default="props">
       <Register :value="props.item" @clickitem="onClickItem"></Register>
     </Gird>
   </div>
@@ -39,6 +40,7 @@ export default {
     return {
       focus: false,
       disable: true,
+      empty: true,
       items: items
     };
   },
@@ -67,6 +69,7 @@ export default {
     },
     onBreak: function(registers) {
       this.disable = false;
+      this.empty = false;
       for (var item of this.items) {
         item.oldValue = item.newValue;
         item.newValue = item.lineName in registers ? registers[item.lineName] : null;
