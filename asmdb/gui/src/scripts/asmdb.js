@@ -78,7 +78,7 @@ function xb(range, callback) {
       bytes[bytes.length] = Math.floor(256 * Math.random());
     }
     callback(range[0], for_test(bytes));
-  }, 500);
+  }, 20);
 }
 
 export default {
