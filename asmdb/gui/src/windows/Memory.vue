@@ -13,7 +13,7 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 const asmType = 'arm32';
-const pieceOf = 512;
+const pieceOf = 1024;
 
 function groupBy() {
   switch (asmType) {
@@ -123,7 +123,7 @@ export default {
     },
     jumpTo: function(address) {
       this.oldData = '';
-      this.newAddr = address - 2 * pieceOf;
+      this.newAddr = address - 1 * pieceOf;
       this.newData = '';
       this.loadOrNot[0] = this.loadOrNot[1] = false;
       if (!this.disable) {
@@ -137,14 +137,14 @@ export default {
       if (this.newAddr == null) {
         return null;
       }
-      return [this.newAddr - 2 * pieceOf, this.newAddr + 3 * pieceOf];
+      return [this.newAddr - 1 * pieceOf, this.newAddr + 2 * pieceOf];
     },
     onBreak: function(addr, memory) {
       this.disable = false;
       if (this.newAddr == null) {
         return;
       }
-      if (this.newAddr != addr + 2 * pieceOf) {
+      if (this.newAddr != addr + 1 * pieceOf) {
         asmdb.xb(this.getRange(), this.onLoadData);
         return;
       }
@@ -157,7 +157,7 @@ export default {
       this.disable = true;
     },
     onLoadData: function(addr, memory) {
-      if (this.newAddr != addr + 2 * pieceOf) {
+      if (this.newAddr != addr + 1 * pieceOf) {
         return;
       }
       this.newData = memory;
@@ -165,13 +165,13 @@ export default {
     },
     onLoadMore: function(addr, memory) {
       this.$refs.recycler.postStop(() => {
-        if (this.loadOrNot[0] && this.newAddr - 3 * pieceOf == addr) {
+        if (this.loadOrNot[0] && this.newAddr - 2 * pieceOf == addr) {
           this.newAddr -= pieceOf;
           this.newData = memory + this.newData.substring(0, this.newData.length - pieceOf);
           this.loadOrNot[0] = this.loadOrNot[1] = false;
           this.invalidate();
         }
-        if (this.loadOrNot[1] && this.newAddr + 3 * pieceOf == addr) {
+        if (this.loadOrNot[1] && this.newAddr + 2 * pieceOf == addr) {
           this.newAddr += pieceOf;
           this.newData = this.newData.substring(pieceOf, this.newData.length) + memory;
           this.loadOrNot[0] = this.loadOrNot[1] = false;

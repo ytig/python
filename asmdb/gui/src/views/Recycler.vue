@@ -81,7 +81,7 @@ export default {
         scrollTop += child.scrollHeight;
       }
     }
-    container.scrollTop = (container.scrollHeight * 2) / 5;
+    container.scrollTop = container.scrollHeight / 3;
   },
   methods: {
     hstSet: function() {
@@ -113,9 +113,9 @@ export default {
       var isBottom = container.scrollTop >= container.scrollHeight - container.clientHeight;
       this.scrolling.onScroll(isTop || isBottom);
       var loadmore = 0;
-      if (container.scrollTop <= container.scrollHeight / 5) {
+      if (container.scrollTop < container.scrollHeight / 6) {
         loadmore = -1;
-      } else if (container.scrollHeight - container.clientHeight - container.scrollTop <= container.scrollHeight / 5) {
+      } else if (container.scrollHeight - container.clientHeight - container.scrollTop < container.scrollHeight / 6) {
         loadmore = 1;
       }
       this.$emit('loadmore', loadmore);
