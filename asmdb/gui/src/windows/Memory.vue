@@ -123,7 +123,7 @@ export default {
     },
     jumpTo: function(address) {
       this.oldData = '';
-      this.newAddr = address;
+      this.newAddr = address - 2 * pieceOf;
       this.newData = '';
       this.loadOrNot[0] = this.loadOrNot[1] = false;
       if (!this.disable) {
