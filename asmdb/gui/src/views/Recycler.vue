@@ -81,7 +81,7 @@ export default {
         scrollTop += child.scrollHeight;
       }
     }
-    container.scrollTop = (container.scrollHeight - container.clientHeight) / 2;
+    container.scrollTop = (container.scrollHeight * 2) / 5;
   },
   methods: {
     hstSet: function() {

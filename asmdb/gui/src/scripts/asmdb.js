@@ -46,6 +46,9 @@ setTimeout(() => {
       stack.onBreak(1, for_test(stack.testBytes));
     }, 2500);
   }
+  if (memory) {
+    memory.onBreak();
+  }
 }, 1000);
 
 function registerEvent(type, object) {
@@ -70,7 +73,7 @@ function unregisterEvent(type, object) {
 function xb(range, callback) {
   //todo
   setTimeout(() => {
-    bytes = [];
+    var bytes = [];
     for (var i = 0; i < range[1] - range[0]; i++) {
       bytes[bytes.length] = Math.floor(256 * Math.random());
     }

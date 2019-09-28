@@ -33,11 +33,12 @@ export default {
       disable: true,
       items: [],
       oldAddr: null,
-      newAddr: 0, //for test
+      newAddr: null,
       oldData: '',
       newData: '',
       itemSelection: null,
-      hst: []
+      hst: [],
+      loadOrNot: [false, false]
     };
   },
   props: {
@@ -121,49 +122,88 @@ export default {
       }
     },
     jumpTo: function(address) {
-      //todo
-      console.log('todo jump to ' + address);
+      this.oldData = '';
+      this.newAddr = address;
+      this.newData = '';
+      this.loadOrNot[0] = this.loadOrNot[1] = false;
+      if (!this.disable) {
+        asmdb.xb(this.getRange(), this.onLoadData);
+      }
+      this.invalidate();
+      this.requestFocus();
+      return true;
     },
     getRange: function() {
       if (this.newAddr == null) {
         return null;
       }
-      return [this.newAddr, this.newAddr + 5 * pieceOf];
+      return [this.newAddr - 2 * pieceOf, this.newAddr + 3 * pieceOf];
     },
     onBreak: function(addr, memory) {
       this.disable = false;
-      if (this.newAddr == addr) {
-        this.oldAddr = this.newAddr;
-        this.oldData = this.newData;
-        this.newData = memory;
-        this.invalidate();
-        setTimeout(() => {
-          this.onLoadMore();
-        }, 2000);
-      } else {
-        //todo
+      if (this.newAddr == null) {
+        return;
       }
+      if (this.newAddr != addr + 2 * pieceOf) {
+        asmdb.xb(this.getRange(), this.onLoadData);
+        return;
+      }
+      this.oldAddr = this.newAddr;
+      this.oldData = this.newData;
+      this.newData = memory;
+      this.invalidate();
     },
     onContinue: function() {
       this.disable = true;
     },
+    onLoadData: function(addr, memory) {
+      if (this.newAddr != addr + 2 * pieceOf) {
+        return;
+      }
+      this.newData = memory;
+      this.invalidate();
+    },
     onLoadMore: function(addr, memory) {
-      //todo
       this.$refs.recycler.postStop(() => {
-        var t = 512;
-        this.newAddr += t;
-        this.newData = this.newData.slice(t, this.newData.length);
-        for (var i = 0; i < t; i++) {
-          this.newData += 't';
+        if (this.loadOrNot[0] && this.newAddr - 3 * pieceOf == addr) {
+          this.newAddr -= pieceOf;
+          this.newData = memory + this.newData.substring(0, this.newData.length - pieceOf);
+          this.loadOrNot[0] = this.loadOrNot[1] = false;
+          this.invalidate();
         }
-        this.invalidate();
+        if (this.loadOrNot[1] && this.newAddr + 3 * pieceOf == addr) {
+          this.newAddr += pieceOf;
+          this.newData = this.newData.substring(pieceOf, this.newData.length) + memory;
+          this.loadOrNot[0] = this.loadOrNot[1] = false;
+          this.invalidate();
+        }
       });
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
     },
     onDelta: function(delta) {
-      //todo
+      if (this.newAddr == null) {
+        return;
+      }
+      if (delta < 0) {
+        if (!this.loadOrNot[0]) {
+          this.loadOrNot[0] = true;
+          var range = this.getRange();
+          asmdb.xb([range[0] - pieceOf, range[0]], this.onLoadMore);
+        }
+      } else {
+        this.loadOrNot[0] = false;
+      }
+      if (delta > 0) {
+        if (!this.loadOrNot[1]) {
+          this.loadOrNot[1] = true;
+          var range = this.getRange();
+          asmdb.xb([range[1], range[1] + pieceOf], this.onLoadMore);
+        }
+      } else {
+        this.loadOrNot[1] = false;
+      }
     },
     invalidate: function() {
       //todo
