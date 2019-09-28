@@ -75,7 +75,19 @@ function unregisterEvent(type, object) {
   //todo
 }
 
+function xb(range, callback) {
+  //todo
+  setTimeout(() => {
+    bytes = [];
+    for (var i = 0; i < range[1] - range[0]; i++) {
+      bytes[bytes.length] = Math.floor(256 * Math.random());
+    }
+    callback(range[0], for_test(bytes));
+  }, 500);
+}
+
 export default {
   registerEvent: registerEvent,
-  unregisterEvent: unregisterEvent
+  unregisterEvent: unregisterEvent,
+  xb: xb
 };
