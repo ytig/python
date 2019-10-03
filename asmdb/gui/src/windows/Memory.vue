@@ -22,6 +22,13 @@ function groupBy() {
   }
 }
 
+function rangeOf() {
+  switch (asmType) {
+    case 'arm32':
+      return [0, Math.pow(16, 8)];
+  }
+}
+
 function measureTextWidth(length) {
   return length * 7.224609375;
 }
@@ -122,8 +129,11 @@ export default {
       }
     },
     jumpTo: function(address) {
+      var ro = rangeOf();
+      var addr = Math.min(Math.max(address, ro[0] + pieceOf), ro[1] - 2 * pieceOf);
+      addr = addr - (addr % (this.column * 8));
       this.oldData = '';
-      this.newAddr = address - 1 * pieceOf;
+      this.newAddr = addr;
       this.newData = '';
       this.loadOrNot[0] = this.loadOrNot[1] = false;
       if (!this.disable) {
@@ -141,11 +151,12 @@ export default {
     },
     onBreak: function(addr, memory) {
       this.disable = false;
-      if (this.newAddr == null) {
+      var range = this.getRange();
+      if (range == null) {
         return;
       }
-      if (this.newAddr != addr + 1 * pieceOf) {
-        asmdb.xb(this.getRange(), this.onLoadData);
+      if (range[0] != addr || range[1] != addr + memory.length) {
+        asmdb.xb(range, this.onLoadData);
         return;
       }
       this.oldAddr = this.newAddr;
@@ -157,7 +168,8 @@ export default {
       this.disable = true;
     },
     onLoadData: function(addr, memory) {
-      if (this.newAddr != addr + 1 * pieceOf) {
+      var range = this.getRange();
+      if (range[0] != addr || range[1] != addr + memory.length) {
         return;
       }
       this.newData = memory;
@@ -165,15 +177,16 @@ export default {
     },
     onLoadMore: function(addr, memory) {
       this.$refs.recycler.postStop(() => {
-        if (this.loadOrNot[0] && this.newAddr - 2 * pieceOf == addr) {
-          this.newAddr -= pieceOf;
-          this.newData = memory + this.newData.substring(0, this.newData.length - pieceOf);
+        var range = this.getRange();
+        if (this.loadOrNot[0] && range[0] == addr + memory.length) {
+          this.newAddr -= memory.length;
+          this.newData = memory + this.newData.substring(0, this.newData.length - memory.length);
           this.loadOrNot[0] = this.loadOrNot[1] = false;
           this.invalidate();
         }
-        if (this.loadOrNot[1] && this.newAddr + 2 * pieceOf == addr) {
-          this.newAddr += pieceOf;
-          this.newData = this.newData.substring(pieceOf, this.newData.length) + memory;
+        if (this.loadOrNot[1] && range[1] == addr) {
+          this.newAddr += memory.length;
+          this.newData = this.newData.substring(memory.length, this.newData.length) + memory;
           this.loadOrNot[0] = this.loadOrNot[1] = false;
           this.invalidate();
         }
@@ -183,14 +196,20 @@ export default {
       this.$emit('clickitem', ...args);
     },
     onDelta: function(delta) {
-      if (this.newAddr == null) {
-        return;
+      if (this.newData.length <= 0) {
+        delta = 0;
+      }
+      var ro = rangeOf();
+      var range = this.getRange();
+      if (range == null) {
+        delta = 0;
       }
       if (delta < 0) {
         if (!this.loadOrNot[0]) {
           this.loadOrNot[0] = true;
-          var range = this.getRange();
-          asmdb.xb([range[0] - pieceOf, range[0]], this.onLoadMore);
+          if (range[0] > ro[0]) {
+            asmdb.xb([Math.max(range[0] - pieceOf, ro[0]), range[0]], this.onLoadMore);
+          }
         }
       } else {
         this.loadOrNot[0] = false;
@@ -198,8 +217,9 @@ export default {
       if (delta > 0) {
         if (!this.loadOrNot[1]) {
           this.loadOrNot[1] = true;
-          var range = this.getRange();
-          asmdb.xb([range[1], range[1] + pieceOf], this.onLoadMore);
+          if (range[1] < ro[1]) {
+            asmdb.xb([range[1], Math.min(range[1] + pieceOf, ro[1])], this.onLoadMore);
+          }
         }
       } else {
         this.loadOrNot[1] = false;
@@ -209,10 +229,11 @@ export default {
       //todo
       var column = this.column * 8;
       var items = [];
+      var addr = this.getRange()[0];
       for (var i = 0; i < this.newData.length / column; i++) {
         var newBytes = this.newData.slice(i * column, (i + 1) * column);
-        var lineNumber = '0x' + (this.newAddr + i * column).toString(16).zfill(2 * groupBy());
-        var idx = this.newAddr / column + i;
+        var lineNumber = '0x' + (addr + i * column).toString(16).zfill(2 * groupBy());
+        var idx = addr / column + i;
         items[items.length] = {
           idx: idx,
           lineNumber: lineNumber,
