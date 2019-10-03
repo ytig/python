@@ -28,6 +28,7 @@ export default {
     font-size: 16px;
     color: @color-text;
     font-family: 'Wawati SC';
+    transition-delay: 1ms;
   }
   > span[css-focus] {
     color: @color-text-light;
