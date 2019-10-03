@@ -247,12 +247,16 @@ export default {
       }
     },
     invalidate: function() {
-      //todo
       var column = this.column * 8;
       var items = [];
       var addr = this.getRange()[0];
       for (var i = 0; i < this.newData.length / column; i++) {
         var newBytes = this.newData.slice(i * column, (i + 1) * column);
+        var oldBytes = '';
+        if (this.oldData) {
+          var da = this.newAddr - this.oldAddr;
+          oldBytes = this.oldData.slice(i * column + da, (i + 1) * column + da);
+        }
         var lineNumber = addr + i * column;
         var highlightNumber = this.itemSelection != null ? this.itemSelection - lineNumber : -1;
         if (highlightNumber < 0 || highlightNumber >= column) {
@@ -263,7 +267,7 @@ export default {
         items[items.length] = {
           idx: idx,
           lineNumber: lineNumber,
-          oldBytes: '',
+          oldBytes: oldBytes,
           newBytes: newBytes,
           showString: true,
           highlightNumber: highlightNumber,
