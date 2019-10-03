@@ -132,7 +132,6 @@ export default {
       var ro = rangeOf();
       address = Math.min(Math.max(address, ro[0]), ro[1] - 1);
       var addr = Math.min(Math.max(address - (address % (this.column * 8)), ro[0] + pieceOf), ro[1] - 2 * pieceOf);
-      this.oldData = '';
       this.newAddr = addr;
       this.newData = '';
       this.loadOrNot[0] = this.loadOrNot[1] = false;
