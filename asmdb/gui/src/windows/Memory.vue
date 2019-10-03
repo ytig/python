@@ -162,6 +162,7 @@ export default {
       this.oldAddr = this.newAddr;
       this.oldData = this.newData;
       this.newData = memory;
+      this.loadOrNot[0] = this.loadOrNot[1] = false;
       this.invalidate();
     },
     onContinue: function() {
@@ -173,6 +174,7 @@ export default {
         return;
       }
       this.newData = memory;
+      this.loadOrNot[0] = this.loadOrNot[1] = false;
       this.invalidate();
     },
     onLoadMore: function(addr, memory) {
@@ -196,14 +198,12 @@ export default {
       this.$emit('clickitem', ...args);
     },
     onDelta: function(delta) {
-      if (this.newData.length <= 0) {
-        delta = 0;
+      if (this.newAddr == null || this.newData.length <= 0 || this.disable) {
+        this.loadOrNot[0] = this.loadOrNot[1] = false;
+        return;
       }
       var ro = rangeOf();
       var range = this.getRange();
-      if (range == null) {
-        delta = 0;
-      }
       if (delta < 0) {
         if (!this.loadOrNot[0]) {
           this.loadOrNot[0] = true;
