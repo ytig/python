@@ -112,24 +112,41 @@ export default {
       this.hst.splice(0, this.hst.length);
     },
     hstSet: function() {
+      if (this.newAddr == null) {
+        return false;
+      }
       const maxHst = 147;
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
-      var posn = {}; //todo save
+      var posn = this.$refs.recycler.getPosition();
+      if (!posn) {
+        posn = [(this.newAddr + 1 * pieceOf) / (this.column * 8), 0];
+      }
       this.hst.splice(this.hst.length, 0, posn);
+      return true;
     },
     hstGet: function() {
       if (this.hst.length <= 0) {
         return false;
       } else {
         var posn = this.hst.splice(this.hst.length - 1, 1)[0];
-        //todo load
+        var ro = rangeOf();
+        var address = posn[0] * this.column * 8;
+        var addr = Math.min(Math.max(address - (address % (this.column * 8)) - 1 * pieceOf, ro[0]), ro[1] - 3 * pieceOf);
+        this.newAddr = addr;
+        this.newData = '';
+        if (!this.disable) {
+          asmdb.xb(this.getRange(), this.onLoadData);
+        }
+        this.itemPosition = posn;
+        this.itemSelection = null;
         this.invalidate();
         return true;
       }
     },
     jumpTo: function(address) {
+      this.hstSet();
       var ro = rangeOf();
       address = Math.min(Math.max(address, ro[0]), ro[1] - 1);
       var addr = Math.min(Math.max(address - (address % (this.column * 8)) - 1 * pieceOf, ro[0]), ro[1] - 3 * pieceOf);
