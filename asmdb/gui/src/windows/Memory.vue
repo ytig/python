@@ -130,8 +130,8 @@ export default {
     },
     jumpTo: function(address) {
       var ro = rangeOf();
-      var addr = Math.min(Math.max(address, ro[0] + pieceOf), ro[1] - 2 * pieceOf);
-      addr = addr - (addr % (this.column * 8));
+      address = Math.min(Math.max(address, ro[0]), ro[1] - 1);
+      var addr = Math.min(Math.max(address - (address % (this.column * 8)), ro[0] + pieceOf), ro[1] - 2 * pieceOf);
       this.oldData = '';
       this.newAddr = addr;
       this.newData = '';
