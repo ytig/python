@@ -168,7 +168,6 @@ export default {
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
-      this.jumpTo(Math.random() < 0.5 ? 2147 : 300); //for test
     },
     onDelta: function(delta) {
       this.onClickIndex(this.page + delta);

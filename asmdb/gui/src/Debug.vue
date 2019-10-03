@@ -2,7 +2,7 @@
   <div id="root">
     <div id="left-layout">
       <Bar id="bar"></Bar>
-      <Assembly id="assembly"></Assembly>
+      <Assembly id="assembly" ref="assembly"></Assembly>
       <div id="points-layout">
         <Breakpoints id="breakpoints"></Breakpoints>
         <div id="points-split"></div>
@@ -11,18 +11,34 @@
       <Python3 id="python3"></Python3>
     </div>
     <div id="right-layout">
-      <Registers id="registers"></Registers>
+      <Registers id="registers" @clickitem="onClickItem"></Registers>
       <div id="heap-layout" ref="heapLayout">
-        <Stack id="stack"></Stack>
+        <Stack id="stack" ref="stack" @clickitem="onClickItem"></Stack>
         <div id="heap-split"></div>
-        <Memory id="memory"></Memory>
+        <Memory id="memory" ref="memory" @clickitem="onClickItem"></Memory>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  methods: {
+    onClickItem: function(usage, address) {
+      switch (usage) {
+        case 0:
+          this.$refs.assembly.jumpTo(address);
+          break;
+        case 1:
+          this.$refs.stack.jumpTo(address);
+          break;
+        case 2:
+          this.$refs.memory.jumpTo(address);
+          break;
+      }
+    }
+  }
+};
 </script>
 
 <style lang="less">
