@@ -43,6 +43,7 @@ export default {
       newAddr: null,
       oldData: '',
       newData: '',
+      itemPosition: null,
       itemSelection: null,
       hst: [],
       loadOrNot: [false, false]
@@ -137,6 +138,8 @@ export default {
       if (!this.disable) {
         asmdb.xb(this.getRange(), this.onLoadData);
       }
+      this.itemPosition = [parseInt(address / (this.column * 8)), 0];
+      this.itemSelection = address;
       this.invalidate();
       this.requestFocus();
       return true;
@@ -232,7 +235,12 @@ export default {
       var addr = this.getRange()[0];
       for (var i = 0; i < this.newData.length / column; i++) {
         var newBytes = this.newData.slice(i * column, (i + 1) * column);
-        var lineNumber = '0x' + (addr + i * column).toString(16).zfill(2 * groupBy());
+        var lineNumber = addr + i * column;
+        var highlightNumber = this.itemSelection != null ? this.itemSelection - lineNumber : -1;
+        if (highlightNumber < 0 || highlightNumber >= column) {
+          highlightNumber = null;
+        }
+        lineNumber = '0x' + lineNumber.toString(16).zfill(2 * groupBy());
         var idx = addr / column + i;
         items[items.length] = {
           idx: idx,
@@ -240,11 +248,16 @@ export default {
           oldBytes: '',
           newBytes: newBytes,
           showString: true,
-          highlightNumber: null,
+          highlightNumber: highlightNumber,
           watchingNumbers: null
         };
       }
       this.items.splice(0, this.items.length, ...items);
+      var posn = this.$refs.recycler.getPosition();
+      if (!posn) {
+        posn = this.itemPosition;
+      }
+      this.items.posn = posn;
     }
   }
 };

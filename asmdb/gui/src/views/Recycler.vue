@@ -52,22 +52,14 @@ class Scrolling {
 export default {
   data: function() {
     return {
-      scrolling: new Scrolling(),
-      hst: [],
-      posn: null
+      scrolling: new Scrolling()
     };
   },
   props: {
     items: Array
   },
-  beforeUpdate: function() {
-    if (!this.posn) {
-      this.hstSet() && this.hstGet();
-    }
-  },
   updated: function() {
-    var posn = this.posn;
-    this.posn = null;
+    var posn = this.items.posn;
     var container = this.$refs.container;
     var scrollTop = 0;
     if (posn) {
@@ -81,31 +73,19 @@ export default {
         scrollTop += child.scrollHeight;
       }
     }
-    container.scrollTop = container.scrollHeight / 3;
   },
   methods: {
-    hstSet: function() {
+    getPosition: function() {
       var container = this.$refs.container;
       var scrollTop = container.scrollTop;
       for (var i = 0; i < container.children.length; i++) {
         var child = container.children[i];
         scrollTop -= child.scrollHeight;
         if (scrollTop < 0) {
-          var posn = [child.getAttribute('idx'), child.scrollHeight + scrollTop];
-          this.hst.splice(this.hst.length, 0, posn);
-          return true;
+          return [child.getAttribute('idx'), child.scrollHeight + scrollTop];
         }
       }
-      return false;
-    },
-    hstGet: function() {
-      if (this.hst.length <= 0) {
-        return false;
-      } else {
-        var posn = this.hst.splice(this.hst.length - 1, 1)[0];
-        this.posn = posn;
-        return true;
-      }
+      return null;
     },
     onScroll: function() {
       var container = this.$refs.container;
