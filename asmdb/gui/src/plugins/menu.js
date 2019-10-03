@@ -35,7 +35,6 @@ export default {
     document.addEventListener('wheel', function (event) {
       if (vm.onWheel(event)) {
         event.stopPropagation();
-        event.preventDefault();
       }
     }, true);
     Vue.prototype.$menu = vm;
