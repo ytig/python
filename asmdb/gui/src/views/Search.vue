@@ -8,11 +8,17 @@
 <script>
 import Animation from '@/scripts/animation';
 
-function exec(source) {
-  //todo local&regs
+function exec(source, locals) {
   var result = null;
   try {
-    result = eval(source);
+    var keys = [];
+    var vals = [];
+    for (var key in locals) {
+      var val = locals[key];
+      keys.push(key);
+      vals.push(val);
+    }
+    result = new Function(...keys, 'return ' + source)(...vals);
   } catch (error) {}
   if (typeof result == 'number') {
     return result;
@@ -29,13 +35,14 @@ export default {
       illegal: false,
       text: '',
       realText: '',
+      locals: null,
       anim: new Animation(1 / 250)
     };
   },
   watch: {
     text: function(newValue, oldValue) {
       if (this.illegal) {
-        if (!newValue || exec(newValue) != null) {
+        if (!newValue || exec(newValue, this.locals) != null) {
           this.illegal = false;
         }
       }
@@ -71,6 +78,7 @@ export default {
   },
   methods: {
     show: function() {
+      this.locals = { sp: 123, pc: 123 }; //todo
       this.showing = true;
       this.text = '';
       this.realText = '';
@@ -78,6 +86,7 @@ export default {
     },
     dismiss: function() {
       this.showing = false;
+      this.locals = null;
     },
     onInput: function() {
       this.realText = this.$refs.input.value;
@@ -87,7 +96,7 @@ export default {
         if (!this.text) {
           this.dismiss();
         } else {
-          var result = exec(this.text);
+          var result = exec(this.text, this.locals);
           if (result != null) {
             this.$emit('search', result);
             this.dismiss();
