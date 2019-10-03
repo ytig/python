@@ -164,6 +164,7 @@ export default {
       this.oldData = this.newData;
       this.newData = memory;
       this.loadOrNot[0] = this.loadOrNot[1] = false;
+      this.itemSelection = null;
       this.invalidate();
     },
     onContinue: function() {
