@@ -131,7 +131,7 @@ export default {
     jumpTo: function(address) {
       var ro = rangeOf();
       address = Math.min(Math.max(address, ro[0]), ro[1] - 1);
-      var addr = Math.min(Math.max(address - (address % (this.column * 8)), ro[0] + pieceOf), ro[1] - 2 * pieceOf);
+      var addr = Math.min(Math.max(address - (address % (this.column * 8)) - 1 * pieceOf, ro[0]), ro[1] - 3 * pieceOf);
       this.newAddr = addr;
       this.newData = '';
       if (!this.disable) {
@@ -145,7 +145,7 @@ export default {
       if (this.newAddr == null) {
         return null;
       }
-      return [this.newAddr - 1 * pieceOf, this.newAddr + 2 * pieceOf];
+      return [this.newAddr, this.newAddr + 3 * pieceOf];
     },
     onBreak: function(addr, memory) {
       this.disable = false;
