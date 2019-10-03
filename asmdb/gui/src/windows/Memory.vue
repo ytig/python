@@ -136,11 +136,11 @@ export default {
         var addr = Math.min(Math.max(address - (address % (this.column * 8)) - 1 * pieceOf, ro[0]), ro[1] - 3 * pieceOf);
         this.newAddr = addr;
         this.newData = '';
+        this.itemPosition = posn;
+        this.itemSelection = null;
         if (!this.disable) {
           asmdb.xb(this.getRange(), this.onLoadData);
         }
-        this.itemPosition = posn;
-        this.itemSelection = null;
         this.invalidate();
         return true;
       }
@@ -152,11 +152,11 @@ export default {
       var addr = Math.min(Math.max(address - (address % (this.column * 8)) - 1 * pieceOf, ro[0]), ro[1] - 3 * pieceOf);
       this.newAddr = addr;
       this.newData = '';
+      this.itemPosition = [parseInt(address / (this.column * 8)), 0];
+      this.itemSelection = address;
       if (!this.disable) {
         asmdb.xb(this.getRange(), this.onLoadData);
       }
-      this.itemPosition = [parseInt(address / (this.column * 8)), 0];
-      this.itemSelection = address;
       this.invalidate();
       this.requestFocus();
       return true;
