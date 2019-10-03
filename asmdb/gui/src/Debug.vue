@@ -30,7 +30,7 @@ export default {
           this.$refs.assembly.jumpTo(address);
           break;
         case 1:
-          this.$refs.stack.jumpTo(address);
+          this.$refs.stack.jumpTo(1 + (address % 2560)); //for test
           break;
         case 2:
           this.$refs.memory.jumpTo(address);
