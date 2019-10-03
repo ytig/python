@@ -134,7 +134,6 @@ export default {
       var addr = Math.min(Math.max(address - (address % (this.column * 8)), ro[0] + pieceOf), ro[1] - 2 * pieceOf);
       this.newAddr = addr;
       this.newData = '';
-      this.loadOrNot[0] = this.loadOrNot[1] = false;
       if (!this.disable) {
         asmdb.xb(this.getRange(), this.onLoadData);
       }
@@ -178,6 +177,9 @@ export default {
     },
     onLoadMore: function(addr, memory) {
       this.$refs.recycler.postStop(() => {
+        if (this.newData.length <= 0) {
+          return;
+        }
         var range = this.getRange();
         if (this.loadOrNot[0] && range[0] == addr + memory.length) {
           this.newAddr -= memory.length;
@@ -197,8 +199,7 @@ export default {
       this.$emit('clickitem', ...args);
     },
     onDelta: function(delta) {
-      if (this.newAddr == null || this.newData.length <= 0 || this.disable) {
-        this.loadOrNot[0] = this.loadOrNot[1] = false;
+      if (this.newAddr == null || this.newData.length <= 0) {
         return;
       }
       var ro = rangeOf();
@@ -206,7 +207,7 @@ export default {
       if (delta < 0) {
         if (!this.loadOrNot[0]) {
           this.loadOrNot[0] = true;
-          if (range[0] > ro[0]) {
+          if (!this.disable && range[0] > ro[0]) {
             asmdb.xb([Math.max(range[0] - pieceOf, ro[0]), range[0]], this.onLoadMore);
           }
         }
@@ -216,7 +217,7 @@ export default {
       if (delta > 0) {
         if (!this.loadOrNot[1]) {
           this.loadOrNot[1] = true;
-          if (range[1] < ro[1]) {
+          if (!this.disable && range[1] < ro[1]) {
             asmdb.xb([range[1], Math.min(range[1] + pieceOf, ro[1])], this.onLoadMore);
           }
         }
