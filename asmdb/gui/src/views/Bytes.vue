@@ -1,5 +1,5 @@
 <template>
-  <div class="bytes-container" :highlight="highlight">
+  <div class="bytes-container" :css-highlight="highlight">
     <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)"></span>
   </div>
 </template>
@@ -179,7 +179,7 @@ export default {
 <style lang="less">
 @import '~@/styles/theme';
 
-.bytes-container[highlight='true'] {
+.bytes-container[css-highlight] {
   > * {
     background: @color-background-selection;
   }
