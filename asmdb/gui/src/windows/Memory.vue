@@ -1,5 +1,5 @@
 <template>
-  <div class="memory-container" :style="{width:windowWidth+'px'}" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
+  <div class="memory-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" @search="onSearch"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
     <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty>

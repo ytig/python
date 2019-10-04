@@ -104,7 +104,7 @@ export default {
   },
   mounted: function() {
     this._parent = this.$refs.container.parentNode;
-    this._parent.addEventListener('wheel', this.onWheel);
+    this._parent.addEventListener('wheel', this.onWheel, { passive: true });
   },
   destroyed: function() {
     this._parent.removeEventListener('wheel', this.onWheel);

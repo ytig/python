@@ -1,5 +1,5 @@
 <template>
-  <div class="registers-container" @wheel="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
+  <div class="registers-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
     <Empty class="registers-empty" v-if="empty" :text="'[no data]'"></Empty>
     <Gird class="registers-gird" :style="{opacity:empty?0:1}" :column="column" :items="items" #default="props">
