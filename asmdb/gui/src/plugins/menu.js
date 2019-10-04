@@ -35,8 +35,13 @@ export default {
     document.addEventListener('wheel', function (event) {
       if (vm.onWheel(event)) {
         event.stopPropagation();
+        event.preventDefault();
       }
-    }, true);
+    }, {
+      capture: true,
+      once: false,
+      passive: false
+    });
     Vue.prototype.$menu = vm;
   }
 }
