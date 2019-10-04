@@ -73,7 +73,8 @@ export default {
       return this.show;
     },
     onWheel: function(event) {
-      return this.show;
+      this.close();
+      return false;
     },
     onClickItem: function(index) {
       var enable = this.items[index][2];

@@ -33,14 +33,7 @@ export default {
       }
     }, true);
     document.addEventListener('wheel', function (event) {
-      if (vm.onWheel(event)) {
-        event.stopPropagation();
-        event.preventDefault();
-      }
-    }, {
-      capture: true,
-      once: false,
-      passive: false
+      vm.onWheel(event);
     });
     Vue.prototype.$menu = vm;
   }
