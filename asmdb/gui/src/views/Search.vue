@@ -66,9 +66,9 @@ export default {
     document.addEventListener('keydown', this.onDomKeyDown, true);
   },
   destroyed: function() {
-    document.removeEventListener('mousedown', this.onDomMouseDown);
-    document.removeEventListener('click', this.onDomClick);
-    document.removeEventListener('keydown', this.onDomKeyDown);
+    document.removeEventListener('mousedown', this.onDomMouseDown, true);
+    document.removeEventListener('click', this.onDomClick, true);
+    document.removeEventListener('keydown', this.onDomKeyDown, true);
   },
   updated: function() {
     var input = this.$refs.input;

@@ -107,7 +107,7 @@ export default {
     this._parent.addEventListener('wheel', this.onWheel, { passive: true });
   },
   destroyed: function() {
-    this._parent.removeEventListener('wheel', this.onWheel);
+    this._parent.removeEventListener('wheel', this.onWheel, { passive: true });
     this._parent = null;
   },
   methods: {
