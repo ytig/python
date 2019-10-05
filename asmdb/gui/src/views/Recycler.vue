@@ -1,107 +1,72 @@
 <template>
   <div ref="container" class="recycler-container" @scroll="onScroll">
-    <div v-for="item in items" :key="item.idx % items.length" :idx="item.idx">
-      <slot :item="item"></slot>
+    <div class="recycler-fill" :style="{transform:'translateY('+lineHeight*source.length+'px)'}"></div>
+    <div class="recycler-item" v-for="(item,index) in viewport" :key="index" v-show="item.key>=0" :style="{transform:'translateY('+lineHeight*item.key+'px)'}">
+      <slot :item="item.val" :index="item.key"></slot>
     </div>
   </div>
 </template>
 
 <script>
-class Scrolling {
-  constructor() {
-    this.tag = 0;
-    this.scrolling = 0;
-    this.runnables = [];
-  }
-
-  onScroll(edge) {
-    if (!edge) {
-      var tag = this.tag;
-      this.scrolling++;
-      setTimeout(() => {
-        if (tag != this.tag) {
-          return;
-        }
-        this.scrolling--;
-        if (this.scrolling == 0) {
-          this.runnables.reverse();
-          while (this.runnables.length > 0) {
-            this.runnables.pop()();
-          }
-        }
-      }, 147);
-    } else {
-      this.tag++;
-      this.scrolling = 0;
-      this.runnables.reverse();
-      while (this.runnables.length > 0) {
-        this.runnables.pop()();
-      }
-    }
-  }
-
-  postStop(runnable) {
-    if (!this.scrolling) {
-      runnable();
-    } else {
-      this.runnables.push(runnable);
-    }
-  }
-}
-
 export default {
   data: function() {
     return {
-      scrolling: new Scrolling()
+      position: { index: 0, offset: 0 },
+      viewport: []
     };
   },
   props: {
-    items: Array
+    lineHeight: Number,
+    source: Object
   },
-  updated: function() {
-    var posn = this.items.posn;
-    var container = this.$refs.container;
-    var scrollTop = 0;
-    if (posn) {
-      for (var i = 0; i < container.children.length; i++) {
-        var child = container.children[i];
-        if (child.getAttribute('idx') == posn[0]) {
-          scrollTop += posn[1];
-          container.scrollTop = scrollTop;
-          return;
-        }
-        scrollTop += child.scrollHeight;
-      }
+  watch: {
+    source: function(newValue, oldValue) {
+      this.invalidate();
     }
   },
+  mounted: function() {
+    var length = 3 * Math.ceil(window.innerHeight / this.lineHeight);
+    var viewport = [];
+    for (var i = 0; i < length; i++) {
+      viewport[i] = { key: 0, val: null };
+    }
+    this.viewport.splice(0, this.viewport.length, ...viewport);
+    this.onScrollStop();
+  },
   methods: {
-    getPosition: function() {
-      var container = this.$refs.container;
-      var scrollTop = container.scrollTop;
-      for (var i = 0; i < container.children.length; i++) {
-        var child = container.children[i];
-        scrollTop -= child.scrollHeight;
-        if (scrollTop < 0) {
-          return [child.getAttribute('idx'), child.scrollHeight + scrollTop];
+    onScroll: function() {
+      //todo
+      this.onScrollStop();
+    },
+    onScrollStop: function() {
+      var scrollTop = this.$refs.container.scrollTop;
+      this.position.index = parseInt(scrollTop / this.lineHeight);
+      this.position.offset = scrollTop % this.lineHeight;
+      this.invalidate();
+    },
+    invalidate: function() {
+      var origin = this.position.index % this.viewport.length;
+      for (var i = 0; i < this.viewport.length; i++) {
+        var o = (origin + i) % this.viewport.length;
+        var slot = this.viewport[o];
+        var key = this.position.index + i;
+        if (i >= (this.viewport * 2) / 3) {
+          key -= this.viewport.length;
+        }
+        if (key < 0 || key >= this.source.length) {
+          key = -1;
+        }
+        var val = null;
+        if (key in this.source) {
+          val = this.source[key];
+        }
+        if (slot.key != key) {
+          slot.key = key;
+        }
+        if (slot.val != val) {
+          slot.val = val;
         }
       }
-      return null;
-    },
-    onScroll: function() {
-      var container = this.$refs.container;
-      var isTop = container.scrollTop <= 0;
-      var isBottom = container.scrollTop >= container.scrollHeight - container.clientHeight;
-      this.scrolling.onScroll(isTop || isBottom);
-      var loadmore = 0;
-      if (container.scrollTop < container.scrollHeight / 6) {
-        loadmore = -1;
-      } else if (container.scrollHeight - container.clientHeight - container.scrollTop < container.scrollHeight / 6) {
-        loadmore = 1;
-      }
-      this.$emit('loadmore', loadmore);
-    },
-    postStop: function(runnable) {
-      this.scrolling.postStop(runnable);
     }
   }
 };
@@ -112,5 +77,16 @@ export default {
 
 .recycler-container {
   overflow: scroll;
+  position: relative;
+  contain: content;
+  .recycler-fill {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+  }
+  .recycler-item {
+    position: absolute;
+    contain: content;
+  }
 }
 </style>
