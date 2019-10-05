@@ -12,7 +12,8 @@ export default {
   data: function() {
     return {
       position: { index: 0, offset: 0 },
-      viewport: []
+      viewport: [],
+      counter: 0
     };
   },
   props: {
@@ -36,10 +37,24 @@ export default {
   methods: {
     onScroll: function() {
       //todo
-      this.onScrollStop();
+      this.counter++;
+      var container = this.$refs.container;
+      if (container.scrollTop <= 0 || container.scrollTop >= container.scrollHeight - container.clientHeight) {
+        this.onScrollStop();
+        return;
+      }
+      var counter = this.counter;
+      setTimeout(() => {
+        if (counter != this.counter) {
+          return;
+        }
+        this.onScrollStop();
+      }, 47);
+      //todo
     },
     onScrollStop: function() {
-      var scrollTop = this.$refs.container.scrollTop;
+      var container = this.$refs.container;
+      var scrollTop = container.scrollTop;
       this.position.index = parseInt(scrollTop / this.lineHeight);
       this.position.offset = scrollTop % this.lineHeight;
       this.invalidate();
