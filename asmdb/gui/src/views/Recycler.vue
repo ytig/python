@@ -50,7 +50,16 @@ export default {
         }
         this.onScrollStop();
       }, 147);
-      //todo
+      var minScrollTop = (this.position.index - this.viewport.length / 3) * this.lineHeight;
+      var maxScrollTop = (this.position.index + this.viewport.length / 3) * this.lineHeight;
+      var scrollTop = container.scrollTop;
+      if (scrollTop < minScrollTop) {
+        this.position.index -= Math.ceil((minScrollTop - scrollTop) / this.lineHeight);
+        this.invalidate();
+      } else if (scrollTop > maxScrollTop) {
+        this.position.index += Math.ceil((scrollTop - maxScrollTop) / this.lineHeight);
+        this.invalidate();
+      }
     },
     onScrollStop: function() {
       var container = this.$refs.container;
