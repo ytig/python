@@ -49,7 +49,7 @@ export default {
           return;
         }
         this.onScrollStop();
-      }, 47);
+      }, 147);
       //todo
     },
     onScrollStop: function() {
