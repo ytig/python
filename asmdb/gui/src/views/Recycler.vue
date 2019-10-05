@@ -65,7 +65,7 @@ export default {
         var o = (origin + i) % this.viewport.length;
         var slot = this.viewport[o];
         var key = this.position.index + i;
-        if (i >= (this.viewport * 2) / 3) {
+        if (i >= (this.viewport.length * 2) / 3) {
           key -= this.viewport.length;
         }
         if (key < 0 || key >= this.source.length) {
