@@ -1,5 +1,5 @@
 <template>
-  <div class="bytes-container" :css-highlight="highlight">
+  <div class="bytes-container" :css-highlight="items.highlight">
     <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)"></span>
   </div>
 </template>
@@ -41,47 +41,30 @@ function usageOf(int) {
 }
 
 export default {
-  data: function() {
-    return {
-      highlight: false,
-      items: []
-    };
-  },
   props: {
-    value: Object
+    lineNumber: String,
+    highlightNumber: Number,
+    watchingNumbers: String,
+    value: Object,
+    group: Number,
+    showString: Boolean
   },
-  watch: {
-    value: function(newValue, oldValue) {
-      var eq = true;
-      for (var k of ['lineNumber', 'oldBytes', 'newBytes', 'showString', 'highlightNumber']) {
-        if (newValue[k] != oldValue[k]) {
-          eq = false;
-          break;
-        }
-      }
-      if (!eq) {
-        this.invalidate();
-      }
-    }
-  },
-  created: function() {
-    this.invalidate();
-  },
-  methods: {
-    onClickItem: function(index) {
-      if (this.items[index] && this.items[index].event) {
-        this.$emit('clickitem', ...this.items[index].event);
-      }
-    },
-    invalidate: function() {
-      this.highlight = typeof this.value.highlightNumber == 'number';
-      var watching = this.value.watchingNumbers || [];
+  computed: {
+    items: function() {
+      var watching = JSON.parse(this.watchingNumbers || '[]');
       var items = [];
+      items.highlight = this.highlightNumber != null && this.highlightNumber >= 0 && this.highlightNumber < this.group;
       //line number
       items[items.length] = {
-        value: this.value.lineNumber,
+        value: this.lineNumber,
         style: ['bytes-line-number', this.highlight ? 'bytes-highlight' : '']
       };
+      if (this.value == null) {
+        //for test
+        items.splice(0, 0, { value: '', style: [] });
+        items.splice(items.length, 0, { value: '', style: [] });
+        return items;
+      }
       //hex
       var curInt;
       var curUsage;
@@ -125,7 +108,7 @@ export default {
         var byte = this.value.newBytes.charCodeAt(i);
         items[items.length] = {
           value: byte.toString(16).zfill(2),
-          style: ['bytes-hex', 'bytes-usage-' + curUsage, 'bytes-changed-' + isChanged, this.value.highlightNumber == i ? 'bytes-highlight' : '']
+          style: ['bytes-hex', 'bytes-usage-' + curUsage, 'bytes-changed-' + isChanged, this.highlightNumber == i ? 'bytes-highlight' : '']
         };
         if (watching.indexOf(i) >= 0) {
           items[items.length - 1].style.push('bytes-border-top bytes-border-bottom');
@@ -143,7 +126,7 @@ export default {
         }
       }
       //string
-      if (this.value.showString) {
+      if (this.showString) {
         items[items.length] = {
           value: '&nbsp;',
           style: ['bytes-space', 'user-select-none']
@@ -170,7 +153,14 @@ export default {
       //padding
       items.splice(0, 0, { value: '', style: [] });
       items.splice(items.length, 0, { value: '', style: [] });
-      this.items.splice(0, this.items.length, ...items);
+      return items;
+    }
+  },
+  methods: {
+    onClickItem: function(index) {
+      if (this.items[index] && this.items[index].event) {
+        this.$emit('clickitem', ...this.items[index].event);
+      }
     }
   }
 };

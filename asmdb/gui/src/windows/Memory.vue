@@ -2,9 +2,9 @@
   <div class="memory-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" @search="onSearch"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
-    <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty>
-    <Recycler ref="recycler" class="memory-recycler" :items="items" #default="props" @loadmore="onDelta">
-      <Bytes :value="props.item" @clickitem="onClickItem"></Bytes>
+    <!-- <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty> -->
+    <Recycler class="memory-recycler" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
+      <Bytes :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemPosition)" :watchingNumbers="source.toWatchingNumbers(props.index,[])" :value="props.item" :group="8*column" :showString="true" @clickitem="onClickItem"></Bytes>
     </Recycler>
   </div>
 </template>
@@ -13,7 +13,7 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 const asmType = 'arm32';
-const pieceOf = 1024;
+const pieceOf = 2400;
 
 function groupBy() {
   switch (asmType) {
@@ -33,20 +33,94 @@ function measureTextWidth(length) {
   return length * 7.224609375;
 }
 
+function measureTextHeight() {
+  return 18;
+}
+
+class Source {
+  constructor(start, end, group, history) {
+    this.start = start;
+    this.end = end;
+    this.group = group;
+    this.history = history;
+    this.length = Math.ceil((end - start) / group);
+    this.loaded = [];
+  }
+
+  toLineNumber(index) {
+    var address = this.start + this.group * index;
+    return '0x' + address.toString(16).zfill(2 * groupBy());
+  }
+
+  toHighlightNumber(index, highlight) {
+    var address = this.start + this.group * index;
+    if (highlight != null) {
+      return highlight - address;
+    }
+    return null;
+  }
+
+  toWatchingNumbers(index, watching) {
+    var _watching = [];
+    var address = this.start + this.group * index;
+    if (watching != null) {
+      for (var addr of watching) {
+        _watching.push(addr - address);
+      }
+    }
+    return JSON.stringify(_watching.sort());
+  }
+
+  onScroll2(index) {
+    var offset = this.group * index;
+    offset -= offset % pieceOf;
+    this.load(offset - pieceOf);
+    this.load(offset);
+    this.load(offset + pieceOf);
+  }
+
+  load(offset) {
+    if (offset < 0 || offset >= this.end - this.start) {
+      return;
+    }
+    var start = this.start + offset;
+    var end = Math.min(start + pieceOf, this.end);
+    if (this.loaded.indexOf(start) >= 0) {
+      return;
+    }
+    this.loaded.push(start);
+    asmdb.xb([start, end], this.onLoad.bind(this));
+  }
+
+  onLoad(address, memory) {
+    if (this.loaded.indexOf(address) < 0) {
+      this.loaded.push(address);
+    }
+    for (var i = 0; i < Math.ceil(memory.length / this.group); i++) {
+      var index = (address - this.start) / this.group + i;
+      var newBytes = memory.slice(i * this.group, (i + 1) * this.group);
+      var oldBytes = null;
+      if (this.history != null && index in this.history) {
+        oldBytes = this.history[index].newBytes;
+      }
+      this[index] = {
+        oldBytes: oldBytes,
+        newBytes: newBytes
+      };
+    }
+  }
+}
+
 export default {
   data: function() {
     return {
       focus: false,
       disable: true,
       items: [],
-      oldAddr: null,
-      newAddr: null,
-      oldData: '',
-      newData: '',
+      source: null,
       itemPosition: null,
       itemSelection: null,
-      hst: [],
-      loadOrNot: [false, false]
+      hst: []
     };
   },
   props: {
@@ -57,10 +131,14 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return Math.ceil(24 + measureTextWidth(2 + (8 * groupBy()) / 4 + 25 * this.column + 2 + 8 * this.column) + 16 * this.column);
+      return Math.ceil(24 + measureTextWidth(2 + 2 * groupBy() + 25 * this.column + 2 + 8 * this.column) + 16 * this.column);
+    },
+    lineHeight: function() {
+      return measureTextHeight();
     }
   },
   created: function() {
+    this.source = new Source(0, Math.pow(16, 2 * groupBy()), 8 * this.column, null);
     keyboard.registerWindow(this);
     asmdb.registerEvent('memory', this);
   },
@@ -119,10 +197,8 @@ export default {
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
-      var posn = this.$refs.recycler.getPosition();
-      if (!posn) {
-        posn = [(this.newAddr + 1 * pieceOf) / (this.column * 8), 0];
-      }
+      var posn = null;
+      //todo
       this.hst.splice(this.hst.length, 0, posn);
       return true;
     },
@@ -131,155 +207,37 @@ export default {
         return false;
       } else {
         var posn = this.hst.splice(this.hst.length - 1, 1)[0];
-        var ro = rangeOf();
-        var address = posn[0] * this.column * 8;
-        var addr = Math.min(Math.max(address - (address % (this.column * 8)) - 1 * pieceOf, ro[0]), ro[1] - 3 * pieceOf);
-        this.newAddr = addr;
-        this.newData = '';
-        this.itemPosition = posn;
-        this.itemSelection = null;
-        if (!this.disable) {
-          asmdb.xb(this.getRange(), this.onLoadData);
-        }
+        //todo
         this.invalidate();
         return true;
       }
     },
     jumpTo: function(address) {
       this.hstSet();
-      var ro = rangeOf();
-      address = Math.min(Math.max(address, ro[0]), ro[1] - 1);
-      var addr = Math.min(Math.max(address - (address % (this.column * 8)) - 1 * pieceOf, ro[0]), ro[1] - 3 * pieceOf);
-      this.newAddr = addr;
-      this.newData = '';
-      this.itemPosition = [parseInt(address / (this.column * 8)), 0];
-      this.itemSelection = address;
-      if (!this.disable) {
-        asmdb.xb(this.getRange(), this.onLoadData);
-      }
-      this.invalidate();
-      this.requestFocus();
-      return true;
+      //todo
     },
     getRange: function() {
-      if (this.newAddr == null) {
-        return null;
-      }
-      return [this.newAddr, this.newAddr + 3 * pieceOf];
+      //todo
     },
     onBreak: function(addr, memory) {
       this.disable = false;
-      var range = this.getRange();
-      if (range == null) {
-        return;
-      }
-      if (range[0] != addr || range[1] != addr + memory.length) {
-        asmdb.xb(range, this.onLoadData);
-        return;
-      }
-      this.oldAddr = this.newAddr;
-      this.oldData = this.newData;
-      this.newData = memory;
-      this.loadOrNot[0] = this.loadOrNot[1] = false;
-      this.itemSelection = null;
+      //todo
       this.invalidate();
     },
     onContinue: function() {
       this.disable = true;
     },
-    onLoadData: function(addr, memory) {
-      var range = this.getRange();
-      if (range[0] != addr || range[1] != addr + memory.length) {
+    onScroll2: function(index) {
+      if (this.disable) {
         return;
       }
-      this.newData = memory;
-      this.loadOrNot[0] = this.loadOrNot[1] = false;
-      this.invalidate();
-    },
-    onLoadMore: function(addr, memory) {
-      this.$refs.recycler.postStop(() => {
-        if (this.newData.length <= 0) {
-          return;
-        }
-        var range = this.getRange();
-        if (this.loadOrNot[0] && range[0] == addr + memory.length) {
-          this.newAddr -= memory.length;
-          this.newData = memory + this.newData.substring(0, this.newData.length - memory.length);
-          this.loadOrNot[0] = this.loadOrNot[1] = false;
-          this.invalidate();
-        }
-        if (this.loadOrNot[1] && range[1] == addr) {
-          this.newAddr += memory.length;
-          this.newData = this.newData.substring(memory.length, this.newData.length) + memory;
-          this.loadOrNot[0] = this.loadOrNot[1] = false;
-          this.invalidate();
-        }
-      });
+      this.source.onScroll2(index);
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
     },
-    onDelta: function(delta) {
-      if (this.newAddr == null || this.newData.length <= 0) {
-        return;
-      }
-      var ro = rangeOf();
-      var range = this.getRange();
-      if (delta < 0) {
-        if (!this.loadOrNot[0]) {
-          this.loadOrNot[0] = true;
-          if (!this.disable && range[0] > ro[0]) {
-            asmdb.xb([Math.max(range[0] - pieceOf, ro[0]), range[0]], this.onLoadMore);
-          }
-        }
-      } else {
-        this.loadOrNot[0] = false;
-      }
-      if (delta > 0) {
-        if (!this.loadOrNot[1]) {
-          this.loadOrNot[1] = true;
-          if (!this.disable && range[1] < ro[1]) {
-            asmdb.xb([range[1], Math.min(range[1] + pieceOf, ro[1])], this.onLoadMore);
-          }
-        }
-      } else {
-        this.loadOrNot[1] = false;
-      }
-    },
     invalidate: function() {
-      var column = this.column * 8;
-      var items = [];
-      var addr = this.getRange()[0];
-      for (var i = 0; i < this.newData.length / column; i++) {
-        var newBytes = this.newData.slice(i * column, (i + 1) * column);
-        var oldBytes = '';
-        if (this.oldData) {
-          var da = this.newAddr - this.oldAddr;
-          oldBytes = this.oldData.slice(i * column + da, (i + 1) * column + da);
-        }
-        var lineNumber = addr + i * column;
-        var highlightNumber = this.itemSelection != null ? this.itemSelection - lineNumber : -1;
-        if (highlightNumber < 0 || highlightNumber >= column) {
-          highlightNumber = null;
-        }
-        lineNumber = '0x' + lineNumber.toString(16).zfill(2 * groupBy());
-        var idx = addr / column + i;
-        items[items.length] = {
-          idx: idx,
-          lineNumber: lineNumber,
-          oldBytes: oldBytes,
-          newBytes: newBytes,
-          showString: true,
-          highlightNumber: highlightNumber,
-          watchingNumbers: null
-        };
-      }
-      this.items.splice(0, this.items.length, ...items);
-      var posn = this.$refs.recycler.getPosition();
-      if (!posn) {
-        posn = this.itemPosition;
-      }
-      this.items.posn = posn;
+      //todo
     }
   }
 };
@@ -301,7 +259,6 @@ export default {
   .memory-recycler {
     flex-grow: 1;
     height: 0px;
-    overflow: scroll;
   }
 }
 </style>

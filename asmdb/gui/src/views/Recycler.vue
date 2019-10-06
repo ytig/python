@@ -32,13 +32,13 @@ export default {
       viewport[i] = { key: 0, val: null };
     }
     this.viewport.splice(0, this.viewport.length, ...viewport);
-    this.onScrollStop();
+    this.onScroll();
   },
   methods: {
     onScroll: function() {
-      //todo
       this.counter++;
       var container = this.$refs.container;
+      this.$emit('scroll2', parseInt(container.scrollTop / this.lineHeight));
       if (container.scrollTop <= 0 || container.scrollTop >= container.scrollHeight - container.clientHeight) {
         this.onScrollStop();
         return;
