@@ -21,7 +21,7 @@ export default {
     source: Object
   },
   watch: {
-    source: function(newValue, oldValue) {
+    'source.invalidate': function(newValue, oldValue) {
       this.invalidate();
     }
   },

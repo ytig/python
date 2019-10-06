@@ -45,6 +45,7 @@ class Source {
     this.history = history;
     this.length = Math.ceil((end - start) / group);
     this.loaded = [];
+    this.invalidate = 0;
   }
 
   toLineNumber(index) {
@@ -108,6 +109,7 @@ class Source {
         newBytes: newBytes
       };
     }
+    this.invalidate++;
   }
 }
 
