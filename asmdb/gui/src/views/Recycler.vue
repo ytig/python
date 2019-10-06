@@ -26,7 +26,7 @@ export default {
     }
   },
   mounted: function() {
-    var length = 3 * Math.ceil(window.innerHeight / this.lineHeight);
+    var length = 3 * Math.ceil(screen.height / this.lineHeight);
     var viewport = [];
     for (var i = 0; i < length; i++) {
       viewport[i] = { key: 0, val: null };
