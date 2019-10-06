@@ -1,7 +1,7 @@
 <template>
   <div ref="container" class="recycler-container" @scroll="onScroll">
     <div class="recycler-fill" :style="{transform:'translateY('+lineHeight*source.length+'px)'}"></div>
-    <div class="recycler-item" v-for="(item,index) in viewport" :key="index" :style="{transform:'translateY('+lineHeight*Math.max(item.key,0)+'px)'}">
+    <div class="recycler-item" v-for="(item, index) in viewport" :key="index" :style="{transform:'translateY('+lineHeight*Math.max(item.key,0)+'px)'}">
       <slot v-if="item.key>=0" :item="item.val" :index="item.key"></slot>
     </div>
   </div>
