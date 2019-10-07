@@ -43,8 +43,7 @@ export default {
   },
   methods: {
     getPageSize: function() {
-      //todo
-      return 64;
+      return parseInt(maxHeight / this.lineHeight / 3);
     },
     getPosition: function() {
       var scrollTop = this.$refs.container.scrollTop;
