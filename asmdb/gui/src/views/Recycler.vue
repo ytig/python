@@ -112,7 +112,7 @@ export default {
     invalidate: function() {
       var pageSize = this.getPageSize();
       var scrollHeight = this.lineHeight * Math.min(this.source.length - this.page * pageSize, 3 * pageSize);
-      var transform_ = 'translateY(' + scrollHeight - 1 + 'px)';
+      var transform_ = 'translateY(' + (scrollHeight - 1) + 'px)';
       if (this.style_.transform != transform_) {
         this.style_.transform = transform_;
       }
