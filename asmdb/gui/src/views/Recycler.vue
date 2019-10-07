@@ -71,12 +71,12 @@ export default {
       }, 147);
       var minScrollTop = (this.position.index - this.viewport.length / 3) * this.lineHeight;
       var maxScrollTop = (this.position.index + this.viewport.length / 3) * this.lineHeight;
-      var scrollTop = this.$refs.container.scrollTop;
-      if (scrollTop < minScrollTop) {
-        this.position.index -= Math.ceil((minScrollTop - scrollTop) / this.lineHeight);
+      var scrollTop_ = this.$refs.container.scrollTop + this.lineHeight * this.page * this.getPageSize();
+      if (scrollTop_ < minScrollTop) {
+        this.position.index -= Math.ceil((minScrollTop - scrollTop_) / this.lineHeight);
         this.invalidate();
-      } else if (scrollTop > maxScrollTop) {
-        this.position.index += Math.ceil((scrollTop - maxScrollTop) / this.lineHeight);
+      } else if (scrollTop_ > maxScrollTop) {
+        this.position.index += Math.ceil((scrollTop_ - maxScrollTop) / this.lineHeight);
         this.invalidate();
       }
     },
