@@ -8,9 +8,12 @@
 </template>
 
 <script>
+var maxHeight = 16777216;
+
 export default {
   data: function() {
     return {
+      page: 0,
       position: { index: 0, offset: 0 },
       viewport: [],
       counter: 0,
@@ -39,12 +42,24 @@ export default {
     this.onScroll();
   },
   methods: {
+    getPageSize: function() {
+      //todo
+      return 64;
+    },
+    getPosition: function() {
+      var scrollTop = this.$refs.container.scrollTop;
+      var position = {};
+      position.index = this.page * this.getPageSize() + parseInt(scrollTop / this.lineHeight);
+      position.offset = scrollTop % this.lineHeight;
+      return position;
+    },
+    scrollTo: function(position) {
+      //todo
+    },
     onScroll: function() {
       this.counter++;
-      var container = this.$refs.container;
-      this.$emit('scroll2', parseInt(container.scrollTop / this.lineHeight));
-      if (container.scrollTop <= 0 || container.scrollTop >= container.scrollHeight - container.clientHeight) {
-        this.onScrollStop();
+      this.$emit('scroll2', this.getPosition());
+      if (this.changePage()) {
         return;
       }
       var counter = this.counter;
@@ -56,7 +71,7 @@ export default {
       }, 147);
       var minScrollTop = (this.position.index - this.viewport.length / 3) * this.lineHeight;
       var maxScrollTop = (this.position.index + this.viewport.length / 3) * this.lineHeight;
-      var scrollTop = container.scrollTop;
+      var scrollTop = this.$refs.container.scrollTop;
       if (scrollTop < minScrollTop) {
         this.position.index -= Math.ceil((minScrollTop - scrollTop) / this.lineHeight);
         this.invalidate();
@@ -65,14 +80,42 @@ export default {
         this.invalidate();
       }
     },
-    onScrollStop: function() {
+    changePage: function() {
+      var pageSize = this.getPageSize();
+      var pageLength = 1 + Math.max(Math.ceil(this.source.length / pageSize) - 3, 0);
       var container = this.$refs.container;
-      var scrollTop = container.scrollTop;
-      this.position.index = parseInt(scrollTop / this.lineHeight);
-      this.position.offset = scrollTop % this.lineHeight;
+      var t = container.scrollTop <= this.lineHeight * pageSize * 0.5;
+      var b = container.scrollTop >= this.lineHeight * pageSize * 2.5;
+      var d = 0;
+      if (this.page > 0 && t) {
+        d -= 1;
+      }
+      if (this.page < pageLength - 1 && b) {
+        d += 1;
+      }
+      if (d != 0) {
+        this.page += d;
+        var position = this.getPosition();
+        this.position.index = position.index;
+        this.position.offset = position.offset;
+        container.scrollTop -= this.lineHeight * pageSize * d;
+        this.invalidate();
+      }
+      return d != 0;
+    },
+    onScrollStop: function() {
+      var position = this.getPosition();
+      this.position.index = position.index;
+      this.position.offset = position.offset;
       this.invalidate();
     },
     invalidate: function() {
+      var pageSize = this.getPageSize();
+      var scrollHeight = this.lineHeight * Math.min(this.source.length - this.page * pageSize, 3 * pageSize);
+      var transform_ = 'translateY(' + scrollHeight - 1 + 'px)';
+      if (this.style_.transform != transform_) {
+        this.style_.transform = transform_;
+      }
       var origin = this.position.index % this.viewport.length;
       for (var i = 0; i < this.viewport.length; i++) {
         var o = (origin + i) % this.viewport.length;
@@ -88,16 +131,19 @@ export default {
         if (key in this.source) {
           val = this.source[key];
         }
+        var translateY = 0;
+        if (key >= 0) {
+          translateY = this.lineHeight * (key - this.page * pageSize);
+        }
+        var transform = 'translateY(' + translateY + 'px)';
         if (slot.key != key) {
           slot.key = key;
-          var translateY = 0;
-          if (key >= 0) {
-            translateY = this.lineHeight * key;
-          }
-          slot.style_.transform = 'translateY(' + translateY + 'px)';
         }
         if (slot.val != val) {
           slot.val = val;
+        }
+        if (slot.style_.transform != transform) {
+          slot.style_.transform = transform;
         }
       }
     }
