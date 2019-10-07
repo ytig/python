@@ -67,10 +67,7 @@ export default {
         if (counter != this.counter) {
           return;
         }
-        var position = this.getPosition();
-        this.position.index = position.index;
-        this.position.offset = position.offset;
-        this.invalidate();
+        this.onScrollStop();
       }, 147);
       var minScrollTop = (this.position.index - this.viewport.length / 3) * this.lineHeight;
       var maxScrollTop = (this.position.index + this.viewport.length / 3) * this.lineHeight;
@@ -105,6 +102,12 @@ export default {
         this.invalidate();
       }
       return d != 0;
+    },
+    onScrollStop: function() {
+      var position = this.getPosition();
+      this.position.index = position.index;
+      this.position.offset = position.offset;
+      this.invalidate();
     },
     invalidate: function() {
       var pageSize = this.getPageSize();
