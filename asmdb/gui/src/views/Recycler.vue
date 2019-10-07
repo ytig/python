@@ -39,7 +39,8 @@ export default {
       viewport[i] = { key: -1, val: null, style_: { transform: 'translateY(0px)' } };
     }
     this.viewport.splice(0, this.viewport.length, ...viewport);
-    this.onScroll();
+    this.$emit('scroll2', this.getPosition());
+    this.invalidate();
   },
   methods: {
     getPageSize: function() {

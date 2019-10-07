@@ -72,7 +72,7 @@ class Source {
     return JSON.stringify(_watching.sort());
   }
 
-  onScroll2(index) {
+  onScroll(index) {
     var offset = this.group * index;
     offset -= offset % pieceOf;
     this.load(offset - pieceOf);
@@ -229,11 +229,11 @@ export default {
     onContinue: function() {
       this.disable = true;
     },
-    onScroll2: function(index) {
+    onScroll2: function(position) {
       if (this.disable) {
         return;
       }
-      this.source.onScroll2(index);
+      this.source.onScroll(position.index);
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
