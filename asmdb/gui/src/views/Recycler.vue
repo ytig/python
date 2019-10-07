@@ -1,7 +1,7 @@
 <template>
   <div ref="container" class="recycler-container" @scroll="onScroll">
-    <div class="recycler-fill" :style="_style"></div>
-    <div class="recycler-item" v-for="(item, index) in viewport" :key="index" :style="item._style">
+    <div class="recycler-fill" :style="style_"></div>
+    <div class="recycler-item" v-for="(item, index) in viewport" :key="index" :style="item.style_">
       <slot v-if="item.key>=0" :item="item.val" :index="item.key"></slot>
     </div>
   </div>
@@ -14,7 +14,7 @@ export default {
       position: { index: 0, offset: 0 },
       viewport: [],
       counter: 0,
-      _style: { transform: 'translateY(0px)' }
+      style_: { transform: 'translateY(0px)' }
     };
   },
   props: {
@@ -33,7 +33,7 @@ export default {
     var length = 3 * Math.ceil(screen.height / this.lineHeight);
     var viewport = [];
     for (var i = 0; i < length; i++) {
-      viewport[i] = { key: -1, val: null, _style: { transform: 'translateY(0px)' } };
+      viewport[i] = { key: -1, val: null, style_: { transform: 'translateY(0px)' } };
     }
     this.viewport.splice(0, this.viewport.length, ...viewport);
     this.onScroll();
@@ -94,7 +94,7 @@ export default {
           if (key >= 0) {
             translateY = this.lineHeight * key;
           }
-          slot._style.transform = 'translateY(' + translateY + 'px)';
+          slot.style_.transform = 'translateY(' + translateY + 'px)';
         }
         if (slot.val != val) {
           slot.val = val;
