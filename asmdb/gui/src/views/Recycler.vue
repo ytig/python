@@ -36,7 +36,7 @@ export default {
     var length = 3 * Math.ceil(screen.height / this.lineHeight);
     var viewport = [];
     for (var i = 0; i < length; i++) {
-      viewport[i] = { key: -1, val: null, style_: { transform: 'translateY(0px)' } };
+      viewport[i] = { key: -1, val: null, style_: { height: this.lineHeight + 'px', transform: 'translateY(0px)' } };
     }
     this.viewport.splice(0, this.viewport.length, ...viewport);
     this.$emit('scroll2', this.getPosition());
@@ -155,17 +155,18 @@ export default {
 @import '~@/styles/theme';
 
 .recycler-container {
-  overflow: scroll;
-  position: relative;
-  contain: content;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  contain: strict;
   .recycler-fill {
-    position: absolute;
+    position: fixed;
     width: 1px;
     height: 1px;
   }
   .recycler-item {
-    position: absolute;
-    contain: content;
+    position: fixed;
+    contain: strict;
+    width: 100%;
   }
 }
 </style>
