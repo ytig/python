@@ -1,6 +1,8 @@
 <template>
-  <div class="bytes-container" :css-highlight="items.highlight">
+  <div class="bytes-container" :css-highlight="highlight">
+    <span></span>
     <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)"></span>
+    <span></span>
   </div>
 </template>
 
@@ -40,6 +42,13 @@ function usageOf(int) {
   return '1';
 }
 
+function newItem(value, ...style) {
+  return {
+    value: value,
+    style: style
+  };
+}
+
 export default {
   props: {
     lineNumber: String,
@@ -50,109 +59,102 @@ export default {
     showString: Boolean
   },
   computed: {
+    highlight: function() {
+      return this.highlightNumber != null && this.highlightNumber >= 0 && this.highlightNumber < this.group;
+    },
     items: function() {
+      var highlight = null;
+      if (this.highlightNumber != null && this.highlightNumber >= 0 && this.highlightNumber < this.group) {
+        highlight = this.highlightNumber;
+      }
       var watching = JSON.parse(this.watchingNumbers || '[]');
       var items = [];
-      items.highlight = this.highlightNumber != null && this.highlightNumber >= 0 && this.highlightNumber < this.group;
       //line number
-      items[items.length] = {
-        value: this.lineNumber,
-        style: ['bytes-line-number', this.highlight ? 'bytes-highlight' : '']
-      };
-      if (this.value == null) {
-        //for test
-        items.splice(0, 0, { value: '', style: [] });
-        items.splice(items.length, 0, { value: '', style: [] });
-        return items;
-      }
+      items.push(newItem(this.lineNumber, 'bytes-line-number', highlight != null ? 'bytes-highlight' : ''));
       //hex
-      var curInt;
       var curUsage;
+      var curEvent;
       var bordering = false;
-      for (var i = 0; i < this.value.newBytes.length; i++) {
+      for (var i = 0; i < this.group; i++) {
         if (i % groupBy() == 0) {
-          items[items.length] = {
-            value: '&nbsp;',
-            style: ['bytes-space', bordering ? 'bytes-border-top bytes-border-bottom' : '']
-          };
+          items.push(newItem('&nbsp;', 'bytes-space', bordering ? 'bytes-border-top bytes-border-bottom' : ''));
           if (i % 8 == 0) {
-            items[items.length] = {
-              value: '&nbsp;',
-              style: ['bytes-space', bordering ? 'bytes-border-top bytes-border-bottom' : '']
-            };
+            items.push(newItem('&nbsp;', 'bytes-space', bordering ? 'bytes-border-top bytes-border-bottom' : ''));
           }
-          if (i + groupBy() - 1 < this.value.newBytes.length) {
-            curInt = 0;
+          if (this.value == null) {
+            curUsage = '0';
+            curEvent = null;
+          } else if (i + groupBy() - 1 < this.value.newBytes.length) {
+            var curAddress = 0;
             for (var j = groupBy() - 1; j >= 0; j--) {
-              curInt *= 256;
-              curInt += this.value.newBytes.charCodeAt(i + j);
+              curAddress *= 256;
+              curAddress += this.value.newBytes.charCodeAt(i + j);
             }
-            curUsage = usageOf(curInt);
+            curUsage = usageOf(curAddress);
+            var curUsage2 = parseInt(curUsage) - 2;
+            if (curUsage2 >= 0) {
+              curEvent = [curUsage2, curAddress];
+            } else {
+              curEvent = null;
+            }
           } else {
-            curInt = null;
             curUsage = '1';
+            curEvent = null;
           }
         } else {
-          items[items.length] = {
-            value: '&nbsp;',
-            style: ['bytes-space', 'bytes-usage-' + curUsage, , bordering ? 'bytes-border-top bytes-border-bottom' : '']
-          };
-          if (curUsage != '1') {
-            items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
+          items.push(newItem('&nbsp;', 'bytes-space', 'bytes-usage-' + curUsage, bordering ? 'bytes-border-top bytes-border-bottom' : ''));
+          if (curEvent != null) {
+            items[items.length - 1].event = curEvent;
           }
         }
-        var isChanged = false;
-        if (Boolean(this.value.oldBytes) && i < this.value.oldBytes.length) {
-          isChanged = this.value.oldBytes[i] != this.value.newBytes[i];
-        }
-        var byte = this.value.newBytes.charCodeAt(i);
-        items[items.length] = {
-          value: byte.toString(16).zfill(2),
-          style: ['bytes-hex', 'bytes-usage-' + curUsage, 'bytes-changed-' + isChanged, this.highlightNumber == i ? 'bytes-highlight' : '']
-        };
-        if (watching.indexOf(i) >= 0) {
-          items[items.length - 1].style.push('bytes-border-top bytes-border-bottom');
-          if (watching.indexOf(i - 1) < 0) {
-            items[items.length - 1].style.push('bytes-border-left');
-            bordering = true;
+        if (this.value == null) {
+          items.push(newItem('..', 'bytes-hex', 'bytes-usage-' + curUsage));
+        } else {
+          var charCode = '&nbsp;&nbsp;';
+          var isChanged = false;
+          if (i < this.value.newBytes.length) {
+            var byte = this.value.newBytes.charCodeAt(i);
+            charCode = byte.toString(16).zfill(2);
+            if (Boolean(this.value.oldBytes) && i < this.value.oldBytes.length) {
+              isChanged = this.value.oldBytes[i] != this.value.newBytes[i];
+            }
           }
-          if (watching.indexOf(i + 1) < 0) {
-            items[items.length - 1].style.push('bytes-border-right');
-            bordering = false;
+          items.push(newItem(charCode, 'bytes-hex', 'bytes-usage-' + curUsage, 'bytes-changed-' + isChanged, highlight == i ? 'bytes-highlight' : ''));
+          if (watching.indexOf(i) >= 0) {
+            items[items.length - 1].style.push('bytes-border-top bytes-border-bottom');
+            if (watching.indexOf(i - 1) < 0) {
+              items[items.length - 1].style.push('bytes-border-left');
+              bordering = true;
+            }
+            if (watching.indexOf(i + 1) < 0) {
+              items[items.length - 1].style.push('bytes-border-right');
+              bordering = false;
+            }
           }
-        }
-        if (curUsage != '1') {
-          items[items.length - 1].event = [parseInt(curUsage) - 2, curInt];
+          if (curEvent != null) {
+            items[items.length - 1].event = curEvent;
+          }
         }
       }
       //string
       if (this.showString) {
-        items[items.length] = {
-          value: '&nbsp;',
-          style: ['bytes-space', 'user-select-none']
-        };
-        items[items.length] = {
-          value: '&nbsp;',
-          style: ['bytes-space', 'user-select-none']
-        };
-        for (var i = 0; i < this.value.newBytes.length; i++) {
-          var byte = this.value.newBytes.charCodeAt(i);
-          if (byte >= 0x21 && byte <= 0x7e) {
-            items[items.length] = {
-              value: String.fromCharCode(byte),
-              style: ['bytes-string', 'user-select-none', 'bytes-visible-' + true]
-            };
-          } else {
-            items[items.length] = {
-              value: '.',
-              style: ['bytes-string', 'user-select-none', 'bytes-visible-' + false]
-            };
+        items.push(newItem('&nbsp;', 'bytes-space', 'user-select-none'));
+        items.push(newItem('&nbsp;', 'bytes-space', 'user-select-none'));
+        if (this.value == null) {
+          for (var i = 0; i < this.group; i++) {
+            items.push(newItem('.', 'bytes-string', 'user-select-none', 'bytes-visible-' + false));
+          }
+        } else {
+          for (var i = 0; i < this.value.newBytes.length; i++) {
+            var byte = this.value.newBytes.charCodeAt(i);
+            if (byte >= 0x21 && byte <= 0x7e) {
+              items.push(newItem(String.fromCharCode(byte), 'bytes-string', 'user-select-none', 'bytes-visible-' + true));
+            } else {
+              items.push(newItem('.', 'bytes-string', 'user-select-none', 'bytes-visible-' + false));
+            }
           }
         }
       }
-      //padding
-      items.splice(0, 0, { value: '', style: [] });
-      items.splice(items.length, 0, { value: '', style: [] });
       return items;
     }
   },
@@ -215,6 +217,9 @@ export default {
   }
   .bytes-hex.bytes-highlight {
     text-decoration: underline;
+  }
+  .bytes-hex.bytes-usage-0 {
+    color: @color-text-darker;
   }
   .bytes-hex.bytes-usage-1.bytes-changed-false {
     color: @color-text;
