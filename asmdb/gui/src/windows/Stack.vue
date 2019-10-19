@@ -4,7 +4,7 @@
     <Navigation :name="'Stack'" :focus="focus" :disable="disable"></Navigation>
     <div ref="stackLayout" class="stack-layout">
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
-      <Bytes v-else v-for="(item, index) in items" :key="index" :value="item" @clickitem="onClickItem"></Bytes>
+      <Bytes v-else v-for="(item, index) in items" :key="index" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :value="item.value" :group="8*column" :showString="false" @clickitem="onClickItem"></Bytes>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="sp==null"></Indicator>
   </div>
@@ -200,11 +200,12 @@ export default {
         lineNumber = '+0x' + lineNumber.toString(16).zfill(3);
         items[items.length] = {
           lineNumber: lineNumber,
-          oldBytes: oldBytes,
-          newBytes: newBytes,
-          showString: false,
           highlightNumber: highlightNumber,
-          watchingNumbers: null
+          watchingNumbers: null,
+          value: {
+            oldBytes: oldBytes,
+            newBytes: newBytes
+          }
         };
       }
       this.items.splice(0, this.items.length, ...items);
