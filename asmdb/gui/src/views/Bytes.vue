@@ -108,7 +108,7 @@ export default {
           }
         }
         if (this.value == null) {
-          items.push(newItem('..', 'bytes-hex', 'bytes-usage-' + curUsage));
+          items.push(newItem('00', 'bytes-hex', 'bytes-usage-' + curUsage));
         } else {
           var charCode = '&nbsp;&nbsp;';
           var isChanged = false;
@@ -142,15 +142,15 @@ export default {
         items.push(newItem('&nbsp;', 'bytes-space', 'user-select-none'));
         if (this.value == null) {
           for (var i = 0; i < this.group; i++) {
-            items.push(newItem('.', 'bytes-string', 'user-select-none', 'bytes-visible-' + false));
+            items.push(newItem('.', 'bytes-string', 'bytes-visible-' + false, 'user-select-none'));
           }
         } else {
           for (var i = 0; i < this.value.newBytes.length; i++) {
             var byte = this.value.newBytes.charCodeAt(i);
             if (byte >= 0x21 && byte <= 0x7e) {
-              items.push(newItem(String.fromCharCode(byte), 'bytes-string', 'user-select-none', 'bytes-visible-' + true));
+              items.push(newItem(String.fromCharCode(byte), 'bytes-string', 'bytes-visible-' + true, 'user-select-none'));
             } else {
-              items.push(newItem('.', 'bytes-string', 'user-select-none', 'bytes-visible-' + false));
+              items.push(newItem('.', 'bytes-string', 'bytes-visible-' + false, 'user-select-none'));
             }
           }
         }
