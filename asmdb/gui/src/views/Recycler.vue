@@ -131,9 +131,11 @@ export default {
         if (key in this.source) {
           val = this.source[key];
         }
-        var translateY = 0;
+        var translateY;
         if (key >= 0) {
           translateY = this.lineHeight * (key - this.page * pageSize);
+        } else {
+          translateY = -this.lineHeight;
         }
         var transform = 'translateY(' + translateY + 'px)';
         if (slot.key != key) {
