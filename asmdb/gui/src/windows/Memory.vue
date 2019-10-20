@@ -72,28 +72,43 @@ class Source {
     return JSON.stringify(_watching.sort());
   }
 
-  onScroll(index) {
+  getRange(index) {
     var offset = this.group * index;
     offset -= offset % pieceOf;
-    this.load(offset - pieceOf);
-    this.load(offset);
-    this.load(offset + pieceOf);
+    var start = this.start + offset - pieceOf;
+    var end = start + 3 * pieceOf;
+    start = Math.max(start, this.start);
+    end = Math.min(end, this.end);
+    return [start, end];
   }
 
-  load(offset) {
-    if (offset < 0 || offset >= this.end - this.start) {
-      return;
+  onScroll(index) {
+    var range = this.getRange(index);
+    var ranges = [];
+    for (var i = 0; i < Math.ceil((range[1] - range[0]) / pieceOf); i++) {
+      var start = range[0] + i * pieceOf;
+      if (this.loaded.indexOf(start) < 0) {
+        this.loaded.push(start);
+        var end = Math.min(start + pieceOf, range[1]);
+        if (ranges.length > 0 && ranges[ranges.length - 1][1] == start) {
+          ranges[ranges.length - 1][1] = end;
+        } else {
+          ranges.push([start, end]);
+        }
+      }
     }
-    var start = this.start + offset;
-    var end = Math.min(start + pieceOf, this.end);
-    if (this.loaded.indexOf(start) >= 0) {
-      return;
+    for (var r of ranges) {
+      asmdb.xb(r, this.onLoad.bind(this));
     }
-    this.loaded.push(start);
-    asmdb.xb([start, end], this.onLoad.bind(this));
   }
 
   onLoad(address, memory) {
+    if (memory.length > pieceOf) {
+      for (var i = 0; i < Math.ceil(memory.length / pieceOf); i++) {
+        this.onLoad(address + i * pieceOf, memory.slice(i * pieceOf, (i + 1) * pieceOf));
+      }
+      return;
+    }
     if (this.loaded.indexOf(address) < 0) {
       this.loaded.push(address);
     }
@@ -110,22 +125,6 @@ class Source {
       };
     }
     this.invalidate++;
-  }
-
-  getRange(index) {
-    var offset = this.group * index;
-    offset -= offset % pieceOf;
-    var start = this.start + offset - pieceOf;
-    var end = start + 3 * pieceOf;
-    start = Math.max(start, this.start);
-    end = Math.min(end, this.end);
-    return [start, end];
-  }
-
-  onBreak(address, memory) {
-    for (var i = 0; i < memory.length / pieceOf; i++) {
-      this.onLoad(address + i * pieceOf, memory.slice(i * pieceOf, (i + 1) * pieceOf));
-    }
   }
 }
 
@@ -251,7 +250,7 @@ export default {
       }
       this.source = new Source(0, Math.pow(16, 2 * groupBy()), 8 * this.column, this.source);
       if (Boolean(memory)) {
-        this.source.onBreak(address, memory);
+        this.source.onLoad(address, memory);
       }
       this.source.onScroll(this.$refs.recycler.getPosition().index);
     },
