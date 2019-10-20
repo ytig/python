@@ -33,8 +33,7 @@ export default {
     margin-top: 10px;
     width: 20px;
     height: 20px;
-    mask-image: url('~@/icons/title.png');
-    background: @color-text;
+    background-image: url('~@/icons/title.png');
   }
   > span {
     line-height: 40px;
