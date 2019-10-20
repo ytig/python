@@ -48,7 +48,6 @@ export default {
   width: 100%;
   height: 100%;
   display: flex;
-  background: @color-background;
 
   #left-layout {
     flex-grow: 1;
@@ -62,17 +61,22 @@ export default {
       flex-grow: 1;
       border-top: 1px solid @color-border;
       border-bottom: 1px solid @color-border;
+      background: @color-background;
     }
     #points-layout {
       display: flex;
       #breakpoints {
         flex-grow: 1;
         height: 100%;
+        background: @color-background;
       }
       #points-split {
         width: 1px;
         height: 100%;
         background: @color-border;
+      }
+      #watchpoints {
+        background: @color-background;
       }
     }
   }
@@ -82,12 +86,16 @@ export default {
     box-shadow: 0px 0px 6px @color-border-shadow;
     display: flex;
     flex-direction: column;
+    #registers {
+      background: @color-background;
+    }
     #heap-layout {
       flex-grow: 1;
       display: flex;
       border-top: 1px solid @color-border;
       #stack {
         height: 100%;
+        background: @color-background;
       }
       #heap-split {
         width: 1px;
@@ -96,6 +104,7 @@ export default {
       }
       #memory {
         height: 100%;
+        background: @color-background;
       }
     }
   }
