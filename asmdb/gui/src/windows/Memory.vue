@@ -3,7 +3,7 @@
     <Search ref="search" @search="onSearch"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
     <!-- <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty> -->
-    <Recycler class="memory-recycler" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
+    <Recycler ref="recycler" class="memory-recycler" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
       <Bytes :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemPosition)" :watchingNumbers="source.toWatchingNumbers(props.index,[])" :value="props.item" :group="8*column" :showString="true" @clickitem="onClickItem"></Bytes>
     </Recycler>
   </div>
@@ -215,8 +215,12 @@ export default {
       }
     },
     jumpTo: function(address) {
-      this.hstSet();
       //todo
+      // this.hstSet();
+      this.$refs.recycler.scrollTo({
+        index: parseInt(address / (8 * this.column)),
+        offset: 0
+      });
     },
     getRange: function() {
       //todo

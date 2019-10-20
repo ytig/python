@@ -54,7 +54,19 @@ export default {
       return position;
     },
     scrollTo: function(position) {
-      //todo
+      var pageSize = this.getPageSize();
+      var pageLength = 1 + Math.max(Math.ceil(this.source.length / pageSize) - 3, 0);
+      var container = this.$refs.container;
+      var maxScrollTop = this.lineHeight * this.source.length - container.clientHeight;
+      var scrollTop = position.index * this.lineHeight + position.offset;
+      scrollTop = Math.min(Math.max(scrollTop, 0), maxScrollTop);
+      var page = parseInt(scrollTop / (this.lineHeight * pageSize)) - 1;
+      page = Math.min(Math.max(page, 0), pageLength - 1);
+      this.page = page;
+      container.scrollTop = scrollTop - this.lineHeight * this.page * pageSize;
+      this.position.index = parseInt(scrollTop / this.lineHeight);
+      this.position.offset = scrollTop % this.lineHeight;
+      this.invalidate();
     },
     onScroll: function() {
       this.counter++;
