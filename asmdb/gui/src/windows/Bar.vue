@@ -1,5 +1,6 @@
 <template>
   <div class="bar-container">
+    <div></div>
     <span class="bar-title">{{title}}</span>
     <span class="bar-item" v-for="(item, index) in items" :key="index" @click="onClickItem(index)">{{item}}</span>
   </div>
@@ -27,29 +28,38 @@ export default {
 .bar-container {
   height: 40px;
   display: flex;
+  > div {
+    margin-left: 12px;
+    margin-top: 10px;
+    width: 20px;
+    height: 20px;
+    mask-image: url('~@/icons/title.png');
+    background: @color-text;
+  }
   > span {
     line-height: 40px;
-    padding: 0px 9px;
     font-size: 16px;
     color: @color-text;
     font-family: 'Wawati SC';
   }
   .bar-title {
-    margin-left: 3px;
     flex-grow: 1;
+    margin-left: 6px;
+    margin-right: 3px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     contain: size;
   }
   .bar-item {
+    padding: 0px 9px;
     cursor: pointer;
-  }
-  .bar-item:nth-last-child(1) {
-    margin-right: 3px;
   }
   .bar-item:hover {
     color: @color-text-light;
+  }
+  > span:nth-last-of-type(1) {
+    margin-right: 3px;
   }
 }
 </style>
