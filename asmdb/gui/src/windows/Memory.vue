@@ -285,8 +285,8 @@ export default {
     padding-top: 12px;
   }
   .memory-recycler {
-    flex-grow: 1;
     height: 0px;
+    flex-grow: 1;
   }
 }
 </style>

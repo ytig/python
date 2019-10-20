@@ -222,8 +222,8 @@ export default {
   display: flex;
   flex-direction: column;
   .stack-layout {
-    flex-grow: 1;
     height: 0px;
+    flex-grow: 1;
     overflow-y: scroll;
   }
 }
