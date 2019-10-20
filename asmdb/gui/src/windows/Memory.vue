@@ -187,20 +187,12 @@ export default {
     onSearch: function(address) {
       this.jumpTo(address);
     },
-    hstSet: function() {
-      var posn = this.$refs.recycler.getPosition();
-      if (this.hst.length > 0) {
-        var _posn = this.hst[this.hst.length - 1];
-        if (posn.index == _posn.index && posn.offset == _posn.offset) {
-          return false;
-        }
-      }
+    hstSet: function(posn) {
       const maxHst = 147;
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
       this.hst.splice(this.hst.length, 0, posn);
-      return true;
     },
     hstGet: function() {
       if (this.hst.length <= 0) {
@@ -214,16 +206,20 @@ export default {
     },
     jumpTo: function(address) {
       address = Math.min(Math.max(address, this.source.start), this.source.end - 1);
+      var posn = {
+        index: parseInt((address - this.source.start) / this.source.group),
+        offset: 0
+      };
       if (!this.show) {
         this.show = true;
       } else {
-        this.hstSet();
+        var _posn = this.$refs.recycler.getPosition();
+        if (_posn.index != posn.index || _posn.offset != posn.offset) {
+          this.hstSet(_posn);
+        }
       }
       this.itemSelection = address;
-      this.$refs.recycler.scrollTo({
-        index: parseInt((address - this.source.start) / this.source.group),
-        offset: 0
-      });
+      this.$refs.recycler.scrollTo(posn);
       this.requestFocus();
     },
     getRange: function() {
