@@ -221,6 +221,7 @@ export default {
         index: parseInt((address - this.source.start) / this.source.group),
         offset: 0
       });
+      this.requestFocus();
     },
     getRange: function() {
       if (!this.show) {
