@@ -187,15 +187,18 @@ export default {
     onSearch: function(address) {
       this.jumpTo(address);
     },
-    hstDel: function() {
-      this.hst.splice(0, this.hst.length);
-    },
     hstSet: function() {
+      var posn = this.$refs.recycler.getPosition();
+      if (this.hst.length > 0) {
+        var _posn = this.hst[this.hst.length - 1];
+        if (posn.index == _posn.index && posn.offset == _posn.offset) {
+          return false;
+        }
+      }
       const maxHst = 147;
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
-      var posn = this.$refs.recycler.getPosition();
       this.hst.splice(this.hst.length, 0, posn);
       return true;
     },
