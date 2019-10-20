@@ -60,7 +60,7 @@ export default {
       var maxScrollTop = this.lineHeight * this.source.length - container.clientHeight;
       var scrollTop = position.index * this.lineHeight + position.offset;
       scrollTop = Math.min(Math.max(scrollTop, 0), maxScrollTop);
-      var page = parseInt(scrollTop / (this.lineHeight * pageSize)) - 1;
+      var page = parseInt(scrollTop / (this.lineHeight * pageSize) - 0.741);
       page = Math.min(Math.max(page, 0), pageLength - 1);
       this.page = page;
       container.scrollTop = scrollTop - this.lineHeight * this.page * pageSize;
