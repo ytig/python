@@ -1,7 +1,6 @@
 <template>
   <div class="bar-container">
     <span class="bar-title">{{title}}</span>
-    <span class="bar-grow"></span>
     <span class="bar-item" v-for="(item, index) in items" :key="index" @click="onClickItem(index)">{{item}}</span>
   </div>
 </template>
@@ -28,23 +27,22 @@ export default {
 .bar-container {
   height: 40px;
   display: flex;
-  .bar-title {
+  > span {
     line-height: 40px;
-    margin-left: 3px;
     padding: 0px 9px;
     font-size: 16px;
     color: @color-text;
     font-family: 'Wawati SC';
   }
-  .bar-grow {
+  .bar-title {
+    margin-left: 3px;
     flex-grow: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    contain: size;
   }
   .bar-item {
-    line-height: 40px;
-    padding: 0px 9px;
-    font-size: 16px;
-    color: @color-text;
-    font-family: 'Wawati SC';
     cursor: pointer;
   }
   .bar-item:nth-last-child(1) {
