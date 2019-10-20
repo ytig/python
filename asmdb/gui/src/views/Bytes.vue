@@ -60,11 +60,11 @@ export default {
   },
   computed: {
     highlight: function() {
-      return this.highlightNumber != null && this.value != null && this.highlightNumber >= 0 && this.highlightNumber < this.value.newBytes.length;
+      return this.highlightNumber != null && this.highlightNumber >= 0 && this.highlightNumber < this.group;
     },
     items: function() {
       var highlight = null;
-      if (this.highlightNumber != null && this.value != null && this.highlightNumber >= 0 && this.highlightNumber < this.value.newBytes.length) {
+      if (this.highlightNumber != null && this.highlightNumber >= 0 && this.highlightNumber < this.group) {
         highlight = this.highlightNumber;
       }
       var watching = JSON.parse(this.watchingNumbers || '[]');
@@ -108,7 +108,7 @@ export default {
           }
         }
         if (this.value == null) {
-          items.push(newItem('00', 'bytes-hex', 'bytes-usage-' + curUsage));
+          items.push(newItem('00', 'bytes-hex', 'bytes-usage-' + curUsage, highlight != null ? 'bytes-highlight' : '', highlight == i ? 'bytes-underline' : ''));
         } else {
           var charCode = '&nbsp;&nbsp;';
           var isChanged = false;
@@ -119,7 +119,7 @@ export default {
               isChanged = this.value.oldBytes[i] != this.value.newBytes[i];
             }
           }
-          items.push(newItem(charCode, 'bytes-hex', 'bytes-usage-' + curUsage, 'bytes-changed-' + isChanged, highlight == i ? 'bytes-highlight' : ''));
+          items.push(newItem(charCode, 'bytes-hex', 'bytes-usage-' + curUsage, 'bytes-changed-' + isChanged, highlight == i ? 'bytes-underline' : ''));
           if (watching.indexOf(i) >= 0) {
             items[items.length - 1].style.push('bytes-border-top bytes-border-bottom');
             if (watching.indexOf(i - 1) < 0) {
@@ -142,7 +142,7 @@ export default {
         items.push(newItem('&nbsp;', 'bytes-space', 'user-select-none'));
         if (this.value == null) {
           for (var i = 0; i < this.group; i++) {
-            items.push(newItem('.', 'bytes-string', 'bytes-visible-' + false, 'user-select-none'));
+            items.push(newItem('.', 'bytes-string', 'bytes-visible-' + false, highlight != null ? 'bytes-highlight' : '', 'user-select-none'));
           }
         } else {
           for (var i = 0; i < this.value.newBytes.length; i++) {
@@ -150,7 +150,7 @@ export default {
             if (byte >= 0x21 && byte <= 0x7e) {
               items.push(newItem(String.fromCharCode(byte), 'bytes-string', 'bytes-visible-' + true, 'user-select-none'));
             } else {
-              items.push(newItem('.', 'bytes-string', 'bytes-visible-' + false, 'user-select-none'));
+              items.push(newItem('.', 'bytes-string', 'bytes-visible-' + false, highlight != null ? 'bytes-highlight' : '', 'user-select-none'));
             }
           }
         }
@@ -215,11 +215,14 @@ export default {
     margin-right: -1px;
     border-right: 1px solid @color-icon-breakpoint;
   }
-  .bytes-hex.bytes-highlight {
+  .bytes-hex.bytes-underline {
     text-decoration: underline;
   }
   .bytes-hex.bytes-usage-0 {
     color: @color-text-darker;
+  }
+  .bytes-hex.bytes-usage-0.bytes-highlight {
+    color: @color-text-dark;
   }
   .bytes-hex.bytes-usage-1.bytes-changed-false {
     color: @color-text;
@@ -264,6 +267,9 @@ export default {
   }
   .bytes-string.bytes-visible-false {
     color: @color-text-darker;
+  }
+  .bytes-string.bytes-visible-false.bytes-highlight {
+    color: @color-text-dark;
   }
 }
 </style>
