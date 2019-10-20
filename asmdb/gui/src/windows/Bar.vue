@@ -30,9 +30,9 @@ export default {
   display: flex;
   > div {
     margin-left: 12px;
-    margin-top: 10px;
-    width: 20px;
-    height: 20px;
+    margin-top: 9px;
+    width: 22px;
+    height: 22px;
     background-image: url('~@/icons/android.png');
   }
   > span {
