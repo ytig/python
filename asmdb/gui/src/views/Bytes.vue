@@ -60,11 +60,11 @@ export default {
   },
   computed: {
     highlight: function() {
-      return this.highlightNumber != null && this.highlightNumber >= 0 && this.highlightNumber < this.group;
+      return this.highlightNumber != null && this.value != null && this.highlightNumber >= 0 && this.highlightNumber < this.value.newBytes.length;
     },
     items: function() {
       var highlight = null;
-      if (this.highlightNumber != null && this.highlightNumber >= 0 && this.highlightNumber < this.group) {
+      if (this.highlightNumber != null && this.value != null && this.highlightNumber >= 0 && this.highlightNumber < this.value.newBytes.length) {
         highlight = this.highlightNumber;
       }
       var watching = JSON.parse(this.watchingNumbers || '[]');
