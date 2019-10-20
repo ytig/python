@@ -43,13 +43,13 @@ export default {
     font-family: 'Wawati SC';
   }
   .bar-title {
+    width: 0px;
     flex-grow: 1;
     margin-left: 6px;
     margin-right: 3px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    contain: size;
   }
   .bar-item {
     padding: 0px 9px;
