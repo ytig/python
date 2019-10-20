@@ -33,7 +33,7 @@ export default {
     margin-top: 10px;
     width: 20px;
     height: 20px;
-    background-image: url('~@/icons/title.png');
+    background-image: url('~@/icons/android.png');
   }
   > span {
     line-height: 40px;
