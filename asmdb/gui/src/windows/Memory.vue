@@ -254,10 +254,10 @@ export default {
         this.source.onBreak(address, memory);
       }
       this.source.onScroll(this.$refs.recycler.getPosition().index);
-      this.itemSelection = null;
     },
     onContinue: function() {
       this.disable = true;
+      this.itemSelection = null;
     },
     onScroll2: function(position) {
       if (this.disable) {
