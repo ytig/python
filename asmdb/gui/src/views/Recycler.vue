@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="recycler-container" @scroll="onScroll">
+  <div ref="container" class="recycler-container" :style="show_" @scroll="onScroll">
     <div class="recycler-fill" :style="style_"></div>
     <div class="recycler-item" v-for="(item, index) in viewport" :key="index" :style="item.style_">
       <slot v-if="item.key>=0" :item="item.val" :index="item.key"></slot>
@@ -21,10 +21,29 @@ export default {
     };
   },
   props: {
+    show: Boolean,
     lineHeight: Number,
     source: Object
   },
+  computed: {
+    show_: function() {
+      if (this.show) {
+        return {};
+      } else {
+        return {
+          opacity: 0,
+          overflowY: 'hidden',
+          pointerEvents: 'none'
+        };
+      }
+    }
+  },
   watch: {
+    show: function(newValue, oldValue) {
+      if (newValue) {
+        this.$emit('scroll2', this.getPosition());
+      }
+    },
     source: function(newValue, oldValue) {
       this.invalidate();
     },
@@ -39,7 +58,9 @@ export default {
       viewport[i] = { key: -1, val: null, style_: { height: this.lineHeight + 'px', transform: 'translateY(0px)' } };
     }
     this.viewport.splice(0, this.viewport.length, ...viewport);
-    this.$emit('scroll2', this.getPosition());
+    if (this.show) {
+      this.$emit('scroll2', this.getPosition());
+    }
     this.invalidate();
   },
   methods: {
