@@ -2,9 +2,9 @@
   <div class="memory-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" @search="onSearch"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
-    <!-- <Empty v-show="items.length==0" class="memory-empty" :text="newAddr==null?'[no data]':'[pulling data]'"></Empty> -->
-    <Recycler ref="recycler" class="memory-recycler" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
-      <Bytes :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemPosition)" :watchingNumbers="source.toWatchingNumbers(props.index,[])" :value="props.item" :group="8*column" :showString="true" @clickitem="onClickItem"></Bytes>
+    <Empty v-show="!show" class="memory-empty" :text="'[no data]'"></Empty>
+    <Recycler ref="recycler" class="memory-recycler" :show="show" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
+      <Bytes :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,[])" :value="props.item" :group="8*column" :showString="true" @clickitem="onClickItem"></Bytes>
     </Recycler>
   </div>
 </template>
@@ -118,9 +118,8 @@ export default {
     return {
       focus: false,
       disable: true,
-      items: [],
+      show: false,
       source: null,
-      itemPosition: null,
       itemSelection: null,
       hst: []
     };
@@ -192,15 +191,11 @@ export default {
       this.hst.splice(0, this.hst.length);
     },
     hstSet: function() {
-      if (this.newAddr == null) {
-        return false;
-      }
       const maxHst = 147;
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
-      var posn = null;
-      //todo
+      var posn = this.$refs.recycler.getPosition();
       this.hst.splice(this.hst.length, 0, posn);
       return true;
     },
@@ -209,26 +204,39 @@ export default {
         return false;
       } else {
         var posn = this.hst.splice(this.hst.length - 1, 1)[0];
-        //todo
-        this.invalidate();
+        this.itemSelection = null;
+        this.$refs.recycler.scrollTo(posn);
         return true;
       }
     },
     jumpTo: function(address) {
-      //todo
-      // this.hstSet();
+      address = Math.min(Math.max(address, this.source.start), this.source.end - 1);
+      if (!this.show) {
+        this.show = true;
+      } else {
+        this.hstSet();
+      }
+      this.itemSelection = address;
       this.$refs.recycler.scrollTo({
-        index: parseInt(address / (8 * this.column)),
+        index: parseInt((address - this.source.start) / this.source.group),
         offset: 0
       });
     },
     getRange: function() {
+      if (!this.show) {
+        return null;
+      }
       //todo
     },
     onBreak: function(addr, memory) {
       this.disable = false;
-      //todo
-      this.invalidate();
+      if (!this.show) {
+        return;
+      }
+      this.source = new Source(0, Math.pow(16, 2 * groupBy()), 8 * this.column, this.source);
+      // this.source.onLoad(addr, memory);
+      this.source.onScroll(this.$refs.recycler.getPosition().index);
+      this.itemSelection = null;
     },
     onContinue: function() {
       this.disable = true;
@@ -241,9 +249,6 @@ export default {
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
-    },
-    invalidate: function() {
-      //todo
     }
   }
 };
