@@ -111,6 +111,22 @@ class Source {
     }
     this.invalidate++;
   }
+
+  getRange(index) {
+    var offset = this.group * index;
+    offset -= offset % pieceOf;
+    var start = this.start + offset - pieceOf;
+    var end = start + 3 * pieceOf;
+    start = Math.max(start, this.start);
+    end = Math.min(end, this.end);
+    return [start, end];
+  }
+
+  onBreak(address, memory) {
+    for (var i = 0; i < memory.length / pieceOf; i++) {
+      this.onLoad(address + i * pieceOf, memory.slice(i * pieceOf, (i + 1) * pieceOf));
+    }
+  }
 }
 
 export default {
@@ -226,15 +242,17 @@ export default {
       if (!this.show) {
         return null;
       }
-      //todo
+      return this.source.getRange(this.$refs.recycler.getPosition().index);
     },
-    onBreak: function(addr, memory) {
+    onBreak: function(address, memory) {
       this.disable = false;
       if (!this.show) {
         return;
       }
       this.source = new Source(0, Math.pow(16, 2 * groupBy()), 8 * this.column, this.source);
-      // this.source.onLoad(addr, memory);
+      if (Boolean(memory)) {
+        this.source.onBreak(address, memory);
+      }
       this.source.onScroll(this.$refs.recycler.getPosition().index);
       this.itemSelection = null;
     },

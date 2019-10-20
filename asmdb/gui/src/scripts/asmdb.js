@@ -47,7 +47,16 @@ setTimeout(() => {
     }, 2500);
   }
   if (memory) {
-    memory.onBreak();
+    var range = memory.getRange();
+    if (range == null) {
+      memory.onBreak();
+    } else {
+      var bytes = [];
+      for (var i = 0; i < range[1] - range[0]; i++) {
+        bytes[bytes.length] = Math.floor(256 * Math.random());
+      }
+      memory.onBreak(range[0], for_test(bytes));
+    }
   }
 }, 1000);
 
