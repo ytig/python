@@ -66,8 +66,7 @@ export default {
     cursor: pointer;
   }
   .bar-item:hover {
-    border: 0px solid @color-background-dark;
-    border-width: 4px 2px;
+    border: 4px solid @color-background-dark;
     border-radius: 4px;
     background-color: @color-background-hover;
   }
