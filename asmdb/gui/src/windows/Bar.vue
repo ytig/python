@@ -34,12 +34,12 @@ export default {
 @import '~@/styles/theme';
 
 .bar-container {
-  height: 40px;
+  height: 32px;
   display: flex;
   .bar-icon {
-    margin-left: 6px;
-    width: 34px;
-    height: 40px;
+    margin-left: 3px;
+    width: 32px;
+    height: 32px;
     background-size: 22px 22px;
     background-repeat: no-repeat;
     background-position: center center;
@@ -52,14 +52,14 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    line-height: 40px;
+    line-height: 32px;
     font-size: 16px;
     color: @color-text;
     font-family: 'Wawati SC';
   }
   .bar-item {
-    width: 34px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     background-size: 16px 16px;
     background-repeat: no-repeat;
     background-position: center center;
