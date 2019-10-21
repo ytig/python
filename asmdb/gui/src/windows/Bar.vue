@@ -37,17 +37,18 @@ export default {
   height: 40px;
   display: flex;
   .bar-icon {
-    margin-left: 12px;
-    margin-top: 9px;
-    width: 22px;
-    height: 22px;
+    margin-left: 6px;
+    width: 34px;
+    height: 40px;
+    background-size: 22px 22px;
+    background-repeat: no-repeat;
+    background-position: center center;
     background-image: url('/static/icons/android.png');
   }
   .bar-text {
+    margin-right: 3px;
     width: 0px;
     flex-grow: 1;
-    margin-left: 6px;
-    margin-right: 3px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
