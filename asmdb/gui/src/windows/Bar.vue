@@ -67,7 +67,7 @@ export default {
   }
   .bar-item:hover {
     border: 0px solid @color-background-dark;
-    border-width: 0px 3px;
+    border-width: 4px 2px;
     background-color: @color-background-hover;
   }
   .bar-item:last-child {
