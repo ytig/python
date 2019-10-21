@@ -2,7 +2,7 @@
   <div class="bar-container">
     <div class="bar-icon"></div>
     <span class="bar-text">{{title}}</span>
-    <div class="bar-item" v-for="(item, index) in items" :key="index" :style="item" @click="onClickItem(index)"></div>
+    <div class="bar-item" v-for="(item, index) in items" :key="index" :style="item" @click="onClickItem(index)" :css-enable="enable"></div>
   </div>
 </template>
 
@@ -10,6 +10,7 @@
 export default {
   data: function() {
     return {
+      enable: false,
       title: 'com.example.app'
     };
   },
@@ -17,7 +18,12 @@ export default {
     items: function() {
       var items = [];
       for (var icon of ['next', 'step', 'cont', 'rlse']) {
-        items.push({ backgroundImage: "url('/static/icons/" + icon + ".png'" });
+        var url = "url('/static/icons/" + icon + ".png'";
+        if (this.enable) {
+          items.push({ backgroundImage: url });
+        } else {
+          items.push({ maskImage: url });
+        }
       }
       return items;
     }
@@ -63,9 +69,17 @@ export default {
     background-size: 16px 16px;
     background-repeat: no-repeat;
     background-position: center center;
+    mask-size: 16px 16px;
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    background-color: @color-text-dark;
+    cursor: not-allowed;
+  }
+  .bar-item[css-enable] {
+    background-color: transparent;
     cursor: pointer;
   }
-  .bar-item:hover {
+  .bar-item[css-enable]:hover {
     border: 4px solid @color-background-dark;
     border-radius: 4px;
     background-color: @color-background-hover;
