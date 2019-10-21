@@ -145,7 +145,7 @@ export default {
     top: 3px;
     width: 16px;
     height: 16px;
-    background: url('~@/icons/search.png') no-repeat;
+    background-image: url('/static/icons/search.png');
     pointer-events: none;
   }
   > input {
