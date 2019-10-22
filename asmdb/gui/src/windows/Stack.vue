@@ -15,10 +15,6 @@ import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 import Bytes from '@/views/Bytes';
 
-function measureTextHeight() {
-  return 18;
-}
-
 export default {
   data: function() {
     return {
