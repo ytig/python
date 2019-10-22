@@ -13,10 +13,7 @@
 <script>
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
-
-function measureTextWidth(length) {
-  return length * 7.224609375;
-}
+import Bytes from '@/views/Bytes';
 
 function measureTextHeight() {
   return 18;
@@ -45,7 +42,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return Math.ceil(24 + measureTextWidth(6 + 25 * this.column) + 16 * this.column);
+      return Bytes.measureWidth('+0x000', 8 * this.column, false);
     }
   },
   created: function() {
@@ -131,7 +128,7 @@ export default {
         return false;
       }
       var offset = address - this.sp;
-      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
+      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / Bytes.measureHeight()) : 0;
       if (offset < 0 || offset >= 10 * row * this.column * 8) {
         return false;
       }
@@ -181,7 +178,7 @@ export default {
     invalidate: function() {
       var page = this.page;
       var column = this.column * 8;
-      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / measureTextHeight()) : 0;
+      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / Bytes.measureHeight()) : 0;
       var start = page * column * row;
       var end = (page + 1) * column * row;
       var oldData = this.oldData.slice(start, end);

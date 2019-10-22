@@ -12,6 +12,7 @@
 <script>
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
+import Bytes from '@/views/Bytes';
 const asmType = 'arm32';
 const pieceOf = 2400;
 
@@ -27,14 +28,6 @@ function rangeOf() {
     case 'arm32':
       return [0, Math.pow(16, 8)];
   }
-}
-
-function measureTextWidth(length) {
-  return length * 7.224609375;
-}
-
-function measureTextHeight() {
-  return 18;
 }
 
 class Source {
@@ -147,10 +140,10 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return Math.ceil(24 + measureTextWidth(2 + 2 * groupBy() + 25 * this.column + 2 + 8 * this.column) + 16 * this.column);
+      return Bytes.measureWidth('0x00000000', 8 * this.column, true);
     },
     lineHeight: function() {
-      return measureTextHeight();
+      return Bytes.measureHeight();
     }
   },
   created: function() {
