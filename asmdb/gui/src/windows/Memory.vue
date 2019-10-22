@@ -140,7 +140,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return Bytes.measureWidth('0x00000000', 8 * this.column, true);
+      return Bytes.measureWidth(2 + 2 * groupBy(), 8 * this.column, true);
     },
     lineHeight: function() {
       return Bytes.measureHeight();

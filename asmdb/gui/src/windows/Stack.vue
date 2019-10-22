@@ -38,7 +38,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return Bytes.measureWidth('+0x000', 8 * this.column, false);
+      return Bytes.measureWidth(6, 8 * this.column, false);
     }
   },
   created: function() {
