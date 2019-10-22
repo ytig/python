@@ -1,8 +1,7 @@
 <template>
-  <div class="bytes-container" :css-highlight="highlight">
-    <span></span>
+  <div class="bytes-container">
+    <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight"></canvas>
     <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)"></span>
-    <span></span>
   </div>
 </template>
 
@@ -42,6 +41,22 @@ function usageOf(int) {
   return '1';
 }
 
+function measureTextWidth(length) {
+  return length * 7.224609375;
+}
+
+function measureTextHeight() {
+  return 14;
+}
+
+function measureViewWidth(lineNumberLength, group, showString) {
+  return Math.ceil(24 + measureTextWidth(lineNumberLength + 2 + 3 * group + parseInt(group / 8) - 2 + (showString ? 2 + group : 0)) + 2 * group);
+}
+
+function measureViewHeight() {
+  return measureTextHeight() + 4;
+}
+
 function newItem(value, ...style) {
   return {
     value: value,
@@ -50,115 +65,105 @@ function newItem(value, ...style) {
 }
 
 export default {
+  measureWidth: measureViewWidth,
+  measureHeight: measureViewHeight,
+  data: function() {
+    return {
+      items: []
+    };
+  },
   props: {
     lineNumber: String,
     highlightNumber: Number,
     watchingNumbers: String,
     value: Object,
     group: Number,
-    showString: Boolean
+    showString: Boolean,
+    isScrolling: Boolean
   },
   computed: {
-    highlight: function() {
-      return this.highlightNumber != null && this.highlightNumber >= 0 && this.highlightNumber < this.group;
+    canvasWidth: function() {
+      return measureViewWidth(this.lineNumber.length, this.group, this.showString);
     },
-    items: function() {
-      var highlight = null;
-      if (this.highlightNumber != null && this.highlightNumber >= 0 && this.highlightNumber < this.group) {
-        highlight = this.highlightNumber;
-      }
-      var watching = JSON.parse(this.watchingNumbers || '[]');
+    canvasHeight: function() {
+      return measureViewHeight();
+    },
+    self: function() {
+      return {
+        lineNumber: this.lineNumber,
+        highlightNumber: this.highlightNumber,
+        watchingNumbers: this.watchingNumbers,
+        value: this.value,
+        group: this.group,
+        showString: this.showString,
+        isScrolling: this.isScrolling
+      };
+    }
+  },
+  watch: {
+    self: function(newValue, oldValue) {
+      //todo
+      this.requestLayout();
+      this.invalidate();
+    }
+  },
+  mounted: function() {
+    this.requestLayout();
+    this.invalidate();
+  },
+  methods: {
+    requestLayout: function() {
       var items = [];
-      //line number
-      items.push(newItem(this.lineNumber, 'bytes-line-number', highlight != null ? 'bytes-highlight' : ''));
-      //hex
-      var curUsage;
-      var curEvent;
-      var bordering = false;
+      items.push(newItem(this.lineNumber));
+      var event;
       for (var i = 0; i < this.group; i++) {
         if (i % groupBy() == 0) {
-          items.push(newItem('&nbsp;', 'bytes-space', bordering ? 'bytes-border-top bytes-border-bottom' : ''));
+          items.push(newItem('&nbsp;'));
           if (i % 8 == 0) {
-            items.push(newItem('&nbsp;', 'bytes-space', bordering ? 'bytes-border-top bytes-border-bottom' : ''));
+            items.push(newItem('&nbsp;'));
           }
           if (this.value == null) {
-            curUsage = '0';
-            curEvent = null;
+            event = null;
           } else if (i + groupBy() - 1 < this.value.newBytes.length) {
-            var curAddress = 0;
+            var address = 0;
             for (var j = groupBy() - 1; j >= 0; j--) {
-              curAddress *= 256;
-              curAddress += this.value.newBytes.charCodeAt(i + j);
+              address *= 256;
+              address += this.value.newBytes.charCodeAt(i + j);
             }
-            curUsage = usageOf(curAddress);
-            var curUsage2 = parseInt(curUsage) - 2;
-            if (curUsage2 >= 0) {
-              curEvent = [curUsage2, curAddress];
+            var usage = parseInt(usageOf(address)) - 2;
+            if (usage >= 0) {
+              event = [usage, address];
             } else {
-              curEvent = null;
+              event = null;
             }
           } else {
-            curUsage = '1';
-            curEvent = null;
+            event = null;
           }
         } else {
-          items.push(newItem('&nbsp;', 'bytes-space', 'bytes-usage-' + curUsage, bordering ? 'bytes-border-top bytes-border-bottom' : ''));
-          if (curEvent != null) {
-            items[items.length - 1].event = curEvent;
+          items.push(newItem('&nbsp;', event != null ? 'bytes-clickable' : ''));
+          if (event != null) {
+            items[items.length - 1].event = event;
           }
         }
         if (this.value == null) {
-          items.push(newItem('00', 'bytes-hex', 'bytes-usage-' + curUsage, highlight != null ? 'bytes-highlight' : '', highlight == i ? 'bytes-underline' : ''));
+          items.push(newItem('00', 'bytes-padding'));
         } else {
           var charCode = '&nbsp;&nbsp;';
-          var isChanged = false;
           if (i < this.value.newBytes.length) {
             var byte = this.value.newBytes.charCodeAt(i);
             charCode = byte.toString(16).zfill(2);
-            if (Boolean(this.value.oldBytes) && i < this.value.oldBytes.length) {
-              isChanged = this.value.oldBytes[i] != this.value.newBytes[i];
-            }
           }
-          items.push(newItem(charCode, 'bytes-hex', 'bytes-usage-' + curUsage, 'bytes-changed-' + isChanged, highlight == i ? 'bytes-underline' : ''));
-          if (watching.indexOf(i) >= 0) {
-            items[items.length - 1].style.push('bytes-border-top bytes-border-bottom');
-            if (watching.indexOf(i - 1) < 0) {
-              items[items.length - 1].style.push('bytes-border-left');
-              bordering = true;
-            }
-            if (watching.indexOf(i + 1) < 0) {
-              items[items.length - 1].style.push('bytes-border-right');
-              bordering = false;
-            }
-          }
-          if (curEvent != null) {
-            items[items.length - 1].event = curEvent;
+          items.push(newItem(charCode, 'bytes-padding', event != null ? 'bytes-clickable' : ''));
+          if (event != null) {
+            items[items.length - 1].event = event;
           }
         }
       }
-      //string
-      if (this.showString) {
-        items.push(newItem('&nbsp;', 'bytes-space', 'user-select-none'));
-        items.push(newItem('&nbsp;', 'bytes-space', 'user-select-none'));
-        if (this.value == null) {
-          for (var i = 0; i < this.group; i++) {
-            items.push(newItem('.', 'bytes-string', 'bytes-visible-' + false, highlight != null ? 'bytes-highlight' : '', 'user-select-none'));
-          }
-        } else {
-          for (var i = 0; i < this.value.newBytes.length; i++) {
-            var byte = this.value.newBytes.charCodeAt(i);
-            if (byte >= 0x21 && byte <= 0x7e) {
-              items.push(newItem(String.fromCharCode(byte), 'bytes-string', 'bytes-visible-' + true, 'user-select-none'));
-            } else {
-              items.push(newItem('.', 'bytes-string', 'bytes-visible-' + false, highlight != null ? 'bytes-highlight' : '', 'user-select-none'));
-            }
-          }
-        }
-      }
-      return items;
-    }
-  },
-  methods: {
+      this.items = items;
+    },
+    invalidate: function() {
+      //todo
+    },
     onClickItem: function(index) {
       if (this.items[index] && this.items[index].event) {
         this.$emit('clickitem', ...this.items[index].event);
@@ -171,105 +176,27 @@ export default {
 <style lang="less">
 @import '~@/styles/theme';
 
-.bytes-container[css-highlight] {
-  > * {
-    background: @color-background-selection;
-  }
-}
 .bytes-container {
-  white-space: nowrap;
-  padding-top: 1px;
-  padding-bottom: 3px;
+  height: 18px;
+  contain: strict;
+  > canvas {
+    position: absolute;
+    pointer-events: none;
+  }
   > span {
+    line-height: 16px;
     font-size: 12px;
+    // color: transparent;
   }
-  > span:first-child {
-    padding-left: 12px;
+  > span:first-of-type {
+    margin-left: 12px;
   }
-  > span:last-child {
-    padding-right: 12px;
+  .bytes-padding {
+    padding-left: 1px;
+    padding-right: 1px;
   }
-
-  .bytes-border-top {
-    border-top: 1px solid @color-icon-breakpoint;
-  }
-  .bytes-border-bottom {
-    border-bottom: 1px solid @color-icon-breakpoint;
-  }
-
-  .bytes-line-number {
-    color: @color-text-darker;
-  }
-  .bytes-line-number.bytes-highlight {
-    color: @color-text-dark;
-  }
-
-  .bytes-hex {
-    padding: 0px 1px;
-  }
-  .bytes-hex.bytes-border-left {
-    margin-left: -1px;
-    border-left: 1px solid @color-icon-breakpoint;
-  }
-  .bytes-hex.bytes-border-right {
-    margin-right: -1px;
-    border-right: 1px solid @color-icon-breakpoint;
-  }
-  .bytes-hex.bytes-underline {
-    text-decoration: underline;
-  }
-  .bytes-hex.bytes-usage-0 {
-    color: @color-text-darker;
-  }
-  .bytes-hex.bytes-usage-0.bytes-highlight {
-    color: @color-text-dark;
-  }
-  .bytes-hex.bytes-usage-1.bytes-changed-false {
-    color: @color-text;
-  }
-  .bytes-hex.bytes-usage-1.bytes-changed-true {
-    color: @color-background;
-    background: @color-text !important;
-  }
-  .bytes-usage-2 {
+  .bytes-clickable {
     cursor: pointer;
-  }
-  .bytes-hex.bytes-usage-2.bytes-changed-false {
-    color: @color-text2;
-  }
-  .bytes-hex.bytes-usage-2.bytes-changed-true {
-    color: @color-background;
-    background: @color-text2 !important;
-  }
-  .bytes-usage-3 {
-    cursor: pointer;
-  }
-  .bytes-hex.bytes-usage-3.bytes-changed-false {
-    color: @color-text3;
-  }
-  .bytes-hex.bytes-usage-3.bytes-changed-true {
-    color: @color-background;
-    background: @color-text3 !important;
-  }
-  .bytes-usage-4 {
-    cursor: pointer;
-  }
-  .bytes-hex.bytes-usage-4.bytes-changed-false {
-    color: @color-text4;
-  }
-  .bytes-hex.bytes-usage-4.bytes-changed-true {
-    color: @color-background;
-    background: @color-text4 !important;
-  }
-
-  .bytes-string.bytes-visible-true {
-    color: @color-text;
-  }
-  .bytes-string.bytes-visible-false {
-    color: @color-text-darker;
-  }
-  .bytes-string.bytes-visible-false.bytes-highlight {
-    color: @color-text-dark;
   }
 }
 </style>
