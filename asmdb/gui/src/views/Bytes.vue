@@ -1,6 +1,6 @@
 <template>
   <div class="bytes-container">
-    <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight"></canvas>
+    <canvas ref="canvas"></canvas>
     <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)"></span>
   </div>
 </template>
@@ -83,12 +83,6 @@ export default {
     lazyLayout: Boolean
   },
   computed: {
-    canvasWidth: function() {
-      return measureViewWidth(this.lineNumber.length, this.group, this.showString);
-    },
-    canvasHeight: function() {
-      return measureViewHeight();
-    },
     self: function() {
       return {
         lineNumber: this.lineNumber,
@@ -182,7 +176,16 @@ export default {
       this.items = items;
     },
     invalidate: function() {
+      var cvs = this.$refs.canvas;
+      var w = measureViewWidth(this.lineNumber.length, this.group, this.showString);
+      var h = measureViewHeight();
+      if (cvs.width != w || cvs.height != h) {
+        cvs.width = w;
+        cvs.height = h;
+      }
       //todo
+      var cxt = cvs.getContext('2d');
+      cxt.fillText('test', 0, 14);
     },
     onClickItem: function(index) {
       if (this.items[index] && this.items[index].event) {
