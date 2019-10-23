@@ -211,7 +211,66 @@ export default {
       x += 12;
       cxt.fillStyle = self.highlightNumber == null ? '#495162' : '#7f848e';
       cxt.fillText(self.lineNumber, x, y);
-      //todo
+      x += measureTextWidth(self.lineNumber.length);
+      var usage;
+      for (var i = 0; i < self.group; i++) {
+        if (i % groupBy() == 0) {
+          x += measureTextWidth(1);
+          if (i % 8 == 0) {
+            x += measureTextWidth(1);
+          }
+          if (self.value == null) {
+            usage = '0';
+          } else if (i + groupBy() - 1 < self.value.newBytes.length) {
+            var address = 0;
+            for (var j = groupBy() - 1; j >= 0; j--) {
+              address *= 256;
+              address += self.value.newBytes.charCodeAt(i + j);
+            }
+            var usage = usageOf(address);
+          } else {
+            usage = '1';
+          }
+        } else {
+          x += measureTextWidth(1);
+        }
+        var charCode = null;
+        if (self.value == null) {
+          charCode = '00';
+        } else if (i < self.value.newBytes.length) {
+          var byte = self.value.newBytes.charCodeAt(i);
+          charCode = byte.toString(16).zfill(2);
+        }
+        x += 1;
+        if (charCode != null) {
+          //todo usage
+          cxt.fillStyle = '#abb2bf';
+          cxt.fillText(charCode, x, y);
+        }
+        x += measureTextWidth(2) + 1;
+      }
+      if (self.showString) {
+        x += measureTextWidth(2);
+        for (var i = 0; i < this.group; i++) {
+          var charCode = null;
+          if (self.value == null) {
+            charCode = '.';
+          } else if (i < self.value.newBytes.length) {
+            var byte = self.value.newBytes.charCodeAt(i);
+            if (byte >= 0x21 && byte <= 0x7e) {
+              charCode = String.fromCharCode(byte);
+            } else {
+              charCode = '.';
+            }
+          }
+          if (charCode != null) {
+            //todo color
+            cxt.fillStyle = '#abb2bf';
+            cxt.fillText(charCode, x, y);
+          }
+          x += measureTextWidth(1);
+        }
+      }
     },
     onClickItem: function(index) {
       if (this.items[index] && this.items[index].event) {
