@@ -192,13 +192,22 @@ export default {
     invalidate: function() {
       var self = this.self;
       var cvs = this.$refs.canvas;
+      var cxt;
       var w = measureViewWidth(self.lineNumber.length, self.group, self.showString);
       var h = measureViewHeight();
-      if (cvs.width != w || cvs.height != h) {
-        cvs.width = w;
-        cvs.height = h;
+      var s = devicePixelRatio;
+      if (cvs.width != w * s || cvs.height != h * s) {
+        cvs.width = w * s;
+        cvs.height = h * s;
+        cvs.style.width = w + 'px';
+        cvs.style.height = h + 'px';
+        cxt = cvs.getContext('2d');
+        if (s != 1) {
+          cxt.scale(s, s);
+        }
+      } else {
+        cxt = cvs.getContext('2d');
       }
-      var cxt = cvs.getContext('2d');
       cxt.clearRect(0, 0, w, h);
       if (self.highlightNumber != null) {
         cxt.fillStyle = '#67769660';
