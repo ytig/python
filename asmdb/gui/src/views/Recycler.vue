@@ -2,7 +2,7 @@
   <div ref="container" class="recycler-container" :style="show_" @scroll="onScroll">
     <div class="recycler-fill" :style="style_"></div>
     <div class="recycler-item" v-for="(item, index) in viewport" :key="index" :style="item.style_">
-      <slot v-if="item.key>=0" :item="item.val" :index="item.key"></slot>
+      <slot v-if="item.key>=0" :item="item.val" :index="item.key" :scrolling="scrolling"></slot>
     </div>
   </div>
 </template>
@@ -17,6 +17,7 @@ export default {
       position: { index: 0, offset: 0 },
       viewport: [],
       counter: 0,
+      scrolling: false,
       style_: { transform: 'translateY(0px)' }
     };
   },
@@ -91,17 +92,19 @@ export default {
     },
     onScroll: function() {
       this.counter++;
-      this.$emit('scroll2', this.getPosition());
-      if (this.changePage()) {
-        return;
-      }
+      this.scrolling = true;
       var counter = this.counter;
       setTimeout(() => {
         if (counter != this.counter) {
           return;
         }
+        this.scrolling = false;
         this.onScrollStop();
       }, 147);
+      this.$emit('scroll2', this.getPosition());
+      if (this.changePage()) {
+        return;
+      }
       var minScrollTop = (this.position.index - this.viewport.length / 3) * this.lineHeight;
       var maxScrollTop = (this.position.index + this.viewport.length / 3) * this.lineHeight;
       var scrollTop_ = this.$refs.container.scrollTop + this.lineHeight * this.page * this.getPageSize();

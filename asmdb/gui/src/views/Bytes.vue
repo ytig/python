@@ -140,7 +140,6 @@ export default {
   },
   methods: {
     requestLayout: function() {
-      return; //for test
       var self = this.self;
       var items = [];
       items.push(newItem(self.lineNumber));
