@@ -200,8 +200,18 @@ export default {
         cvs.height = h;
       }
       var cxt = cvs.getContext('2d');
+      cxt.clearRect(0, 0, w, h);
+      if (self.highlightNumber != null) {
+        cxt.fillStyle = '#67769660';
+        cxt.fillRect(0, 0, w, h - 2);
+      }
+      cxt.font = '12px Menlo';
+      var x = 0;
+      var y = 12;
+      x += 12;
+      cxt.fillStyle = self.highlightNumber == null ? '#495162' : '#7f848e';
+      cxt.fillText(self.lineNumber, x, y);
       //todo
-      cxt.fillText('test', 0, 14);
     },
     onClickItem: function(index) {
       if (this.items[index] && this.items[index].event) {
