@@ -78,7 +78,7 @@ export default {
       var pageSize = this.getPageSize();
       var pageLength = 1 + Math.max(Math.ceil(this.source.length / pageSize) - 3, 0);
       var container = this.$refs.container;
-      var maxScrollTop = this.lineHeight * this.source.length - container.clientHeight;
+      var maxScrollTop = Math.max(this.lineHeight * this.source.length - container.clientHeight, 0);
       var scrollTop = position.index * this.lineHeight + position.offset;
       scrollTop = Math.min(Math.max(scrollTop, 0), maxScrollTop);
       var page = parseInt(scrollTop / (this.lineHeight * pageSize) - 0.741);
