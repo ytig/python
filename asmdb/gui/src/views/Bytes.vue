@@ -112,7 +112,7 @@ export default {
     self: function(newValue, oldValue) {
       var needLayout = false;
       var needDraw = false;
-      if (newValue.lineNumber != oldValue.lineNumber || newValue.value != oldValue.value || newValue.group != oldValue.group || ewValue.showString != oldValue.showString) {
+      if (newValue.lineNumber != oldValue.lineNumber || newValue.value != oldValue.value || newValue.group != oldValue.group || newValue.showString != oldValue.showString) {
         needLayout = true;
         needDraw = true;
       }
