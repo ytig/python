@@ -84,10 +84,23 @@ export default {
   },
   computed: {
     self: function() {
+      var highlightNumber = this.highlightNumber;
+      if (highlightNumber != null) {
+        if (highlightNumber < 0 || highlightNumber >= this.group) {
+          highlightNumber = null;
+        }
+      }
+      var watchingNumbers = [];
+      for (var n of JSON.parse(this.watchingNumbers || '[]')) {
+        if (n >= 0 && n < this.group) {
+          watchingNumbers.push(n);
+        }
+      }
+      watchingNumbers.sort();
       return {
         lineNumber: this.lineNumber,
-        highlightNumber: this.highlightNumber,
-        watchingNumbers: this.watchingNumbers,
+        highlightNumber: highlightNumber,
+        watchingNumbers: watchingNumbers,
         value: this.value,
         group: this.group,
         showString: this.showString,
@@ -103,7 +116,7 @@ export default {
         needLayout = true;
         needDraw = true;
       }
-      if (newValue.highlightNumber != oldValue.highlightNumber || newValue.watchingNumbers != oldValue.watchingNumbers) {
+      if (newValue.highlightNumber != oldValue.highlightNumber || JSON.stringify(newValue.watchingNumbers) != JSON.stringify(oldValue.watchingNumbers)) {
         needDraw = true;
       }
       if (!newValue.lazyLayout) {
@@ -128,22 +141,23 @@ export default {
   methods: {
     requestLayout: function() {
       return; //for test
+      var self = this.self;
       var items = [];
-      items.push(newItem(this.lineNumber));
+      items.push(newItem(self.lineNumber));
       var event;
-      for (var i = 0; i < this.group; i++) {
+      for (var i = 0; i < self.group; i++) {
         if (i % groupBy() == 0) {
           items.push(newItem('&nbsp;'));
           if (i % 8 == 0) {
             items.push(newItem('&nbsp;'));
           }
-          if (this.value == null) {
+          if (self.value == null) {
             event = null;
-          } else if (i + groupBy() - 1 < this.value.newBytes.length) {
+          } else if (i + groupBy() - 1 < self.value.newBytes.length) {
             var address = 0;
             for (var j = groupBy() - 1; j >= 0; j--) {
               address *= 256;
-              address += this.value.newBytes.charCodeAt(i + j);
+              address += self.value.newBytes.charCodeAt(i + j);
             }
             var usage = parseInt(usageOf(address)) - 2;
             if (usage >= 0) {
@@ -160,12 +174,12 @@ export default {
             items[items.length - 1].event = event;
           }
         }
-        if (this.value == null) {
+        if (self.value == null) {
           items.push(newItem('00', 'bytes-padding'));
         } else {
           var charCode = '&nbsp;&nbsp;';
-          if (i < this.value.newBytes.length) {
-            var byte = this.value.newBytes.charCodeAt(i);
+          if (i < self.value.newBytes.length) {
+            var byte = self.value.newBytes.charCodeAt(i);
             charCode = byte.toString(16).zfill(2);
           }
           items.push(newItem(charCode, 'bytes-padding', event != null ? 'bytes-clickable' : ''));
@@ -177,8 +191,9 @@ export default {
       this.items = items;
     },
     invalidate: function() {
+      var self = this.self;
       var cvs = this.$refs.canvas;
-      var w = measureViewWidth(this.lineNumber.length, this.group, this.showString);
+      var w = measureViewWidth(self.lineNumber.length, self.group, self.showString);
       var h = measureViewHeight();
       if (cvs.width != w || cvs.height != h) {
         cvs.width = w;
