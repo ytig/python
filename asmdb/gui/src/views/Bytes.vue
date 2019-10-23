@@ -69,6 +69,7 @@ export default {
   measureHeight: measureViewHeight,
   data: function() {
     return {
+      dirty: false,
       items: []
     };
   },
@@ -79,7 +80,7 @@ export default {
     value: Object,
     group: Number,
     showString: Boolean,
-    isScrolling: Boolean
+    lazyLayout: Boolean
   },
   computed: {
     canvasWidth: function() {
@@ -96,15 +97,29 @@ export default {
         value: this.value,
         group: this.group,
         showString: this.showString,
-        isScrolling: this.isScrolling
+        lazyLayout: this.lazyLayout
       };
     }
   },
   watch: {
     self: function(newValue, oldValue) {
-      //todo
-      this.requestLayout();
-      this.invalidate();
+      var needInvalidate = false;
+      if (needInvalidate) {
+        this.invalidate();
+        if (!newValue.lazyLayout) {
+          this.requestLayout();
+          this.dirty = false;
+        } else {
+          this.dirty = true;
+        }
+      } else {
+        if (!newValue.lazyLayout) {
+          if (this.dirty) {
+            this.dirty = false;
+            this.requestLayout();
+          }
+        }
+      }
     }
   },
   mounted: function() {
