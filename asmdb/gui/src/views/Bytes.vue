@@ -127,6 +127,7 @@ export default {
   },
   methods: {
     requestLayout: function() {
+      return; //for test
       var items = [];
       items.push(newItem(this.lineNumber));
       var event;
@@ -183,8 +184,8 @@ export default {
         cvs.width = w;
         cvs.height = h;
       }
-      //todo
       var cxt = cvs.getContext('2d');
+      //todo
       cxt.fillText('test', 0, 14);
     },
     onClickItem: function(index) {
@@ -209,7 +210,7 @@ export default {
   > span {
     line-height: 16px;
     font-size: 12px;
-    // color: transparent;
+    color: transparent;
   }
   > span:first-of-type {
     margin-left: 12px;
