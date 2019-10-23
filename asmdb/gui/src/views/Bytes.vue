@@ -103,22 +103,27 @@ export default {
   },
   watch: {
     self: function(newValue, oldValue) {
-      var needInvalidate = false;
-      if (needInvalidate) {
-        this.invalidate();
-        if (!newValue.lazyLayout) {
+      var needLayout = false;
+      var needDraw = false;
+      if (newValue.lineNumber != oldValue.lineNumber || newValue.value != oldValue.value || newValue.group != oldValue.group || ewValue.showString != oldValue.showString) {
+        needLayout = true;
+        needDraw = true;
+      }
+      if (newValue.highlightNumber != oldValue.highlightNumber || newValue.watchingNumbers != oldValue.watchingNumbers) {
+        needDraw = true;
+      }
+      if (!newValue.lazyLayout) {
+        if (needLayout || this.dirty) {
           this.requestLayout();
           this.dirty = false;
-        } else {
-          this.dirty = true;
         }
       } else {
-        if (!newValue.lazyLayout) {
-          if (this.dirty) {
-            this.dirty = false;
-            this.requestLayout();
-          }
+        if (needLayout) {
+          this.dirty = true;
         }
+      }
+      if (needDraw) {
+        this.invalidate();
       }
     }
   },
