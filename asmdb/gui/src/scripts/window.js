@@ -6,6 +6,13 @@ String.prototype.zfill = function (size) {
   return str;
 }
 
+window.emptySelection = function () {
+  var selection = getSelection();
+  if (selection.type == 'Range') {
+    selection.empty();
+  }
+}
+
 window.measureText = function (text, font) {
   var canvas = document.getElementById('__canvas__');
   if (!canvas) {

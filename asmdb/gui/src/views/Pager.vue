@@ -112,6 +112,7 @@ export default {
   },
   methods: {
     onWheel: function(event) {
+      emptySelection();
       this.wheeling.onWheel(event);
     },
     onWheelDown: function() {

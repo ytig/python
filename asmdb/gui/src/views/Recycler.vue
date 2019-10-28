@@ -69,6 +69,7 @@ export default {
     },
     scrollTo: function(position) {
       this.scrolling = true;
+      emptySelection();
       var counter = ++this.counter;
       setTimeout(() => {
         if (counter != this.counter) {
