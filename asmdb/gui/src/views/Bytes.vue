@@ -1,6 +1,5 @@
 <template>
   <div class="bytes-container">
-    <canvas ref="canvas"></canvas>
     <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)"></span>
   </div>
 </template>
@@ -293,11 +292,6 @@ export default {
 
 .bytes-container {
   height: 18px;
-  contain: strict;
-  > canvas {
-    position: absolute;
-    pointer-events: none;
-  }
   > span {
     line-height: 16px;
     font-size: 12px;
