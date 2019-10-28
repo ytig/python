@@ -37,8 +37,8 @@ export default {
     text-decoration: line-through;
   }
   .navigation-gradient {
-    z-index: 1;
     position: absolute;
+    z-index: 1;
     top: 36px;
     width: 100%;
     height: 2px;
