@@ -24,14 +24,13 @@ var canvasList = {};
 window.getContext = function (token, top, height) {
   if (token in canvasList) {
     var canvasItem = canvasList[token];
-    if (top >= canvasItem[1] + canvasItem[2] || top + height <= canvasItem[1]) {
+    if (top >= canvasItem[2] + canvasItem[3] || top + height <= canvasItem[2]) {
       return null;
     }
-    var context = canvasItem[0].getContext('2d');
-    var t = context.getTransform();
-    var y = top - canvasItem[1];
-    context.setTransform(t.a, 0, 0, t.d, 0, t.d * y);
-    return context;
+    var s = devicePixelRatio;
+    var y = top - canvasItem[2];
+    canvasItem[1].setTransform(s, 0, 0, s, 0, s * y);
+    return canvasItem[1];
   }
   return null;
 }
@@ -44,7 +43,13 @@ window.setContext = function (canvas, top, height) {
       break;
     }
   }
-  canvasList[token] = [canvas, top, height];
+  var s = devicePixelRatio;
+  if (canvas.width != s * canvas.clientWidth || canvas.height != s * canvas.clientHeight) {
+    canvas.width = s * canvas.clientWidth;
+    canvas.height = s * canvas.clientHeight;
+  }
+  var context = canvas.getContext('2d');
+  canvasList[token] = [canvas, context, top, height];
   return token;
 }
 window.delContext = function (canvas) {
