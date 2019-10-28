@@ -80,6 +80,7 @@ export default {
     value: Object,
     group: Number,
     showString: Boolean,
+    canvasContext: String,
     lazyLayout: Boolean
   },
   computed: {
@@ -104,6 +105,7 @@ export default {
         value: this.value,
         group: this.group,
         showString: this.showString,
+        canvasContext: this.canvasContext,
         lazyLayout: this.lazyLayout
       };
     }
@@ -116,12 +118,12 @@ export default {
         needLayout = true;
         needDraw = true;
       }
-      if (newValue.highlightNumber != oldValue.highlightNumber || JSON.stringify(newValue.watchingNumbers) != JSON.stringify(oldValue.watchingNumbers)) {
+      if (newValue.highlightNumber != oldValue.highlightNumber || JSON.stringify(newValue.watchingNumbers) != JSON.stringify(oldValue.watchingNumbers || newValue.canvasContext != oldValue.canvasContext)) {
         needDraw = true;
       }
       if (!newValue.lazyLayout) {
         if (needLayout || this.dirty) {
-          this.requestLayout();
+          this.layout();
           this.dirty = false;
         }
       } else {
@@ -130,16 +132,16 @@ export default {
         }
       }
       if (needDraw) {
-        this.invalidate();
+        this.draw();
       }
     }
   },
   mounted: function() {
-    this.requestLayout();
-    this.invalidate();
+    this.layout();
+    this.draw();
   },
   methods: {
-    requestLayout: function() {
+    layout: function() {
       var self = this.self;
       var items = [];
       items.push(newItem(self.lineNumber));
@@ -189,36 +191,33 @@ export default {
       }
       this.items = items;
     },
-    invalidate: function() {
+    draw: function() {
       var self = this.self;
-      var cvs = this.$refs.canvas;
-      var cxt;
+      var cc = self.canvasContext.split(';');
+      var h = measureViewHeight();
+      var t = parseInt(cc[0]) * h;
+      for (var i of cc[1].split(',')) {
+        var c = getContext(parseInt(i), t, h);
+        if (c != null) {
+          this.draw_(c);
+        }
+      }
+    },
+    draw_: function(ctx) {
+      var self = this.self;
       var w = measureViewWidth(self.lineNumber.length, self.group, self.showString);
       var h = measureViewHeight();
-      var s = devicePixelRatio;
-      if (cvs.width != w * s || cvs.height != h * s) {
-        cvs.width = w * s;
-        cvs.height = h * s;
-        cvs.style.width = w + 'px';
-        cvs.style.height = h + 'px';
-        cxt = cvs.getContext('2d');
-        if (s != 1) {
-          cxt.scale(s, s);
-        }
-      } else {
-        cxt = cvs.getContext('2d');
-      }
-      cxt.clearRect(0, 0, w, h);
+      ctx.clearRect(0, 0, w, h);
       if (self.highlightNumber != null) {
-        cxt.fillStyle = '#67769660';
-        cxt.fillRect(0, 0, w, h - 2);
+        ctx.fillStyle = '#67769660';
+        ctx.fillRect(0, 0, w, h - 2);
       }
-      cxt.font = '12px Menlo';
+      ctx.font = '12px Menlo';
       var x = 0;
       var y = 12;
       x += 12;
-      cxt.fillStyle = self.highlightNumber == null ? '#495162' : '#7f848e';
-      cxt.fillText(self.lineNumber, x, y);
+      ctx.fillStyle = self.highlightNumber == null ? '#495162' : '#7f848e';
+      ctx.fillText(self.lineNumber, x, y);
       x += measureTextWidth(self.lineNumber.length);
       var usage;
       for (var i = 0; i < self.group; i++) {
@@ -252,8 +251,8 @@ export default {
         x += 1;
         if (charCode != null) {
           //todo usage
-          cxt.fillStyle = '#abb2bf';
-          cxt.fillText(charCode, x, y);
+          ctx.fillStyle = '#abb2bf';
+          ctx.fillText(charCode, x, y);
         }
         x += measureTextWidth(2) + 1;
       }
@@ -273,8 +272,8 @@ export default {
           }
           if (charCode != null) {
             //todo color
-            cxt.fillStyle = '#abb2bf';
-            cxt.fillText(charCode, x, y);
+            ctx.fillStyle = '#abb2bf';
+            ctx.fillText(charCode, x, y);
           }
           x += measureTextWidth(1);
         }

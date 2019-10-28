@@ -4,7 +4,7 @@
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
     <Empty v-show="!show" class="memory-empty" :text="'[no data]'"></Empty>
     <Recycler ref="recycler" class="memory-recycler" :show="show" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
-      <Bytes :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,[])" :value="props.item" :group="8*column" :showString="true" :lazyLayout="props.scrolling" @clickitem="onClickItem"></Bytes>
+      <Bytes :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,[])" :value="props.item" :group="8*column" :showString="true" :canvasContext="props.index+';'+props.context" :lazyLayout="props.scrolling" @clickitem="onClickItem"></Bytes>
     </Recycler>
   </div>
 </template>
