@@ -26,6 +26,12 @@ window.measureText = function (text, font) {
   return context.measureText(text).width;
 }
 
+window.resetContext = function (canvas) {
+  var context = canvas.getContext('2d');
+  context.resetTransform();
+  context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
 var canvasToken = 0;
 var canvasList = {};
 window.getContext = function (token, top, height) {

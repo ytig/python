@@ -27,11 +27,8 @@ export default {
   watch: {
     show: function(newValue, oldValue) {
       if (!newValue) {
-        for (var view of [this.$refs.canvas1, this.$refs.canvas2]) {
-          var context = view.getContext('2d');
-          context.resetTransform();
-          context.clearRect(0, 0, view.width, view.height);
-        }
+        resetContext(this.$refs.canvas1);
+        resetContext(this.$refs.canvas2);
       }
     },
     source: function(newValue, oldValue) {
@@ -50,10 +47,10 @@ export default {
     this.viewport.splice(0, this.viewport.length, ...viewport);
     var w = this.$refs.container.clientWidth;
     var h = length * this.lineHeight;
-    for (var view of [this.$refs.canvas1, this.$refs.canvas2]) {
-      view.style.width = w + 'px';
-      view.style.height = h + 'px';
-    }
+    this.$refs.canvas1.style.width = w + 'px';
+    this.$refs.canvas1.style.height = h + 'px';
+    this.$refs.canvas2.style.width = w + 'px';
+    this.$refs.canvas2.style.height = h + 'px';
     this.scrollTo(this.position);
   },
   destroyed: function() {
