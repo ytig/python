@@ -52,8 +52,10 @@ export default {
     this.$refs.canvas2.style.width = w + 'px';
     this.$refs.canvas2.style.height = h + 'px';
     this.scrollTo(this.position);
+    addEventListener('resize', this.onResize);
   },
   destroyed: function() {
+    removeEventListener('resize', this.onResize);
     delContext(this.$refs.canvas1);
     delContext(this.$refs.canvas2);
   },
@@ -91,6 +93,13 @@ export default {
         index: this.position.index,
         offset: this.position.offset + event.deltaY
       });
+    },
+    onResize: function() {
+      var scrollTop = this.position.index * this.lineHeight + this.position.offset;
+      var maxScrollTop = this.source.length * this.lineHeight - this.$refs.container.clientHeight;
+      if (scrollTop > maxScrollTop) {
+        this.scrollTo(this.position);
+      }
     },
     invalidate: function() {
       var scrollTop = this.position.index * this.lineHeight + this.position.offset;
