@@ -276,13 +276,15 @@ export default {
               ctx.fillStyle = Theme.colorText4;
               break;
           }
+          var x1 = Math.floor(x);
+          var x2 = Math.ceil(x + measureTextWidth(charCode.length));
           if (changed) {
-            ctx.fillRect(x - 1, 1, measureTextWidth(charCode.length) + 2, h - 4);
+            ctx.fillRect(x1 - 1, 1, x2 - x1 + 2, h - 4);
             ctx.fillStyle = Theme.colorBackground;
           }
           ctx.fillText(charCode, x, y);
           if (self.highlightNumber == i) {
-            ctx.fillRect(x, h - 5, measureTextWidth(charCode.length), 1);
+            ctx.fillRect(x1, h - 5, x2 - x1, 1);
           }
         }
         x += measureTextWidth(2) + 1;
