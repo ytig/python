@@ -216,7 +216,7 @@ export default {
       address = Math.min(Math.max(address, this.source.start), this.source.end - 1);
       var posn = {
         index: parseInt((address - this.source.start) / this.source.group),
-        offset: -2
+        offset: -4
       };
       if (!this.show) {
         this.show = true;
