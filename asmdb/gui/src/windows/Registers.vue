@@ -48,7 +48,7 @@ export default {
       items: items
     };
   },
-  created: function() {
+  mounted: function() {
     keyboard.registerWindow(this);
     asmdb.registerEvent('registers', this);
   },

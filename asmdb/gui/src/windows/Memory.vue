@@ -148,6 +148,8 @@ export default {
   },
   created: function() {
     this.source = new Source(0, Math.pow(16, 2 * groupBy()), 8 * this.column, null);
+  },
+  mounted: function() {
     keyboard.registerWindow(this);
     asmdb.registerEvent('memory', this);
   },

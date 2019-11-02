@@ -41,7 +41,7 @@ export default {
       return Bytes.measureWidth(6, 8 * this.column, false);
     }
   },
-  created: function() {
+  mounted: function() {
     keyboard.registerWindow(this);
     asmdb.registerEvent('stack', this);
   },
