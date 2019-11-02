@@ -147,11 +147,11 @@ export default {
       items.push(newItem(self.lineNumber));
       var event;
       for (var i = 0; i < self.group; i++) {
+        if (i % 8 == 0) {
+          items.push(newItem('&nbsp;'));
+        }
         if (i % groupBy() == 0) {
           items.push(newItem('&nbsp;'));
-          if (i % 8 == 0) {
-            items.push(newItem('&nbsp;'));
-          }
           if (self.value == null) {
             event = null;
           } else if (i + groupBy() - 1 < self.value.newBytes.length) {
