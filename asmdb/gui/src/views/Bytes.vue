@@ -268,6 +268,9 @@ export default {
               break;
           }
           ctx.fillText(charCode, x, y);
+          if (self.highlightNumber == i) {
+            ctx.fillRect(x, h - 5, measureTextWidth(charCode.length), 1);
+          }
         }
         x += measureTextWidth(2) + 1;
       }
