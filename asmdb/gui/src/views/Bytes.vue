@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import Theme from '@/styles/theme';
 const asmType = 'arm32';
 
 function groupBy() {
@@ -208,14 +209,14 @@ export default {
       var h = measureViewHeight();
       ctx.clearRect(0, 0, w, h);
       if (self.highlightNumber != null) {
-        ctx.fillStyle = '#67769660';
+        ctx.fillStyle = Theme.colorBackgroundSelection;
         ctx.fillRect(0, 0, w, h - 2);
       }
       ctx.font = '12px Menlo';
       var x = 0;
       var y = 12;
       x += 12;
-      ctx.fillStyle = self.highlightNumber == null ? '#495162' : '#7f848e';
+      ctx.fillStyle = self.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
       ctx.fillText(self.lineNumber, x, y);
       x += measureTextWidth(self.lineNumber.length);
       var usage;
@@ -250,7 +251,7 @@ export default {
         x += 1;
         if (charCode != null) {
           //todo usage
-          ctx.fillStyle = '#abb2bf';
+          ctx.fillStyle = Theme.colorText;
           ctx.fillText(charCode, x, y);
         }
         x += measureTextWidth(2) + 1;
@@ -271,7 +272,7 @@ export default {
           }
           if (charCode != null) {
             //todo color
-            ctx.fillStyle = '#abb2bf';
+            ctx.fillStyle = Theme.colorText;
             ctx.fillText(charCode, x, y);
           }
           x += measureTextWidth(1);
