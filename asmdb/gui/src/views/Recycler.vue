@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="recycler-container" @wheel.passive="onWheel">
+  <div ref="container" class="recycler-container" @wheel="onWheel">
     <div class="recycler-item" v-for="(item, index) in viewport" :key="index" :style="item.style_">
       <slot v-if="show&&item.key>=0" :item="item.val" :index="item.key" :context="context" :scrolling="scrolling"></slot>
     </div>
