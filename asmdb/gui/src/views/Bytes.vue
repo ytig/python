@@ -219,6 +219,7 @@ export default {
       ctx.fillStyle = self.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
       ctx.fillText(self.lineNumber, x, y);
       x += measureTextWidth(self.lineNumber.length);
+      var coordinates = [];
       var usage;
       for (var i = 0; i < self.group; i++) {
         if (i % 8 == 0) {
@@ -254,6 +255,8 @@ export default {
             }
           }
         }
+        var coordinate = {};
+        coordinate.left = x;
         x += 1;
         if (charCode != null) {
           switch (usage) {
@@ -283,6 +286,32 @@ export default {
           }
         }
         x += measureTextWidth(2) + 1;
+        coordinate.right = x;
+        coordinates.push(coordinate);
+      }
+      ctx.fillStyle = Theme.colorIconBreakpoint;
+      var s = 0;
+      while (s < this.group) {
+        if (self.watchingNumbers.indexOf(s) >= 0) {
+          var e = s + 1;
+          while (e < this.group) {
+            if (self.watchingNumbers.indexOf(e) < 0) {
+              break;
+            }
+            e++;
+          }
+          var x1 = coordinates[s].left - 1;
+          var x2 = coordinates[e - 1].right + 1;
+          var y1 = 0;
+          var y2 = h - 2;
+          ctx.fillRect(x1, y1, 1, y2 - y1);
+          ctx.fillRect(x1, y1, x2 - x1, 1);
+          ctx.fillRect(x2 - 1, y1, 1, y2 - y1);
+          ctx.fillRect(x1, y2 - 1, x2 - x1, 1);
+          s = e + 1;
+        } else {
+          s++;
+        }
       }
       if (self.showString) {
         x += measureTextWidth(2);
