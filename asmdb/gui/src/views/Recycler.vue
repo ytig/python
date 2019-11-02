@@ -42,7 +42,7 @@ export default {
     var length = Math.ceil(screen.height / this.lineHeight) + 1;
     var viewport = [];
     for (var i = 0; i < length; i++) {
-      viewport[i] = { key: -1, val: null, ctx: null, style_: { height: this.lineHeight + 'px', transform: 'translateY(0px)' } };
+      viewport[i] = { key: -1, val: null, style_: { height: this.lineHeight + 'px', transform: 'translateY(0px)' } };
     }
     this.viewport.splice(0, this.viewport.length, ...viewport);
     var w = this.$refs.container.clientWidth;
