@@ -255,8 +255,11 @@ export default {
             }
           }
         }
-        var coordinate = {};
-        coordinate.left = x;
+        var coordinate = {
+          left: Math.round(x),
+          right: Math.round(x) + Math.ceil(measureTextWidth(2)) + 2
+        };
+        coordinates.push(coordinate);
         x += 1;
         if (charCode != null) {
           switch (usage) {
@@ -276,20 +279,16 @@ export default {
               ctx.fillStyle = Theme.colorText4;
               break;
           }
-          var x1 = Math.floor(x);
-          var x2 = Math.ceil(x + measureTextWidth(charCode.length));
           if (changed) {
-            ctx.fillRect(x1 - 1, 1, x2 - x1 + 2, h - 4);
+            ctx.fillRect(coordinate.left, 1, coordinate.right - coordinate.left, h - 4);
             ctx.fillStyle = Theme.colorBackground;
           }
           ctx.fillText(charCode, x, y);
           if (self.highlightNumber == i) {
-            ctx.fillRect(x1, h - 5, x2 - x1, 1);
+            ctx.fillRect(coordinate.left + 1, h - 5, coordinate.right - coordinate.left - 2, 1);
           }
         }
         x += measureTextWidth(2) + 1;
-        coordinate.right = x;
-        coordinates.push(coordinate);
       }
       ctx.fillStyle = Theme.colorIconBreakpoint;
       var s = 0;
@@ -302,8 +301,8 @@ export default {
             }
             e++;
           }
-          var x1 = Math.floor(coordinates[s].left) - 1;
-          var x2 = Math.ceil(coordinates[e - 1].right) + 1;
+          var x1 = coordinates[s].left - 1;
+          var x2 = coordinates[e - 1].right + 1;
           var y1 = 0;
           var y2 = h - 2;
           ctx.fillRect(x1, y1, 1, y2 - y1);
