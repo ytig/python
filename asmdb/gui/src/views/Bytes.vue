@@ -301,8 +301,8 @@ export default {
             }
             e++;
           }
-          var x1 = coordinates[s].left - 1;
-          var x2 = coordinates[e - 1].right + 1;
+          var x1 = coordinates[s].left - 3;
+          var x2 = coordinates[e - 1].right + 3;
           var y1 = 0;
           var y2 = h - 2;
           ctx.fillRect(x1, y1, 1, y2 - y1);
