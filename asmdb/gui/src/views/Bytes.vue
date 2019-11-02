@@ -242,11 +242,17 @@ export default {
           x += measureTextWidth(1);
         }
         var charCode = null;
+        var changed = false;
         if (self.value == null) {
           charCode = '00';
         } else if (i < self.value.newBytes.length) {
           var byte = self.value.newBytes.charCodeAt(i);
           charCode = byte.toString(16).zfill(2);
+          if (self.value.oldBytes != null && i < self.value.oldBytes.length) {
+            if (byte != self.value.oldBytes.charCodeAt(i)) {
+              changed = true;
+            }
+          }
         }
         x += 1;
         if (charCode != null) {
@@ -266,6 +272,10 @@ export default {
             case '4':
               ctx.fillStyle = Theme.colorText4;
               break;
+          }
+          if (changed) {
+            ctx.fillRect(x - 1, 1, measureTextWidth(charCode.length) + 2, h - 4);
+            ctx.fillStyle = Theme.colorBackground;
           }
           ctx.fillText(charCode, x, y);
           if (self.highlightNumber == i) {
