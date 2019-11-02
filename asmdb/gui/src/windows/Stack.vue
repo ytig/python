@@ -3,8 +3,11 @@
     <Pager :canSub="page>0&&sp!=null" :canAdd="page<10-1&&sp!=null" @delta="onDelta"></Pager>
     <Navigation :name="'Stack'" :focus="focus" :disable="disable"></Navigation>
     <div ref="stackLayout" class="stack-layout">
+      <div class="stack-draw" :style="{width:windowWidth+'px',height:linesHeight+'px'}">
+        <canvas ref="canvas"></canvas>
+      </div>
       <Empty v-if="items.length==0" :text="'[no data]'" style="padding-top:12px;"></Empty>
-      <!-- <Bytes v-else v-for="(item, index) in items" :key="index" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :value="item.value" :group="8*column" :showString="false" :lazyLayout="false" @clickitem="onClickItem"></Bytes> -->
+      <Bytes v-else v-for="(item, index) in items" :key="index" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :value="item.value" :group="8*column" :showString="false" :canvasContext="index+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="sp==null"></Indicator>
   </div>
@@ -26,6 +29,7 @@ export default {
       oldData: '',
       newData: '',
       itemSelection: null,
+      context: '',
       pageCache: {},
       hst: []
     };
@@ -39,15 +43,25 @@ export default {
   computed: {
     windowWidth: function() {
       return Bytes.measureWidth(6, 8 * this.column, false);
+    },
+    linesHeight: function() {
+      return Bytes.measureHeight() * this.items.length;
     }
   },
   mounted: function() {
+    var canvas = this.$refs.canvas;
+    var width = this.windowWidth;
+    var height = screen.height;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    this.context = '' + setContext(canvas, 0, height);
     keyboard.registerWindow(this);
     asmdb.registerEvent('stack', this);
   },
   destroyed: function() {
     asmdb.unregisterEvent('stack', this);
     keyboard.unregisterWindow(this);
+    delContext(this.$refs.canvas);
   },
   methods: {
     requestFocus: function() {
@@ -124,7 +138,7 @@ export default {
         return false;
       }
       var offset = address - this.sp;
-      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / Bytes.measureHeight()) : 0;
+      var row = Math.floor(this.$refs.stackLayout.clientHeight / Bytes.measureHeight());
       if (offset < 0 || offset >= 10 * row * this.column * 8) {
         return false;
       }
@@ -174,7 +188,7 @@ export default {
     invalidate: function() {
       var page = this.page;
       var column = this.column * 8;
-      var row = this.$refs.stackLayout ? Math.floor(this.$refs.stackLayout.clientHeight / Bytes.measureHeight()) : 0;
+      var row = Math.floor(this.$refs.stackLayout.clientHeight / Bytes.measureHeight());
       var start = page * column * row;
       var end = (page + 1) * column * row;
       var oldData = this.oldData.slice(start, end);
@@ -215,9 +229,15 @@ export default {
   display: flex;
   flex-direction: column;
   .stack-layout {
+    position: relative;
     height: 0px;
     flex-grow: 1;
     overflow-y: scroll;
+    .stack-draw {
+      position: absolute;
+      overflow: hidden;
+      pointer-events: none;
+    }
   }
 }
 </style>
