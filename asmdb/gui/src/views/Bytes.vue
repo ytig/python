@@ -221,11 +221,11 @@ export default {
       x += measureTextWidth(self.lineNumber.length);
       var usage;
       for (var i = 0; i < self.group; i++) {
+        if (i % 8 == 0) {
+          x += measureTextWidth(1);
+        }
         if (i % groupBy() == 0) {
           x += measureTextWidth(1);
-          if (i % 8 == 0) {
-            x += measureTextWidth(1);
-          }
           if (self.value == null) {
             usage = '0';
           } else if (i + groupBy() - 1 < self.value.newBytes.length) {
@@ -250,8 +250,23 @@ export default {
         }
         x += 1;
         if (charCode != null) {
-          //todo usage
-          ctx.fillStyle = Theme.colorText;
+          switch (usage) {
+            case '0':
+              ctx.fillStyle = self.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
+              break;
+            case '1':
+              ctx.fillStyle = Theme.colorText;
+              break;
+            case '2':
+              ctx.fillStyle = Theme.colorText2;
+              break;
+            case '3':
+              ctx.fillStyle = Theme.colorText3;
+              break;
+            case '4':
+              ctx.fillStyle = Theme.colorText4;
+              break;
+          }
           ctx.fillText(charCode, x, y);
         }
         x += measureTextWidth(2) + 1;
@@ -261,18 +276,27 @@ export default {
         for (var i = 0; i < this.group; i++) {
           var charCode = null;
           if (self.value == null) {
+            usage = '0';
             charCode = '.';
           } else if (i < self.value.newBytes.length) {
             var byte = self.value.newBytes.charCodeAt(i);
             if (byte >= 0x21 && byte <= 0x7e) {
+              usage = '1';
               charCode = String.fromCharCode(byte);
             } else {
+              usage = '0';
               charCode = '.';
             }
           }
           if (charCode != null) {
-            //todo color
-            ctx.fillStyle = Theme.colorText;
+            switch (usage) {
+              case '0':
+                ctx.fillStyle = self.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
+                break;
+              case '1':
+                ctx.fillStyle = Theme.colorText;
+                break;
+            }
             ctx.fillText(charCode, x, y);
           }
           x += measureTextWidth(1);
