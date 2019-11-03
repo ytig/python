@@ -38,7 +38,7 @@ class Enable {
 export default {
   data: function() {
     return {
-      enable: new Enable(250),
+      enable: new Enable(224),
       title: 'com.example.app'
     };
   },
