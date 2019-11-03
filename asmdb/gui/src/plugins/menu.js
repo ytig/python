@@ -37,4 +37,4 @@ export default {
     });
     Vue.prototype.$menu = vm;
   }
-}
+};

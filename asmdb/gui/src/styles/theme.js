@@ -25,4 +25,4 @@ export default {
   colorTextMenuDark: '#9da5b4',
   //icon
   colorIconBreakpoint: '#e51400'
-}
+};

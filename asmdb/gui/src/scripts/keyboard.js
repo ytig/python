@@ -51,4 +51,4 @@ export default {
   registerWindow: registerWindow,
   unregisterWindow: unregisterWindow,
   requestFocus: requestFocus
-}
+};
