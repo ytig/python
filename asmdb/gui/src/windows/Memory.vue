@@ -216,10 +216,7 @@ export default {
     },
     jumpTo: function(address) {
       address = Math.min(Math.max(address, this.source.start), this.source.end - 1);
-      var posn = {
-        index: parseInt((address - this.source.start) / this.source.group),
-        offset: -4
-      };
+      var index = parseInt((address - this.source.start) / this.source.group);
       var old_posn = null;
       if (!this.show) {
         this.show = true;
@@ -227,7 +224,10 @@ export default {
         old_posn = this.$refs.recycler.getPosition();
       }
       this.itemSelection = address;
-      this.$refs.recycler.scrollTo(posn);
+      this.$refs.recycler.scrollTo({
+        index: index,
+        offset: -4
+      });
       if (old_posn != null) {
         var new_posn = this.$refs.recycler.getPosition();
         if (old_posn.index != new_posn.index || old_posn.offset != new_posn.offset) {
