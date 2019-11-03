@@ -2,17 +2,18 @@ var cur = -1;
 var list = [];
 
 function registerWindow(object) {
-  if (object in list) {
+  var i = list.indexOf(object);
+  if (i >= 0) {
     return;
   }
   list.push(object);
 }
 
 function unregisterWindow(object) {
-  if (!(object in list)) {
+  var i = list.indexOf(object);
+  if (i < 0) {
     return;
   }
-  var i = list.indexOf(object);
   list.splice(i, 1);
   if (i == cur) {
     cur = -1;
@@ -21,18 +22,18 @@ function unregisterWindow(object) {
 }
 
 function requestFocus(object) {
-  if (!(object in list)) {
-    return;
-  }
-  var _object = cur >= 0 ? list[cur] : null;
+  var old_object = cur >= 0 ? list[cur] : null;
   cur = list.indexOf(object);
-  if (_object == object) {
+  var new_object = cur >= 0 ? list[cur] : null;
+  if (old_object == new_object) {
     return;
   }
-  if (_object != null) {
-    _object.onFocusChanged(false);
+  if (old_object != null) {
+    old_object.onFocusChanged(false);
   }
-  object.onFocusChanged(true);
+  if (new_object != null) {
+    new_object.onFocusChanged(true);
+  }
 }
 
 document.addEventListener('keydown', function (event) {
