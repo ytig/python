@@ -220,16 +220,20 @@ export default {
         index: parseInt((address - this.source.start) / this.source.group),
         offset: -4
       };
+      var old_posn = null;
       if (!this.show) {
         this.show = true;
       } else {
-        var _posn = this.$refs.recycler.getPosition();
-        if (_posn.index != posn.index || _posn.offset != posn.offset) {
-          this.hstSet(_posn);
-        }
+        old_posn = this.$refs.recycler.getPosition();
       }
       this.itemSelection = address;
       this.$refs.recycler.scrollTo(posn);
+      if (old_posn != null) {
+        var new_posn = this.$refs.recycler.getPosition();
+        if (old_posn.index != new_posn.index || old_posn.offset != new_posn.offset) {
+          this.hstSet(old_posn);
+        }
+      }
       this.requestFocus();
     },
     getRange: function() {
