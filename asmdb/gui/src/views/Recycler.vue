@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import resize from '@/scripts/resize';
+
 export default {
   data: function() {
     return {
@@ -52,10 +54,10 @@ export default {
     this.$refs.canvas2.style.width = w + 'px';
     this.$refs.canvas2.style.height = h + 'px';
     this.scrollTo(this.position);
-    addEventListener('resize', this.onResize);
+    resize.registerEvent(this);
   },
   destroyed: function() {
-    removeEventListener('resize', this.onResize);
+    resize.unregisterEvent(this);
     delContext(this.$refs.canvas1);
     delContext(this.$refs.canvas2);
   },
