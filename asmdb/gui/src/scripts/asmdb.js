@@ -1,104 +1,108 @@
-function for_test(bytes) {
-  var str = '';
-  for (var b in bytes) {
-    str += String.fromCharCode(bytes[b]);
+var struct = {};
+
+document.cookie = "token={}; path=/"; //for test
+var ws = new WebSocket("ws://" + location.host + "/ws");
+ws.onmessage = function (event) {
+  var data = JSON.parse(event.data);
+  switch (data.type) {
+    case 'push':
+      if (!(data.key in struct)) {
+        struct[data.key] = data.val;
+        push(data.key, data.val);
+      } else {
+        var oldValue = struct[data.key];
+        struct[data.key] = data.val;
+        push(data.key, data.val, oldValue);
+      }
+      break;
+    case 'pull':
+      var callback = callbacks[data.tag];
+      delete callbacks[data.tag];
+      if (data.e == null) {
+        if (callback.success) {
+          callback.success(data.r);
+        }
+      } else {
+        if (callback.failure) {
+          callback.failure(data.e);
+        }
+      }
+      break;
   }
-  return str;
+};
+
+function push(attrName, newValue, oldValue) {
+  //todo
+  console.log(attrName, newValue);
 }
 
-var bar = null;
-var registers = null;
-var stack = null;
-var memory = null;
+var tag = 0;
+var callbacks = {};
 
-setTimeout(() => {
-  if (bar) {
-    bar.onBreak();
-  }
-  if (registers) {
-    var _regs = ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr'];
-    var regs = {};
-    for (var i = 0; i < _regs.length; i++) {
-      var max = Math.random() < 0.5 ? 0xffffffff : 0xff;
-      regs[_regs[i]] = Math.floor(max * Math.random());
+function pull(method, params, success, failure) {
+  var data = {
+    type: 'pull',
+    tag: ++tag,
+    method: method,
+    params: params || []
+  };
+  callbacks[data.tag] = {
+    success: success,
+    failure: failure
+  };
+  ws.send(JSON.stringify(data));
+}
+
+function next() {
+  pull('next');
+}
+
+function step() {
+  pull('step');
+}
+
+function cont() {
+  pull('cont');
+}
+
+function xb(range, success) {
+  pull('xb', [...range], function (ret) {
+    if (success) {
+      success(atob(ret));
     }
-    registers.onBreak(regs);
-    registers.testRegs = regs;
-    setTimeout(() => {
-      for (var i = 0; i < _regs.length; i++) {
-        if (Math.random() < 0.8) {
-          continue;
-        }
-        var max = Math.random() < 0.5 ? 0xffffffff : 0xff;
-        regs[_regs[i]] = Math.floor(max * Math.random());
-      }
-      registers.onBreak(registers.testRegs);
-    }, 2500);
-  }
-  if (stack) {
-    var bytes = [];
-    for (var i = 0; i < 10 * 256; i++) {
-      bytes[bytes.length] = Math.floor(256 * Math.random());
-    }
-    stack.onBreak(1, for_test(bytes));
-    stack.testBytes = bytes;
-    setTimeout(() => {
-      stack.testBytes[0] = 147;
-      stack.testBytes[1] = 147;
-      stack.testBytes[2] = 147;
-      stack.testBytes[3] = 147;
-      stack.onBreak(1, for_test(stack.testBytes));
-    }, 2500);
-  }
-  if (memory) {
-    var range = memory.getRange();
-    if (range == null) {
-      memory.onBreak();
-    } else {
-      var bytes = [];
-      for (var i = 0; i < range[1] - range[0]; i++) {
-        bytes[bytes.length] = Math.floor(256 * Math.random());
-      }
-      memory.onBreak(range[0], for_test(bytes));
-    }
-  }
-}, 1000);
+  });
+}
+
+var objects = {};
 
 function registerEvent(type, object) {
-  //todo
-  switch (type) {
-    case 'bar':
-      bar = object;
-      break;
-    case 'registers':
-      registers = object;
-      break;
-    case 'stack':
-      stack = object;
-      break;
-    case 'memory':
-      memory = object;
-      break;
+  if (!(type in objects)) {
+    objects[type] = [];
   }
+  var i = objects[type].indexOf(object);
+  if (i >= 0) {
+    return;
+  }
+  objects[type].push(object);
+  //todo
 }
 
 function unregisterEvent(type, object) {
-  //todo
-}
-
-function xb(range, callback) {
-  //todo
-  setTimeout(() => {
-    var bytes = [];
-    for (var i = 0; i < range[1] - range[0]; i++) {
-      bytes[bytes.length] = Math.floor(256 * Math.random());
-    }
-    callback(range[0], for_test(bytes));
-  }, 20);
+  if (!(type in objects)) {
+    return;
+  }
+  var i = objects[type].indexOf(object);
+  if (i < 0) {
+    return;
+  }
+  objects[type].splice(i, 1);
 }
 
 export default {
+  next: next,
+  step: step,
+  cont: cont,
+  xb: xb,
   registerEvent: registerEvent,
-  unregisterEvent: unregisterEvent,
-  xb: xb
+  unregisterEvent: unregisterEvent
 };
