@@ -2,7 +2,7 @@
   <div class="bar-container">
     <div class="bar-icon"></div>
     <span class="bar-text">{{title}}</span>
-    <div class="bar-item" v-for="(item, index) in items" :key="index" :style="item" @click="onClickItem(index)" :css-enable="enable.enable"></div>
+    <div class="bar-item" v-for="(item, index) in items" :key="index" :style="item" @click="onClickItem(index)" :css-enable="enable.enable_f"></div>
   </div>
 </template>
 
@@ -11,16 +11,26 @@ import asmdb from '@/scripts/asmdb';
 
 class Enable {
   constructor(delay) {
-    this.enable = false;
+    this.enable_t = false;
+    this.enable_f = false;
     this.delay = delay;
+    this.counter = 0;
   }
 
   onEnable(enable) {
-    //todo
+    this.counter++;
     if (enable) {
-      this.enable = true;
+      this.enable_t = true;
+      this.enable_f = true;
     } else {
-      this.enable = false;
+      this.enable_t = false;
+      var counter = this.counter;
+      setTimeout(() => {
+        if (counter != this.counter) {
+          return;
+        }
+        this.enable_f = false;
+      }, this.delay);
     }
   }
 }
@@ -37,7 +47,7 @@ export default {
       var items = [];
       for (var icon of ['next', 'step', 'cont', 'rlse']) {
         var url = "url('/static/icons/" + icon + ".png'";
-        if (this.enable.enable) {
+        if (this.enable.enable_f) {
           items.push({ backgroundImage: url });
         } else {
           items.push({ maskImage: url });
@@ -60,6 +70,9 @@ export default {
       this.enable.onEnable(false);
     },
     onClickItem: function(index) {
+      if (!this.enable.enable_t) {
+        return;
+      }
       //todo
     }
   }
