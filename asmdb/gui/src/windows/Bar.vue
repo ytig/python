@@ -2,15 +2,33 @@
   <div class="bar-container">
     <div class="bar-icon"></div>
     <span class="bar-text">{{title}}</span>
-    <div class="bar-item" v-for="(item, index) in items" :key="index" :style="item" @click="onClickItem(index)" :css-enable="enable"></div>
+    <div class="bar-item" v-for="(item, index) in items" :key="index" :style="item" @click="onClickItem(index)" :css-enable="enable.enable"></div>
   </div>
 </template>
 
 <script>
+import asmdb from '@/scripts/asmdb';
+
+class Enable {
+  constructor(delay) {
+    this.enable = false;
+    this.delay = delay;
+  }
+
+  onEnable(enable) {
+    //todo
+    if (enable) {
+      this.enable = true;
+    } else {
+      this.enable = false;
+    }
+  }
+}
+
 export default {
   data: function() {
     return {
-      enable: false,
+      enable: new Enable(250),
       title: 'com.example.app'
     };
   },
@@ -19,7 +37,7 @@ export default {
       var items = [];
       for (var icon of ['next', 'step', 'cont', 'rlse']) {
         var url = "url('/static/icons/" + icon + ".png'";
-        if (this.enable) {
+        if (this.enable.enable) {
           items.push({ backgroundImage: url });
         } else {
           items.push({ maskImage: url });
@@ -28,7 +46,19 @@ export default {
       return items;
     }
   },
+  mounted: function() {
+    asmdb.registerEvent('bar', this);
+  },
+  destroyed: function() {
+    asmdb.unregisterEvent('bar', this);
+  },
   methods: {
+    onBreak: function() {
+      this.enable.onEnable(true);
+    },
+    onContinue: function() {
+      this.enable.onEnable(false);
+    },
     onClickItem: function(index) {
       //todo
     }
