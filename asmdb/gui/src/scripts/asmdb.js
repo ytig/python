@@ -31,9 +31,94 @@ ws.onmessage = function (event) {
   }
 };
 
+var counter = 0;
+var _registers = null;
+
+class Union {
+  constructor(callable) {
+    this._callable = callable;
+    this._wait = 0;
+    this._events = [];
+  }
+
+  wait() {
+    this._wait++;
+  }
+
+  notify(event) {
+    if (event != undefined) {
+      this._events.push(event);
+    }
+    if (--this._wait == 0) {
+      if (this._callable()) {
+        for (var _event of this._events) {
+          _event();
+        }
+      }
+      this._events.splice(0, this._events.length);
+    }
+  }
+}
+
 function push(attrName, newValue, oldValue) {
-  //todo
-  console.log(attrName, newValue);
+  switch (attrName) {
+    case 'suspend':
+      counter++;
+      if (newValue) {
+        var _counter = counter;
+        ir((registers) => {
+          var union = new Union(() => {
+            return _counter == counter;
+          });
+          union.wait();
+          //bar
+          union.wait();
+          union.notify(() => {
+            _registers = registers;
+            iterObjects('bar', (object) => {
+              object.onBreak();
+            });
+          });
+          //assembly todo
+          //registers
+          union.wait();
+          union.notify(() => {
+            iterObjects('registers', (object) => {
+              object.onBreak(registers);
+            });
+          });
+          //stack
+          union.wait();
+          sp = registers['sp'];
+          xb([sp, sp + 256 * 10], (stack) => {
+            union.notify(() => {
+              iterObjects('stack', (object) => {
+                object.onBreak(sp, stack);
+              });
+            });
+          });
+          //memory
+          iterObjects('memory', (object) => {
+            var range = object.getRange();
+            if (range == null) {
+              return;
+            }
+            union.wait();
+            xb(range, (memory) => {
+              union.notify(() => {
+                object.onBreak(range[0], memory);
+              });
+            })
+          });
+          union.notify();
+        })
+      } else {
+        iterObjects('*', (object) => {
+          object.onContinue();
+        });
+      }
+      break;
+  }
 }
 
 var tag = 0;
@@ -65,6 +150,14 @@ function cont() {
   pull('cont');
 }
 
+function ir(success) {
+  pull('ir', [], function (ret) {
+    if (success) {
+      success(atob(ret));
+    }
+  });
+}
+
 function xb(range, success) {
   pull('xb', [...range], function (ret) {
     if (success) {
@@ -74,6 +167,22 @@ function xb(range, success) {
 }
 
 var objects = {};
+
+function iterObjects(filter, handler) {
+  filter = filter.split('|');
+  if (filter.indexOf('*') >= 0) {
+    filter = null;
+  }
+  for (var type in objects) {
+    if (filter && filter.indexOf(type) < 0) {
+      continue;
+    }
+    var array = objects[type];
+    for (object of array) {
+      handler(object);
+    }
+  }
+}
 
 function registerEvent(type, object) {
   if (!(type in objects)) {
