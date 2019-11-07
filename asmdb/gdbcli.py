@@ -57,5 +57,8 @@ class GdbController:
     async def cont(self):
         await self._command('continue')
 
+    async def ir(self):
+        return {'todo': 'ir'}
+
     async def xb(self, start, end):
         return b'todo xb'

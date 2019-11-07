@@ -139,7 +139,7 @@ def push_prop(name, default):
 
 
 class WsGdbController(GdbController):
-    PULL = ('next', 'step', 'cont', 'xb',)
+    PULL = ('next', 'step', 'cont', 'ir', 'xb',)
     PUSH = ('suspend',)
     suspend = push_prop('suspend', False)
 
