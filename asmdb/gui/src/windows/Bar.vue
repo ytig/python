@@ -18,12 +18,14 @@ class Enable {
   }
 
   onEnable(enable) {
+    if (this.enable_t == enable) {
+      return;
+    }
+    this.enable_t = enable;
     this.counter++;
-    if (enable) {
-      this.enable_t = true;
+    if (this.enable_t) {
       this.enable_f = true;
     } else {
-      this.enable_t = false;
       var counter = this.counter;
       setTimeout(() => {
         if (counter != this.counter) {
