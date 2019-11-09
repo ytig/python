@@ -153,7 +153,7 @@ function cont() {
 function ir(success) {
   pull('ir', [], function (ret) {
     if (success) {
-      success(atob(ret));
+      success(ret);
     }
   });
 }
