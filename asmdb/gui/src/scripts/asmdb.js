@@ -92,7 +92,7 @@ function push(attrName, newValue, oldValue) {
           //stack
           union.wait();
           var sp = registers['sp'];
-          xb([sp, sp + 256 * 10], (stack) => {
+          xb([sp, sp + 400 * 10], (stack) => {
             union.notify(() => {
               iterObjects('stack', (object) => {
                 object.onBreak(sp, stack);
