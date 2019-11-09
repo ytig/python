@@ -1,5 +1,5 @@
 <template>
-  <div class="bar-container">
+  <div class="bar-container" @mouseup="onMouseUp">
     <div class="bar-icon"></div>
     <span class="bar-text">{{title}}</span>
     <div class="bar-item" v-for="(item, index) in items" :key="index" :style="item" @click="onClickItem(index)" :css-enable="enable.enable_f"></div>
@@ -65,6 +65,29 @@ export default {
     asmdb.unregisterEvent('bar', this);
   },
   methods: {
+    onMouseUp: function(event) {
+      if (event.button == 2) {
+        var items = [];
+        var fullscreen = document.fullscreenElement != null;
+        items[items.length] = ['Fullscreen', 'space', !fullscreen];
+        items[items.length] = ['Exit fullscreen', '⎋', fullscreen];
+        this.$menu.alert(event, items, this.onClickMenu);
+      }
+    },
+    onClickMenu: function(index) {
+      switch (index) {
+        case 0:
+          if (document.fullscreenElement == null) {
+            document.body.webkitRequestFullScreen();
+          }
+          break;
+        case 1:
+          if (document.fullscreenElement != null) {
+            document.exitFullscreen();
+          }
+          break;
+      }
+    },
     onBreak: function() {
       this.enable.onEnable(true);
     },
