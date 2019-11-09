@@ -89,7 +89,7 @@ function push(attrName, newValue, oldValue) {
           });
           //stack
           union.wait();
-          sp = registers['sp'];
+          var sp = registers['sp'];
           xb([sp, sp + 256 * 10], (stack) => {
             union.notify(() => {
               iterObjects('stack', (object) => {
