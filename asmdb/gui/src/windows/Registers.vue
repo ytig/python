@@ -11,14 +11,6 @@
 <script>
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
-const asmType = 'arm32';
-
-function regsOf() {
-  switch (asmType) {
-    case 'arm32':
-      return ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr'];
-  }
-}
 
 export default {
   data: function() {
@@ -26,7 +18,7 @@ export default {
     var items = [];
     var lineFills = [];
     var c = 0;
-    for (var k of regsOf()) {
+    for (var k of asmdb.asmRegs) {
       lineFills[c] = Math.max(k.length, lineFills[c] || 0);
       c = (c + 1) % column;
       items[items.length] = {

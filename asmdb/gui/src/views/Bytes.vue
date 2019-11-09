@@ -6,40 +6,7 @@
 
 <script>
 import Theme from '@/styles/theme';
-const asmType = 'arm32';
-
-function groupBy() {
-  switch (asmType) {
-    case 'arm32':
-      return 4;
-  }
-}
-
-function usageOf(int) {
-  if (int % 32 == 0) {
-    return '2';
-  }
-  if (int % 32 == 1) {
-    return '3';
-  }
-  if (int % 32 == 2) {
-    return '4';
-  }
-  //todo check?
-  if (int >= 0x08048000 && int <= 0x08049000) {
-    return '2';
-  }
-  if (int >= 0xbfcb4000 && int <= 0xbfcc9000) {
-    return '3';
-  }
-  if (int >= 0x08ac5000 && int <= 0x08ae6000) {
-    return '4';
-  }
-  if (int >= 0x08049000 && int <= 0x0804a000) {
-    return '4';
-  }
-  return '1';
-}
+import asmdb from '@/scripts/asmdb';
 
 function measureTextWidth(length) {
   return length * 7.224609375;
@@ -150,17 +117,17 @@ export default {
         if (i % 8 == 0) {
           items.push(newItem('&nbsp;'));
         }
-        if (i % groupBy() == 0) {
+        if (i % asmdb.asmUnit == 0) {
           items.push(newItem('&nbsp;'));
           if (self.value == null) {
             event = null;
-          } else if (i + groupBy() - 1 < self.value.newBytes.length) {
+          } else if (i + asmdb.asmUnit - 1 < self.value.newBytes.length) {
             var address = 0;
-            for (var j = groupBy() - 1; j >= 0; j--) {
+            for (var j = asmdb.asmUnit - 1; j >= 0; j--) {
               address *= 256;
               address += self.value.newBytes.charCodeAt(i + j);
             }
-            var usage = parseInt(usageOf(address)) - 2;
+            var usage = parseInt(asmdb.getAddressUsage(address)) - 2;
             if (usage >= 0) {
               event = [usage, address];
             } else {
@@ -225,17 +192,17 @@ export default {
         if (i % 8 == 0) {
           x += measureTextWidth(1);
         }
-        if (i % groupBy() == 0) {
+        if (i % asmdb.asmUnit == 0) {
           x += measureTextWidth(1);
           if (self.value == null) {
             usage = '0';
-          } else if (i + groupBy() - 1 < self.value.newBytes.length) {
+          } else if (i + asmdb.asmUnit - 1 < self.value.newBytes.length) {
             var address = 0;
-            for (var j = groupBy() - 1; j >= 0; j--) {
+            for (var j = asmdb.asmUnit - 1; j >= 0; j--) {
               address *= 256;
               address += self.value.newBytes.charCodeAt(i + j);
             }
-            var usage = usageOf(address);
+            var usage = asmdb.getAddressUsage(address);
           } else {
             usage = '1';
           }

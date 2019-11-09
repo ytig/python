@@ -233,6 +233,28 @@ function unregisterEvent(type, object) {
   objects[type].splice(i, 1);
 }
 
+const asmType = 'arm32';
+const asmUnit = {
+  'arm32': 4
+} [asmType];
+const asmRegs = {
+  'arm32': ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']
+} [asmType];
+
+function getAddressUsage(int) {
+  //todo
+  if (int % 32 == 0) {
+    return '2';
+  }
+  if (int % 32 == 1) {
+    return '3';
+  }
+  if (int % 32 == 2) {
+    return '4';
+  }
+  return '1';
+}
+
 export default {
   next: next,
   step: step,
@@ -240,5 +262,8 @@ export default {
   rlse: rlse,
   xb: xb,
   registerEvent: registerEvent,
-  unregisterEvent: unregisterEvent
+  unregisterEvent: unregisterEvent,
+  asmUnit: asmUnit,
+  asmRegs: asmRegs,
+  getAddressUsage: getAddressUsage
 };

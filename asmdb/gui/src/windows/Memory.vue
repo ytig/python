@@ -13,22 +13,7 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 import Bytes from '@/views/Bytes';
-const asmType = 'arm32';
 const pieceOf = 2400;
-
-function groupBy() {
-  switch (asmType) {
-    case 'arm32':
-      return 4;
-  }
-}
-
-function rangeOf() {
-  switch (asmType) {
-    case 'arm32':
-      return [0, Math.pow(16, 8)];
-  }
-}
 
 class Source {
   constructor(start, end, group, history) {
@@ -43,7 +28,7 @@ class Source {
 
   toLineNumber(index) {
     var address = this.start + this.group * index;
-    return '0x' + address.toString(16).zfill(2 * groupBy());
+    return '0x' + address.toString(16).zfill(2 * asmdb.asmUnit);
   }
 
   toHighlightNumber(index, highlight) {
@@ -58,7 +43,7 @@ class Source {
     var watchingNumbers = [];
     var address = this.start + this.group * index;
     for (var watchpoint of watchpoints) {
-      for (var i = 0; i < groupBy(); i++) {
+      for (var i = 0; i < asmdb.asmUnit; i++) {
         watchingNumbers.push(watchpoint.address + i - address);
       }
     }
@@ -141,14 +126,14 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return Bytes.measureWidth(2 + 2 * groupBy(), 8 * this.column, true);
+      return Bytes.measureWidth(2 + 2 * asmdb.asmUnit, 8 * this.column, true);
     },
     lineHeight: function() {
       return Bytes.measureHeight();
     }
   },
   created: function() {
-    this.source = new Source(0, Math.pow(16, 2 * groupBy()), 8 * this.column, null);
+    this.source = new Source(0, Math.pow(16, 2 * asmdb.asmUnit), 8 * this.column, null);
   },
   mounted: function() {
     keyboard.registerWindow(this);
@@ -248,7 +233,7 @@ export default {
       if (!this.show) {
         return;
       }
-      this.source = new Source(0, Math.pow(16, 2 * groupBy()), 8 * this.column, this.source);
+      this.source = new Source(0, Math.pow(16, 2 * asmdb.asmUnit), 8 * this.column, this.source);
       if (Boolean(memory)) {
         this.source.onLoad(address, memory);
       }
