@@ -4,7 +4,7 @@
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
     <Empty v-show="!show" class="memory-empty" :text="'[no data]'"></Empty>
     <Recycler ref="recycler" class="memory-recycler" :show="show" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
-      <Bytes :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,[])" :value="props.item" :group="8*column" :showString="true" :canvasContext="props.index+';'+props.context" :lazyLayout="props.scrolling" @clickitem="onClickItem"></Bytes>
+      <Bytes :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,watchpoints)" :value="props.item" :group="8*column" :showString="true" :canvasContext="props.index+';'+props.context" :lazyLayout="props.scrolling" @clickitem="onClickItem"></Bytes>
     </Recycler>
   </div>
 </template>
@@ -54,15 +54,16 @@ class Source {
     return null;
   }
 
-  toWatchingNumbers(index, watching) {
-    var _watching = [];
+  toWatchingNumbers(index, watchpoints) {
+    var watchingNumbers = [];
     var address = this.start + this.group * index;
-    if (watching != null) {
-      for (var addr of watching) {
-        _watching.push(addr - address);
-      }
+    for (var watchpoint of watchpoints) {
+      watchingNumbers.push(watchpoint.address - address);
+      watchingNumbers.push(watchpoint.address + 1 - address);
+      watchingNumbers.push(watchpoint.address + 2 - address);
+      watchingNumbers.push(watchpoint.address + 3 - address);
     }
-    return JSON.stringify(_watching.sort());
+    return JSON.stringify(watchingNumbers.sort());
   }
 
   getRange(index) {
@@ -129,6 +130,7 @@ export default {
       show: false,
       source: null,
       itemSelection: null,
+      watchpoints: [],
       hst: []
     };
   },
@@ -256,6 +258,9 @@ export default {
     onContinue: function() {
       this.disable = true;
       this.itemSelection = null;
+    },
+    onWatchpoints: function(watchpoints) {
+      this.watchpoints = watchpoints;
     },
     onScroll2: function(position) {
       if (this.disable) {

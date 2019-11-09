@@ -156,6 +156,6 @@ class WsGdbController(GdbController):
     async def anew(cls, config):
         self = await super().anew(config)
         self.suspend = True  # for test
-        self.watchpoints.append({'address': 0})
+        self.watchpoints.append({'address': 20})
         self.watchpoints = self.watchpoints
         return self
