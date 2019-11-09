@@ -104,10 +104,10 @@ export default {
     margin-left: 3px;
     width: 32px;
     height: 32px;
-    background-size: 22px 22px;
+    background-size: 16px 16px;
     background-repeat: no-repeat;
     background-position: center center;
-    background-image: url('/static/icons/android.png');
+    background-image: url('/static/icons/folder.png');
   }
   .bar-text {
     margin-right: 3px;
