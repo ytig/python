@@ -55,7 +55,7 @@ export default {
     display: flex;
     flex-direction: column;
     #bar {
-      background: linear-gradient(@color-border, @color-background-dark 38.2%);
+      background: linear-gradient(@color-border, @color-background-dark 20%);
     }
     #assembly {
       flex-grow: 1;
