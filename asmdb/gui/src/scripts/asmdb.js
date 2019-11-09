@@ -16,15 +16,17 @@ ws.onmessage = function (event) {
       }
       break;
     case 'pull':
-      var callback = callbacks[data.tag];
-      delete callbacks[data.tag];
-      if (data.e == null) {
-        if (callback.success) {
-          callback.success(data.r);
-        }
-      } else {
-        if (callback.failure) {
-          callback.failure(data.e);
+      if (data.tag in callbacks) {
+        var callback = callbacks[data.tag];
+        delete callbacks[data.tag];
+        if (data.e == null) {
+          if (callback.success) {
+            callback.success(data.r);
+          }
+        } else {
+          if (callback.failure) {
+            callback.failure(data.e);
+          }
         }
       }
       break;
@@ -134,10 +136,12 @@ function pull(method, params, success, failure) {
     method: method,
     params: params || []
   };
-  callbacks[data.tag] = {
-    success: success,
-    failure: failure
-  };
+  if (success || failure) {
+    callbacks[data.tag] = {
+      success: success,
+      failure: failure
+    };
+  }
   ws.send(JSON.stringify(data));
 }
 
