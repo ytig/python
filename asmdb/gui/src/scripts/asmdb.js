@@ -101,6 +101,9 @@ function push(attrName, newValue, oldValue) {
           iterObjects('memory', (object) => {
             var range = object.getRange();
             if (range == null) {
+              union.notify(() => {
+                object.onBreak(null, null);
+              });
               return;
             }
             union.wait();
