@@ -124,6 +124,20 @@ function push(attrName, newValue, oldValue) {
         });
       }
       break;
+    case 'breakpoints':
+      iterObjects('*', (object) => {
+        if (object.onBreakpoints) {
+          object.onBreakpoints(newValue);
+        }
+      });
+      break;
+    case 'watchpoints':
+      iterObjects('*', (object) => {
+        if (object.onWatchpoints) {
+          object.onWatchpoints(newValue);
+        }
+      });
+      break;
   }
 }
 
