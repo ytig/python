@@ -120,7 +120,7 @@ def push_prop(name, default):
         return getattr(self, _name, default)
 
     def notify(self):
-        for session in SESSIONS:
+        for session in SESSIONS.values():
             if session._ctrl is self:
                 session.notify(name, fget(self))
 
