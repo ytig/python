@@ -99,19 +99,19 @@ function push(attrName, newValue, oldValue) {
           });
           //memory
           iterObjects('memory', (object) => {
+            union.wait();
             var range = object.getRange();
             if (range == null) {
               union.notify(() => {
                 object.onBreak(null, null);
               });
-              return;
-            }
-            union.wait();
-            xb(range, (memory) => {
-              union.notify(() => {
-                object.onBreak(range[0], memory);
+            } else {
+              xb(range, (memory) => {
+                union.notify(() => {
+                  object.onBreak(range[0], memory);
+                });
               });
-            })
+            }
           });
           union.notify();
         })
