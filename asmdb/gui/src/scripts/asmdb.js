@@ -255,6 +255,33 @@ function getAddressUsage(int) {
   return '1';
 }
 
+function getRegsString(int) {
+  var str = '';
+  switch (getAddressUsage(int)) {
+    case '1':
+      if (int >= 0x21 && int <= 0x7e) {
+        if (int == 0x27) {
+          str = '"\'"';
+        } else {
+          str = "'" + String.fromCharCode(int) + "'";
+        }
+      }
+      break;
+    case '3':
+      str = 'sp+123'; //todo
+      break;
+  }
+  return str;
+}
+
+function getCpsrString(int) {
+  var n = (int & 0x80000000) == 0 ? '' : 'N';
+  var z = (int & 0x40000000) == 0 ? '' : 'Z';
+  var c = (int & 0x20000000) == 0 ? '' : 'C';
+  var v = (int & 0x10000000) == 0 ? '' : 'V';
+  return n + z + c + v;
+}
+
 export default {
   next: next,
   step: step,
@@ -265,5 +292,7 @@ export default {
   unregisterEvent: unregisterEvent,
   asmUnit: asmUnit,
   asmRegs: asmRegs,
-  getAddressUsage: getAddressUsage
+  getAddressUsage: getAddressUsage,
+  getRegsString: getRegsString,
+  getCpsrString: getCpsrString
 };

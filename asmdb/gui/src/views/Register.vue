@@ -9,47 +9,7 @@
 </template>
 
 <script>
-const asmType = 'arm32';
-
-function usageOf(val) {
-  //todo
-  if (val % 32 == 0) {
-    return '2';
-  }
-  if (val % 32 == 1) {
-    return '3';
-  }
-  if (val % 32 == 2) {
-    return '4';
-  }
-  return '1';
-}
-
-function regsString(val) {
-  var str = '';
-  switch (usageOf(val)) {
-    case '1':
-      if (val >= 0x21 && val <= 0x7e) {
-        if (val == 0x27) {
-          str = '"\'"';
-        } else {
-          str = "'" + String.fromCharCode(val) + "'";
-        }
-      }
-      break;
-    case '3':
-      str = 'sp+123'; //todo
-      break;
-  }
-  return str;
-}
-function cpsrString(val) {
-  var n = (val & 0x80000000) == 0 ? '' : 'N';
-  var z = (val & 0x40000000) == 0 ? '' : 'Z';
-  var c = (val & 0x20000000) == 0 ? '' : 'C';
-  var v = (val & 0x10000000) == 0 ? '' : 'V';
-  return n + z + c + v;
-}
+import asmdb from '@/scripts/asmdb';
 
 export default {
   props: {
@@ -70,9 +30,9 @@ export default {
         case 'sp':
           return '';
         case 'cpsr':
-          return cpsrString(this.value.newValue);
+          return asmdb.getCpsrString(this.value.newValue);
         default:
-          return regsString(this.value.newValue);
+          return asmdb.getRegsString(this.value.newValue);
       }
     },
     cssUsage: function() {
@@ -85,7 +45,7 @@ export default {
         case 'cpsr':
           return '1';
         default:
-          return usageOf(this.value.newValue);
+          return asmdb.getAddressUsage(this.value.newValue);
       }
     },
     cssChanged: function() {
