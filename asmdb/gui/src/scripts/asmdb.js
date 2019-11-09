@@ -153,6 +153,10 @@ function cont() {
   pull('cont');
 }
 
+function rlse() {
+  pull('rlse');
+}
+
 function ir(success) {
   pull('ir', [], function (ret) {
     if (success) {
@@ -214,6 +218,7 @@ export default {
   next: next,
   step: step,
   cont: cont,
+  rlse: rlse,
   xb: xb,
   registerEvent: registerEvent,
   unregisterEvent: unregisterEvent

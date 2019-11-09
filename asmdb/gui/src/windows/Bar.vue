@@ -75,7 +75,20 @@ export default {
       if (!this.enable.enable_t) {
         return;
       }
-      //todo
+      switch (index) {
+        case 0:
+          asmdb.next();
+          break;
+        case 1:
+          asmdb.step();
+          break;
+        case 2:
+          asmdb.cont();
+          break;
+        case 3:
+          asmdb.rlse();
+          break;
+      }
     }
   }
 };
