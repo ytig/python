@@ -1,7 +1,7 @@
 var struct = {};
 
-document.cookie = "token={}; path=/"; //for test
-var ws = new WebSocket("ws://" + location.host + "/ws");
+document.cookie = 'token={}; path=/'; //for test
+var ws = new WebSocket('ws://' + location.host + '/ws');
 ws.onmessage = function (event) {
   var data = JSON.parse(event.data);
   switch (data.type) {
@@ -114,7 +114,7 @@ function push(attrName, newValue, oldValue) {
             }
           });
           union.notify();
-        })
+        });
       } else {
         iterObjects('*', (object) => {
           object.onContinue();
