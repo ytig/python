@@ -74,7 +74,7 @@ export default {
       if (event.button == 2) {
         var items = [];
         items[items.length] = ['Go back', '⌫', this.hst.length > 0];
-        items[items.length] = ['Jump to SP', 'space', this.sp != null && this.page != 0];
+        items[items.length] = ['Return to SP', '↩︎', this.sp != null && this.page != 0];
         items[items.length] = ['Previous page', '←', this.sp != null && this.page - 1 >= 0];
         items[items.length] = ['Next page', '→', this.sp != null && this.page + 1 < 10];
         this.$menu.alert(event, items, this.onClickMenu);
@@ -103,7 +103,7 @@ export default {
       }
     },
     onKeyDown: function(event) {
-      var index = [8, 32, 37, 39].indexOf(event.keyCode);
+      var index = [8, 13, 37, 39].indexOf(event.keyCode);
       if (index >= 0) {
         this.onClickMenu(index);
         return true;
