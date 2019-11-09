@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Navigation :name="'break'"></Navigation>
+    <Navigation :name="'B-points'"></Navigation>
   </div>
 </template>
 
