@@ -101,7 +101,7 @@ export default {
   height: 32px;
   display: flex;
   .bar-icon {
-    margin-left: 3px;
+    margin-left: 4px;
     width: 32px;
     height: 32px;
     background-size: 16px 16px;
@@ -110,7 +110,7 @@ export default {
     background-image: url('/static/icons/folder.png');
   }
   .bar-text {
-    margin-right: 3px;
+    margin-right: 4px;
     width: 0px;
     flex-grow: 1;
     overflow: hidden;
@@ -143,7 +143,7 @@ export default {
     background-color: @color-background-hover;
   }
   .bar-item:last-child {
-    margin-right: 3px;
+    margin-right: 4px;
   }
 }
 </style>
