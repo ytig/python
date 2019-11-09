@@ -58,7 +58,17 @@ class GdbController:
         await self._command('continue')
 
     async def ir(self):
-        return {'todo': 'ir'}
+        d = {}
+        for k in ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']:
+            d[k] = 0
+        return d
 
     async def xb(self, start, end):
-        return b'todo xb'
+        import random
+        ret = b''
+        for i in range(end - start):
+            if random.random() < 0.01:
+                ret += b'\x00'
+            else:
+                ret += b'\x66'
+        return ret

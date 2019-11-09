@@ -141,7 +141,14 @@ def push_prop(name, default):
 class WsGdbController(GdbController):
     PULL = ('next', 'step', 'cont', 'ir', 'xb',)
     PUSH = ('suspend',)
-    suspend = push_prop('suspend', False)
+    suspend = push_prop('suspend', True)
+
+    async def next(self):
+        self.suspend = False
+        ret = await super().next()
+        await asyncio.sleep(3)
+        self.suspend = True
+        return ret
 
     @classmethod
     async def anew(cls, config):
