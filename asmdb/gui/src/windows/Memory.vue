@@ -58,10 +58,9 @@ class Source {
     var watchingNumbers = [];
     var address = this.start + this.group * index;
     for (var watchpoint of watchpoints) {
-      watchingNumbers.push(watchpoint.address - address);
-      watchingNumbers.push(watchpoint.address + 1 - address);
-      watchingNumbers.push(watchpoint.address + 2 - address);
-      watchingNumbers.push(watchpoint.address + 3 - address);
+      for (var i = 0; i < groupBy(); i++) {
+        watchingNumbers.push(watchpoint.address + i - address);
+      }
     }
     return JSON.stringify(watchingNumbers.sort());
   }
