@@ -140,8 +140,10 @@ def push_prop(name, default):
 
 class WsGdbController(GdbController):
     PULL = ('next', 'step', 'cont', 'ir', 'xb',)
-    PUSH = ('suspend',)
-    suspend = push_prop('suspend', True)
+    PUSH = ('suspend', 'breakpoints', 'watchpoints',)
+    suspend = push_prop('suspend', False)
+    breakpoints = push_prop('breakpoints', [])
+    watchpoints = push_prop('watchpoints', [])
 
     async def next(self):
         self.suspend = False
@@ -153,4 +155,7 @@ class WsGdbController(GdbController):
     @classmethod
     async def anew(cls, config):
         self = await super().anew(config)
+        self.suspend = True  # for test
+        self.watchpoints.append({'address': 0})
+        self.watchpoints = self.watchpoints
         return self
