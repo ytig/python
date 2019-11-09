@@ -30,6 +30,7 @@ export default {
       oldData: '',
       newData: '',
       itemSelection: null,
+      watchpoints: [],
       context: '',
       pageCache: {},
       hst: []
@@ -188,6 +189,10 @@ export default {
         this.invalidate();
       }
     },
+    onWatchpoints: function(watchpoints) {
+      this.watchpoints = watchpoints;
+      this.invalidate();
+    },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
     },
@@ -215,15 +220,22 @@ export default {
         var newBytes = newData.slice(i * column, (i + 1) * column);
         var oldBytes = oldData.slice(i * column, (i + 1) * column);
         var lineNumber = start + i * column;
+        var address = this.sp + lineNumber;
         var highlightNumber = this.itemSelection != null ? this.itemSelection - lineNumber : -1;
         if (highlightNumber < 0 || highlightNumber >= column) {
           highlightNumber = null;
+        }
+        var watchingNumbers = [];
+        for (var watchpoint of this.watchpoints) {
+          for (var j = 0; j < asmdb.asmUnit; j++) {
+            watchingNumbers.push(watchpoint.address + j - address);
+          }
         }
         lineNumber = '+0x' + lineNumber.toString(16).zfill(3);
         items[items.length] = {
           lineNumber: lineNumber,
           highlightNumber: highlightNumber,
-          watchingNumbers: null,
+          watchingNumbers: JSON.stringify(watchingNumbers.sort()),
           value: {
             oldBytes: oldBytes,
             newBytes: newBytes
