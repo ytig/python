@@ -178,7 +178,7 @@ function iterObjects(filter, handler) {
       continue;
     }
     var array = objects[type];
-    for (object of array) {
+    for (var object of array) {
       handler(object);
     }
   }
