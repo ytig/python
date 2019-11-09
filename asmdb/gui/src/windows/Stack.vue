@@ -163,15 +163,16 @@ export default {
         this.page = this.sp in this.pageCache ? this.pageCache[this.sp] : 0;
         this.oldData = '';
         this.newData = stack;
+        this.itemSelection = null;
       } else {
         this.oldData = this.newData;
         this.newData = stack;
       }
-      this.itemSelection = null;
       this.invalidate();
     },
     onContinue: function() {
       this.disable = true;
+      this.itemSelection = null;
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
