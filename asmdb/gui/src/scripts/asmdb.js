@@ -1,7 +1,8 @@
 var struct = {};
 
 document.cookie = 'token={}; path=/'; //for test
-var ws = new WebSocket('ws://' + location.host + '/ws');
+// var ws = new WebSocket('ws://' + location.host + '/ws');
+var ws = new WebSocket('ws://localhost:8080/ws');
 ws.onmessage = function (event) {
   var data = JSON.parse(event.data);
   switch (data.type) {
