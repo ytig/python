@@ -172,7 +172,10 @@ export default {
     },
     onContinue: function() {
       this.disable = true;
-      this.itemSelection = null;
+      if (this.itemSelection != null) {
+        this.itemSelection = null;
+        this.invalidate();
+      }
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
