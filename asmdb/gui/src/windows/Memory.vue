@@ -91,7 +91,7 @@ class Source {
       }
     }
     for (var r of ranges) {
-      asmdb.xb(r, this.onLoad.bind(this));
+      asmdb.xb(r, this.onLoad.bind(this, r[0]));
     }
   }
 
