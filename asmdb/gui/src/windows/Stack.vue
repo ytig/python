@@ -15,6 +15,7 @@
 
 <script>
 import keyboard from '@/scripts/keyboard';
+import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
 import Bytes from '@/views/Bytes';
 
@@ -56,10 +57,12 @@ export default {
     canvas.style.height = height + 'px';
     this.context = '' + setContext(canvas, 0, height);
     keyboard.registerWindow(this);
+    resize.registerEvent(this);
     asmdb.registerEvent('stack', this);
   },
   destroyed: function() {
     asmdb.unregisterEvent('stack', this);
+    resize.unregisterEvent(this);
     keyboard.unregisterWindow(this);
     delContext(this.$refs.canvas);
   },
@@ -110,6 +113,14 @@ export default {
       } else {
         return false;
       }
+    },
+    onResize: function() {
+      var row = Math.floor(this.$refs.stackLayout.clientHeight / Bytes.measureHeight());
+      if (this.items.length >= row) {
+        return;
+      }
+      this.itemSelection = null;
+      this.invalidate();
     },
     hstDel: function() {
       this.hst.splice(0, this.hst.length);
