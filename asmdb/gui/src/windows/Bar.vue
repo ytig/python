@@ -98,7 +98,8 @@ export default {
 @import '~@/styles/theme';
 
 .bar-container {
-  height: 32px;
+  padding-top: 8px;
+  height: 40px;
   display: flex;
   .bar-icon {
     margin-left: 4px;

@@ -1,7 +1,6 @@
 <template>
   <div id="root">
     <div id="left-layout">
-      <div id="bar-shadow"></div>
       <Bar id="bar"></Bar>
       <Assembly id="assembly" ref="assembly"></Assembly>
       <div id="points-layout">
@@ -55,13 +54,8 @@ export default {
     height: 100%;
     display: flex;
     flex-direction: column;
-    #bar-shadow {
-      height: 4px;
-      box-shadow: 0px 4px 4px -4px @color-border-shadow inset;
-      background: @color-background-dark;
-    }
     #bar {
-      background: @color-background-dark;
+      background: linear-gradient(@color-border, @color-background-dark 38.2%);
     }
     #assembly {
       flex-grow: 1;
