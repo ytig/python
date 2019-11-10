@@ -176,7 +176,7 @@ export default {
 .search-container[css-theme='1'] {
   background: @color-background-popup2;
   > div {
-    background-image: url('/static/icons/search.png');
+    background-image: url('/static/icons/edit.png');
   }
 }
 </style>
