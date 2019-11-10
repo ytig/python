@@ -7,6 +7,7 @@
 
 <script>
 import Animation from '@/scripts/animation';
+import asmdb from '@/scripts/asmdb';
 
 function exec(source, locals) {
   var result = null;
@@ -81,7 +82,7 @@ export default {
   },
   methods: {
     show: function() {
-      this.locals = { sp: 123, pc: 123 }; //todo
+      this.locals = asmdb.getRegisters();
       this.showing = true;
       this.text = '';
       this.realText = '';

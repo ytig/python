@@ -259,6 +259,9 @@ function unregisterEvent(type, object) {
   objects[type].splice(i, 1);
 }
 
+function getRegisters() {
+  return Object.assign({}, _registers);
+}
 
 function getAddressUsage(int) {
   var delta = int - _registers[SPNM];
@@ -318,6 +321,7 @@ export default {
   wp: wp,
   registerEvent: registerEvent,
   unregisterEvent: unregisterEvent,
+  getRegisters: getRegisters,
   getAddressUsage: getAddressUsage,
   getRegsString: getRegsString,
   getCpsrString: getCpsrString,
