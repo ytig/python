@@ -3,8 +3,8 @@
     <Navigation :name="'Wpoints'" :focus="focus" :gradient="true"></Navigation>
     <div class="watchpoints-layout">
       <div></div>
-      <div class="watchpoints-item" v-for="(item, index) in items" :key="index">
-        <span>{{index}}</span>
+      <div class="watchpoints-item" v-for="item in items" :key="item">
+        <span></span>
         <span @click="onClickItem(index)">{{item}}</span>
         <span @click="onSubPoint(index)"></span>
       </div>
@@ -24,8 +24,8 @@ function measureTextWidth(length) {
   return length * 7.224609375;
 }
 
-function measureViewWidth(lineNumberLength) {
-  return Math.ceil(4 * 12 + 16 + measureTextWidth(lineNumberLength + 2 + 2 * asmdb.UNIT));
+function measureViewWidth() {
+  return Math.ceil(12 + 8 + 8 + measureTextWidth(2 + 2 * asmdb.UNIT) + 16 + 16 + 12);
 }
 
 export default {
@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return measureViewWidth(1);
+      return measureViewWidth();
     },
     items: function() {
       var items = [];
@@ -109,14 +109,16 @@ export default {
       height: 18px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      > span {
-        font-size: 12px;
-      }
       > span:nth-child(1) {
-        color: @color-text-darker;
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: @color-icon-breakpoint;
+        margin-right: 8px;
       }
       > span:nth-child(2) {
+        flex-grow: 1;
+        font-size: 12px;
         color: @color-text;
         cursor: pointer;
       }
