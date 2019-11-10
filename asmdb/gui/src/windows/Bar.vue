@@ -72,6 +72,10 @@ export default {
       if (event.button == 2) {
         var items = [];
         var fullscreen = document.fullscreenElement != null;
+        items[items.length] = ['Nexti', 'n', this.enable.enable_t];
+        items[items.length] = ['Stepi', 's', this.enable.enable_t];
+        items[items.length] = ['Continue', 'c', this.enable.enable_t];
+        items[items.length] = ['Release suspend', 'r', this.enable.enable_t];
         items[items.length] = ['Fullscreen', 'space', !fullscreen];
         items[items.length] = ['Exit fullscreen', '⎋', fullscreen];
         this.$menu.alert(event, items, this.onClickMenu);
@@ -80,11 +84,17 @@ export default {
     onClickMenu: function(index) {
       switch (index) {
         case 0:
+        case 1:
+        case 2:
+        case 3:
+          this.onClickItem(index);
+          break;
+        case 4:
           if (document.fullscreenElement == null) {
             document.body.webkitRequestFullScreen();
           }
           break;
-        case 1:
+        case 5:
           if (document.fullscreenElement != null) {
             document.exitFullscreen();
           }
@@ -92,8 +102,13 @@ export default {
       }
     },
     onKeyDown: function(event) {
-      var index = [32, 27].indexOf(event.keyCode);
+      var index = [78, 83, 67, 82, 32, 27].indexOf(event.keyCode);
       if (index >= 0) {
+        if (index >= 0 && index < 4) {
+          if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey || !/[a-z]/.test(event.key)) {
+            return false;
+          }
+        }
         this.onClickMenu(index);
         return true;
       } else {
