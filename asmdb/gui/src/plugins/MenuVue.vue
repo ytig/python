@@ -85,6 +85,7 @@ export default {
 
 .menu-container {
   position: fixed;
+  z-index: 9;
   display: inline-block;
   background: @color-background-dark;
   box-shadow: 0px 2px 6px @color-border-shadow;
