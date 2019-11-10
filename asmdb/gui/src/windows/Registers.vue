@@ -1,6 +1,6 @@
 <template>
   <div class="registers-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
-    <Navigation :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
+    <Navigation ref="navigation" :name="'Registers'" :focus="focus" :disable="disable"></Navigation>
     <Empty class="registers-empty" v-if="empty" :text="'no data'"></Empty>
     <Gird class="registers-gird" :style="{opacity:empty?0:1}" :column="column" :items="items" #default="props">
       <Register :value="props.item" @clickitem="onClickItem"></Register>
@@ -57,7 +57,11 @@ export default {
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
-        this.$menu.alert(event);
+        if (isChildOrMe(this.$refs.navigation.$el, event.target)) {
+          this.$menu.alert(event);
+        } else {
+          this.$menu.close();
+        }
       }
     },
     onKeyDown: function(event) {
