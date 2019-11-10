@@ -84,7 +84,7 @@ export default {
     },
     onAddPoint: function() {
       //todo
-      asmdb.wp([], [{ address: 224 }]);
+      asmdb.wp([], [{ address: 4 * parseInt(64 * Math.random()) }]);
     }
   }
 };
