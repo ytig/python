@@ -5,11 +5,11 @@
       <div></div>
       <div class="watchpoints-item" v-for="(item, index) in items" :key="index">
         <span>{{index}}</span>
-        <span>{{item}}</span>
-        <span></span>
+        <span @click="onClickItem(index)">{{item}}</span>
+        <span @click="onSubPoint(index)"></span>
       </div>
       <div class="watchpoints-func">
-        <span></span>
+        <span v-show="items.length<items.max_length" @click="onAddPoint"></span>
       </div>
       <div></div>
     </div>
@@ -43,15 +43,8 @@ export default {
       var items = [];
       for (var watchpoint of this.watchpoints) {
         items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.UNIT));
-        //for test
-        items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.UNIT));
-        items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.UNIT));
-        items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.UNIT));
-        items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.UNIT));
-        items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.UNIT));
-        items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.UNIT));
-        items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.UNIT));
       }
+      items.max_length = asmdb.WLEN;
       return items;
     }
   },
@@ -80,6 +73,15 @@ export default {
     },
     onWatchpoints: function(watchpoints) {
       this.watchpoints = watchpoints;
+    },
+    onClickItem: function(index) {
+      this.$emit('clickitem', 1, this.items[index]);
+    },
+    onSubPoint: function(index) {
+      //todo
+    },
+    onAddPoint: function() {
+      //todo
     }
   }
 };
@@ -129,7 +131,6 @@ export default {
       }
     }
     .watchpoints-func {
-      height: 18px;
       display: flex;
       flex-direction: row-reverse;
       align-items: center;
@@ -140,6 +141,8 @@ export default {
         background-repeat: no-repeat;
         background-position: center center;
         margin-left: 12px;
+        margin-top: 1px;
+        margin-bottom: 1px;
       }
       > span:nth-child(1) {
         background-image: url('/static/icons/add.png');

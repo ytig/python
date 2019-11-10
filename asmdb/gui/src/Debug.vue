@@ -4,9 +4,9 @@
       <Bar id="bar"></Bar>
       <Assembly id="assembly" ref="assembly"></Assembly>
       <div id="points-layout">
-        <Breakpoints id="breakpoints"></Breakpoints>
+        <Breakpoints id="breakpoints" @clickitem="onClickItem"></Breakpoints>
         <div id="points-split"></div>
-        <Watchpoints id="watchpoints"></Watchpoints>
+        <Watchpoints id="watchpoints" @clickitem="onClickItem"></Watchpoints>
       </div>
       <Python3 id="python3"></Python3>
     </div>

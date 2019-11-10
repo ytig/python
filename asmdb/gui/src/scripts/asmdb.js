@@ -8,6 +8,9 @@ const REGS = {
 const SPNM = {
   'arm32': 'sp'
 } [TYPE];
+const WLEN = {
+  'arm32': 4
+} [TYPE];
 
 var struct = {};
 
@@ -289,6 +292,7 @@ export default {
   UNIT: UNIT,
   REGS: REGS,
   SPNM: SPNM,
+  WLEN: WLEN,
   next: next,
   step: step,
   cont: cont,
