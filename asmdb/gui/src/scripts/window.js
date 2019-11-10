@@ -6,6 +6,16 @@ String.prototype.zfill = function (size) {
   return str;
 }
 
+window.isChildOrMe = function (parent, child) {
+  while (child) {
+    if (parent == child) {
+      return true;
+    }
+    child = child.parentNode;
+  }
+  return false;
+}
+
 window.emptySelection = function () {
   var selection = getSelection();
   if (selection.type == 'Range') {
