@@ -76,7 +76,7 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items[items.length] = ['Add point', '↩︎', this.watchpoints.length < asmdb.WLEN];
+      items[items.length] = ['Edit point', '↩︎', this.watchpoints.length < asmdb.WLEN];
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
