@@ -206,6 +206,22 @@ function xb(range, success) {
   });
 }
 
+function badd(address) {
+  pull('badd', [address]);
+}
+
+function bsub(address) {
+  pull('bsub', [address]);
+}
+
+function wadd(address) {
+  pull('wadd', [address]);
+}
+
+function wsub(address) {
+  pull('wsub', [address]);
+}
+
 var objects = {};
 
 function iterObjects(filter, handler) {
@@ -298,6 +314,10 @@ export default {
   cont: cont,
   rlse: rlse,
   xb: xb,
+  badd: badd,
+  bsub: bsub,
+  wadd: wadd,
+  wsub: wsub,
   registerEvent: registerEvent,
   unregisterEvent: unregisterEvent,
   getAddressUsage: getAddressUsage,

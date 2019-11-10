@@ -80,10 +80,11 @@ export default {
       this.$emit('clickitem', 1, this.items[index]);
     },
     onSubPoint: function(index) {
-      //todo
+      asmdb.wsub(this.watchpoints[index].address);
     },
     onAddPoint: function() {
       //todo
+      asmdb.wadd(224);
     }
   }
 };
