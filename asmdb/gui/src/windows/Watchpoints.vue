@@ -4,7 +4,7 @@
     <Empty v-show="items.length==0" class="watchpoints-empty" :text="'no point'"></Empty>
     <div class="watchpoints-layout">
       <div></div>
-      <div class="watchpoints-item" v-for="item in items" :key="item">
+      <div class="watchpoints-item" v-for="(item, index) in items" :key="item">
         <span></span>
         <span @click="onClickItem(index)">{{item}}</span>
         <span></span>
