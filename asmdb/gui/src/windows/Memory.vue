@@ -269,8 +269,6 @@ export default {
   .memory-empty {
     position: absolute;
     top: 40px;
-    width: 100%;
-    padding-top: 12px;
   }
   .memory-recycler {
     height: 0px;

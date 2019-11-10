@@ -90,8 +90,6 @@ export default {
   .registers-empty {
     position: absolute;
     top: 40px;
-    width: 100%;
-    padding-top: 12px;
   }
   .registers-gird {
     padding-left: 12px;

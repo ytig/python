@@ -14,9 +14,10 @@ export default {
 @import '~@/styles/theme';
 
 .empty-container {
-  text-align: center;
-  color: @color-text-dark;
+  padding-left: 12px;
+  line-height: 18px;
   font-size: 12px;
+  color: @color-text-dark;
   text-shadow: 1px 1px 2px @color-text-shadow;
 }
 </style>

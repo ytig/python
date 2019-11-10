@@ -84,6 +84,7 @@ export default {
   }
 
   #right-layout {
+    z-index: 1;
     height: 100%;
     box-shadow: 0px 0px 6px @color-border-shadow;
     display: flex;
