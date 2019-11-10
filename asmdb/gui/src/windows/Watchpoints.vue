@@ -1,11 +1,12 @@
 <template>
-  <div class="watchpoints-container" :style="{width:windowWidth+'px',height:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
+  <div class="watchpoints-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Wpoints'" :focus="focus" :gradient="true"></Navigation>
     <div class="watchpoints-layout">
       <div></div>
       <div class="watchpoints-item" v-for="item in items" :key="item">
         <span></span>
         <span @click="onClickItem(index)">{{item}}</span>
+        <span></span>
         <span @click="onSubPoint(index)"></span>
       </div>
       <div class="watchpoints-func">
@@ -25,7 +26,7 @@ function measureTextWidth(length) {
 }
 
 function measureViewWidth() {
-  return Math.ceil(12 + 8 + 8 + measureTextWidth(2 + 2 * asmdb.UNIT) + 16 + 16 + 12);
+  return Math.ceil(12 + 8 + 8 + measureTextWidth(2 + 2 * asmdb.UNIT) + 40 + 16 + 12);
 }
 
 export default {
@@ -91,6 +92,7 @@ export default {
 @import '~@/styles/theme';
 
 .watchpoints-container {
+  height: 130px;
   display: flex;
   flex-direction: column;
   .watchpoints-layout {
@@ -117,12 +119,14 @@ export default {
         margin-right: 8px;
       }
       > span:nth-child(2) {
-        flex-grow: 1;
         font-size: 12px;
         color: @color-text;
         cursor: pointer;
       }
       > span:nth-child(3) {
+        flex-grow: 1;
+      }
+      > span:nth-child(4) {
         width: 16px;
         height: 16px;
         background-size: 16px 16px;
