@@ -1,5 +1,5 @@
 <template>
-  <div class="navigation-container" :css-gradient="gradient">
+  <div class="navigation-container" :css-gradient="gradient" @mouseup="onMouseUp">
     <span class="user-select-none" :css-focus="focus" :css-disable="disable">{{name}}</span>
     <div v-if="gradient" class="navigation-gradient"></div>
   </div>
@@ -12,6 +12,14 @@ export default {
     focus: Boolean,
     disable: Boolean,
     gradient: Boolean
+  },
+  methods: {
+    onMouseUp: function(event) {
+      if (event.button == 2) {
+        this.$emit('mouseup2', event);
+        event.stopPropagation();
+      }
+    }
   }
 };
 </script>

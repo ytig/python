@@ -1,7 +1,7 @@
 <template>
   <div class="stack-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Pager :canSub="page>0&&sp!=null" :canAdd="page<10-1&&sp!=null" @delta="onDelta"></Pager>
-    <Navigation ref="navigation" :name="'Stack'" :focus="focus" :disable="disable"></Navigation>
+    <Navigation :name="'Stack'" :focus="focus" :disable="disable" @mouseup2="onMouseUp2"></Navigation>
     <div ref="stackLayout" class="stack-layout">
       <div class="stack-draw" :style="{width:windowWidth+'px',height:linesHeight+'px'}">
         <canvas ref="canvas"></canvas>
@@ -76,17 +76,16 @@ export default {
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
-        if (isChildOrMe(this.$refs.navigation.$el, event.target)) {
-          var items = [];
-          items[items.length] = ['Go back', '⌫', this.hst.length > 0];
-          items[items.length] = ['Return to SP', '↩︎', this.sp != null && this.page != 0];
-          items[items.length] = ['Previous page', '←', this.sp != null && this.page - 1 >= 0];
-          items[items.length] = ['Next page', '→', this.sp != null && this.page + 1 < 10];
-          this.$menu.alert(event, items, this.onClickMenu);
-        } else {
-          this.$menu.close();
-        }
+        this.$menu.close();
       }
+    },
+    onMouseUp2: function(evnet) {
+      var items = [];
+      items[items.length] = ['Go back', '⌫', this.hst.length > 0];
+      items[items.length] = ['Return to SP', '↩︎', this.sp != null && this.page != 0];
+      items[items.length] = ['Previous page', '←', this.sp != null && this.page - 1 >= 0];
+      items[items.length] = ['Next page', '→', this.sp != null && this.page + 1 < 10];
+      this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
       switch (index) {

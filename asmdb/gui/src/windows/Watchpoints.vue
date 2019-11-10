@@ -1,6 +1,6 @@
 <template>
   <div class="watchpoints-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
-    <Navigation ref="navigation" :name="'Wpoints'" :focus="focus" :gradient="true"></Navigation>
+    <Navigation :name="'Wpoints'" :focus="focus" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <Empty v-show="items.length==0" class="watchpoints-empty" :text="'no point'"></Empty>
     <div class="watchpoints-layout">
       <div></div>
@@ -67,12 +67,11 @@ export default {
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
-        if (isChildOrMe(this.$refs.navigation.$el, event.target)) {
-          this.$menu.alert(event);
-        } else {
-          this.$menu.close();
-        }
+        this.$menu.close();
       }
+    },
+    onMouseUp2: function(evnet) {
+      this.$menu.alert(event);
     },
     onKeyDown: function(event) {
       return false;
