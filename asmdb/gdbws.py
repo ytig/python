@@ -172,7 +172,7 @@ class WsGdbController(GdbController):
             watchpoints[point['address']] = point
         for point in del_points:
             if point['address'] in watchpoints:
-                del watchpoints[point.address]
+                del watchpoints[point['address']]
         for point in set_points:
             watchpoints[point['address']] = point
         self.watchpoints.clear()
