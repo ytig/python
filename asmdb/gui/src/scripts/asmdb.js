@@ -133,7 +133,7 @@ function push(attrName, newValue, oldValue) {
           union.notify();
         });
       } else {
-        iterObjects('*', (object) => {
+        iterObjects('bar|assembly|registers|stack|memory', (object) => {
           object.onContinue();
         });
       }
