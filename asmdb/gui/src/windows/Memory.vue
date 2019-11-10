@@ -1,6 +1,6 @@
 <template>
   <div class="memory-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
-    <Search ref="search" @search="onSearch"></Search>
+    <Search ref="search" :theme="0" @search="onSearch"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <Empty v-show="!show" class="memory-empty" :text="'no data'"></Empty>
     <Recycler ref="recycler" class="memory-recycler" :show="show" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">

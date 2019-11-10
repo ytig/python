@@ -1,5 +1,6 @@
 <template>
   <div class="watchpoints-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
+    <Search ref="search" :theme="1" @search="onAddPoint"></Search>
     <Navigation :name="'Wpoints'" :focus="focus" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <Empty v-show="items.length==0" class="watchpoints-empty" :text="'no point'"></Empty>
     <div class="watchpoints-layout">
@@ -11,7 +12,7 @@
         <span @click="onSubPoint(index)"></span>
       </div>
       <div class="watchpoints-func">
-        <span v-show="items.length<items.max_length" @click="onAddPoint"></span>
+        <span v-show="items.length<items.max_length" @click="onClickMenu(0)"></span>
       </div>
       <div></div>
     </div>
@@ -64,6 +65,9 @@ export default {
     },
     onFocusChanged: function(value) {
       this.focus = value;
+      if (!value) {
+        this.$refs.search.dismiss();
+      }
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
@@ -71,10 +75,27 @@ export default {
       }
     },
     onMouseUp2: function(evnet) {
-      this.$menu.alert(event);
+      var items = [];
+      items[items.length] = ['Add point', '↩︎', this.watchpoints.length < asmdb.WLEN];
+      this.$menu.alert(event, items, this.onClickMenu);
+    },
+    onClickMenu: function(index) {
+      switch (index) {
+        case 0:
+          if (this.watchpoints.length < asmdb.WLEN) {
+            this.$refs.search.show();
+          }
+          break;
+      }
     },
     onKeyDown: function(event) {
-      return false;
+      var index = [13].indexOf(event.keyCode);
+      if (index >= 0) {
+        this.onClickMenu(index);
+        return true;
+      } else {
+        return false;
+      }
     },
     onWatchpoints: function(watchpoints) {
       this.watchpoints = watchpoints;
@@ -85,9 +106,10 @@ export default {
     onSubPoint: function(index) {
       asmdb.wp([this.watchpoints[index]], []);
     },
-    onAddPoint: function() {
-      //todo
-      asmdb.wp([], [{ address: 4 * parseInt(64 * Math.random()) }]);
+    onAddPoint: function(address) {
+      address = Math.min(Math.max(address, 0), Math.pow(16, 2 * asmdb.UNIT) - 1);
+      address -= address % asmdb.UNIT;
+      asmdb.wp([], [{ address: address }]);
     }
   }
 };

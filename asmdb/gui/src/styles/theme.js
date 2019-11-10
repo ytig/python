@@ -7,6 +7,7 @@ export default {
   colorBackgroundSelection2: '#d7dae0',
   colorBackgroundHover: '#383e4a',
   colorBackgroundPopup: '#4d78cc',
+  colorBackgroundPopup2: '#7e0097',
   //border
   colorBorder: '#181a1f',
   colorBorderLight: '#515a6b',

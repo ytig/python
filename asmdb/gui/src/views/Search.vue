@@ -1,5 +1,5 @@
 <template>
-  <div v-show="showing" class="search-container" :style="{left:containerLeft+'px'}" :css-illegal="illegal">
+  <div v-show="showing" class="search-container" :style="{left:containerLeft+'px'}" :css-illegal="illegal" :css-theme="''+theme">
     <div></div>
     <input ref="input" type="text" :style="{width:inputWidth+'px'}" v-model="text" @input="onInput" @keypress="onKeyPress" @blur="onBlur" />
   </div>
@@ -38,6 +38,9 @@ export default {
       locals: null,
       anim: new Animation(1 / 250)
     };
+  },
+  props: {
+    theme: Number
   },
   watch: {
     text: function(newValue, oldValue) {
@@ -136,7 +139,6 @@ export default {
   z-index: 4;
   left: 4px;
   top: 4px;
-  background: @color-background-popup;
   border-radius: 2px;
   box-shadow: 1px 1px @color-border-shadow;
   > div {
@@ -145,7 +147,6 @@ export default {
     top: 3px;
     width: 16px;
     height: 16px;
-    background-image: url('/static/icons/search.png');
     pointer-events: none;
   }
   > input {
@@ -164,6 +165,18 @@ export default {
 .search-container[css-illegal] {
   > input {
     border: 1px solid @color-border-illegal;
+  }
+}
+.search-container[css-theme='0'] {
+  background: @color-background-popup;
+  > div {
+    background-image: url('/static/icons/search.png');
+  }
+}
+.search-container[css-theme='1'] {
+  background: @color-background-popup2;
+  > div {
+    background-image: url('/static/icons/search.png');
   }
 }
 </style>
