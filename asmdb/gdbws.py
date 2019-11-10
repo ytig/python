@@ -139,11 +139,19 @@ def push_prop(name, default):
 
 
 class WsGdbController(GdbController):
-    PULL = ('next', 'step', 'cont', 'ir', 'xb',)
+    PULL = ('next', 'step', 'cont', 'rlse', 'ir', 'xb', 'bp', 'wp')
     PUSH = ('suspend', 'breakpoints', 'watchpoints',)
     suspend = push_prop('suspend', False)
     breakpoints = push_prop('breakpoints', None)
     watchpoints = push_prop('watchpoints', None)
+
+    @classmethod
+    async def anew(cls, config):
+        self = await super().anew(config)
+        self.suspend = True  # for test
+        self.breakpoints = []
+        self.watchpoints = []
+        return self
 
     async def next(self):
         self.suspend = False
@@ -152,9 +160,22 @@ class WsGdbController(GdbController):
         self.suspend = True
         return ret
 
-    @classmethod
-    async def anew(cls, config):
-        self = await super().anew(config)
-        self.suspend = True  # for test
-        self.watchpoints = [{'address': 224}]
-        return self
+    async def rlse(self):
+        pass
+
+    async def bp(self, del_points, set_points):
+        pass
+
+    async def wp(self, del_points, set_points):
+        watchpoints = {}
+        for point in self.watchpoints:
+            watchpoints[point['address']] = point
+        for point in del_points:
+            if point['address'] in watchpoints:
+                del watchpoints[point.address]
+        for point in set_points:
+            watchpoints[point['address']] = point
+        self.watchpoints.clear()
+        for address in sorted(watchpoints.keys()):
+            self.watchpoints.append(watchpoints[address])
+        self.watchpoints = self.watchpoints

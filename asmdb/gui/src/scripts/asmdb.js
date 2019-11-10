@@ -206,20 +206,12 @@ function xb(range, success) {
   });
 }
 
-function badd(address) {
-  pull('badd', [address]);
+function bp(delPoints, setPoints) {
+  pull('bp', [delPoints, setPoints]);
 }
 
-function bsub(address) {
-  pull('bsub', [address]);
-}
-
-function wadd(address) {
-  pull('wadd', [address]);
-}
-
-function wsub(address) {
-  pull('wsub', [address]);
+function wp(delPoints, setPoints) {
+  pull('wp', [delPoints, setPoints]);
 }
 
 var objects = {};
@@ -314,10 +306,8 @@ export default {
   cont: cont,
   rlse: rlse,
   xb: xb,
-  badd: badd,
-  bsub: bsub,
-  wadd: wadd,
-  wsub: wsub,
+  bp: bp,
+  wp: wp,
   registerEvent: registerEvent,
   unregisterEvent: unregisterEvent,
   getAddressUsage: getAddressUsage,
