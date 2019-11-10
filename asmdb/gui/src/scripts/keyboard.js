@@ -37,17 +37,18 @@ function requestFocus(object) {
 }
 
 document.addEventListener('keydown', function (event) {
+  if (cur >= 0) {
+    if (list[cur].onKeyDown(event)) {
+      event.preventDefault();
+      return;
+    }
+  }
   if (event.keyCode == 32) {
     if (document.fullscreenElement == null) {
       document.body.webkitRequestFullScreen();
     }
     event.preventDefault();
     return;
-  }
-  if (cur >= 0) {
-    if (list[cur].onKeyDown(event)) {
-      event.preventDefault();
-    }
   }
 });
 
