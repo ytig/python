@@ -100,13 +100,13 @@ export default {
       font-family: 'PingFang SC';
       font-size: 12px;
       color: @color-text-darker;
-      margin-right: 18px;
+      margin-right: 24px;
     }
     > span:last-child {
       font-family: 'PingFang SC';
       font-size: 12px;
       color: @color-text-darker;
-      margin-left: 30px;
+      margin-left: 24px;
     }
   }
   > div[css-enable] {
