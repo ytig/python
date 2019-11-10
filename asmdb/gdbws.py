@@ -92,6 +92,7 @@ class Session:
                 if tag is not None:
                     emit({'type': 'pull', 'tag': tag, 'r': suit_js(r), 'e': None, })
             except BaseException as e:
+                print(repr(e))
                 if tag is not None:
                     emit({'type': 'pull', 'tag': tag, 'r': None, 'e': suit_js(e), })
 
