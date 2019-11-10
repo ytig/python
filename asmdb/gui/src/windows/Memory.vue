@@ -2,7 +2,7 @@
   <div class="memory-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" @search="onSearch"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
-    <Empty v-show="!show" class="memory-empty" :text="'[no data]'"></Empty>
+    <Empty v-show="!show" class="memory-empty" :text="'no data'"></Empty>
     <Recycler ref="recycler" class="memory-recycler" :show="show" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
       <Bytes :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,watchpoints)" :value="props.item" :group="8*column" :showString="true" :canvasContext="props.index+';'+props.context" :lazyLayout="props.scrolling" @clickitem="onClickItem"></Bytes>
     </Recycler>

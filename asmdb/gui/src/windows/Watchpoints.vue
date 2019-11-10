@@ -1,7 +1,7 @@
 <template>
   <div class="watchpoints-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Navigation :name="'Wpoints'" :focus="focus" :gradient="true"></Navigation>
-    <Empty v-show="items.length==0" class="watchpoints-empty" :text="'[no point]'"></Empty>
+    <Empty v-show="items.length==0" class="watchpoints-empty" :text="'no point'"></Empty>
     <div class="watchpoints-layout">
       <div></div>
       <div class="watchpoints-item" v-for="item in items" :key="item">

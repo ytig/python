@@ -6,7 +6,7 @@
       <div class="stack-draw" :style="{width:windowWidth+'px',height:linesHeight+'px'}">
         <canvas ref="canvas"></canvas>
       </div>
-      <Empty v-if="items.length==0" :text="'[no data]'"></Empty>
+      <Empty v-if="items.length==0" :text="'no data'"></Empty>
       <Bytes v-else v-for="(item, index) in items" :key="index" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :value="item.value" :group="8*column" :showString="false" :canvasContext="index+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="sp==null"></Indicator>
