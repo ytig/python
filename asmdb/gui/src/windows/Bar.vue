@@ -105,7 +105,7 @@ export default {
       var index = [78, 83, 67, 82, 32, 27].indexOf(event.keyCode);
       if (index >= 0) {
         if (index >= 0 && index < 4) {
-          if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey || !/[a-z]/.test(event.key)) {
+          if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || !/[a-z]/.test(event.key)) {
             return false;
           }
         }
