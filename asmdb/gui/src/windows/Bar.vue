@@ -102,17 +102,23 @@ export default {
       }
     },
     onKeyDown: function(event) {
-      var index = [78, 83, 67, 82, 32, 27].indexOf(event.keyCode);
+      var d = 0;
+      var index = ['n', 's', 'c', 'r'].indexOf(event.key);
       if (index >= 0) {
-        if (index >= 0 && index < 4) {
-          if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || !/[a-z]/.test(event.key)) {
-            return false;
-          }
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+          return false;
         }
-        this.onClickMenu(index);
+        this.onClickMenu(index + d);
         return true;
       } else {
-        return false;
+        d += 4;
+        index = [32, 27].indexOf(event.keyCode);
+        if (index >= 0) {
+          this.onClickMenu(index + d);
+          return true;
+        } else {
+          return false;
+        }
       }
     },
     onBreak: function() {
