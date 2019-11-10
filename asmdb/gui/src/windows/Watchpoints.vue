@@ -26,7 +26,7 @@ function measureTextWidth(length) {
 }
 
 function measureViewWidth() {
-  return Math.ceil(12 + 8 + 8 + measureTextWidth(2 + 2 * asmdb.UNIT) + 40 + 16 + 12);
+  return Math.ceil(12 + 8 + 8 + measureTextWidth(2 + 2 * asmdb.UNIT) + 32 + 16 + 12);
 }
 
 export default {
@@ -146,13 +146,13 @@ export default {
         background-size: 16px 16px;
         background-repeat: no-repeat;
         background-position: center center;
-        margin-left: 12px;
+        margin-left: 8px;
         margin-top: 1px;
         margin-bottom: 1px;
+        cursor: pointer;
       }
       > span:nth-child(1) {
         background-image: url('/static/icons/add.png');
-        cursor: pointer;
       }
     }
   }
