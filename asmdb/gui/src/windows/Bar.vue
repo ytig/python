@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 
 class Enable {
@@ -59,10 +60,12 @@ export default {
     }
   },
   mounted: function() {
+    keyboard.setDefaultWindow(this);
     asmdb.registerEvent('bar', this);
   },
   destroyed: function() {
     asmdb.unregisterEvent('bar', this);
+    keyboard.setDefaultWindow(null);
   },
   methods: {
     onMouseUp: function(event) {
@@ -86,6 +89,15 @@ export default {
             document.exitFullscreen();
           }
           break;
+      }
+    },
+    onKeyDown: function(event) {
+      var index = [32, -1].indexOf(event.keyCode);
+      if (index >= 0) {
+        this.onClickMenu(index);
+        return true;
+      } else {
+        return false;
       }
     },
     onBreak: function() {

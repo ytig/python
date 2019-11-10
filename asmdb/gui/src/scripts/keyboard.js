@@ -1,5 +1,10 @@
+var def = null;
 var cur = -1;
 var list = [];
+
+function setDefaultWindow(object) {
+  def = object;
+}
 
 function registerWindow(object) {
   var i = list.indexOf(object);
@@ -40,14 +45,7 @@ document.addEventListener('keydown', function (event) {
   var consume = false;
   consume = cur >= 0 ? list[cur].onKeyDown(event) : false;
   if (!consume) {
-    switch (event.keyCode) {
-      case 32:
-        if (document.fullscreenElement == null) {
-          document.body.webkitRequestFullScreen();
-          consume = true;
-        }
-        break;
-    }
+    consume = def != null ? def.onKeyDown(event) : false;
   }
   if (consume) {
     event.preventDefault();
@@ -55,6 +53,7 @@ document.addEventListener('keydown', function (event) {
 });
 
 export default {
+  setDefaultWindow: setDefaultWindow,
   registerWindow: registerWindow,
   unregisterWindow: unregisterWindow,
   requestFocus: requestFocus
