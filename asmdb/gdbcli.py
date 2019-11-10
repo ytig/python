@@ -29,14 +29,20 @@ class GdbError(RuntimeError):
 
 
 class GdbController:
+    test = 0
+
     @classmethod
     async def anew(cls, config):
+        cls.test += 1
+        print('new', test)
         self = cls()
         self.process = await gdb_startup(config)
         self.cmdlock = asyncio.Lock()
         return self
 
     async def adel(self):
+        type(self).test -= 1
+        print('del', test)
         self.process.kill()
 
     def sigint(self):
