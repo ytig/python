@@ -2,7 +2,7 @@
   <div ref="menuContainer" v-show="show" class="menu-container" :style="{left:left+'px',top:top+'px'}">
     <div v-for="(item, index) in items" :key="index" :css-enable="item[2]">
       <span class="user-select-none">{{item[0]}}</span>
-      <span class="user-select-none">{{item[1]}}</span>
+      <span v-show="item[1].length>0" class="user-select-none">{{item[1]}}</span>
     </div>
   </div>
 </template>
@@ -33,7 +33,7 @@ export default {
       this.left = 0;
       this.top = 0;
       this.show = true;
-      this.items = items || [];
+      this.items = items || [['undefined', '', false]];
       this.listener = listener || null;
       this.$nextTick(function() {
         var view = this.$refs.menuContainer;
@@ -90,7 +90,6 @@ export default {
   box-shadow: 0px 2px 6px @color-border-shadow;
   padding-top: 4px;
   padding-bottom: 4px;
-  min-width: 74px;
   > div {
     padding-left: 12px;
     padding-right: 6px;
@@ -101,12 +100,13 @@ export default {
       font-family: 'PingFang SC';
       font-size: 12px;
       color: @color-text-darker;
-      margin-right: 47px;
+      margin-right: 18px;
     }
     > span:last-child {
       font-family: 'PingFang SC';
       font-size: 12px;
       color: @color-text-darker;
+      margin-left: 30px;
     }
   }
   > div[css-enable] {

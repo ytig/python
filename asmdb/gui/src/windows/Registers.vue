@@ -57,7 +57,7 @@ export default {
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
-        this.$menu.close();
+        this.$menu.alert(event);
       }
     },
     onKeyDown: function(event) {
