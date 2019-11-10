@@ -33,8 +33,8 @@ export default {
       this.left = 0;
       this.top = 0;
       this.show = true;
-      this.items = items;
-      this.listener = listener;
+      this.items = items || [];
+      this.listener = listener || null;
       this.$nextTick(function() {
         var view = this.$refs.menuContainer;
         this.left = event.clientX - (event.clientX + view.clientWidth <= window.innerWidth ? 0 : view.clientWidth);
@@ -72,7 +72,7 @@ export default {
     onClickItem: function(index) {
       var enable = this.items[index][2];
       if (enable) {
-        this.listener(index);
+        this.listener && this.listener(index);
         this.close();
       }
     }
