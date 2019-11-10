@@ -1,6 +1,6 @@
 <template>
   <div class="bytes-container">
-    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)"></span>
+    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)" @mouseup="onMouseUpItem(index, ...arguments)"></span>
   </div>
 </template>
 
@@ -41,6 +41,7 @@ export default {
     };
   },
   props: {
+    startAddress: Number,
     lineNumber: String,
     highlightNumber: Number,
     watchingNumbers: String,
@@ -119,6 +120,7 @@ export default {
         }
         if (i % asmdb.UNIT == 0) {
           items.push(newItem('&nbsp;'));
+          items[items.length - 1].index = i;
           if (self.value == null) {
             event = null;
           } else if (i + asmdb.UNIT - 1 < self.value.newBytes.length) {
@@ -141,6 +143,7 @@ export default {
           if (event != null) {
             items[items.length - 1].event = event;
           }
+          items[items.length - 1].index = i;
         }
         if (self.value == null) {
           items.push(newItem('00', 'bytes-padding'));
@@ -154,6 +157,7 @@ export default {
           if (event != null) {
             items[items.length - 1].event = event;
           }
+          items[items.length - 1].index = i;
         }
       }
       this.items = items;
@@ -317,6 +321,34 @@ export default {
       if (this.items[index] && this.items[index].event) {
         this.$emit('clickitem', ...this.items[index].event);
       }
+    },
+    onMouseUpItem: function(index, event) {
+      if (event.button == 2) {
+        if (this.items[index] && this.items[index].index != undefined) {
+          var menu = this.onCreateMenu(this.items[index].index);
+          this.$menu.alert(event, menu, i => {
+            menu[i].event();
+          });
+          event.stopPropagation();
+        }
+      }
+    },
+    onCreateMenu: function(index) {
+      var self = this.self;
+      var address = this.startAddress + index;
+      address -= address % asmdb.UNIT;
+      var watching = self.watchingNumbers.indexOf(index) >= 0;
+      var canWatch = true; //todo
+      var items = [];
+      items[items.length] = [!watching ? 'Watching' : 'Not watching', '', watching || canWatch];
+      items[items.length - 1].event = () => {
+        if (!watching) {
+          asmdb.wp([], [{ address: address }]);
+        } else {
+          asmdb.wp([{ address: address }], []);
+        }
+      };
+      return items;
     }
   }
 };

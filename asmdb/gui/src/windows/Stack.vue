@@ -7,7 +7,7 @@
         <canvas ref="canvas"></canvas>
       </div>
       <Empty v-if="items.length==0" :text="'no data'"></Empty>
-      <Bytes v-else v-for="(item, index) in items" :key="index" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :value="item.value" :group="8*column" :showString="false" :canvasContext="index+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
+      <Bytes v-else v-for="(item, index) in items" :key="index" :startAddress="item.startAddress" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :value="item.value" :group="8*column" :showString="false" :canvasContext="index+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="sp==null"></Indicator>
   </div>
@@ -220,7 +220,7 @@ export default {
         var newBytes = newData.slice(i * column, (i + 1) * column);
         var oldBytes = oldData.slice(i * column, (i + 1) * column);
         var lineNumber = start + i * column;
-        var address = this.sp + lineNumber;
+        var startAddress = this.sp + lineNumber;
         var highlightNumber = this.itemSelection != null ? this.itemSelection - lineNumber : -1;
         if (highlightNumber < 0 || highlightNumber >= column) {
           highlightNumber = null;
@@ -228,11 +228,12 @@ export default {
         var watchingNumbers = [];
         for (var watchpoint of this.watchpoints) {
           for (var j = 0; j < asmdb.UNIT; j++) {
-            watchingNumbers.push(watchpoint.address + j - address);
+            watchingNumbers.push(watchpoint.address + j - startAddress);
           }
         }
         lineNumber = '+0x' + lineNumber.toString(16).zfill(3);
         items[items.length] = {
+          startAddress: startAddress,
           lineNumber: lineNumber,
           highlightNumber: highlightNumber,
           watchingNumbers: JSON.stringify(watchingNumbers.sort()),
