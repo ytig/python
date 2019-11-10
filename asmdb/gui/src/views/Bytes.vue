@@ -338,7 +338,7 @@ export default {
       var address = this.startAddress + index;
       address -= address % asmdb.UNIT;
       var watching = self.watchingNumbers.indexOf(index) >= 0;
-      var canWatch = true; //todo
+      var canWatch = asmdb.getWatchpointsLength() < asmdb.WLEN;
       var items = [];
       items[items.length] = [!watching ? 'Watching' : 'Not watching', '', watching || canWatch];
       items[items.length - 1].event = () => {

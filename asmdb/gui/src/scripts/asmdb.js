@@ -50,6 +50,8 @@ ws.onmessage = function (event) {
 
 var counter = 0;
 var _registers = null;
+var _breakpoints = [];
+var _watchpoints = [];
 
 class Union {
   constructor(callable) {
@@ -139,6 +141,7 @@ function push(attrName, newValue, oldValue) {
       }
       break;
     case 'breakpoints':
+      _breakpoints = newValue;
       iterObjects('*', (object) => {
         if (object.onBreakpoints) {
           object.onBreakpoints(newValue);
@@ -146,6 +149,7 @@ function push(attrName, newValue, oldValue) {
       });
       break;
     case 'watchpoints':
+      _watchpoints = newValue;
       iterObjects('*', (object) => {
         if (object.onWatchpoints) {
           object.onWatchpoints(newValue);
@@ -296,6 +300,10 @@ function getCpsrString(int) {
   return n + z + c + v;
 }
 
+function getWatchpointsLength() {
+  return _watchpoints.length;
+}
+
 export default {
   UNIT: UNIT,
   REGS: REGS,
@@ -312,5 +320,6 @@ export default {
   unregisterEvent: unregisterEvent,
   getAddressUsage: getAddressUsage,
   getRegsString: getRegsString,
-  getCpsrString: getCpsrString
+  getCpsrString: getCpsrString,
+  getWatchpointsLength: getWatchpointsLength
 };
