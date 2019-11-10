@@ -227,7 +227,7 @@ export default {
         }
         var watchingNumbers = [];
         for (var watchpoint of this.watchpoints) {
-          for (var j = 0; j < asmdb.asmUnit; j++) {
+          for (var j = 0; j < asmdb.UNIT; j++) {
             watchingNumbers.push(watchpoint.address + j - address);
           }
         }

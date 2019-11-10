@@ -18,7 +18,7 @@ export default {
     var items = [];
     var lineFills = [];
     var c = 0;
-    for (var k of asmdb.asmRegs) {
+    for (var k of asmdb.REGS) {
       lineFills[c] = Math.max(k.length, lineFills[c] || 0);
       c = (c + 1) % column;
       items[items.length] = {

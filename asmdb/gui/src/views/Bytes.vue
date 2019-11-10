@@ -117,13 +117,13 @@ export default {
         if (i % 8 == 0) {
           items.push(newItem('&nbsp;'));
         }
-        if (i % asmdb.asmUnit == 0) {
+        if (i % asmdb.UNIT == 0) {
           items.push(newItem('&nbsp;'));
           if (self.value == null) {
             event = null;
-          } else if (i + asmdb.asmUnit - 1 < self.value.newBytes.length) {
+          } else if (i + asmdb.UNIT - 1 < self.value.newBytes.length) {
             var address = 0;
-            for (var j = asmdb.asmUnit - 1; j >= 0; j--) {
+            for (var j = asmdb.UNIT - 1; j >= 0; j--) {
               address *= 256;
               address += self.value.newBytes.charCodeAt(i + j);
             }
@@ -192,13 +192,13 @@ export default {
         if (i % 8 == 0) {
           x += measureTextWidth(1);
         }
-        if (i % asmdb.asmUnit == 0) {
+        if (i % asmdb.UNIT == 0) {
           x += measureTextWidth(1);
           if (self.value == null) {
             usage = '0';
-          } else if (i + asmdb.asmUnit - 1 < self.value.newBytes.length) {
+          } else if (i + asmdb.UNIT - 1 < self.value.newBytes.length) {
             var address = 0;
-            for (var j = asmdb.asmUnit - 1; j >= 0; j--) {
+            for (var j = asmdb.UNIT - 1; j >= 0; j--) {
               address *= 256;
               address += self.value.newBytes.charCodeAt(i + j);
             }

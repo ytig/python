@@ -27,7 +27,7 @@ export default {
         return '';
       }
       switch (this.value.lineName) {
-        case asmdb.asmSP:
+        case asmdb.SPNM:
           return '';
         case 'cpsr':
           return asmdb.getCpsrString(this.value.newValue);
@@ -40,7 +40,7 @@ export default {
         return '0';
       }
       switch (this.value.lineName) {
-        case asmdb.asmSP:
+        case asmdb.SPNM:
           return '3';
         case 'cpsr':
           return '1';

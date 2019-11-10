@@ -1,3 +1,14 @@
+const TYPE = 'arm32';
+const UNIT = {
+  'arm32': 4
+} [TYPE];
+const REGS = {
+  'arm32': ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']
+} [TYPE];
+const SPNM = {
+  'arm32': 'sp'
+} [TYPE];
+
 var struct = {};
 
 document.cookie = 'token={}; path=/'; //for test
@@ -92,7 +103,7 @@ function push(attrName, newValue, oldValue) {
           });
           //stack
           union.wait();
-          var sp = registers[asmSP];
+          var sp = registers[SPNM];
           xb([sp, sp + 400 * 10], (stack) => {
             union.notify(() => {
               iterObjects('stack', (object) => {
@@ -233,28 +244,13 @@ function unregisterEvent(type, object) {
   objects[type].splice(i, 1);
 }
 
-const asmType = 'arm32';
-const asmUnit = {
-  'arm32': 4
-} [asmType];
-const asmRegs = {
-  'arm32': ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']
-} [asmType];
-const asmSP = {
-  'arm32': 'sp'
-} [asmType];
 
 function getAddressUsage(int) {
-  //todo
-  if (int % 32 == 0) {
-    return '2';
-  }
-  if (int % 32 == 1) {
+  var delta = int - _registers[SPNM];
+  if (delta >= 0 && delta < 400 * 10) {
     return '3';
   }
-  if (int % 32 == 2) {
-    return '4';
-  }
+  //todo
   return '1';
 }
 
@@ -271,7 +267,11 @@ function getRegsString(int) {
       }
       break;
     case '3':
-      str = 'sp+123'; //todo
+      str = 'sp';
+      var delta = int - _registers[SPNM];
+      if (delta != 0) {
+        str += '+' + delta;
+      }
       break;
   }
   return str;
@@ -286,6 +286,9 @@ function getCpsrString(int) {
 }
 
 export default {
+  UNIT: UNIT,
+  REGS: REGS,
+  SPNM: SPNM,
   next: next,
   step: step,
   cont: cont,
@@ -293,8 +296,6 @@ export default {
   xb: xb,
   registerEvent: registerEvent,
   unregisterEvent: unregisterEvent,
-  asmUnit: asmUnit,
-  asmRegs: asmRegs,
   getAddressUsage: getAddressUsage,
   getRegsString: getRegsString,
   getCpsrString: getCpsrString
