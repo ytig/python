@@ -267,7 +267,7 @@ function getRegsString(int) {
       }
       break;
     case '3':
-      str = 'sp';
+      str = SPNM;
       var delta = int - _registers[SPNM];
       if (delta != 0) {
         str += '+' + delta;
