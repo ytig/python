@@ -92,7 +92,7 @@ export default {
       }
     },
     onKeyDown: function(event) {
-      var index = [32, -1].indexOf(event.keyCode);
+      var index = [32, 27].indexOf(event.keyCode);
       if (index >= 0) {
         this.onClickMenu(index);
         return true;
