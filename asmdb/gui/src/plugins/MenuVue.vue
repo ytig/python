@@ -90,6 +90,7 @@ export default {
   box-shadow: 0px 2px 6px @color-border-shadow;
   padding-top: 4px;
   padding-bottom: 4px;
+  min-width: 74px;
   > div {
     padding-left: 12px;
     padding-right: 6px;
