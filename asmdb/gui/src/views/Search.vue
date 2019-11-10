@@ -133,7 +133,7 @@ export default {
 
 .search-container {
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   left: 4px;
   top: 4px;
   background: @color-background-popup;
