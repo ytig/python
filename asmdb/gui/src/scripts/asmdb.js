@@ -92,7 +92,7 @@ function push(attrName, newValue, oldValue) {
           });
           //stack
           union.wait();
-          var sp = registers['sp'];
+          var sp = registers[asmSP];
           xb([sp, sp + 400 * 10], (stack) => {
             union.notify(() => {
               iterObjects('stack', (object) => {
@@ -239,6 +239,9 @@ const asmUnit = {
 } [asmType];
 const asmRegs = {
   'arm32': ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']
+} [asmType];
+const asmSP = {
+  'arm32': 'sp'
 } [asmType];
 
 function getAddressUsage(int) {
