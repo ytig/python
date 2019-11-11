@@ -16,8 +16,6 @@ class Debugger {
     this.ws.onmessage = this.onMessage.bind(this);
     this.counter = 0;
     this.registers = null;
-    this.breakpoints = [];
-    this.watchpoints = [];
     this.tag = 0;
     this.callbacks = {};
     this.objects = {};
@@ -116,7 +114,6 @@ class Debugger {
         }
         break;
       case 'breakpoints':
-        this.breakpoints = newValue;
         this.iterObjects('*', (object) => {
           if (object.onBreakpoints) {
             object.onBreakpoints(newValue);
@@ -124,7 +121,6 @@ class Debugger {
         });
         break;
       case 'watchpoints':
-        this.watchpoints = newValue;
         this.iterObjects('*', (object) => {
           if (object.onWatchpoints) {
             object.onWatchpoints(newValue);
@@ -274,7 +270,7 @@ class Debugger {
   }
 
   getWatchpointsLength() {
-    return this.watchpoints.length;
+    return this.struct.watchpoints.length;
   }
 }
 
