@@ -340,7 +340,7 @@ export default {
       var watching = self.watchingNumbers.indexOf(index) >= 0;
       var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN;
       var items = [];
-      items[items.length] = [!watching ? 'Watching' : 'Not watching', '', watching || canWatch];
+      items[items.length] = [!watching ? 'Watching' : 'Watching end', '', watching || canWatch];
       items[items.length - 1].event = () => {
         if (!watching) {
           asmdb.getInstance().wp([], [{ address: address }]);
