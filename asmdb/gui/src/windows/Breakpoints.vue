@@ -88,6 +88,7 @@ export default {
       asmdb.getInstance().bp([point], []);
     },
     onTogglePoint: function(point) {
+      point = Object.assign({}, point);
       point.disable = !point.disable;
       asmdb.getInstance().bp([], [point]);
     },
