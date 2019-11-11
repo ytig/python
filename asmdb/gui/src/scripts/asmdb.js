@@ -210,7 +210,63 @@ class Debugger {
       return;
     }
     this.objects[type].push(object);
-    //todo
+    var suspend = this.struct.suspend;
+    var counter = this.counter;
+    switch (type) {
+      case 'bar':
+        if (!suspend) {
+          object.onContinue();
+        } else {
+          object.onBreak();
+        }
+        break;
+      case 'assembly': //todo
+        break;
+      case 'registers':
+        if (!suspend) {
+          object.onContinue();
+        } else {
+          this.ir((registers) => {
+            if (counter != this.counter) {
+              return;
+            }
+            object.onBreak(registers);
+          });
+        }
+        break;
+      case 'stack':
+        if (!suspend) {
+          object.onContinue();
+        } else {
+          this.ir((registers) => {
+            var sp = registers[this.SPNM];
+            this.xb([sp, sp + 400 * 10], (stack) => {
+              if (counter != this.counter) {
+                return;
+              }
+              object.onBreak(sp, stack);
+            });
+          });
+        }
+        break;
+      case 'memory':
+        if (!suspend) {
+          object.onContinue();
+        } else {
+          var range = object.getRange();
+          if (range == null) {
+            object.onBreak(null, null);
+          } else {
+            this.xb(range, (memory) => {
+              if (counter != this.counter) {
+                return;
+              }
+              object.onBreak(range[0], memory);
+            });
+          }
+        }
+        break;
+    }
   }
 
   unregisterEvent(type, object) {
