@@ -2,7 +2,6 @@
   <div class="watchpoints-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" :theme="1" @search="onAddPoint"></Search>
     <Navigation :name="'Wpoints'" :focus="focus" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
-    <Empty v-show="watchpoints.length==0" class="watchpoints-empty" :text="'no point'"></Empty>
     <div class="watchpoints-layout">
       <div></div>
       <div class="watchpoints-item" v-for="point in watchpoints" :key="point.address">
@@ -119,10 +118,6 @@ export default {
   height: 130px;
   display: flex;
   flex-direction: column;
-  .watchpoints-empty {
-    position: absolute;
-    top: 40px;
-  }
   .watchpoints-layout {
     height: 0px;
     flex-grow: 1;

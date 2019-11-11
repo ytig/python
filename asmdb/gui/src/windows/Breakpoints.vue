@@ -2,7 +2,6 @@
   <div class="breakpoints-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" :theme="1" @search="onAddPoint"></Search>
     <Navigation :name="'Bpoints'" :focus="focus" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
-    <Empty v-show="breakpoints.length==0" class="breakpoints-empty" :text="'no point'"></Empty>
     <div class="breakpoints-layout">
       <div></div>
       <div class="breakpoints-item" v-for="point in breakpoints" :key="point.address" :css-disable="point.disable">
@@ -108,10 +107,6 @@ export default {
   height: 130px;
   display: flex;
   flex-direction: column;
-  .breakpoints-empty {
-    position: absolute;
-    top: 40px;
-  }
   .breakpoints-layout {
     height: 0px;
     flex-grow: 1;

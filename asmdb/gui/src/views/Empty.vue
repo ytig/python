@@ -17,6 +17,6 @@ export default {
   padding-left: 12px;
   line-height: 18px;
   font-size: 12px;
-  color: transparent;
+  color: @color-text-dark;
 }
 </style>
