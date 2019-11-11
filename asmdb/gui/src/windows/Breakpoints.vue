@@ -64,15 +64,13 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items[items.length] = ['Edit point', '↩︎', this.breakpoints.length < asmdb.getInstance().WLEN];
+      items[items.length] = ['Edit point', '↩︎', true];
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
       switch (index) {
         case 0:
-          if (this.breakpoints.length < asmdb.getInstance().WLEN) {
-            this.$refs.search.show();
-          }
+          this.$refs.search.show();
           break;
       }
     },
