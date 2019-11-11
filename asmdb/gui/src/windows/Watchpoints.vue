@@ -9,10 +9,10 @@
         <span></span>
         <span @click="onClickItem(index)">{{item}}</span>
         <span></span>
-        <span @click="onSubPoint(index)"></span>
+        <div class="watchpoints-icon" @click="onSubPoint(index)"></div>
       </div>
       <div class="watchpoints-func">
-        <span v-show="items.length<items.max_length" @click="onClickMenu(0)"></span>
+        <div v-show="items.length<items.max_length" class="watchpoints-icon" @click="onClickMenu(0)"></div>
       </div>
       <div></div>
     </div>
@@ -143,50 +143,46 @@ export default {
       height: 18px;
       display: flex;
       align-items: center;
-      > span:nth-child(1) {
+      > span:nth-of-type(1) {
         width: 8px;
         height: 8px;
         border-radius: 999px;
         background: @color-icon-breakpoint;
         margin-right: 8px;
       }
-      > span:nth-child(2) {
+      > span:nth-of-type(2) {
         font-size: 12px;
         color: @color-text;
         cursor: pointer;
       }
-      > span:nth-child(3) {
+      > span:nth-of-type(3) {
         flex-grow: 1;
       }
-      > span:nth-child(4) {
-        width: 16px;
-        height: 16px;
-        background-size: 16px 16px;
-        background-repeat: no-repeat;
-        background-position: center center;
+      > div:nth-last-of-type(1) {
         background-image: url('/static/icons/sub.png');
-        cursor: pointer;
       }
     }
     .watchpoints-func {
       display: flex;
       flex-direction: row-reverse;
       align-items: center;
-      > span {
-        width: 16px;
-        height: 16px;
-        background-size: 16px 16px;
-        background-repeat: no-repeat;
-        background-position: center center;
+      > div {
         margin-left: 8px;
         margin-top: 1px;
         margin-bottom: 1px;
-        cursor: pointer;
       }
-      > span:nth-child(1) {
+      > div:nth-of-type(1) {
         background-image: url('/static/icons/add.png');
       }
     }
+  }
+  .watchpoints-icon {
+    width: 16px;
+    height: 16px;
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    cursor: pointer;
   }
 }
 </style>
