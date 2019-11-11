@@ -64,7 +64,7 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items[items.length] = ['Edit point', '↩︎', true];
+      items[items.length] = ['Edit breakpoint', '↩︎', true];
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {

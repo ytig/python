@@ -76,7 +76,7 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items[items.length] = ['Edit point', '↩︎', this.watchpoints.length < asmdb.getInstance().WLEN];
+      items[items.length] = ['Edit watchpoint', '↩︎', this.watchpoints.length < asmdb.getInstance().WLEN];
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
