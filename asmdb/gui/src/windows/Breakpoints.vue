@@ -149,15 +149,12 @@ export default {
         background-image: url('/static/icons/sub.png');
       }
       > div:nth-last-of-type(2) {
-        background-image: url('/static/icons/disable.png');
+        background-image: url('/static/icons/toggle.png');
       }
     }
     .breakpoints-item[css-disable] {
       > span:nth-of-type(1) {
-        background: @color-text; //todo
-      }
-      > div:nth-last-of-type(2) {
-        background-image: url('/static/icons/enable.png');
+        background: @color-text;
       }
     }
     .breakpoints-func {
