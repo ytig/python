@@ -87,7 +87,7 @@ export default {
       this.breakpoints = breakpoints;
     },
     onClickItem: function(index) {
-      this.$emit('clickitem', 1, this.items[index]);
+      this.$emit('clickitem', 0, this.items[index]);
     },
     onSubPoint: function(index) {
       asmdb.getInstance().bp([this.breakpoints[index]], []);
