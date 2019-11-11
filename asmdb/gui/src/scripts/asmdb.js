@@ -10,29 +10,28 @@ class Debugger {
         this.WLEN = 4;
         break;
     }
-    this.struct = {};
-    this.ws = new WebSocket('ws://localhost:8080/ws');
-    // this.ws = new WebSocket('ws://' + location.host + '/ws');
-    this.ws.onmessage = this.onMessage.bind(this);
+    this.struct = {
+      suspend: false,
+      breakpoints: [],
+      watchpoints: []
+    };
     this.counter = 0;
     this.registers = null;
     this.tag = 0;
     this.callbacks = {};
     this.objects = {};
+    this.ws = new WebSocket('ws://localhost:8080/ws');
+    // this.ws = new WebSocket('ws://' + location.host + '/ws');
+    this.ws.onmessage = this.onMessage.bind(this);
   }
 
   onMessage(event) {
     var data = JSON.parse(event.data);
     switch (data.type) {
       case 'push':
-        if (!(data.key in this.struct)) {
-          this.struct[data.key] = data.val;
-          this.push(data.key, data.val);
-        } else {
-          var oldValue = this.struct[data.key];
-          this.struct[data.key] = data.val;
-          this.push(data.key, data.val, oldValue);
-        }
+        var oldValue = this.struct[data.key];
+        this.struct[data.key] = data.val;
+        this.push(data.key, data.val, oldValue);
         break;
       case 'pull':
         if (data.tag in this.callbacks) {
