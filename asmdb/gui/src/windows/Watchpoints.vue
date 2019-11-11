@@ -2,17 +2,17 @@
   <div class="watchpoints-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" :theme="1" @search="onAddPoint"></Search>
     <Navigation :name="'Wpoints'" :focus="focus" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
-    <Empty v-show="items.length==0" class="watchpoints-empty" :text="'no point'"></Empty>
+    <Empty v-show="watchpoints.length==0" class="watchpoints-empty" :text="'no point'"></Empty>
     <div class="watchpoints-layout">
       <div></div>
-      <div class="watchpoints-item" v-for="(item, index) in items" :key="item">
+      <div class="watchpoints-item" v-for="(item, index) in watchpoints" :key="item.address">
         <span></span>
-        <span @click="onClickItem(index)">{{item}}</span>
+        <span @click="onClickItem(index)">{{toHex(item.address)}}</span>
         <span></span>
         <div class="watchpoints-icon" @click="onSubPoint(index)"></div>
       </div>
       <div class="watchpoints-func">
-        <div v-show="items.length<items.max_length" class="watchpoints-icon" @click="onClickMenu(0)"></div>
+        <div v-show="watchpoints.length<wlen" class="watchpoints-icon" @click="onClickMenu(0)"></div>
       </div>
       <div></div>
     </div>
@@ -35,20 +35,13 @@ export default {
   data: function() {
     return {
       focus: false,
-      watchpoints: []
+      watchpoints: [],
+      wlen: asmdb.getInstance().WLEN
     };
   },
   computed: {
     windowWidth: function() {
       return measureViewWidth();
-    },
-    items: function() {
-      var items = [];
-      for (var point of this.watchpoints) {
-        items.push('0x' + point.address.toString(16).zfill(2 * asmdb.getInstance().UNIT));
-      }
-      items.max_length = asmdb.getInstance().WLEN;
-      return items;
     }
   },
   mounted: function() {
@@ -60,6 +53,9 @@ export default {
     keyboard.unregisterWindow(this);
   },
   methods: {
+    toHex: function(address) {
+      return '0x' + address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
+    },
     requestFocus: function() {
       keyboard.requestFocus(this);
     },
@@ -76,13 +72,13 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items[items.length] = ['Edit watchpoint', '↩︎', this.watchpoints.length < asmdb.getInstance().WLEN];
+      items[items.length] = ['Edit watchpoint', '↩︎', this.watchpoints.length < this.wlen];
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
       switch (index) {
         case 0:
-          if (this.watchpoints.length < asmdb.getInstance().WLEN) {
+          if (this.watchpoints.length < this.wlen) {
             this.$refs.search.show();
           }
           break;
@@ -101,7 +97,7 @@ export default {
       this.watchpoints = watchpoints;
     },
     onClickItem: function(index) {
-      this.$emit('clickitem', 1, this.items[index]);
+      this.$emit('clickitem', 1, this.watchpoints[index].address);
     },
     onSubPoint: function(index) {
       asmdb.getInstance().wp([this.watchpoints[index]], []);
