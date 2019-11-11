@@ -14,10 +14,9 @@ export default {
 @import '~@/styles/theme';
 
 .empty-container {
-  padding-left: 24px;
+  padding-left: 12px;
   line-height: 18px;
   font-size: 12px;
-  color: @color-text-dark;
-  font-style: italic;
+  color: transparent;
 }
 </style>
