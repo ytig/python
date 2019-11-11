@@ -154,7 +154,7 @@ export default {
     }
     .breakpoints-item[css-disable] {
       > span:nth-of-type(1) {
-        background: @color-text;
+        background: @color-icon-breakpoint2;
       }
     }
     .breakpoints-func {

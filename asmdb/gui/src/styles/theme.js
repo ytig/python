@@ -25,5 +25,6 @@ export default {
   colorTextMenu: '#c8c8c8',
   colorTextMenuDark: '#9da5b4',
   //icon
-  colorIconBreakpoint: '#e51400'
+  colorIconBreakpoint: '#e51400',
+  colorIconBreakpoint2: '#6e6e6e'
 };
