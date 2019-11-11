@@ -143,7 +143,7 @@ export default {
         flex-grow: 1;
       }
       > div {
-        margin-left: 8px;
+        margin-left: 12px;
       }
       > div:nth-last-of-type(1) {
         background-image: url('/static/icons/sub.png');
@@ -162,7 +162,7 @@ export default {
       flex-direction: row-reverse;
       align-items: center;
       > div {
-        margin-left: 8px;
+        margin-left: 12px;
         margin-top: 1px;
         margin-bottom: 1px;
       }

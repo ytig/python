@@ -163,7 +163,7 @@ export default {
       flex-direction: row-reverse;
       align-items: center;
       > div {
-        margin-left: 8px;
+        margin-left: 12px;
         margin-top: 1px;
         margin-bottom: 1px;
       }
