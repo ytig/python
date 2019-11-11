@@ -5,12 +5,12 @@
     <Empty v-show="breakpoints.length==0" class="breakpoints-empty" :text="'no point'"></Empty>
     <div class="breakpoints-layout">
       <div></div>
-      <div class="breakpoints-item" v-for="item in breakpoints" :key="item.address" :css-disable="item.disable">
+      <div class="breakpoints-item" v-for="point in breakpoints" :key="point.address" :css-disable="point.disable">
         <span></span>
-        <span @click="onClickItem(item)">{{toHex(item.address)}}</span>
+        <span @click="onClickItem(point)">{{toHex(point.address)}}</span>
         <span></span>
-        <div class="breakpoints-icon" @click="onTogglePoint(item)"></div>
-        <div class="breakpoints-icon" @click="onSubPoint(item)"></div>
+        <div class="breakpoints-icon" @click="onTogglePoint(point)"></div>
+        <div class="breakpoints-icon" @click="onSubPoint(point)"></div>
       </div>
       <div class="breakpoints-func">
         <div class="breakpoints-icon" @click="onClickMenu(0)"></div>

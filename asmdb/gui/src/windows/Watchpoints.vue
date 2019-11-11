@@ -5,11 +5,11 @@
     <Empty v-show="watchpoints.length==0" class="watchpoints-empty" :text="'no point'"></Empty>
     <div class="watchpoints-layout">
       <div></div>
-      <div class="watchpoints-item" v-for="(item, index) in watchpoints" :key="item.address">
+      <div class="watchpoints-item" v-for="point in watchpoints" :key="point.address">
         <span></span>
-        <span @click="onClickItem(index)">{{toHex(item.address)}}</span>
+        <span @click="onClickItem(point)">{{toHex(point.address)}}</span>
         <span></span>
-        <div class="watchpoints-icon" @click="onSubPoint(index)"></div>
+        <div class="watchpoints-icon" @click="onSubPoint(point)"></div>
       </div>
       <div class="watchpoints-func">
         <div v-show="watchpoints.length<wlen" class="watchpoints-icon" @click="onClickMenu(0)"></div>
@@ -96,11 +96,11 @@ export default {
     onWatchpoints: function(watchpoints) {
       this.watchpoints = watchpoints;
     },
-    onClickItem: function(index) {
-      this.$emit('clickitem', 1, this.watchpoints[index].address);
+    onClickItem: function(point) {
+      this.$emit('clickitem', 1, point.address);
     },
-    onSubPoint: function(index) {
-      asmdb.getInstance().wp([this.watchpoints[index]], []);
+    onSubPoint: function(point) {
+      asmdb.getInstance().wp([point], []);
     },
     onAddPoint: function(address) {
       address = Math.min(Math.max(address, 0), Math.pow(16, 2 * asmdb.getInstance().UNIT) - 1);
