@@ -2,17 +2,18 @@
   <div class="breakpoints-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" :theme="1" @search="onAddPoint"></Search>
     <Navigation :name="'Bpoints'" :focus="focus" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
-    <Empty v-show="items.length==0" class="breakpoints-empty" :text="'no point'"></Empty>
+    <Empty v-show="breakpoints.length==0" class="breakpoints-empty" :text="'no point'"></Empty>
     <div class="breakpoints-layout">
       <div></div>
-      <div class="breakpoints-item" v-for="(item, index) in items" :key="item">
+      <div class="breakpoints-item" v-for="item in breakpoints" :key="item.address" :css-disable="item.disable">
         <span></span>
-        <span @click="onClickItem(index)">{{item}}</span>
+        <span @click="onClickItem(item)">{{toHex(item.address)}}</span>
         <span></span>
-        <span @click="onSubPoint(index)"></span>
+        <div class="breakpoints-icon" @click="onTogglePoint(item)"></div>
+        <div class="breakpoints-icon" @click="onSubPoint(item)"></div>
       </div>
       <div class="breakpoints-func">
-        <span @click="onClickMenu(0)"></span>
+        <div class="breakpoints-icon" @click="onClickMenu(0)"></div>
       </div>
       <div></div>
     </div>
@@ -30,15 +31,6 @@ export default {
       breakpoints: []
     };
   },
-  computed: {
-    items: function() {
-      var items = [];
-      for (var point of this.breakpoints) {
-        items.push('0x' + point.address.toString(16).zfill(2 * asmdb.getInstance().UNIT));
-      }
-      return items;
-    }
-  },
   mounted: function() {
     keyboard.registerWindow(this);
     asmdb.getInstance().registerEvent('breakpoints', this);
@@ -48,6 +40,9 @@ export default {
     keyboard.unregisterWindow(this);
   },
   methods: {
+    toHex: function(address) {
+      return '0x' + address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
+    },
     requestFocus: function() {
       keyboard.requestFocus(this);
     },
@@ -86,15 +81,19 @@ export default {
     onBreakpoints: function(breakpoints) {
       this.breakpoints = breakpoints;
     },
-    onClickItem: function(index) {
-      this.$emit('clickitem', 0, this.items[index]);
+    onClickItem: function(point) {
+      this.$emit('clickitem', 0, point.address);
     },
-    onSubPoint: function(index) {
-      asmdb.getInstance().bp([this.breakpoints[index]], []);
+    onSubPoint: function(point) {
+      asmdb.getInstance().bp([point], []);
+    },
+    onTogglePoint: function(point) {
+      point.disable = !point.disable;
+      asmdb.getInstance().bp([], [point]);
     },
     onAddPoint: function(address) {
       address = Math.min(Math.max(address, 0), Math.pow(16, 2 * asmdb.getInstance().UNIT) - 1);
-      asmdb.getInstance().bp([], [{ address: address }]);
+      asmdb.getInstance().bp([], [{ address: address, disable: false }]);
     }
   }
 };
@@ -105,6 +104,7 @@ export default {
 
 .breakpoints-container {
   position: relative;
+  height: 130px;
   display: flex;
   flex-direction: column;
   .breakpoints-empty {
@@ -127,50 +127,60 @@ export default {
       height: 18px;
       display: flex;
       align-items: center;
-      > span:nth-child(1) {
+      > span:nth-of-type(1) {
         width: 8px;
         height: 8px;
         border-radius: 999px;
         background: @color-icon-breakpoint;
         margin-right: 8px;
       }
-      > span:nth-child(2) {
+      > span:nth-of-type(2) {
         font-size: 12px;
         color: @color-text;
         cursor: pointer;
       }
-      > span:nth-child(3) {
+      > span:nth-of-type(3) {
         flex-grow: 1;
       }
-      > span:nth-child(4) {
-        width: 16px;
-        height: 16px;
-        background-size: 16px 16px;
-        background-repeat: no-repeat;
-        background-position: center center;
+      > div {
+        margin-left: 8px;
+      }
+      > div:nth-last-of-type(1) {
         background-image: url('/static/icons/sub.png');
-        cursor: pointer;
+      }
+      > div:nth-last-of-type(2) {
+        background-image: url('/static/icons/disable.png');
+      }
+    }
+    .breakpoints-item[css-disable] {
+      > span:nth-of-type(1) {
+        background: @color-text; //todo
+      }
+      > div:nth-last-of-type(2) {
+        background-image: url('/static/icons/enable.png');
       }
     }
     .breakpoints-func {
       display: flex;
       flex-direction: row-reverse;
       align-items: center;
-      > span {
-        width: 16px;
-        height: 16px;
-        background-size: 16px 16px;
-        background-repeat: no-repeat;
-        background-position: center center;
+      > div {
         margin-left: 8px;
         margin-top: 1px;
         margin-bottom: 1px;
-        cursor: pointer;
       }
-      > span:nth-child(1) {
+      > div:nth-of-type(1) {
         background-image: url('/static/icons/add.png');
       }
     }
+  }
+  .breakpoints-icon {
+    width: 16px;
+    height: 16px;
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    cursor: pointer;
   }
 }
 </style>
