@@ -14,10 +14,10 @@ export default {
 @import '~@/styles/theme';
 
 .empty-container {
-  padding-left: 12px;
+  padding-left: 24px;
   line-height: 18px;
   font-size: 12px;
   color: @color-text-dark;
-  text-shadow: 1px 1px 2px @color-text-shadow;
+  font-style: italic;
 }
 </style>
