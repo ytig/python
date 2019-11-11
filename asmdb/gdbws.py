@@ -165,7 +165,18 @@ class WsGdbController(GdbController):
         pass
 
     async def bp(self, del_points, set_points):
-        pass
+        breakpoints = {}
+        for point in self.breakpoints:
+            breakpoints[point['address']] = point
+        for point in del_points:
+            if point['address'] in breakpoints:
+                del breakpoints[point['address']]
+        for point in set_points:
+            breakpoints[point['address']] = point
+        self.breakpoints.clear()
+        for address in sorted(breakpoints.keys()):
+            self.breakpoints.append(breakpoints[address])
+        self.breakpoints = self.breakpoints
 
     async def wp(self, del_points, set_points):
         watchpoints = {}
