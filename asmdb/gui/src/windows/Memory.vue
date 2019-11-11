@@ -2,7 +2,7 @@
   <div class="memory-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" :theme="0" @search="onSearch"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
-    <Empty v-show="!show" class="memory-empty" :text="'press enter and search an address.'"></Empty>
+    <Empty v-show="!show&&trigger" class="memory-empty" :text="'press enter and search an address.'"></Empty>
     <Recycler ref="recycler" class="memory-recycler" :show="show" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
       <Bytes :startAddress="source.toStartAddress(props.index)" :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,watchpoints)" :value="props.item" :group="8*column" :showString="true" :canvasContext="props.index+';'+props.context" :lazyLayout="props.scrolling" @clickitem="onClickItem"></Bytes>
     </Recycler>
@@ -115,6 +115,7 @@ export default {
     return {
       focus: false,
       disable: true,
+      trigger: false,
       show: false,
       source: null,
       itemSelection: null,
@@ -236,6 +237,7 @@ export default {
       return this.source.getRange(this.$refs.recycler.getPosition().index);
     },
     onBreak: function(address, memory) {
+      this.trigger = true;
       this.disable = false;
       if (!this.show) {
         return;
