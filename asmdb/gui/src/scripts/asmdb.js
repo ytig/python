@@ -267,6 +267,12 @@ class Debugger {
         }
         break;
     }
+    if (object.onBreakpoints) {
+      object.onBreakpoints(this.struct.breakpoints);
+    }
+    if (object.onWatchpoints) {
+      object.onWatchpoints(this.struct.watchpoints);
+    }
   }
 
   unregisterEvent(type, object) {
