@@ -18,7 +18,7 @@ export default {
     var items = [];
     var lineFills = [];
     var c = 0;
-    for (var k of asmdb.REGS) {
+    for (var k of asmdb.getInstance().REGS) {
       lineFills[c] = Math.max(k.length, lineFills[c] || 0);
       c = (c + 1) % column;
       items[items.length] = {
@@ -42,10 +42,10 @@ export default {
   },
   mounted: function() {
     keyboard.registerWindow(this);
-    asmdb.registerEvent('registers', this);
+    asmdb.getInstance().registerEvent('registers', this);
   },
   destroyed: function() {
-    asmdb.unregisterEvent('registers', this);
+    asmdb.getInstance().unregisterEvent('registers', this);
     keyboard.unregisterWindow(this);
   },
   methods: {

@@ -118,18 +118,18 @@ export default {
         if (i % 8 == 0) {
           items.push(newItem('&nbsp;'));
         }
-        if (i % asmdb.UNIT == 0) {
+        if (i % asmdb.getInstance().UNIT == 0) {
           items.push(newItem('&nbsp;'));
           items[items.length - 1].index = i;
           if (self.value == null) {
             event = null;
-          } else if (i + asmdb.UNIT - 1 < self.value.newBytes.length) {
+          } else if (i + asmdb.getInstance().UNIT - 1 < self.value.newBytes.length) {
             var address = 0;
-            for (var j = asmdb.UNIT - 1; j >= 0; j--) {
+            for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
               address *= 256;
               address += self.value.newBytes.charCodeAt(i + j);
             }
-            var usage = parseInt(asmdb.getAddressUsage(address)) - 2;
+            var usage = parseInt(asmdb.getInstance().getAddressUsage(address)) - 2;
             if (usage >= 0) {
               event = [usage, address];
             } else {
@@ -196,17 +196,17 @@ export default {
         if (i % 8 == 0) {
           x += measureTextWidth(1);
         }
-        if (i % asmdb.UNIT == 0) {
+        if (i % asmdb.getInstance().UNIT == 0) {
           x += measureTextWidth(1);
           if (self.value == null) {
             usage = '0';
-          } else if (i + asmdb.UNIT - 1 < self.value.newBytes.length) {
+          } else if (i + asmdb.getInstance().UNIT - 1 < self.value.newBytes.length) {
             var address = 0;
-            for (var j = asmdb.UNIT - 1; j >= 0; j--) {
+            for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
               address *= 256;
               address += self.value.newBytes.charCodeAt(i + j);
             }
-            var usage = asmdb.getAddressUsage(address);
+            var usage = asmdb.getInstance().getAddressUsage(address);
           } else {
             usage = '1';
           }
@@ -336,16 +336,16 @@ export default {
     onCreateMenu: function(index) {
       var self = this.self;
       var address = this.startAddress + index;
-      address -= address % asmdb.UNIT;
+      address -= address % asmdb.getInstance().UNIT;
       var watching = self.watchingNumbers.indexOf(index) >= 0;
-      var canWatch = asmdb.getWatchpointsLength() < asmdb.WLEN;
+      var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN;
       var items = [];
       items[items.length] = [!watching ? 'Watching' : 'Not watching', '', watching || canWatch];
       items[items.length - 1].event = () => {
         if (!watching) {
-          asmdb.wp([], [{ address: address }]);
+          asmdb.getInstance().wp([], [{ address: address }]);
         } else {
-          asmdb.wp([{ address: address }], []);
+          asmdb.getInstance().wp([{ address: address }], []);
         }
       };
       return items;

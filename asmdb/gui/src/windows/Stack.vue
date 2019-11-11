@@ -59,10 +59,10 @@ export default {
     this.context = '' + setContext(canvas, 0, height);
     keyboard.registerWindow(this);
     resize.registerEvent(this);
-    asmdb.registerEvent('stack', this);
+    asmdb.getInstance().registerEvent('stack', this);
   },
   destroyed: function() {
-    asmdb.unregisterEvent('stack', this);
+    asmdb.getInstance().unregisterEvent('stack', this);
     resize.unregisterEvent(this);
     keyboard.unregisterWindow(this);
     delContext(this.$refs.canvas);
@@ -230,7 +230,7 @@ export default {
         }
         var watchingNumbers = [];
         for (var watchpoint of this.watchpoints) {
-          for (var j = 0; j < asmdb.UNIT; j++) {
+          for (var j = 0; j < asmdb.getInstance().UNIT; j++) {
             watchingNumbers.push(watchpoint.address + j - startAddress);
           }
         }

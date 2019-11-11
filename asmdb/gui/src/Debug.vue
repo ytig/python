@@ -22,7 +22,14 @@
 </template>
 
 <script>
+import asmdb from '@/scripts/asmdb';
+
 export default {
+  created: function() {
+    if (!asmdb.getInstance()) {
+      asmdb.newInstance(); //todo catch
+    }
+  },
   methods: {
     onClickItem: function(usage, address) {
       switch (usage) {

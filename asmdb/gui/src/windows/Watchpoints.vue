@@ -28,7 +28,7 @@ function measureTextWidth(length) {
 }
 
 function measureViewWidth() {
-  return Math.ceil(12 + 8 + 8 + measureTextWidth(2 + 2 * asmdb.UNIT) + 32 + 16 + 12);
+  return Math.ceil(12 + 8 + 8 + measureTextWidth(2 + 2 * asmdb.getInstance().UNIT) + 32 + 16 + 12);
 }
 
 export default {
@@ -45,18 +45,18 @@ export default {
     items: function() {
       var items = [];
       for (var watchpoint of this.watchpoints) {
-        items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.UNIT));
+        items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.getInstance().UNIT));
       }
-      items.max_length = asmdb.WLEN;
+      items.max_length = asmdb.getInstance().WLEN;
       return items;
     }
   },
   mounted: function() {
     keyboard.registerWindow(this);
-    asmdb.registerEvent('watchpoints', this);
+    asmdb.getInstance().registerEvent('watchpoints', this);
   },
   destroyed: function() {
-    asmdb.unregisterEvent('watchpoints', this);
+    asmdb.getInstance().unregisterEvent('watchpoints', this);
     keyboard.unregisterWindow(this);
   },
   methods: {
@@ -76,13 +76,13 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items[items.length] = ['Edit point', '↩︎', this.watchpoints.length < asmdb.WLEN];
+      items[items.length] = ['Edit point', '↩︎', this.watchpoints.length < asmdb.getInstance().WLEN];
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
       switch (index) {
         case 0:
-          if (this.watchpoints.length < asmdb.WLEN) {
+          if (this.watchpoints.length < asmdb.getInstance().WLEN) {
             this.$refs.search.show();
           }
           break;
@@ -104,12 +104,12 @@ export default {
       this.$emit('clickitem', 1, this.items[index]);
     },
     onSubPoint: function(index) {
-      asmdb.wp([this.watchpoints[index]], []);
+      asmdb.getInstance().wp([this.watchpoints[index]], []);
     },
     onAddPoint: function(address) {
-      address = Math.min(Math.max(address, 0), Math.pow(16, 2 * asmdb.UNIT) - 1);
-      address -= address % asmdb.UNIT;
-      asmdb.wp([], [{ address: address }]);
+      address = Math.min(Math.max(address, 0), Math.pow(16, 2 * asmdb.getInstance().UNIT) - 1);
+      address -= address % asmdb.getInstance().UNIT;
+      asmdb.getInstance().wp([], [{ address: address }]);
     }
   }
 };

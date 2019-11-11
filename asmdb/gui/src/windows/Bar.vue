@@ -61,10 +61,10 @@ export default {
   },
   mounted: function() {
     keyboard.setDefaultWindow(this);
-    asmdb.registerEvent('bar', this);
+    asmdb.getInstance().registerEvent('bar', this);
   },
   destroyed: function() {
-    asmdb.unregisterEvent('bar', this);
+    asmdb.getInstance().unregisterEvent('bar', this);
     keyboard.setDefaultWindow(null);
   },
   methods: {
@@ -133,16 +133,16 @@ export default {
       }
       switch (index) {
         case 0:
-          asmdb.next();
+          asmdb.getInstance().next();
           break;
         case 1:
-          asmdb.step();
+          asmdb.getInstance().step();
           break;
         case 2:
-          asmdb.cont();
+          asmdb.getInstance().cont();
           break;
         case 3:
-          asmdb.rlse();
+          asmdb.getInstance().rlse();
           break;
       }
     }

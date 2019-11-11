@@ -1,57 +1,282 @@
-const TYPE = 'arm32';
-const UNIT = {
-  'arm32': 4
-} [TYPE];
-const REGS = {
-  'arm32': ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']
-} [TYPE];
-const SPNM = {
-  'arm32': 'sp'
-} [TYPE];
-const WLEN = {
-  'arm32': 4
-} [TYPE];
+class Debugger {
+  constructor() {
+    document.cookie = 'token={}; path=/'; //for test
+    this.TYPE = 'arm32';
+    switch (this.TYPE) {
+      case 'arm32':
+        this.UNIT = 4;
+        this.REGS = ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr'];
+        this.SPNM = 'sp';
+        this.WLEN = 4;
+        break;
+    }
+    this.struct = {};
+    this.ws = new WebSocket('ws://localhost:8080/ws');
+    // this.ws = new WebSocket('ws://' + location.host + '/ws');
+    this.ws.onmessage = this.onMessage.bind(this);
+    this.counter = 0;
+    this.registers = null;
+    this.breakpoints = [];
+    this.watchpoints = [];
+    this.tag = 0;
+    this.callbacks = {};
+    this.objects = {};
+  }
 
-var struct = {};
-
-document.cookie = 'token={}; path=/'; //for test
-// var ws = new WebSocket('ws://' + location.host + '/ws');
-var ws = new WebSocket('ws://localhost:8080/ws');
-ws.onmessage = function (event) {
-  var data = JSON.parse(event.data);
-  switch (data.type) {
-    case 'push':
-      if (!(data.key in struct)) {
-        struct[data.key] = data.val;
-        push(data.key, data.val);
-      } else {
-        var oldValue = struct[data.key];
-        struct[data.key] = data.val;
-        push(data.key, data.val, oldValue);
-      }
-      break;
-    case 'pull':
-      if (data.tag in callbacks) {
-        var callback = callbacks[data.tag];
-        delete callbacks[data.tag];
-        if (data.e == null) {
-          if (callback.success) {
-            callback.success(data.r);
-          }
+  onMessage(event) {
+    var data = JSON.parse(event.data);
+    switch (data.type) {
+      case 'push':
+        if (!(data.key in this.struct)) {
+          this.struct[data.key] = data.val;
+          this.push(data.key, data.val);
         } else {
-          if (callback.failure) {
-            callback.failure(data.e);
+          var oldValue = this.struct[data.key];
+          this.struct[data.key] = data.val;
+          this.push(data.key, data.val, oldValue);
+        }
+        break;
+      case 'pull':
+        if (data.tag in this.callbacks) {
+          var callback = this.callbacks[data.tag];
+          delete this.callbacks[data.tag];
+          if (data.e == null) {
+            if (callback.success) {
+              callback.success(data.r);
+            }
+          } else {
+            if (callback.failure) {
+              callback.failure(data.e);
+            }
           }
         }
-      }
-      break;
+        break;
+    }
   }
-};
 
-var counter = 0;
-var _registers = null;
-var _breakpoints = [];
-var _watchpoints = [];
+  push(attrName, newValue, oldValue) {
+    switch (attrName) {
+      case 'suspend':
+        this.counter++;
+        if (newValue) {
+          var counter = this.counter;
+          this.ir((registers) => {
+            var union = new Union(() => {
+              return counter == this.counter;
+            });
+            union.wait();
+            //bar
+            union.wait();
+            union.notify(() => {
+              this.registers = registers;
+              this.iterObjects('bar', (object) => {
+                object.onBreak();
+              });
+            });
+            //assembly todo
+            //registers
+            union.wait();
+            union.notify(() => {
+              this.iterObjects('registers', (object) => {
+                object.onBreak(registers);
+              });
+            });
+            //stack
+            union.wait();
+            var sp = registers[this.SPNM];
+            this.xb([sp, sp + 400 * 10], (stack) => {
+              union.notify(() => {
+                this.iterObjects('stack', (object) => {
+                  object.onBreak(sp, stack);
+                });
+              });
+            });
+            //memory
+            this.iterObjects('memory', (object) => {
+              union.wait();
+              var range = object.getRange();
+              if (range == null) {
+                union.notify(() => {
+                  object.onBreak(null, null);
+                });
+              } else {
+                this.xb(range, (memory) => {
+                  union.notify(() => {
+                    object.onBreak(range[0], memory);
+                  });
+                });
+              }
+            });
+            union.notify();
+          });
+        } else {
+          this.iterObjects('bar|assembly|registers|stack|memory', (object) => {
+            object.onContinue();
+          });
+        }
+        break;
+      case 'breakpoints':
+        this.breakpoints = newValue;
+        this.iterObjects('*', (object) => {
+          if (object.onBreakpoints) {
+            object.onBreakpoints(newValue);
+          }
+        });
+        break;
+      case 'watchpoints':
+        this.watchpoints = newValue;
+        this.iterObjects('*', (object) => {
+          if (object.onWatchpoints) {
+            object.onWatchpoints(newValue);
+          }
+        });
+        break;
+    }
+  }
+
+  pull(method, params, success, failure) {
+    var data = {
+      type: 'pull',
+      tag: ++this.tag,
+      method: method,
+      params: params || []
+    };
+    if (success || failure) {
+      this.callbacks[data.tag] = {
+        success: success,
+        failure: failure
+      };
+    }
+    this.ws.send(JSON.stringify(data));
+  }
+
+  next() {
+    this.pull('next');
+  }
+
+  step() {
+    this.pull('step');
+  }
+
+  cont() {
+    this.pull('cont');
+  }
+
+  rlse() {
+    this.pull('rlse');
+  }
+
+  ir(success) {
+    this.pull('ir', [], function (ret) {
+      if (success) {
+        success(ret);
+      }
+    });
+  }
+
+  xb(range, success) {
+    this.pull('xb', [...range], function (ret) {
+      if (success) {
+        success(atob(ret));
+      }
+    });
+  }
+
+  bp(delPoints, setPoints) {
+    this.pull('bp', [delPoints, setPoints]);
+  }
+
+  wp(delPoints, setPoints) {
+    this.pull('wp', [delPoints, setPoints]);
+  }
+
+  iterObjects(filter, handler) {
+    filter = filter.split('|');
+    if (filter.indexOf('*') >= 0) {
+      filter = null;
+    }
+    for (var type in this.objects) {
+      if (filter && filter.indexOf(type) < 0) {
+        continue;
+      }
+      var array = this.objects[type];
+      for (var object of array) {
+        handler(object);
+      }
+    }
+  }
+
+  registerEvent(type, object) {
+    if (!(type in this.objects)) {
+      this.objects[type] = [];
+    }
+    var i = this.objects[type].indexOf(object);
+    if (i >= 0) {
+      return;
+    }
+    this.objects[type].push(object);
+    //todo
+  }
+
+  unregisterEvent(type, object) {
+    if (!(type in this.objects)) {
+      return;
+    }
+    var i = this.objects[type].indexOf(object);
+    if (i < 0) {
+      return;
+    }
+    this.objects[type].splice(i, 1);
+  }
+
+  getRegisters() {
+    return Object.assign({}, this.registers);
+  }
+
+  getAddressUsage(int) {
+    var delta = int - this.registers[this.SPNM];
+    if (delta >= 0 && delta < 400 * 10) {
+      return '3';
+    }
+    //todo
+    return '1';
+  }
+
+  getRegsString(int) {
+    var str = '';
+    switch (this.getAddressUsage(int)) {
+      case '1':
+        if (int >= 0x21 && int <= 0x7e) {
+          if (int == 0x27) {
+            str = '"\'"';
+          } else {
+            str = "'" + String.fromCharCode(int) + "'";
+          }
+        }
+        break;
+      case '3':
+        str = this.SPNM;
+        var delta = int - this.registers[this.SPNM];
+        if (delta != 0) {
+          str += '+' + delta;
+        }
+        break;
+    }
+    return str;
+  }
+
+  getCpsrString(int) {
+    var n = (int & 0x80000000) == 0 ? '' : 'N';
+    var z = (int & 0x40000000) == 0 ? '' : 'Z';
+    var c = (int & 0x20000000) == 0 ? '' : 'C';
+    var v = (int & 0x10000000) == 0 ? '' : 'V';
+    return n + z + c + v;
+  }
+
+  getWatchpointsLength() {
+    return this.watchpoints.length;
+  }
+}
 
 class Union {
   constructor(callable) {
@@ -79,251 +304,17 @@ class Union {
   }
 }
 
-function push(attrName, newValue, oldValue) {
-  switch (attrName) {
-    case 'suspend':
-      counter++;
-      if (newValue) {
-        var _counter = counter;
-        ir((registers) => {
-          var union = new Union(() => {
-            return _counter == counter;
-          });
-          union.wait();
-          //bar
-          union.wait();
-          union.notify(() => {
-            _registers = registers;
-            iterObjects('bar', (object) => {
-              object.onBreak();
-            });
-          });
-          //assembly todo
-          //registers
-          union.wait();
-          union.notify(() => {
-            iterObjects('registers', (object) => {
-              object.onBreak(registers);
-            });
-          });
-          //stack
-          union.wait();
-          var sp = registers[SPNM];
-          xb([sp, sp + 400 * 10], (stack) => {
-            union.notify(() => {
-              iterObjects('stack', (object) => {
-                object.onBreak(sp, stack);
-              });
-            });
-          });
-          //memory
-          iterObjects('memory', (object) => {
-            union.wait();
-            var range = object.getRange();
-            if (range == null) {
-              union.notify(() => {
-                object.onBreak(null, null);
-              });
-            } else {
-              xb(range, (memory) => {
-                union.notify(() => {
-                  object.onBreak(range[0], memory);
-                });
-              });
-            }
-          });
-          union.notify();
-        });
-      } else {
-        iterObjects('bar|assembly|registers|stack|memory', (object) => {
-          object.onContinue();
-        });
-      }
-      break;
-    case 'breakpoints':
-      _breakpoints = newValue;
-      iterObjects('*', (object) => {
-        if (object.onBreakpoints) {
-          object.onBreakpoints(newValue);
-        }
-      });
-      break;
-    case 'watchpoints':
-      _watchpoints = newValue;
-      iterObjects('*', (object) => {
-        if (object.onWatchpoints) {
-          object.onWatchpoints(newValue);
-        }
-      });
-      break;
-  }
+var instance = null;
+
+function newInstance() {
+  instance = new Debugger();
 }
 
-var tag = 0;
-var callbacks = {};
-
-function pull(method, params, success, failure) {
-  var data = {
-    type: 'pull',
-    tag: ++tag,
-    method: method,
-    params: params || []
-  };
-  if (success || failure) {
-    callbacks[data.tag] = {
-      success: success,
-      failure: failure
-    };
-  }
-  ws.send(JSON.stringify(data));
-}
-
-function next() {
-  pull('next');
-}
-
-function step() {
-  pull('step');
-}
-
-function cont() {
-  pull('cont');
-}
-
-function rlse() {
-  pull('rlse');
-}
-
-function ir(success) {
-  pull('ir', [], function (ret) {
-    if (success) {
-      success(ret);
-    }
-  });
-}
-
-function xb(range, success) {
-  pull('xb', [...range], function (ret) {
-    if (success) {
-      success(atob(ret));
-    }
-  });
-}
-
-function bp(delPoints, setPoints) {
-  pull('bp', [delPoints, setPoints]);
-}
-
-function wp(delPoints, setPoints) {
-  pull('wp', [delPoints, setPoints]);
-}
-
-var objects = {};
-
-function iterObjects(filter, handler) {
-  filter = filter.split('|');
-  if (filter.indexOf('*') >= 0) {
-    filter = null;
-  }
-  for (var type in objects) {
-    if (filter && filter.indexOf(type) < 0) {
-      continue;
-    }
-    var array = objects[type];
-    for (var object of array) {
-      handler(object);
-    }
-  }
-}
-
-function registerEvent(type, object) {
-  if (!(type in objects)) {
-    objects[type] = [];
-  }
-  var i = objects[type].indexOf(object);
-  if (i >= 0) {
-    return;
-  }
-  objects[type].push(object);
-  //todo
-}
-
-function unregisterEvent(type, object) {
-  if (!(type in objects)) {
-    return;
-  }
-  var i = objects[type].indexOf(object);
-  if (i < 0) {
-    return;
-  }
-  objects[type].splice(i, 1);
-}
-
-function getRegisters() {
-  return Object.assign({}, _registers);
-}
-
-function getAddressUsage(int) {
-  var delta = int - _registers[SPNM];
-  if (delta >= 0 && delta < 400 * 10) {
-    return '3';
-  }
-  //todo
-  return '1';
-}
-
-function getRegsString(int) {
-  var str = '';
-  switch (getAddressUsage(int)) {
-    case '1':
-      if (int >= 0x21 && int <= 0x7e) {
-        if (int == 0x27) {
-          str = '"\'"';
-        } else {
-          str = "'" + String.fromCharCode(int) + "'";
-        }
-      }
-      break;
-    case '3':
-      str = SPNM;
-      var delta = int - _registers[SPNM];
-      if (delta != 0) {
-        str += '+' + delta;
-      }
-      break;
-  }
-  return str;
-}
-
-function getCpsrString(int) {
-  var n = (int & 0x80000000) == 0 ? '' : 'N';
-  var z = (int & 0x40000000) == 0 ? '' : 'Z';
-  var c = (int & 0x20000000) == 0 ? '' : 'C';
-  var v = (int & 0x10000000) == 0 ? '' : 'V';
-  return n + z + c + v;
-}
-
-function getWatchpointsLength() {
-  return _watchpoints.length;
+function getInstance() {
+  return instance;
 }
 
 export default {
-  UNIT: UNIT,
-  REGS: REGS,
-  SPNM: SPNM,
-  WLEN: WLEN,
-  next: next,
-  step: step,
-  cont: cont,
-  rlse: rlse,
-  xb: xb,
-  bp: bp,
-  wp: wp,
-  registerEvent: registerEvent,
-  unregisterEvent: unregisterEvent,
-  getRegisters: getRegisters,
-  getAddressUsage: getAddressUsage,
-  getRegsString: getRegsString,
-  getCpsrString: getCpsrString,
-  getWatchpointsLength: getWatchpointsLength
+  newInstance: newInstance,
+  getInstance: getInstance
 };

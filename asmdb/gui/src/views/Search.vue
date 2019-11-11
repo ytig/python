@@ -82,7 +82,7 @@ export default {
   },
   methods: {
     show: function() {
-      this.locals = asmdb.getRegisters();
+      this.locals = asmdb.getInstance().getRegisters();
       this.showing = true;
       this.text = '';
       this.realText = '';

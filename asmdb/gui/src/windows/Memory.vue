@@ -32,7 +32,7 @@ class Source {
 
   toLineNumber(index) {
     var address = this.start + this.group * index;
-    return '0x' + address.toString(16).zfill(2 * asmdb.UNIT);
+    return '0x' + address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
   }
 
   toHighlightNumber(index, highlight) {
@@ -47,7 +47,7 @@ class Source {
     var watchingNumbers = [];
     var address = this.start + this.group * index;
     for (var watchpoint of watchpoints) {
-      for (var i = 0; i < asmdb.UNIT; i++) {
+      for (var i = 0; i < asmdb.getInstance().UNIT; i++) {
         watchingNumbers.push(watchpoint.address + i - address);
       }
     }
@@ -80,7 +80,7 @@ class Source {
       }
     }
     for (var r of ranges) {
-      asmdb.xb(r, this.onLoad.bind(this, r[0]));
+      asmdb.getInstance().xb(r, this.onLoad.bind(this, r[0]));
     }
   }
 
@@ -130,21 +130,21 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return Bytes.measureWidth(2 + 2 * asmdb.UNIT, 8 * this.column, true);
+      return Bytes.measureWidth(2 + 2 * asmdb.getInstance().UNIT, 8 * this.column, true);
     },
     lineHeight: function() {
       return Bytes.measureHeight();
     }
   },
   created: function() {
-    this.source = new Source(0, Math.pow(16, 2 * asmdb.UNIT), 8 * this.column, null);
+    this.source = new Source(0, Math.pow(16, 2 * asmdb.getInstance().UNIT), 8 * this.column, null);
   },
   mounted: function() {
     keyboard.registerWindow(this);
-    asmdb.registerEvent('memory', this);
+    asmdb.getInstance().registerEvent('memory', this);
   },
   destroyed: function() {
-    asmdb.unregisterEvent('memory', this);
+    asmdb.getInstance().unregisterEvent('memory', this);
     keyboard.unregisterWindow(this);
   },
   methods: {
@@ -240,7 +240,7 @@ export default {
       if (!this.show) {
         return;
       }
-      this.source = new Source(0, Math.pow(16, 2 * asmdb.UNIT), 8 * this.column, this.source);
+      this.source = new Source(0, Math.pow(16, 2 * asmdb.getInstance().UNIT), 8 * this.column, this.source);
       if (Boolean(memory)) {
         this.source.onLoad(address, memory);
       }

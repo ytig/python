@@ -28,9 +28,9 @@ export default {
       }
       switch (this.value.lineName) {
         case 'cpsr':
-          return asmdb.getCpsrString(this.value.newValue);
+          return asmdb.getInstance().getCpsrString(this.value.newValue);
         default:
-          return asmdb.getRegsString(this.value.newValue);
+          return asmdb.getInstance().getRegsString(this.value.newValue);
       }
     },
     cssUsage: function() {
@@ -41,7 +41,7 @@ export default {
         case 'cpsr':
           return '1';
         default:
-          return asmdb.getAddressUsage(this.value.newValue);
+          return asmdb.getInstance().getAddressUsage(this.value.newValue);
       }
     },
     cssChanged: function() {
