@@ -9,7 +9,6 @@ import menu from '@/plugins/menu';
 Vue.use(menu);
 
 import Bytes from '@/views/Bytes';
-import Empty from '@/views/Empty';
 import Gird from '@/views/Gird';
 import Indicator from '@/views/Indicator';
 import Navigation from '@/views/Navigation';
@@ -26,7 +25,6 @@ import Registers from '@/windows/Registers';
 import Stack from '@/windows/Stack';
 import Watchpoints from '@/windows/Watchpoints';
 Vue.component('Bytes', Bytes);
-Vue.component('Empty', Empty);
 Vue.component('Gird', Gird);
 Vue.component('Indicator', Indicator);
 Vue.component('Navigation', Navigation);
