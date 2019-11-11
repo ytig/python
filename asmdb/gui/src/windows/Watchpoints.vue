@@ -154,6 +154,9 @@ export default {
       > span:nth-of-type(3) {
         flex-grow: 1;
       }
+      > div {
+        margin-left: 12px;
+      }
       > div:nth-last-of-type(1) {
         background-image: url('/static/icons/sub.png');
       }
