@@ -44,8 +44,8 @@ export default {
     },
     items: function() {
       var items = [];
-      for (var watchpoint of this.watchpoints) {
-        items.push('0x' + watchpoint.address.toString(16).zfill(2 * asmdb.getInstance().UNIT));
+      for (var point of this.watchpoints) {
+        items.push('0x' + point.address.toString(16).zfill(2 * asmdb.getInstance().UNIT));
       }
       items.max_length = asmdb.getInstance().WLEN;
       return items;
