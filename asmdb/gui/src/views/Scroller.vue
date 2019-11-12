@@ -72,7 +72,7 @@ export default {
       var scrollTop = this.delta;
       var height = screen.height;
       var index = parseSignedInt(scrollTop / height);
-      var offset = screenTop - index * height;
+      var offset = scrollTop - index * height;
       var views = [this.$refs.canvas1, this.$refs.canvas2];
       var tokens = [];
       for (var i = 0; i < views.length; i++) {
