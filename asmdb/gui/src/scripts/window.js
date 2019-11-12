@@ -6,6 +6,15 @@ String.prototype.zfill = function (size) {
   return str;
 }
 
+window.parseSignedInt = function (float) {
+  if (float >= 0) {
+    return parseInt(float);
+  } else {
+    var floor = Math.floor(float);
+    return parseInt(float - floor) + floor;
+  }
+}
+
 window.requestAnimationFrames = function (callback) {
   var i = 0;
   var _callback = function () {

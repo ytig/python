@@ -9,14 +9,6 @@
 </template>
 
 <script>
-function parseInt2(float) {
-  if (float >= 0) {
-    return parseInt(float);
-  } else {
-    return parseInt(float) - 1;
-  }
-}
-
 export default {
   data: function() {
     return {
@@ -79,7 +71,7 @@ export default {
     invalidate: function() {
       var scrollTop = this.delta;
       var height = screen.height;
-      var index = parseInt2(scrollTop / height);
+      var index = parseSignedInt(scrollTop / height);
       var offset = screenTop - index * height;
       var views = [this.$refs.canvas1, this.$refs.canvas2];
       var tokens = [];
