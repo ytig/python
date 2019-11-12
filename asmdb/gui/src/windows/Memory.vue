@@ -213,7 +213,7 @@ export default {
         this.source.onScroll(index);
       }
       requestAnimationFrames(i => {
-        if (!(disable || index in this.source || i >= 1)) {
+        if (!(disable || index in this.source || i >= 2)) {
           return false;
         }
         var posn = {
