@@ -56,6 +56,12 @@ export default {
     delContext(this.$refs.canvas2);
   },
   methods: {
+    getPosition: function() {
+      return {
+        index: this.position.index,
+        offset: this.position.offset
+      };
+    },
     scrollBy: function(delta) {
       emptySelection();
       this.scrolling = true;
@@ -95,7 +101,7 @@ export default {
       }
       this.position.index = index;
       this.position.offset = offset;
-      //todo emit loadmore
+      this.$emit('scroll2', this.getPosition());
       this.invalidate();
     },
     onWheel: function(event) {
