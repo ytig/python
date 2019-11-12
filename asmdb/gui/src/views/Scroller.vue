@@ -25,11 +25,14 @@ export default {
   watch: {
     source: function(newValue, oldValue) {
       this.position.index = this.position.offset = 0;
-      this.invalidate();
+      this.scrollBy(0);
     },
     'source.invalidate': function(newValue, oldValue) {
-      this.position.offset = Math.min(this.position.offset, this.source[this.position.index].height - 1);
-      this.invalidate();
+      if (this.position.offset >= this.source[this.position.index].height) {
+        this.scrollBy(0);
+      } else {
+        this.invalidate();
+      }
     }
   },
   mounted: function() {
@@ -81,7 +84,7 @@ export default {
             offset -= this.source[index].height;
             index++;
           } else {
-            offset = this.source[index].height - 1;
+            offset = this.source[index].height;
           }
         }
         if (!(index + 1 in this.source)) {
@@ -122,7 +125,6 @@ export default {
         if (view.index != index + i) {
           view.index = index + i;
           view.token = setContext(view, view.index * height, height);
-          resetContext(view);
         }
         tokens.push(view.token);
       }
