@@ -1,26 +1,18 @@
 <template>
   <div ref="container" class="scroller-container" @wheel="onWheel">
     <div class="scroller-item" v-for="(item, index) in viewport" :key="index" :style="item.style_">
-      <slot v-if="item.key!=null" :item="item.val" :index="item.key" :context="context" :scrolling="scrolling"></slot>
+      <slot v-if="item.key!=null" :item="item.val" :index="item.key" :offset="item.top" :context="context" :scrolling="scrolling"></slot>
     </div>
-    <canvas ref="canvas1" class="scroller-draw" style="background:#f00"></canvas>
-    <canvas ref="canvas2" class="scroller-draw" style="background:#0f0"></canvas>
+    <canvas ref="canvas1" class="scroller-draw"></canvas>
+    <canvas ref="canvas2" class="scroller-draw"></canvas>
   </div>
 </template>
 
 <script>
-function getLength2(source) {
-  return [28, 28];
-}
-
-function getItemTop(source, index) {
-  return 18 * index;
-}
-
 export default {
   data: function() {
     return {
-      scrollTop: 0,
+      position: { index: 0, offset: 0 },
       viewport: [],
       counter: 0,
       context: '',
@@ -32,9 +24,12 @@ export default {
   },
   watch: {
     source: function(newValue, oldValue) {
+      this.position.index = 0;
+      this.position.offset = 0;
       this.invalidate();
     },
     'source.invalidate': function(newValue, oldValue) {
+      this.position.offset = Math.min(Math.max(this.position.offset, 0), this.source[this.position.index].height - 1);
       this.invalidate();
     }
   },
@@ -43,7 +38,7 @@ export default {
     var length = Math.ceil(screen.height / minHeight) + 1;
     var viewport = [];
     for (var i = 0; i < length; i++) {
-      viewport[i] = { key: null, val: null, style_: { transform: 'translateY(0px)' } };
+      viewport[i] = { key: null, val: null, top: 0, style_: { height: '0px', transform: 'translateY(0px)' } };
     }
     this.viewport.splice(0, this.viewport.length, ...viewport);
     var w = this.$refs.container.clientWidth;
@@ -70,17 +65,37 @@ export default {
         this.scrolling = false;
         this.invalidate();
       }, 147);
-      var length2 = getLength2(this.source);
-      var minScrollTop = length2[0] > 0 ? getItemTop(this.source, -length2[0]) : 0;
-      var maxScrollTop = length2[1] > 0 ? getItemTop(this.source, length2[1] - 1) : 0;
-      this.scrollTop = Math.min(Math.max(this.scrollTop + delta, minScrollTop), maxScrollTop);
+      var index = this.position.index;
+      var offset = this.position.offset;
+      if (index in this.source) {
+        offset += delta;
+        while (offset < 0) {
+          if (index - 1 in this.source) {
+            offset += this.source[index].height;
+            index--;
+          } else {
+            offset = 0;
+          }
+        }
+        while (offset >= this.source[index].height) {
+          if (index + 1 in this.source) {
+            offset -= this.source[index].height;
+            index++;
+          } else {
+            offset = this.source[index].height - 1;
+          }
+        }
+      }
+      this.position.index = index;
+      this.position.offset = offset;
+      //todo emit loadmore
       this.invalidate();
     },
     onWheel: function(event) {
       this.scrollBy(event.deltaY);
     },
     invalidate: function() {
-      var scrollTop = this.scrollTop;
+      var scrollTop = this.position.index * 18; //todo
       var height = screen.height;
       var index = parseSignedInt(scrollTop / height);
       var offset = scrollTop - index * height;
@@ -100,7 +115,40 @@ export default {
         tokens.push(view.token);
       }
       this.context = tokens.sort().join();
-      //todo
+      for (var i = 0; i < this.viewport.length; i++) {
+        var o = (((this.position.index + i) % this.viewport.length) + this.viewport.length) % this.viewport.length;
+        var slot = this.viewport[o];
+        var key = this.position.index + i;
+        var val = null;
+        var top = scrollTop;
+        var add = 0;
+        if (key in this.source) {
+          val = this.source[key];
+          add = val.height;
+        } else {
+          key = null;
+        }
+        scrollTop += add;
+        if (slot.key != key) {
+          slot.key = key;
+        }
+        if (slot.val != val) {
+          slot.val = val;
+        }
+        if (slot.top != top) {
+          slot.top = top;
+        }
+        if (!this.scrolling) {
+          var height = add + 'px';
+          var transform = 'translateY(' + top + 'px)';
+          if (slot.style_.height != height) {
+            slot.style_.height = height;
+          }
+          if (slot.style_.transform != transform) {
+            slot.style_.transform = transform;
+          }
+        }
+      }
     }
   }
 };
