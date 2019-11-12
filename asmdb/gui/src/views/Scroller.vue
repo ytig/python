@@ -33,8 +33,8 @@ export default {
     }
   },
   mounted: function() {
-    var minHeight = 12;
-    var length = Math.ceil(screen.height / minHeight) + 1;
+    var minLineHeight = 12;
+    var length = Math.ceil(screen.height / minLineHeight) + 1;
     var viewport = [];
     for (var i = 0; i < length; i++) {
       viewport[i] = { key: null, val: null, top: 0, style_: { height: '0px', transform: 'translateY(0px)' } };
