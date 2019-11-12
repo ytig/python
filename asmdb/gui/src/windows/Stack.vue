@@ -3,10 +3,10 @@
     <Pager :canSub="page>0&&sp!=null" :canAdd="page<10-1&&sp!=null" @delta="onDelta"></Pager>
     <Navigation :name="'Stack'" :focus="focus" :disable="disable" @mouseup2="onMouseUp2"></Navigation>
     <div ref="stackLayout" class="stack-layout">
-      <div class="stack-draw" :style="{width:windowWidth+'px',height:linesHeight+'px'}">
+      <div class="stack-draw" :style="{width:windowWidth+'px',height:items.length*lineHeight+'px'}">
         <canvas ref="canvas"></canvas>
       </div>
-      <Bytes v-for="(item, index) in items" :key="index" :startAddress="item.startAddress" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :value="item.value" :group="8*column" :showString="false" :canvasContext="index+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
+      <Bytes v-for="(item, index) in items" :key="index" :startAddress="item.startAddress" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :value="item.value" :group="8*column" :showString="false" :canvasContext="index*lineHeight+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="sp==null"></Indicator>
   </div>
@@ -45,8 +45,8 @@ export default {
     windowWidth: function() {
       return Bytes.measureWidth(6, 8 * this.column, false);
     },
-    linesHeight: function() {
-      return Bytes.measureHeight() * this.items.length;
+    lineHeight: function() {
+      return Bytes.measureHeight();
     }
   },
   mounted: function() {

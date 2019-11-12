@@ -166,7 +166,7 @@ export default {
       var self = this.self;
       var cc = self.canvasContext.split(';');
       var h = measureViewHeight();
-      var t = parseInt(cc[0]) * h;
+      var t = parseInt(cc[0]);
       for (var i of cc[1].split(',')) {
         var c = getContext(parseInt(i), t, h);
         if (c != null) {
