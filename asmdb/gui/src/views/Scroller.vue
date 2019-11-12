@@ -166,6 +166,23 @@ export default {
           }
         }
       }
+      var cvsHeight = screen.height;
+      var sumHeight = -this.position.offset;
+      var i = this.position.index;
+      while (i in this.source) {
+        sumHeight += this.source[i].height;
+        if (sumHeight >= cvsHeight) {
+          return;
+        }
+        i++;
+      }
+      var cvsWidth = this.$refs.container.clientWidth;
+      for (var token of tokens) {
+        var ctx = getContext(token, scrollTop + sumHeight, cvsHeight);
+        if (ctx != null) {
+          ctx.clearRect(0, 0, cvsWidth, cvsHeight);
+        }
+      }
     }
   }
 };
