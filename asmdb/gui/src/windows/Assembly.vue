@@ -1,6 +1,6 @@
 <template>
   <div class="assembly-container">
-    <Navigation :name="'Assembly'"></Navigation>
+    <Navigation :name="'Assembly'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <Scroller ref="scroller" class="assembly-scroller" :source="source" #default="props">
       <Bytes :startAddress="0" :lineNumber="props.item.lineNumber" :value="props.item.value" :group="16" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Bytes>
     </Scroller>
@@ -30,6 +30,8 @@ export default {
       source.invalidate++;
     }, 1000);
     return {
+      focus: false,
+      disable: true,
       source: source
     };
   }
