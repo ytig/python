@@ -1,9 +1,13 @@
 <template>
   <div class="assembly-container">
     <Navigation :name="'Assembly'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
-    <Scroller ref="scroller" class="assembly-scroller" :source="source" #default="props">
-      <Bytes :startAddress="0" :lineNumber="props.item.lineNumber" :value="props.item.value" :group="16" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Bytes>
-    </Scroller>
+    <div class="assembly-column">
+      <div class="assembly-row">
+        <Scroller ref="scroller" class="assembly-scroller" :source="source" #default="props">
+          <Bytes :startAddress="0" :lineNumber="props.item.lineNumber" :value="props.item.value" :group="16" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Bytes>
+        </Scroller>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -45,10 +49,19 @@ export default {
   position: relative;
   display: flex;
   flex-direction: column;
-  .assembly-scroller {
-    width: 555px;
+  .assembly-column {
     height: 0px;
     flex-grow: 1;
+    display: flex;
+    .assembly-row {
+      width: 0px;
+      flex-grow: 1;
+      overflow-x: scroll;
+      .assembly-scroller {
+        width: 555px;
+        height: 100%;
+      }
+    }
   }
 }
 </style>
