@@ -77,6 +77,7 @@ export default {
             index--;
           } else {
             offset = 0;
+            break;
           }
         }
         while (offset >= this.source[index].height) {
@@ -85,6 +86,7 @@ export default {
             index++;
           } else {
             offset = this.source[index].height;
+            break;
           }
         }
         if (!(index + 1 in this.source)) {
