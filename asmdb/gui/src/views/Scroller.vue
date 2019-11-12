@@ -13,7 +13,7 @@ function parseInt2(float) {
   if (float >= 0) {
     return parseInt(float);
   } else {
-    //todo
+    return parseInt(float) - 1;
   }
 }
 
