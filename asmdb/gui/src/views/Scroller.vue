@@ -12,7 +12,7 @@
 export default {
   data: function() {
     return {
-      delta: 0,
+      scrollTop: 0,
       viewport: [],
       counter: 0,
       context: '',
@@ -62,14 +62,14 @@ export default {
         this.scrolling = false;
         this.invalidate();
       }, 147);
-      this.delta += delta; //todo
+      this.scrollTop += delta; //todo
       this.invalidate();
     },
     onWheel: function(event) {
       this.scrollBy(event.deltaY);
     },
     invalidate: function() {
-      var scrollTop = this.delta;
+      var scrollTop = this.scrollTop;
       var height = screen.height;
       var index = parseSignedInt(scrollTop / height);
       var offset = scrollTop - index * height;
