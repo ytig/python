@@ -86,7 +86,7 @@ export default {
         needLayout = true;
         needDraw = true;
       }
-      if (newValue.highlightNumber != oldValue.highlightNumber || JSON.stringify(newValue.watchingNumbers) != JSON.stringify(oldValue.watchingNumbers || newValue.canvasContext != oldValue.canvasContext)) {
+      if (newValue.highlightNumber != oldValue.highlightNumber || JSON.stringify(newValue.watchingNumbers) != JSON.stringify(oldValue.watchingNumbers) || newValue.canvasContext != oldValue.canvasContext) {
         needDraw = true;
       }
       if (!newValue.lazyLayout) {
