@@ -7,8 +7,9 @@ String.prototype.zfill = function (size) {
 }
 
 window.requestAnimationFrames = function (callback) {
+  var i = 0;
   var _callback = function () {
-    if (!callback()) {
+    if (!callback(i++)) {
       requestAnimationFrame(_callback);
     }
   }

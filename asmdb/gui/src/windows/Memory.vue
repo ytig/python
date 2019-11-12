@@ -212,8 +212,8 @@ export default {
       if (!disable) {
         this.source.onScroll(index);
       }
-      requestAnimationFrames(() => {
-        if (!(disable || index in this.source)) {
+      requestAnimationFrames(i => {
+        if (!(disable || index in this.source || i >= 1)) {
           return false;
         }
         var posn = {
