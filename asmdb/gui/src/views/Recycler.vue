@@ -49,10 +49,8 @@ export default {
     this.viewport.splice(0, this.viewport.length, ...viewport);
     var w = this.$refs.container.clientWidth;
     var h = length * this.lineHeight;
-    this.$refs.canvas1.style.width = w + 'px';
-    this.$refs.canvas1.style.height = h + 'px';
-    this.$refs.canvas2.style.width = w + 'px';
-    this.$refs.canvas2.style.height = h + 'px';
+    this.$refs.canvas1.style.width = this.$refs.canvas2.style.width = w + 'px';
+    this.$refs.canvas1.style.height = this.$refs.canvas2.style.height = h + 'px';
     this.scrollTo(this.position);
     resize.registerEvent(this);
   },
