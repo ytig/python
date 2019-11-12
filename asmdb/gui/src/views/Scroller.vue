@@ -139,6 +139,7 @@ export default {
       this.context = tokens.sort().join();
       var sum = scrollTop - this.position.offset;
       for (var i = 0; i < this.viewport.length; i++) {
+        //todo dynmic viewport
         var o = (((this.position.index + i) % this.viewport.length) + this.viewport.length) % this.viewport.length;
         var slot = this.viewport[o];
         var key = this.position.index + i;
