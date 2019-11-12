@@ -2,7 +2,7 @@
   <div class="assembly-container">
     <Navigation :name="'Assembly'"></Navigation>
     <Scroller ref="scroller" class="assembly-scroller" :source="source" #default="props">
-      <Bytes :startAddress="0" :lineNumber="props.item.lineNumber" :value="props.item.value" :group="8" :canvasContext="props.index+';'+props.context" :lazyLayout="props.scrolling"></Bytes>
+      <Bytes :startAddress="0" :lineNumber="props.item.lineNumber" :value="props.item.value" :group="8" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Bytes>
     </Scroller>
   </div>
 </template>

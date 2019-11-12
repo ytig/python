@@ -115,12 +115,13 @@ export default {
         tokens.push(view.token);
       }
       this.context = tokens.sort().join();
+      var sum = scrollTop - this.position.offset;
       for (var i = 0; i < this.viewport.length; i++) {
         var o = (((this.position.index + i) % this.viewport.length) + this.viewport.length) % this.viewport.length;
         var slot = this.viewport[o];
         var key = this.position.index + i;
         var val = null;
-        var top = scrollTop;
+        var top = sum;
         var add = 0;
         if (key in this.source) {
           val = this.source[key];
@@ -128,7 +129,7 @@ export default {
         } else {
           key = null;
         }
-        scrollTop += add;
+        sum += add;
         if (slot.key != key) {
           slot.key = key;
         }
@@ -140,7 +141,7 @@ export default {
         }
         if (!this.scrolling) {
           var height = add + 'px';
-          var transform = 'translateY(' + top + 'px)';
+          var transform = 'translateY(' + (top - scrollTop) + 'px)';
           if (slot.style_.height != height) {
             slot.style_.height = height;
           }
