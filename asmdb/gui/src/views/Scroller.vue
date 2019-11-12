@@ -110,6 +110,7 @@ export default {
         if (view.index != index + i) {
           view.index = index + i;
           view.token = setContext(view, view.index * height, height);
+          resetContext(view);
         }
         tokens.push(view.token);
       }
