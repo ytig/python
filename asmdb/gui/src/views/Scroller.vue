@@ -167,7 +167,7 @@ export default {
         if (item) {
           items.push(item);
         }
-        sumTop += val.height;
+        sumTop += this.source[i].height;
         if (sumTop - scrollTop >= canvasHeight) {
           break;
         }
