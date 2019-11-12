@@ -28,7 +28,7 @@ export default {
       this.invalidate();
     },
     'source.invalidate': function(newValue, oldValue) {
-      this.position.offset = Math.min(Math.max(this.position.offset, 0), this.source[this.position.index].height - 1);
+      this.position.offset = Math.min(this.position.offset, this.source[this.position.index].height - 1);
       this.invalidate();
     }
   },
@@ -83,6 +83,9 @@ export default {
           } else {
             offset = this.source[index].height - 1;
           }
+        }
+        if (!(index + 1 in this.source)) {
+          offset = 0;
         }
       }
       this.position.index = index;
