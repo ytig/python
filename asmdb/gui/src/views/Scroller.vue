@@ -135,10 +135,10 @@ export default {
       while (++i in this.source) {
         var item = {
           key: i,
-          val: this.source[key],
+          val: this.source[i],
           top: sumTop,
           style_: {
-            height: this.source[key].height + 'px',
+            height: this.source[i].height + 'px',
             transform: 'translateY(' + (sumTop - scrollTop) + 'px)'
           }
         };
