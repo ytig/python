@@ -76,7 +76,6 @@ export default {
       display: flex;
       #breakpoints {
         flex-grow: 1;
-        height: 100%;
         background: @color-background;
       }
       #points-split {
