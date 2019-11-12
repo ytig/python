@@ -58,7 +58,7 @@ export default {
       flex-grow: 1;
       overflow-x: scroll;
       .assembly-scroller {
-        width: 555px;
+        width: 500px;
         height: 100%;
       }
     }
