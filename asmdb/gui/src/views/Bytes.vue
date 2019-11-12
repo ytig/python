@@ -105,7 +105,11 @@ export default {
     }
   },
   mounted: function() {
-    this.layout();
+    if (!this.lazyLayout) {
+      this.layout();
+    } else {
+      this.dirty = true;
+    }
     this.draw();
   },
   methods: {
