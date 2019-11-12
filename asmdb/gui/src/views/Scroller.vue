@@ -3,12 +3,20 @@
     <div class="scroller-item" v-for="(item, index) in viewport" :key="index" :style="item.style_">
       <slot v-if="item.key!=null" :item="item.val" :index="item.key" :context="context" :scrolling="scrolling"></slot>
     </div>
-    <canvas ref="canvas1" class="scroller-draw"></canvas>
-    <canvas ref="canvas2" class="scroller-draw"></canvas>
+    <canvas ref="canvas1" class="scroller-draw" style="background:#f00"></canvas>
+    <canvas ref="canvas2" class="scroller-draw" style="background:#0f0"></canvas>
   </div>
 </template>
 
 <script>
+function getLength(source) {
+  return [28, 28];
+}
+
+function getTop(source, index) {
+  return 18 * index;
+}
+
 export default {
   data: function() {
     return {
@@ -62,7 +70,10 @@ export default {
         this.scrolling = false;
         this.invalidate();
       }, 147);
-      this.scrollTop += delta; //todo
+      var length = getLength(this.source);
+      var minScrollTop = length[0] > 0 ? getTop(this.source, -length[0]) : 0;
+      var maxScrollTop = length[1] > 0 ? getTop(this.source, length[1] - 1) : 0;
+      this.scrollTop = Math.min(Math.max(this.scrollTop + delta, minScrollTop), maxScrollTop);
       this.invalidate();
     },
     onWheel: function(event) {
