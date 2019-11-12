@@ -1,6 +1,6 @@
 <template>
   <div class="memory-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
-    <Search ref="search" :theme="0" @search="onSearch"></Search>
+    <Search ref="search" :theme="0" @search="jumpTo"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <div v-show="!show&&trigger" class="memory-empty user-select-none">press enter and search an address.</div>
     <Recycler ref="recycler" class="memory-recycler" :show="show" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
@@ -188,9 +188,6 @@ export default {
         return false;
       }
     },
-    onSearch: function(address) {
-      this.jumpTo(address);
-    },
     hstSet: function(posn) {
       const maxHst = 147;
       while (this.hst.length >= maxHst) {
@@ -211,23 +208,33 @@ export default {
     jumpTo: function(address) {
       address = Math.min(Math.max(address, this.source.start), this.source.end - 1);
       var index = parseInt((address - this.source.start) / this.source.group);
-      var old_posn = null;
-      if (!this.show) {
-        this.show = true;
-      } else {
-        old_posn = this.$refs.recycler.getPosition();
+      var disable = this.disable;
+      if (!disable) {
+        this.source.onScroll(index);
       }
-      this.itemSelection = address;
-      this.$refs.recycler.scrollTo({
-        index: index,
-        offset: -4
-      });
-      if (old_posn != null) {
-        var new_posn = this.$refs.recycler.getPosition();
-        if (old_posn.index != new_posn.index || old_posn.offset != new_posn.offset) {
-          this.hstSet(old_posn);
+      requestAnimationFrames(() => {
+        if (!(disable || index in this.source)) {
+          return false;
         }
-      }
+        var posn = {
+          index: index,
+          offset: -4
+        };
+        if (!this.show) {
+          this.show = true;
+          this.itemSelection = address;
+          this.$refs.recycler.scrollTo(posn);
+        } else {
+          this.itemSelection = address;
+          var old_posn = this.$refs.recycler.getPosition();
+          this.$refs.recycler.scrollTo(posn);
+          var new_posn = this.$refs.recycler.getPosition();
+          if (old_posn.index != new_posn.index || old_posn.offset != new_posn.offset) {
+            this.hstSet(old_posn);
+          }
+        }
+        return true;
+      });
       this.requestFocus();
     },
     getRange: function() {

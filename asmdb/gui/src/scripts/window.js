@@ -6,6 +6,15 @@ String.prototype.zfill = function (size) {
   return str;
 }
 
+window.requestAnimationFrames = function (callback) {
+  var _callback = function () {
+    if (!callback()) {
+      requestAnimationFrame(_callback);
+    }
+  }
+  requestAnimationFrame(_callback);
+}
+
 window.isChildOrMe = function (parent, child) {
   while (child) {
     if (parent == child) {
