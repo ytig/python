@@ -9,11 +9,11 @@
 </template>
 
 <script>
-function getLength(source) {
+function getLength2(source) {
   return [28, 28];
 }
 
-function getTop(source, index) {
+function getItemTop(source, index) {
   return 18 * index;
 }
 
@@ -70,9 +70,9 @@ export default {
         this.scrolling = false;
         this.invalidate();
       }, 147);
-      var length = getLength(this.source);
-      var minScrollTop = length[0] > 0 ? getTop(this.source, -length[0]) : 0;
-      var maxScrollTop = length[1] > 0 ? getTop(this.source, length[1] - 1) : 0;
+      var length2 = getLength2(this.source);
+      var minScrollTop = length2[0] > 0 ? getItemTop(this.source, -length2[0]) : 0;
+      var maxScrollTop = length2[1] > 0 ? getItemTop(this.source, length2[1] - 1) : 0;
       this.scrollTop = Math.min(Math.max(this.scrollTop + delta, minScrollTop), maxScrollTop);
       this.invalidate();
     },
