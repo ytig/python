@@ -95,7 +95,7 @@ export default {
       this.scrollBy(event.deltaY);
     },
     invalidate: function() {
-      var scrollTop = this.position.index * 18; //todo
+      var scrollTop = this.position.index * 18 + this.position.offset; //todo
       var height = screen.height;
       var index = parseSignedInt(scrollTop / height);
       var offset = scrollTop - index * height;
