@@ -24,8 +24,7 @@ export default {
   },
   watch: {
     source: function(newValue, oldValue) {
-      this.position.index = 0;
-      this.position.offset = 0;
+      this.position.index = this.position.offset = 0;
       this.invalidate();
     },
     'source.invalidate': function(newValue, oldValue) {
