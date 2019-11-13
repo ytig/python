@@ -362,6 +362,7 @@ export default {
         return;
       }
       //todo
+      this.$editor.alert(0, 0, 2, '??', this.onModify.bind(this));
     },
     onModify: function() {
       //todo

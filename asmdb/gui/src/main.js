@@ -7,6 +7,8 @@ Vue.use(VueRouter);
 
 import menu from '@/plugins/menu';
 Vue.use(menu);
+import editor from '@/plugins/editor';
+Vue.use(editor);
 
 import Bytes from '@/views/Bytes';
 import Gird from '@/views/Gird';
