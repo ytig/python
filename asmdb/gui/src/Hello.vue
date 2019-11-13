@@ -8,6 +8,7 @@
 export default {
   methods: {
     startDebug: function() {
+      document.body.webkitRequestFullScreen();
       this.$router.replace('/world');
     }
   }
