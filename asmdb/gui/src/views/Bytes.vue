@@ -354,10 +354,10 @@ export default {
         }
       };
       items[items.length] = ['Modify', '', asmdb.getInstance().isSuspend()];
-      items[items.length - 1].event = this.doModify.bind(this);
+      items[items.length - 1].event = this.doModify.bind(this, index);
       return items;
     },
-    doModify: function() {
+    doModify: function(index) {
       if (!asmdb.getInstance().isSuspend()) {
         return;
       }
@@ -365,6 +365,9 @@ export default {
       this.$editor.alert(0, 0, 2, '??', this.onModify.bind(this));
     },
     onModify: function() {
+      if (!asmdb.getInstance().isSuspend()) {
+        return;
+      }
       //todo
     }
   }
