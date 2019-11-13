@@ -114,33 +114,34 @@ class Session:
             emit({'type': 'push', 'key': key, 'val': suit_js(val), })
 
 
+def notify_all(ctrl, key, val):
+    for session in SESSIONS.values():
+        if session._ctrl is ctrl:
+            session.notify(key, val)
+
+
 def push_prop(name, default):
     _name = '_' + name
 
     def fget(self):
         return getattr(self, _name, default)
 
-    def notify(self):
-        for session in SESSIONS.values():
-            if session._ctrl is self:
-                session.notify(name, fget(self))
-
     def fset(self, value):
         try:
             setattr(self, _name, value)
         finally:
-            notify(self)
+            notify_all(self, name, fget(self))
 
     def fdel(self):
         try:
             delattr(self, _name)
         finally:
-            notify(self)
+            notify_all(self, name, fget(self))
     return property(fget, fset, fdel)
 
 
 class WsGdbController(GdbController):
-    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt')
+    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'mod')
     PUSH = ('suspend', 'breakpoints', 'watchpoints',)
     suspend = push_prop('suspend', False)
     breakpoints = push_prop('breakpoints', None)
