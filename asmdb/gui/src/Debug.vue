@@ -1,21 +1,21 @@
 <template>
-  <div id="root">
-    <div id="left-layout">
-      <Bar id="bar"></Bar>
-      <Assembly id="assembly" ref="assembly"></Assembly>
-      <div id="points-layout">
-        <Breakpoints id="breakpoints" @clickitem="onClickItem"></Breakpoints>
-        <div id="points-split"></div>
-        <Watchpoints id="watchpoints" @clickitem="onClickItem"></Watchpoints>
+  <div class="debug-container">
+    <div class="debug-left-layout">
+      <Bar ref="bar" class="debug-bar"></Bar>
+      <Assembly ref="assembly" class="debug-assembly"></Assembly>
+      <div class="debug-points-layout">
+        <Breakpoints ref="breakpoints" class="debug-breakpoints" @clickitem="onClickItem"></Breakpoints>
+        <div class="debug-points-split"></div>
+        <Watchpoints ref="watchpoints" class="debug-watchpoints" @clickitem="onClickItem"></Watchpoints>
       </div>
-      <Python3 id="python3"></Python3>
+      <Python3 ref="python3" class="debug-python3"></Python3>
     </div>
-    <div id="right-layout">
-      <Registers id="registers" @clickitem="onClickItem"></Registers>
-      <div id="heap-layout" ref="heapLayout">
-        <Stack id="stack" ref="stack" @clickitem="onClickItem"></Stack>
-        <div id="heap-split"></div>
-        <Memory id="memory" ref="memory" @clickitem="onClickItem"></Memory>
+    <div class="debug-right-layout">
+      <Registers ref="registers" class="debug-registers" @clickitem="onClickItem"></Registers>
+      <div class="debug-heap-layout">
+        <Stack ref="stack" class="debug-stack" @clickitem="onClickItem"></Stack>
+        <div class="debug-heap-split"></div>
+        <Memory ref="memory" class="debug-memory" @clickitem="onClickItem"></Memory>
       </div>
     </div>
   </div>
@@ -53,65 +53,65 @@ export default {
 <style lang="less">
 @import '~@/styles/theme';
 
-#root {
+.debug-container {
   width: 100%;
   height: 100%;
   display: flex;
 
-  #left-layout {
+  .debug-left-layout {
     flex-grow: 1;
     height: 100%;
     display: flex;
     flex-direction: column;
-    #bar {
+    .debug-bar {
       background: @color-background-dark;
     }
-    #assembly {
+    .debug-assembly {
       flex-grow: 1;
       border-top: 1px solid @color-border;
       border-bottom: 1px solid @color-border;
       background: @color-background;
     }
-    #points-layout {
+    .debug-points-layout {
       display: flex;
-      #breakpoints {
+      .debug-breakpoints {
         flex-grow: 1;
         background: @color-background;
       }
-      #points-split {
+      .debug-points-split {
         width: 1px;
         height: 100%;
         background: @color-border;
       }
-      #watchpoints {
+      .debug-watchpoints {
         background: @color-background;
       }
     }
   }
 
-  #right-layout {
+  .debug-right-layout {
     z-index: 1;
     height: 100%;
     box-shadow: 0px 0px 6px @color-border-shadow;
     display: flex;
     flex-direction: column;
-    #registers {
+    .debug-registers {
       background: @color-background;
     }
-    #heap-layout {
+    .debug-heap-layout {
       flex-grow: 1;
       display: flex;
       border-top: 1px solid @color-border;
-      #stack {
+      .debug-stack {
         height: 100%;
         background: @color-background;
       }
-      #heap-split {
+      .debug-heap-split {
         width: 1px;
         height: 100%;
         background: @color-border;
       }
-      #memory {
+      .debug-memory {
         height: 100%;
         background: @color-background;
       }
