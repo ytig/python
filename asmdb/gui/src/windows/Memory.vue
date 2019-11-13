@@ -138,7 +138,7 @@ export default {
     }
   },
   created: function() {
-    this.source = new Source(0, Math.pow(16, 2 * asmdb.getInstance().UNIT), 8 * this.column, null);
+    this.source = new Source(...asmdb.getInstance().getMemoryRange(), 8 * this.column, null);
   },
   mounted: function() {
     keyboard.registerWindow(this);
@@ -249,7 +249,7 @@ export default {
       if (!this.show) {
         return;
       }
-      this.source = new Source(0, Math.pow(16, 2 * asmdb.getInstance().UNIT), 8 * this.column, this.source);
+      this.source = new Source(...asmdb.getInstance().getMemoryRange(), 8 * this.column, this.source);
       if (Boolean(memory)) {
         this.source.onLoad(address, memory);
       }

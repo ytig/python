@@ -290,6 +290,14 @@ class Debugger {
     return Object.assign({}, this.registers);
   }
 
+  getAssemblyRange() {
+    return [0, Math.pow(16, 2 * this.UNIT)]; //todo
+  }
+
+  getMemoryRange() {
+    return [0, Math.pow(16, 2 * this.UNIT)];
+  }
+
   getAddressUsage(int) {
     var delta = int - this.registers[this.SPNM];
     if (delta >= 0 && delta < 400 * 10) {
