@@ -286,6 +286,10 @@ class Debugger {
     this.objects[type].splice(i, 1);
   }
 
+  isSuspend() {
+    return this.struct.suspend;
+  }
+
   getRegisters() {
     return Object.assign({}, this.registers);
   }

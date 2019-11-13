@@ -353,7 +353,18 @@ export default {
           asmdb.getInstance().wpt([{ address: address }], []);
         }
       };
+      items[items.length] = ['Modify', '', asmdb.getInstance().isSuspend()];
+      items[items.length - 1].event = this.doModify.bind(this);
       return items;
+    },
+    doModify: function() {
+      if (!asmdb.getInstance().isSuspend()) {
+        return;
+      }
+      //todo
+    },
+    onModify: function() {
+      //todo
     }
   }
 };
