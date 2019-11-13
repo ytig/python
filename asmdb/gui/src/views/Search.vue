@@ -9,7 +9,7 @@
 import Animation from '@/scripts/animation';
 import asmdb from '@/scripts/asmdb';
 
-function exec(source, locals) {
+function exec(source, locals, condition) {
   var result = null;
   try {
     var keys = [];
@@ -21,7 +21,7 @@ function exec(source, locals) {
     }
     result = new Function(...keys, 'return ' + source)(...vals);
   } catch (error) {}
-  if (typeof result == 'number') {
+  if (typeof result == 'number' && condition(result)) {
     return result;
   } else {
     return null;
@@ -41,12 +41,13 @@ export default {
     };
   },
   props: {
-    theme: Number
+    theme: Number,
+    condition: Function
   },
   watch: {
     text: function(newValue, oldValue) {
       if (this.illegal) {
-        if (!newValue || exec(newValue, this.locals) != null) {
+        if (!newValue || exec(newValue, this.locals, this.condition) != null) {
           this.illegal = false;
         }
       }
@@ -100,7 +101,7 @@ export default {
         if (!this.text) {
           this.dismiss();
         } else {
-          var result = exec(this.text, this.locals);
+          var result = exec(this.text, this.locals, this.condition);
           if (result != null) {
             this.$emit('search', result);
             this.dismiss();

@@ -1,6 +1,6 @@
 <template>
   <div class="memory-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
-    <Search ref="search" :theme="0" @search="jumpTo"></Search>
+    <Search ref="search" :theme="0" :condition="searchTest" @search="jumpTo"></Search>
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <div v-show="!show&&trigger" class="memory-empty user-select-none">press enter and search an address.</div>
     <Recycler ref="recycler" class="memory-recycler" :show="show" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
@@ -149,6 +149,10 @@ export default {
     keyboard.unregisterWindow(this);
   },
   methods: {
+    searchTest: function(address) {
+      var range = asmdb.getInstance().getMemoryRange();
+      return address >= range[0] && address < range[1];
+    },
     requestFocus: function() {
       keyboard.requestFocus(this);
     },

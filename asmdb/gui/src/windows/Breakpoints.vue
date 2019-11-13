@@ -1,6 +1,6 @@
 <template>
   <div class="breakpoints-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
-    <Search ref="search" :theme="1" @search="onAddPoint"></Search>
+    <Search ref="search" :theme="1" :condition="searchTest" @search="onAddPoint"></Search>
     <Navigation :name="'Bpoints'" :focus="focus" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <div class="breakpoints-layout">
       <div></div>
@@ -41,6 +41,10 @@ export default {
   methods: {
     toHex: function(address) {
       return '0x' + address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
+    },
+    searchTest: function(address) {
+      var range = asmdb.getInstance().getAssemblyRange();
+      return address >= range[0] && address < range[1];
     },
     requestFocus: function() {
       keyboard.requestFocus(this);
@@ -92,7 +96,6 @@ export default {
       asmdb.getInstance().bpt([], [point]);
     },
     onAddPoint: function(address) {
-      address = Math.min(Math.max(address, 0), Math.pow(16, 2 * asmdb.getInstance().UNIT) - 1);
       asmdb.getInstance().bpt([], [{ address: address, disable: false }]);
     }
   }

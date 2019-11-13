@@ -1,6 +1,6 @@
 <template>
   <div class="watchpoints-container" :style="{width:windowWidth+'px'}" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
-    <Search ref="search" :theme="1" @search="onAddPoint"></Search>
+    <Search ref="search" :theme="1" :condition="searchTest" @search="onAddPoint"></Search>
     <Navigation :name="'Wpoints'" :focus="focus" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <div class="watchpoints-layout">
       <div></div>
@@ -55,6 +55,10 @@ export default {
     toHex: function(address) {
       return '0x' + address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
     },
+    searchTest: function(address) {
+      var range = asmdb.getInstance().getMemoryRange();
+      return address >= range[0] && address < range[1];
+    },
     requestFocus: function() {
       keyboard.requestFocus(this);
     },
@@ -102,7 +106,6 @@ export default {
       asmdb.getInstance().wpt([point], []);
     },
     onAddPoint: function(address) {
-      address = Math.min(Math.max(address, 0), Math.pow(16, 2 * asmdb.getInstance().UNIT) - 1);
       address -= address % asmdb.getInstance().UNIT;
       asmdb.getInstance().wpt([], [{ address: address }]);
     }
