@@ -347,9 +347,9 @@ export default {
       items[items.length] = [!watching ? 'Watching' : 'Watching done', '', watching || canWatch];
       items[items.length - 1].event = () => {
         if (!watching) {
-          asmdb.getInstance().wp([], [{ address: address }]);
+          asmdb.getInstance().wpt([], [{ address: address }]);
         } else {
-          asmdb.getInstance().wp([{ address: address }], []);
+          asmdb.getInstance().wpt([{ address: address }], []);
         }
       };
       return items;

@@ -84,16 +84,16 @@ export default {
       this.$emit('clickitem', 0, point.address);
     },
     onSubPoint: function(point) {
-      asmdb.getInstance().bp([point], []);
+      asmdb.getInstance().bpt([point], []);
     },
     onTogglePoint: function(point) {
       point = Object.assign({}, point);
       point.disable = !point.disable;
-      asmdb.getInstance().bp([], [point]);
+      asmdb.getInstance().bpt([], [point]);
     },
     onAddPoint: function(address) {
       address = Math.min(Math.max(address, 0), Math.pow(16, 2 * asmdb.getInstance().UNIT) - 1);
-      asmdb.getInstance().bp([], [{ address: address, disable: false }]);
+      asmdb.getInstance().bpt([], [{ address: address, disable: false }]);
     }
   }
 };

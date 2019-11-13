@@ -99,12 +99,12 @@ export default {
       this.$emit('clickitem', 1, point.address);
     },
     onSubPoint: function(point) {
-      asmdb.getInstance().wp([point], []);
+      asmdb.getInstance().wpt([point], []);
     },
     onAddPoint: function(address) {
       address = Math.min(Math.max(address, 0), Math.pow(16, 2 * asmdb.getInstance().UNIT) - 1);
       address -= address % asmdb.getInstance().UNIT;
-      asmdb.getInstance().wp([], [{ address: address }]);
+      asmdb.getInstance().wpt([], [{ address: address }]);
     }
   }
 };

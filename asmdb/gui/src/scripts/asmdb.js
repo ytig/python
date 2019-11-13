@@ -177,12 +177,12 @@ class Debugger {
     });
   }
 
-  bp(delPoints, setPoints) {
-    this.pull('bp', [delPoints, setPoints]);
+  bpt(delPoints, setPoints) {
+    this.pull('bpt', [delPoints, setPoints]);
   }
 
-  wp(delPoints, setPoints) {
-    this.pull('wp', [delPoints, setPoints]);
+  wpt(delPoints, setPoints) {
+    this.pull('wpt', [delPoints, setPoints]);
   }
 
   iterObjects(filter, handler) {
