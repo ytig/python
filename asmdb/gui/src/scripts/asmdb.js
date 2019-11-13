@@ -57,7 +57,7 @@ class Debugger {
         this.counter++;
         if (newValue) {
           var counter = this.counter;
-          this.ir((registers) => {
+          this.reg((registers) => {
             var union = new Union(() => {
               return counter == this.counter;
             });
@@ -81,7 +81,7 @@ class Debugger {
             //stack
             union.wait();
             var sp = registers[this.SPNM];
-            this.xb([sp, sp + 400 * 10], (stack) => {
+            this.mem([sp, sp + 400 * 10], (stack) => {
               union.notify(() => {
                 this.iterObjects('stack', (object) => {
                   object.onBreak(sp, stack);
@@ -97,7 +97,7 @@ class Debugger {
                   object.onBreak(null, null);
                 });
               } else {
-                this.xb(range, (memory) => {
+                this.mem(range, (memory) => {
                   union.notify(() => {
                     object.onBreak(range[0], memory);
                   });
@@ -161,16 +161,16 @@ class Debugger {
     this.pull('rlse');
   }
 
-  ir(success) {
-    this.pull('ir', [], function (ret) {
+  reg(success) {
+    this.pull('reg', [], function (ret) {
       if (success) {
         success(ret);
       }
     });
   }
 
-  xb(range, success) {
-    this.pull('xb', [...range], function (ret) {
+  mem(range, success) {
+    this.pull('mem', [...range], function (ret) {
       if (success) {
         success(atob(ret));
       }
@@ -226,7 +226,7 @@ class Debugger {
         if (!suspend) {
           object.onContinue();
         } else {
-          this.ir((registers) => {
+          this.reg((registers) => {
             if (counter != this.counter) {
               return;
             }
@@ -238,9 +238,9 @@ class Debugger {
         if (!suspend) {
           object.onContinue();
         } else {
-          this.ir((registers) => {
+          this.reg((registers) => {
             var sp = registers[this.SPNM];
-            this.xb([sp, sp + 400 * 10], (stack) => {
+            this.mem([sp, sp + 400 * 10], (stack) => {
               if (counter != this.counter) {
                 return;
               }
@@ -257,7 +257,7 @@ class Debugger {
           if (range == null) {
             object.onBreak(null, null);
           } else {
-            this.xb(range, (memory) => {
+            this.mem(range, (memory) => {
               if (counter != this.counter) {
                 return;
               }

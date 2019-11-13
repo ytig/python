@@ -80,7 +80,7 @@ class Source {
       }
     }
     for (var r of ranges) {
-      asmdb.getInstance().xb(r, this.onLoad.bind(this, r[0]));
+      asmdb.getInstance().mem(r, this.onLoad.bind(this, r[0]));
     }
   }
 
