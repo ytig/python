@@ -140,7 +140,7 @@ def push_prop(name, default):
 
 
 class WsGdbController(GdbController):
-    PULL = ('next', 'step', 'cont', 'rlse', 'ir', 'xb', 'bp', 'wp')
+    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt')
     PUSH = ('suspend', 'breakpoints', 'watchpoints',)
     suspend = push_prop('suspend', False)
     breakpoints = push_prop('breakpoints', None)
@@ -156,15 +156,38 @@ class WsGdbController(GdbController):
 
     async def next(self):
         self.suspend = False
-        ret = await super().next()
         await asyncio.sleep(3)
         self.suspend = True
-        return ret
+
+    async def step(self):
+        pass
+
+    async def cont(self):
+        pass
 
     async def rlse(self):
         pass
 
-    async def bp(self, del_points, set_points):
+    async def asm(self):
+        pass
+
+    async def reg(self):
+        d = {}
+        for k in ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']:
+            d[k] = 0
+        return d
+
+    async def mem(self, start, end):
+        import random
+        ret = b''
+        for i in range(end - start):
+            if random.random() < 0.01:
+                ret += b'\x00'
+            else:
+                ret += b'\x66'
+        return ret
+
+    async def bpt(self, del_points, set_points):
         breakpoints = {}
         for point in self.breakpoints:
             breakpoints[point['address']] = point
@@ -178,7 +201,7 @@ class WsGdbController(GdbController):
             self.breakpoints.append(breakpoints[address])
         self.breakpoints = self.breakpoints
 
-    async def wp(self, del_points, set_points):
+    async def wpt(self, del_points, set_points):
         watchpoints = {}
         for point in self.watchpoints:
             watchpoints[point['address']] = point

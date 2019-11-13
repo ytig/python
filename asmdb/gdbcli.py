@@ -29,21 +29,14 @@ class GdbError(RuntimeError):
 
 
 class GdbController:
-    test = 0
-
     @classmethod
     async def anew(cls, config):
-        cls.test += 1
-        print('new', cls.test)
         self = cls()
         self.process = await gdb_startup(config)
         self.cmdlock = asyncio.Lock()
         return self
 
     async def adel(self):
-        cls = type(self)
-        cls.test -= 1
-        print('del', cls.test)
         self.process.kill()
 
     def sigint(self):
@@ -54,28 +47,3 @@ class GdbController:
         async with self.cmdlock:
             self.process.stdin.write(command.encode() + b'\n')
             return (await gdb_readlines(self.process.stdout)).decode()
-
-    async def next(self):
-        await self._command('nexti')
-
-    async def step(self):
-        await self._command('stepi')
-
-    async def cont(self):
-        await self._command('continue')
-
-    async def ir(self):
-        d = {}
-        for k in ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']:
-            d[k] = 0
-        return d
-
-    async def xb(self, start, end):
-        import random
-        ret = b''
-        for i in range(end - start):
-            if random.random() < 0.01:
-                ret += b'\x00'
-            else:
-                ret += b'\x66'
-        return ret
