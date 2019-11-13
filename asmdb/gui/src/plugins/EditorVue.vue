@@ -1,5 +1,5 @@
 <template>
-  <div ref="menuContainer" v-show="show" class="editor-container" :style="{left:left+'px',top:top+'px'}">
+  <div ref="container" v-show="show" class="editor-container" :style="{left:left+'px',top:top+'px'}">
     <div style="width:100px;height:100px"></div>
   </div>
 </template>

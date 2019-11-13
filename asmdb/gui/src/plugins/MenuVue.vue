@@ -1,5 +1,5 @@
 <template>
-  <div ref="menuContainer" v-show="show" class="menu-container" :style="{left:left+'px',top:top+'px'}">
+  <div ref="container" v-show="show" class="menu-container" :style="{left:left+'px',top:top+'px'}">
     <div v-for="(item, index) in items" :key="index" :css-enable="item[2]">
       <span class="user-select-none">{{item[0]}}</span>
       <span v-show="item[1].length>0" class="user-select-none">{{item[1]}}</span>
@@ -36,7 +36,7 @@ export default {
       this.items = items || [['undefined', '', false]];
       this.listener = listener || null;
       this.$nextTick(function() {
-        var view = this.$refs.menuContainer;
+        var view = this.$refs.container;
         this.left = event.clientX - (event.clientX + view.clientWidth <= window.innerWidth ? 0 : view.clientWidth);
         this.top = event.clientY - (event.clientY + view.clientHeight <= window.innerHeight ? 0 : view.clientHeight);
       });
@@ -48,7 +48,7 @@ export default {
     },
     onMouseDown: function(event) {
       var intercept = this.show;
-      var inner = this.$refs.menuContainer == event.target || getChildIndex(this.$refs.menuContainer, event.target) >= 0;
+      var inner = this.$refs.container == event.target || getChildIndex(this.$refs.container, event.target) >= 0;
       if (!inner) {
         this.close();
       }
@@ -56,7 +56,7 @@ export default {
     },
     onClick: function(event) {
       if (this.show) {
-        var index = getChildIndex(this.$refs.menuContainer, event.target);
+        var index = getChildIndex(this.$refs.container, event.target);
         if (index >= 0) {
           this.onClickItem(index);
         }
