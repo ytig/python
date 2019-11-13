@@ -16,6 +16,7 @@ export default {
 
 <style lang="less">
 @import '~@/styles/theme';
+
 .hello-container {
   width: 100%;
   height: 100%;
