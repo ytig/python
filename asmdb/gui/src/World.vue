@@ -1,21 +1,21 @@
 <template>
-  <div class="debug-container">
-    <div class="debug-left-layout">
-      <Bar ref="bar" class="debug-bar"></Bar>
-      <Assembly ref="assembly" class="debug-assembly"></Assembly>
-      <div class="debug-points-layout">
-        <Breakpoints ref="breakpoints" class="debug-breakpoints" @clickitem="onClickItem"></Breakpoints>
-        <div class="debug-points-split"></div>
-        <Watchpoints ref="watchpoints" class="debug-watchpoints" @clickitem="onClickItem"></Watchpoints>
+  <div class="world-container">
+    <div class="world-left-layout">
+      <Bar ref="bar" class="world-bar"></Bar>
+      <Assembly ref="assembly" class="world-assembly"></Assembly>
+      <div class="world-points-layout">
+        <Breakpoints ref="breakpoints" class="world-breakpoints" @clickitem="onClickItem"></Breakpoints>
+        <div class="world-points-split"></div>
+        <Watchpoints ref="watchpoints" class="world-watchpoints" @clickitem="onClickItem"></Watchpoints>
       </div>
-      <Python3 ref="python3" class="debug-python3"></Python3>
+      <Python3 ref="python3" class="world-python3"></Python3>
     </div>
-    <div class="debug-right-layout">
-      <Registers ref="registers" class="debug-registers" @clickitem="onClickItem"></Registers>
-      <div class="debug-heap-layout">
-        <Stack ref="stack" class="debug-stack" @clickitem="onClickItem"></Stack>
-        <div class="debug-heap-split"></div>
-        <Memory ref="memory" class="debug-memory" @clickitem="onClickItem"></Memory>
+    <div class="world-right-layout">
+      <Registers ref="registers" class="world-registers" @clickitem="onClickItem"></Registers>
+      <div class="world-heap-layout">
+        <Stack ref="stack" class="world-stack" @clickitem="onClickItem"></Stack>
+        <div class="world-heap-split"></div>
+        <Memory ref="memory" class="world-memory" @clickitem="onClickItem"></Memory>
       </div>
     </div>
   </div>
@@ -53,65 +53,65 @@ export default {
 <style lang="less">
 @import '~@/styles/theme';
 
-.debug-container {
+.world-container {
   width: 100%;
   height: 100%;
   display: flex;
 
-  .debug-left-layout {
+  .world-left-layout {
     flex-grow: 1;
     height: 100%;
     display: flex;
     flex-direction: column;
-    .debug-bar {
+    .world-bar {
       background: @color-background-dark;
     }
-    .debug-assembly {
+    .world-assembly {
       flex-grow: 1;
       border-top: 1px solid @color-border;
       border-bottom: 1px solid @color-border;
       background: @color-background;
     }
-    .debug-points-layout {
+    .world-points-layout {
       display: flex;
-      .debug-breakpoints {
+      .world-breakpoints {
         flex-grow: 1;
         background: @color-background;
       }
-      .debug-points-split {
+      .world-points-split {
         width: 1px;
         height: 100%;
         background: @color-border;
       }
-      .debug-watchpoints {
+      .world-watchpoints {
         background: @color-background;
       }
     }
   }
 
-  .debug-right-layout {
+  .world-right-layout {
     z-index: 1;
     height: 100%;
     box-shadow: 0px 0px 6px @color-border-shadow;
     display: flex;
     flex-direction: column;
-    .debug-registers {
+    .world-registers {
       background: @color-background;
     }
-    .debug-heap-layout {
+    .world-heap-layout {
       flex-grow: 1;
       display: flex;
       border-top: 1px solid @color-border;
-      .debug-stack {
+      .world-stack {
         height: 100%;
         background: @color-background;
       }
-      .debug-heap-split {
+      .world-heap-split {
         width: 1px;
         height: 100%;
         background: @color-border;
       }
-      .debug-memory {
+      .world-memory {
         height: 100%;
         background: @color-background;
       }

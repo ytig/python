@@ -43,20 +43,20 @@ Vue.component('Registers', Registers);
 Vue.component('Stack', Stack);
 Vue.component('Watchpoints', Watchpoints);
 
-import Connect from '@/Connect';
-import Debug from '@/Debug';
+import Hello from '@/Hello';
+import World from '@/World';
 new Vue({
   el: '#app',
   router: new VueRouter({
     routes: [{
       path: '/',
-      redirect: '/connect',
+      redirect: '/hello',
     }, {
-      path: '/connect',
-      component: Connect,
+      path: '/hello',
+      component: Hello,
     }, {
-      path: '/debug',
-      component: Debug,
+      path: '/world',
+      component: World,
     }],
   }),
   template: '<router-view/>',
