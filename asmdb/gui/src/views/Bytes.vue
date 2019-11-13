@@ -151,6 +151,7 @@ export default {
         }
         if (self.value == null) {
           items.push(newItem('00', 'bytes-padding'));
+          items[items.length - 1].index = i;
         } else {
           var charCode = '&nbsp;&nbsp;';
           if (i < self.value.newBytes.length) {
