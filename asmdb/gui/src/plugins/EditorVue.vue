@@ -5,6 +5,16 @@
 </template>
 
 <script>
+function getChildIndex(parent, child) {
+  while (child) {
+    if (child.parentNode == parent) {
+      return new Array(...parent.childNodes).indexOf(child);
+    }
+    child = child.parentNode;
+  }
+  return -1;
+}
+
 export default {
   data: function() {
     return {
@@ -27,6 +37,21 @@ export default {
     },
     close: function() {
       this.show = false;
+    },
+    onMouseDown: function(event) {
+      var intercept = this.show;
+      var inner = this.$refs.container == event.target || getChildIndex(this.$refs.container, event.target) >= 0;
+      if (!inner) {
+        this.close();
+      }
+      return intercept;
+    },
+    onKeyDown: function(event) {
+      return this.show;
+    },
+    onWheel: function(event) {
+      this.close();
+      return false;
     }
   }
 };
