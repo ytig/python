@@ -1,6 +1,6 @@
 <template>
   <div ref="container" v-show="show" class="editor-container" :style="{left:left+'px',top:top+'px'}">
-    <div style="width:100px;height:100px"></div>
+    <input ref="input" type="text" :style="{width:inputWidth+'px'}" v-model="text" @input="onInput" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
 
@@ -23,8 +23,15 @@ export default {
       show: false,
       length: 0,
       placeholder: '',
-      listener: null
+      listener: null,
+      text: '',
+      realText: ''
     };
+  },
+  computed: {
+    inputWidth: function() {
+      return Math.ceil(1 + measureText(this.realText, '12px Menlo'));
+    }
   },
   methods: {
     alert: function(left, top, length, placeholder, listener) {
@@ -34,9 +41,25 @@ export default {
       this.length = length;
       this.placeholder = placeholder;
       this.listener = listener;
+      this.text = '';
+      this.realText = '';
     },
     close: function() {
       this.show = false;
+    },
+    onInput: function() {
+      this.realText = this.$refs.input.value;
+    },
+    onKeyPress: function(event) {
+      if (event.keyCode == 13) {
+        if (this.text) {
+          this.listener(parseInt('0x' + this.text));
+        }
+        this.close();
+      }
+    },
+    onBlur: function() {
+      this.close();
     },
     onMouseDown: function(event) {
       var intercept = this.show;
@@ -68,5 +91,14 @@ export default {
   box-shadow: 0px 2px 6px @color-border-shadow;
   padding-top: 4px;
   padding-bottom: 4px;
+  > input {
+    box-sizing: content-box;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    padding: 3px 3px 1px 20px;
+    max-width: 224px;
+    font-size: 12px;
+    color: @color-text-light;
+  }
 }
 </style>
