@@ -1,11 +1,13 @@
 <template>
-  <div ref="container" v-show="show" class="editor-container" :style="{left:left+'px',top:top+'px'}">
+  <div ref="container" v-show="show" class="editor-container" :style="{left:left+'px',top:top+'px',transform:'scale('+scale+','+scale+')'}">
     <span>0x</span>
     <input ref="input" type="text" :style="{width:inputWidth+'px'}" :placeholder="placeholder" @input="onInput" @compositionstart="onCompositionStart" @compositionend="onCompositionEnd" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
 
 <script>
+import Animation from '@/scripts/animation';
+
 function getChildIndex(parent, child) {
   while (child) {
     if (child.parentNode == parent) {
@@ -26,7 +28,8 @@ export default {
       placeholder: '',
       listener: null,
       composition: false,
-      text: ''
+      text: '',
+      anim: new Animation(1 / 73)
     };
   },
   computed: {
@@ -34,6 +37,12 @@ export default {
       var w1 = measureText(this.text, '12px Menlo');
       var w2 = measureText(this.placeholder, '12px Menlo');
       return Math.ceil(1 + Math.max(w1, w2));
+    },
+    scale: function() {
+      var input = this.anim.value;
+      var T = 2;
+      var output = (T + 1) * Math.pow(input - 1, 3) + T * Math.pow(input - 1, 2) + 1;
+      return output;
     }
   },
   methods: {
@@ -50,6 +59,8 @@ export default {
       this.$nextTick(function() {
         this.$refs.input.focus();
       });
+      this.anim.$value(0);
+      this.anim.$target(1);
     },
     close: function() {
       this.show = false;
