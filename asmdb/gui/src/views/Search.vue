@@ -88,6 +88,9 @@ export default {
       this.text = '';
       this.realText = '';
       this.anim.$value(0);
+      this.$nextTick(function() {
+        this.$refs.input.focus();
+      });
     },
     dismiss: function() {
       this.showing = false;

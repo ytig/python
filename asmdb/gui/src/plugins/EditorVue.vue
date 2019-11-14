@@ -43,6 +43,9 @@ export default {
       this.listener = listener;
       this.text = '';
       this.realText = '';
+      this.$nextTick(function() {
+        this.$refs.input.focus();
+      });
     },
     close: function() {
       this.show = false;
