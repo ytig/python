@@ -29,7 +29,7 @@ export default {
       listener: null,
       composition: false,
       text: '',
-      anim: new Animation(1 / 73)
+      anim: new Animation(1 / 147)
     };
   },
   computed: {
