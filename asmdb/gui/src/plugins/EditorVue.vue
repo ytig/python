@@ -1,6 +1,7 @@
 <template>
   <div ref="container" v-show="show" class="editor-container" :style="{left:left+'px',top:top+'px'}">
-    <input ref="input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @compositionstart="onCompositionStart" @compositionend="onCompositionEnd" @keypress="onKeyPress" @blur="onBlur" />
+    <span>0x</span>
+    <input ref="input" type="text" :style="{width:inputWidth+'px'}" :placeholder="placeholder" @input="onInput" @compositionstart="onCompositionStart" @compositionend="onCompositionEnd" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
 
@@ -30,13 +31,15 @@ export default {
   },
   computed: {
     inputWidth: function() {
-      return Math.ceil(1 + measureText('0x' + (this.text || this.placeholder), '12px Menlo'));
+      var w1 = measureText(this.text, '12px Menlo');
+      var w2 = measureText(this.placeholder, '12px Menlo');
+      return Math.ceil(1 + Math.max(w1, w2));
     }
   },
   methods: {
     alert: function(left, top, length, placeholder, listener) {
-      this.left = left;
-      this.top = top;
+      this.left = left - 1;
+      this.top = top - 1;
       this.show = true;
       this.length = length;
       this.placeholder = placeholder;
@@ -103,11 +106,22 @@ export default {
   position: fixed;
   z-index: 7;
   display: inline-block;
-  background: @color-background-dark;
-  box-shadow: 0px 2px 6px @color-border-shadow;
-  > input {
+  background: @color-text;
+  border: 1px solid @color-border;
+  > span {
+    position: absolute;
     font-size: 12px;
-    color: @color-text-light;
+    color: @color-background;
+    pointer-events: none;
+  }
+  > input {
+    box-sizing: content-box;
+    padding-left: 15px;
+    font-size: 12px;
+    color: @color-background;
+  }
+  > input::placeholder {
+    color: @color-background;
   }
 }
 </style>
