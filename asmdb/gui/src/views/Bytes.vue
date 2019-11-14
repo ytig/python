@@ -1,6 +1,6 @@
 <template>
   <div class="bytes-container">
-    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)" @mouseup="onMouseUpItem(index, ...arguments)"></span>
+    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value" @click="onClickItem(index)" @dblclick="onDoubleClickItem(index)" @mouseup="onMouseUpItem(index, ...arguments)"></span>
   </div>
 </template>
 
@@ -327,6 +327,20 @@ export default {
         this.$emit('clickitem', ...this.items[index].event);
       }
     },
+    onDoubleClickItem: function(index) {
+      if (this.items[index] && this.items[index].index != undefined) {
+        index = this.items[index].index;
+        var address = this.startAddress + index;
+        var range = asmdb.getInstance().getMemoryRange();
+        var inRange = address >= range[0] && address < range[1];
+        if (asmdb.getInstance().isSuspend() && inRange) {
+          var el = this.$el.getElementsByClassName('bytes-padding')[index];
+          var rect = el.getBoundingClientRect();
+          var placeholder = el.innerHTML;
+          this.$editor.alert(parseInt(rect.x + 1 - measureTextWidth(2)), parseInt(rect.y), 2, placeholder, this.onModify.bind(this, address));
+        }
+      }
+    },
     onMouseUpItem: function(index, event) {
       if (event.button == 2) {
         if (this.items[index] && this.items[index].index != undefined) {
@@ -360,14 +374,16 @@ export default {
       var placeholder = el.innerHTML;
       items[items.length] = ['Modify', '', asmdb.getInstance().isSuspend() && inRange];
       items[items.length - 1].event = () => {
-        this.$editor.alert(parseInt(rect.x + 1 - measureTextWidth(2)), parseInt(rect.y), 2, placeholder, newValue => {
-          if (!asmdb.getInstance().isSuspend()) {
-            return;
-          }
-          //todo mod mem
-        });
+        this.$editor.alert(parseInt(rect.x + 1 - measureTextWidth(2)), parseInt(rect.y), 2, placeholder, this.onModify.bind(this, address));
       };
       return items;
+    },
+    onModify: function(address, value) {
+      if (!asmdb.getInstance().isSuspend()) {
+        return;
+      }
+      //todo mod mem
+      console.log(address, value);
     }
   }
 };

@@ -2,7 +2,7 @@
   <div class="register-container">
     <span>{{value.lineName}}</span>
     <span v-for="i in (value.lineFill+1-value.lineName.length)" :key="i" class="user-select-none">&nbsp;</span>
-    <span ref="bytes" :css-usage="cssUsage" :css-changed="cssChanged" @click="onClick" @mouseup="onMouseUp">{{hexValue}}</span>
+    <span ref="bytes" :css-usage="cssUsage" :css-changed="cssChanged" @click="onClick" @dblclick="onDoubleClick" @mouseup="onMouseUp">{{hexValue}}</span>
     <span class="user-select-none">&nbsp;</span>
     <span>{{strValue}}</span>
   </div>
@@ -58,6 +58,15 @@ export default {
         this.$emit('clickitem', usage, this.value.newValue);
       }
     },
+    onDoubleClick: function() {
+      var inRange = true;
+      if (asmdb.getInstance().isSuspend() && inRange) {
+        var el = this.$refs.bytes;
+        var rect = el.getBoundingClientRect();
+        var placeholder = el.innerHTML.substring(2);
+        this.$editor.alert(parseInt(rect.x), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onModify.bind(this, this.value.lineName));
+      }
+    },
     onMouseUp: function(event) {
       if (event.button == 2) {
         var menu = this.onCreateMenu();
@@ -68,20 +77,23 @@ export default {
       }
     },
     onCreateMenu: function() {
+      var inRange = true;
       var items = [];
       var el = this.$refs.bytes;
       var rect = el.getBoundingClientRect();
       var placeholder = el.innerHTML.substring(2);
-      items[items.length] = ['Modify', '', asmdb.getInstance().isSuspend()];
+      items[items.length] = ['Modify', '', asmdb.getInstance().isSuspend() && inRange];
       items[items.length - 1].event = () => {
-        this.$editor.alert(parseInt(rect.x), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, newValue => {
-          if (!asmdb.getInstance().isSuspend()) {
-            return;
-          }
-          //todo mod reg
-        });
+        this.$editor.alert(parseInt(rect.x), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onModify.bind(this, this.value.lineName));
       };
       return items;
+    },
+    onModify: function(name, value) {
+      if (!asmdb.getInstance().isSuspend()) {
+        return;
+      }
+      //todo mod reg
+      console.log(name, value);
     }
   }
 };
