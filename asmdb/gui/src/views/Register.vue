@@ -64,7 +64,7 @@ export default {
         var el = this.$refs.bytes;
         var rect = el.getBoundingClientRect();
         var placeholder = el.innerHTML.substring(2);
-        this.$editor.alert(parseInt(rect.x), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onModify.bind(this, this.value.lineName));
+        this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onModify.bind(this, this.value.lineName));
       }
     },
     onMouseUp: function(event) {
