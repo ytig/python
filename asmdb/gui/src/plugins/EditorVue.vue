@@ -38,7 +38,7 @@ export default {
   },
   methods: {
     alert: function(left, top, length, placeholder, listener) {
-      this.left = left - 1;
+      this.left = left - 2;
       this.top = top - 1;
       this.show = true;
       this.length = length;
@@ -110,13 +110,14 @@ export default {
   border: 1px solid @color-border;
   > span {
     position: absolute;
+    padding-left: 1px;
     font-size: 12px;
     color: @color-background;
     pointer-events: none;
   }
   > input {
     box-sizing: content-box;
-    padding-left: 15px;
+    padding-left: 16px;
     font-size: 12px;
     color: @color-background;
   }
