@@ -1,6 +1,6 @@
 <template>
   <div ref="container" v-show="show" class="editor-container" :style="{left:left+'px',top:top+'px'}">
-    <input ref="input" type="text" :style="{width:inputWidth+'px'}" v-model="text" @input="onInput" @keypress="onKeyPress" @blur="onBlur" />
+    <input ref="input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @compositionstart="onCompositionStart" @compositionend="onCompositionEnd" @keypress="onKeyPress" @blur="onBlur" />
   </div>
 </template>
 
@@ -24,13 +24,13 @@ export default {
       length: 0,
       placeholder: '',
       listener: null,
-      text: '',
-      realText: ''
+      composition: false,
+      text: ''
     };
   },
   computed: {
     inputWidth: function() {
-      return Math.ceil(1 + measureText(this.realText, '12px Menlo'));
+      return Math.ceil(1 + measureText('0x' + (this.text || this.placeholder), '12px Menlo'));
     }
   },
   methods: {
@@ -41,8 +41,9 @@ export default {
       this.length = length;
       this.placeholder = placeholder;
       this.listener = listener;
+      this.composition = false;
       this.text = '';
-      this.realText = '';
+      this.$refs.input.value = '';
       this.$nextTick(function() {
         this.$refs.input.focus();
       });
@@ -51,7 +52,19 @@ export default {
       this.show = false;
     },
     onInput: function() {
-      this.realText = this.$refs.input.value;
+      if (!this.composition) {
+        this.onCompositionEnd();
+      }
+      this.text = this.$refs.input.value;
+    },
+    onCompositionStart: function() {
+      this.composition = true;
+    },
+    onCompositionEnd: function() {
+      this.composition = false;
+      var input = this.$refs.input;
+      input.value = input.value.replace(/[^0-9a-f]/g, '').substring(0, this.length);
+      this.text = input.value;
     },
     onKeyPress: function(event) {
       if (event.keyCode == 13) {
@@ -92,14 +105,7 @@ export default {
   display: inline-block;
   background: @color-background-dark;
   box-shadow: 0px 2px 6px @color-border-shadow;
-  padding-top: 4px;
-  padding-bottom: 4px;
   > input {
-    box-sizing: content-box;
-    border-radius: 2px;
-    border: 1px solid transparent;
-    padding: 3px 3px 1px 20px;
-    max-width: 224px;
     font-size: 12px;
     color: @color-text-light;
   }
