@@ -341,34 +341,33 @@ export default {
     onCreateMenu: function(index) {
       var self = this.self;
       var address = this.startAddress + index;
-      address -= address % asmdb.getInstance().UNIT;
-      var watching = self.watchingNumbers.indexOf(index) >= 0;
-      var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN;
+      var range = asmdb.getInstance().getMemoryRange();
+      var inRange = address >= range[0] && address < range[1];
       var items = [];
+      var watching = self.watchingNumbers.indexOf(index) >= 0;
+      var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN && inRange;
       items[items.length] = [!watching ? 'Watching' : 'Watching done', '', watching || canWatch];
       items[items.length - 1].event = () => {
+        var addr = address - (address % asmdb.getInstance().UNIT);
         if (!watching) {
-          asmdb.getInstance().wpt([], [{ address: address }]);
+          asmdb.getInstance().wpt([], [{ address: addr }]);
         } else {
-          asmdb.getInstance().wpt([{ address: address }], []);
+          asmdb.getInstance().wpt([{ address: addr }], []);
         }
       };
-      items[items.length] = ['Modify', '', asmdb.getInstance().isSuspend()];
-      items[items.length - 1].event = this.doModify.bind(this, index);
+      var el = this.$el.getElementsByClassName('bytes-padding')[index];
+      var rect = el.getBoundingClientRect();
+      var placeholder = el.innerHTML;
+      items[items.length] = ['Modify', '', asmdb.getInstance().isSuspend() && inRange];
+      items[items.length - 1].event = () => {
+        this.$editor.alert(parseInt(rect.x) + 1, parseInt(rect.y), 2, placeholder, newValue => {
+          if (!asmdb.getInstance().isSuspend()) {
+            return;
+          }
+          //todo
+        });
+      };
       return items;
-    },
-    doModify: function(index) {
-      if (!asmdb.getInstance().isSuspend()) {
-        return;
-      }
-      //todo
-      this.$editor.alert(0, 0, 2, '??', this.onModify.bind(this));
-    },
-    onModify: function() {
-      if (!asmdb.getInstance().isSuspend()) {
-        return;
-      }
-      //todo
     }
   }
 };

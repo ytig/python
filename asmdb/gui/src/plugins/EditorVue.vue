@@ -18,8 +18,8 @@ export default {
   },
   methods: {
     alert: function(left, top, length, placeholder, listener) {
-      this.left = 0;
-      this.top = 0;
+      this.left = left;
+      this.top = top;
       this.show = true;
       this.length = length;
       this.placeholder = placeholder;
