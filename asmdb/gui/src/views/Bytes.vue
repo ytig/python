@@ -360,7 +360,7 @@ export default {
       var placeholder = el.innerHTML;
       items[items.length] = ['Modify', '', asmdb.getInstance().isSuspend() && inRange];
       items[items.length - 1].event = () => {
-        this.$editor.alert(parseInt(rect.x) + 1 - measureTextWidth(2), parseInt(rect.y), 2, placeholder, newValue => {
+        this.$editor.alert(parseInt(rect.x + 1 - measureTextWidth(2)), parseInt(rect.y), 2, placeholder, newValue => {
           if (!asmdb.getInstance().isSuspend()) {
             return;
           }
