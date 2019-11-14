@@ -38,8 +38,8 @@ export default {
   },
   methods: {
     alert: function(left, top, length, placeholder, listener) {
-      this.left = left - 2;
-      this.top = top - 1;
+      this.left = left - 5;
+      this.top = top - 5;
       this.show = true;
       this.length = length;
       this.placeholder = placeholder;
@@ -106,23 +106,24 @@ export default {
   position: fixed;
   z-index: 7;
   display: inline-block;
-  background: @color-text;
-  border: 1px solid @color-border;
+  background: #ff0;
   > span {
     position: absolute;
-    padding-left: 1px;
+    padding-top: 5px;
+    padding-bottom: 3px;
+    padding-left: 5px;
     font-size: 12px;
-    color: @color-background;
+    color: #000;
     pointer-events: none;
   }
   > input {
     box-sizing: content-box;
-    padding-left: 16px;
+    padding-top: 5px;
+    padding-bottom: 3px;
+    padding-left: 20px;
+    padding-right: 4px;
     font-size: 12px;
-    color: @color-background;
-  }
-  > input::placeholder {
-    color: @color-background;
+    color: #000;
   }
 }
 </style>
