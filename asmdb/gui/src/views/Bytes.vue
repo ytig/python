@@ -372,7 +372,7 @@ export default {
       var el = this.$el.getElementsByClassName('bytes-padding')[index];
       var rect = el.getBoundingClientRect();
       var placeholder = el.innerHTML;
-      items[items.length] = ['Modify', 'c²', asmdb.getInstance().isSuspend() && inRange];
+      items[items.length] = ['Modify', '', asmdb.getInstance().isSuspend() && inRange];
       items[items.length - 1].event = () => {
         this.$editor.alert(parseInt(rect.x + 1 - measureTextWidth(2)), parseInt(rect.y), 2, placeholder, this.onModify.bind(this, address));
       };
