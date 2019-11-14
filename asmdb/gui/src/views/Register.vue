@@ -2,7 +2,7 @@
   <div class="register-container">
     <span>{{value.lineName}}</span>
     <span v-for="i in (value.lineFill+1-value.lineName.length)" :key="i" class="user-select-none">&nbsp;</span>
-    <span :css-usage="cssUsage" :css-changed="cssChanged" @click="onClickItem">{{hexValue}}</span>
+    <span ref="bytes" :css-usage="cssUsage" :css-changed="cssChanged" @click="onClick" @mouseup="onMouseUp">{{hexValue}}</span>
     <span class="user-select-none">&nbsp;</span>
     <span>{{strValue}}</span>
   </div>
@@ -52,11 +52,36 @@ export default {
     }
   },
   methods: {
-    onClickItem: function() {
+    onClick: function() {
       var usage = parseInt(this.cssUsage) - 2;
       if (usage >= 0) {
         this.$emit('clickitem', usage, this.value.newValue);
       }
+    },
+    onMouseUp: function(event) {
+      if (event.button == 2) {
+        var menu = this.onCreateMenu();
+        this.$menu.alert(event, menu, i => {
+          menu[i].event();
+        });
+        event.stopPropagation();
+      }
+    },
+    onCreateMenu: function() {
+      var items = [];
+      var el = this.$refs.bytes;
+      var rect = el.getBoundingClientRect();
+      var placeholder = el.innerHTML.substring(2);
+      items[items.length] = ['Modify', '', asmdb.getInstance().isSuspend()];
+      items[items.length - 1].event = () => {
+        this.$editor.alert(parseInt(rect.x), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, newValue => {
+          if (!asmdb.getInstance().isSuspend()) {
+            return;
+          }
+          //todo mod reg
+        });
+      };
+      return items;
     }
   }
 };
