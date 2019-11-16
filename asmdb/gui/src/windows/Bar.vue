@@ -2,7 +2,7 @@
   <div class="bar-container" @mouseup="onMouseUp">
     <div class="bar-icon"></div>
     <span class="bar-text">{{title}}</span>
-    <div class="bar-item" v-for="(item, index) in items" :key="index" :style="item" @click="onClickItem(index)" :css-enable="enable.enable_f"></div>
+    <div class="bar-item" v-for="(item, index) in items" :key="index" :title="item.title" :style="item.style" @click="onClickItem(index)" :css-enable="enable.enable_f"></div>
   </div>
 </template>
 
@@ -47,13 +47,22 @@ export default {
   },
   computed: {
     items: function() {
+      var titles = ['nexti', 'stepi', 'continue', 'release'];
+      var icons = ['next', 'step', 'cont', 'rlse'];
       var items = [];
-      for (var icon of ['next', 'step', 'cont', 'rlse']) {
-        var url = "url('/static/icons/" + icon + ".png'";
+      for (var i = 0; i < 4; i++) {
+        var title = titles[i];
+        var url = "url('/static/icons/" + icons[i] + ".png'";
         if (this.enable.enable_f) {
-          items.push({ backgroundImage: url });
+          items.push({
+            title: title,
+            style: { backgroundImage: url }
+          });
         } else {
-          items.push({ maskImage: url });
+          items.push({
+            title: title,
+            style: { maskImage: url }
+          });
         }
       }
       return items;
