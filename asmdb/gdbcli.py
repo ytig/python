@@ -37,7 +37,8 @@ class GdbController:
         return self
 
     async def adel(self):
-        self.process.kill()
+        self.process.send_signal(signal.SIGINT)
+        self.process.stdin.write(b'quit\n')
 
     def sigint(self):
         if self.cmdlock.locked():
