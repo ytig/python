@@ -7,6 +7,8 @@ class Debugger {
         this.UNIT = 4;
         this.REGS = ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr'];
         this.SPNM = 'sp';
+        this.LRNM = 'lr';
+        this.PCNM = 'pc';
         this.WLEN = 4;
         break;
     }
@@ -319,6 +321,17 @@ class Debugger {
 
   getAssemblyRange() {
     return [0, Math.pow(16, 2 * this.UNIT)]; //todo
+  }
+
+  getRegistersRange() {
+    var range = [];
+    var _regs = [this.SPNM, this.LRNM, this.PCNM];
+    for (var reg of this.REGS) {
+      if (_regs.indexOf(reg) < 0) {
+        range.push(reg);
+      }
+    }
+    return range;
   }
 
   getMemoryRange() {

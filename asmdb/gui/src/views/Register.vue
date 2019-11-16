@@ -62,7 +62,8 @@ export default {
       }
     },
     onDoubleClick: function() {
-      var inRange = true;
+      var range = asmdb.getInstance().getRegistersRange();
+      var inRange = range.indexOf(this.value.lineName) >= 0;
       if (asmdb.getInstance().isSuspend() && inRange) {
         var el = this.$refs.bytes;
         var rect = el.getBoundingClientRect();
@@ -80,7 +81,8 @@ export default {
       }
     },
     onCreateMenu: function() {
-      var inRange = true;
+      var range = asmdb.getInstance().getRegistersRange();
+      var inRange = range.indexOf(this.value.lineName) >= 0;
       var items = [];
       var el = this.$refs.bytes;
       var rect = el.getBoundingClientRect();
