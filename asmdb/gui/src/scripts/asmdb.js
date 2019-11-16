@@ -204,7 +204,7 @@ class Debugger {
   }
 
   asgn(express) {
-    this.pull('asgn', [express])
+    this.pull('asgn', [express]);
   }
 
   iterObjects(filter, handler) {
