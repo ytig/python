@@ -201,9 +201,9 @@ export default {
       if (this.sp == null) {
         return;
       }
-      this.assigned.push(address);
       var offset = address - this.sp;
       if (offset >= 0 && offset < this.newData.length) {
+        this.assigned.push(address);
         this.newData = this.newData.slice(0, offset) + String.fromCharCode(value) + this.newData.slice(offset + 1);
         this.invalidate();
       }
