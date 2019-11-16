@@ -47,6 +47,7 @@ export default {
   },
   methods: {
     alert: function(left, top, length, placeholder, listener) {
+      this.close();
       this.left = left - 5;
       this.top = top - 5;
       this.show = true;
@@ -63,6 +64,13 @@ export default {
       this.anim.$target(1);
     },
     close: function() {
+      if (this.listener != null) {
+        var text = this.text.replace(/[^0-9a-f]/g, '').slice(0, this.length);
+        if (text) {
+          this.listener(parseInt('0x' + text));
+        }
+        this.listener = null;
+      }
       this.show = false;
     },
     onInput: function() {
@@ -82,9 +90,6 @@ export default {
     },
     onKeyPress: function(event) {
       if (event.keyCode == 13) {
-        if (this.text) {
-          this.listener(parseInt('0x' + this.text));
-        }
         this.close();
       }
     },
