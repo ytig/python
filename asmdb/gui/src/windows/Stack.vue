@@ -6,7 +6,7 @@
       <div class="stack-draw" :style="{width:windowWidth+'px',height:items.length*lineHeight+'px'}">
         <canvas ref="canvas"></canvas>
       </div>
-      <Bytes v-for="(item, index) in items" :key="index" :startAddress="item.startAddress" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :assignedNumbers="item.assignedNumbers" :value="item.value" :group="8*column" :showString="false" :canvasContext="index*lineHeight+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
+      <Bytes v-for="(item, index) in items" :key="index" :startAddress="item.startAddress" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :assignedNumbers="item.assignedNumbers" :oldBytes="item.oldBytes" :newBytes="item.newBytes" :group="8*column" :showString="false" :canvasContext="index*lineHeight+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="sp==null"></Indicator>
   </div>
@@ -257,10 +257,8 @@ export default {
           highlightNumber: highlightNumber,
           watchingNumbers: JSON.stringify(watchingNumbers.sort()),
           assignedNumbers: JSON.stringify(assignedNumbers.sort()),
-          value: {
-            oldBytes: oldBytes,
-            newBytes: newBytes
-          }
+          oldBytes: oldBytes,
+          newBytes: newBytes
         };
       }
       this.items.splice(0, this.items.length, ...items);

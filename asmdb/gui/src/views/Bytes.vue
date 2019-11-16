@@ -46,7 +46,8 @@ export default {
     highlightNumber: Number,
     watchingNumbers: String,
     assignedNumbers: String,
-    value: Object,
+    oldBytes: String,
+    newBytes: String,
     group: Number,
     showString: Boolean,
     canvasContext: String,
@@ -79,7 +80,8 @@ export default {
         highlightNumber: highlightNumber,
         watchingNumbers: watchingNumbers,
         assignedNumbers: assignedNumbers,
-        value: this.value,
+        oldBytes: this.oldBytes,
+        newBytes: this.newBytes,
         group: this.group,
         showString: this.showString,
         canvasContext: this.canvasContext,
@@ -91,11 +93,11 @@ export default {
     self: function(newValue, oldValue) {
       var needLayout = false;
       var needDraw = false;
-      if (newValue.lineNumber != oldValue.lineNumber || newValue.value != oldValue.value || newValue.group != oldValue.group || newValue.showString != oldValue.showString) {
+      if (newValue.lineNumber != oldValue.lineNumber || newValue.newBytes != oldValue.newBytes || newValue.group != oldValue.group || newValue.showString != oldValue.showString) {
         needLayout = true;
         needDraw = true;
       }
-      if (newValue.highlightNumber != oldValue.highlightNumber || JSON.stringify(newValue.watchingNumbers) != JSON.stringify(oldValue.watchingNumbers) || JSON.stringify(newValue.assignedNumbers) != JSON.stringify(oldValue.assignedNumbers) || newValue.canvasContext != oldValue.canvasContext) {
+      if (newValue.highlightNumber != oldValue.highlightNumber || JSON.stringify(newValue.watchingNumbers) != JSON.stringify(oldValue.watchingNumbers) || JSON.stringify(newValue.assignedNumbers) != JSON.stringify(oldValue.assignedNumbers) || newValue.oldBytes != oldValue.oldBytes || newValue.canvasContext != oldValue.canvasContext) {
         needDraw = true;
       }
       if (!newValue.lazyLayout) {
@@ -134,13 +136,13 @@ export default {
         if (i % asmdb.getInstance().UNIT == 0) {
           items.push(newItem('&nbsp;'));
           items[items.length - 1].index = i;
-          if (self.value == null) {
+          if (self.newBytes == null) {
             event = null;
-          } else if (i + asmdb.getInstance().UNIT - 1 < self.value.newBytes.length) {
+          } else if (i + asmdb.getInstance().UNIT - 1 < self.newBytes.length) {
             var address = 0;
             for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
               address *= 256;
-              address += self.value.newBytes.charCodeAt(i + j);
+              address += self.newBytes.charCodeAt(i + j);
             }
             var usage = parseInt(asmdb.getInstance().getAddressUsage(address)) - 2;
             if (usage >= 0) {
@@ -158,13 +160,13 @@ export default {
           }
           items[items.length - 1].index = i;
         }
-        if (self.value == null) {
+        if (self.newBytes == null) {
           items.push(newItem('00', 'bytes-padding'));
           items[items.length - 1].index = i;
         } else {
           var charCode = '&nbsp;&nbsp;';
-          if (i < self.value.newBytes.length) {
-            var byte = self.value.newBytes.charCodeAt(i);
+          if (i < self.newBytes.length) {
+            var byte = self.newBytes.charCodeAt(i);
             charCode = byte.toString(16).zfill(2);
           }
           items.push(newItem(charCode, 'bytes-padding', event != null ? 'bytes-clickable' : ''));
@@ -212,13 +214,13 @@ export default {
         }
         if (i % asmdb.getInstance().UNIT == 0) {
           x += measureTextWidth(1);
-          if (self.value == null) {
+          if (self.newBytes == null) {
             usage = '0';
-          } else if (i + asmdb.getInstance().UNIT - 1 < self.value.newBytes.length) {
+          } else if (i + asmdb.getInstance().UNIT - 1 < self.newBytes.length) {
             var address = 0;
             for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
               address *= 256;
-              address += self.value.newBytes.charCodeAt(i + j);
+              address += self.newBytes.charCodeAt(i + j);
             }
             var usage = asmdb.getInstance().getAddressUsage(address);
           } else {
@@ -229,13 +231,13 @@ export default {
         }
         var charCode = null;
         var changed = false;
-        if (self.value == null) {
+        if (self.newBytes == null) {
           charCode = '00';
-        } else if (i < self.value.newBytes.length) {
-          var byte = self.value.newBytes.charCodeAt(i);
+        } else if (i < self.newBytes.length) {
+          var byte = self.newBytes.charCodeAt(i);
           charCode = byte.toString(16).zfill(2);
-          if (self.value.oldBytes != null && i < self.value.oldBytes.length) {
-            if (byte != self.value.oldBytes.charCodeAt(i)) {
+          if (self.oldBytes != null && i < self.oldBytes.length) {
+            if (byte != self.oldBytes.charCodeAt(i)) {
               changed = true;
             }
           }
@@ -307,11 +309,11 @@ export default {
         x += measureTextWidth(2);
         for (var i = 0; i < this.group; i++) {
           var charCode = null;
-          if (self.value == null) {
+          if (self.newBytes == null) {
             usage = '0';
             charCode = '.';
-          } else if (i < self.value.newBytes.length) {
-            var byte = self.value.newBytes.charCodeAt(i);
+          } else if (i < self.newBytes.length) {
+            var byte = self.newBytes.charCodeAt(i);
             if (byte >= 0x21 && byte <= 0x7e) {
               usage = '1';
               charCode = String.fromCharCode(byte);

@@ -4,7 +4,7 @@
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <div v-show="!show&&trigger" class="memory-empty user-select-none">press enter and search an address.</div>
     <Recycler ref="recycler" class="memory-recycler" :show="show" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
-      <Bytes :startAddress="source.toStartAddress(props.index)" :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,watchpoints)" :assignedNumbers="source.toAssignedNumbers(props.index,assigned)" :value="props.item" :group="8*column" :showString="true" :canvasContext="props.index*lineHeight+';'+props.context" :lazyLayout="props.scrolling" @clickitem="onClickItem"></Bytes>
+      <Bytes :startAddress="source.toStartAddress(props.index)" :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,watchpoints)" :assignedNumbers="source.toAssignedNumbers(props.index,assigned)" :oldBytes="props.item!=null?props.item.oldBytes:null" :newBytes="props.item!=null?props.item.newBytes:null" :group="8*column" :showString="true" :canvasContext="props.index*lineHeight+';'+props.context" :lazyLayout="props.scrolling" @clickitem="onClickItem"></Bytes>
     </Recycler>
   </div>
 </template>
