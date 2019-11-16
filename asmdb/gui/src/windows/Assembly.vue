@@ -4,7 +4,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller ref="scroller" class="assembly-scroller" :source="source" #default="props">
-          <Bytes :startAddress="0" :lineNumber="props.item.lineNumber" :value="props.item.value" :group="16" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Bytes>
+          <Instruction :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
         </Scroller>
       </div>
     </div>

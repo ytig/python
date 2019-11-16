@@ -96,6 +96,18 @@ export default {
     },
     draw_: function(ctx) {
       //todo
+      ctx.font = '12px Menlo';
+      var x = 0;
+      var y = 12;
+      x += 12 + 16;
+      ctx.fillStyle = Theme.colorTextDarker;
+      ctx.fillText('0x12345678  ', x, y);
+      x += measureTextWidth(12);
+      ctx.fillStyle = Theme.colorText2;
+      ctx.fillText('ldr    ', x, y);
+      x += measureTextWidth(7);
+      ctx.fillStyle = Theme.colorText;
+      ctx.fillText('r0, r1', x, y);
     }
   }
 };
