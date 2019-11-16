@@ -2,7 +2,7 @@
   <div class="register-container">
     <span>{{value.lineName}}</span>
     <span v-for="i in (value.lineFill+1-value.lineName.length)" :key="i" class="user-select-none">&nbsp;</span>
-    <span ref="bytes" :css-usage="cssUsage" :css-changed="cssChanged" @click="onClick" @dblclick="onDoubleClick" @mouseup="onMouseUp">{{hexValue}}</span>
+    <span ref="bytes" :css-usage="cssUsage" :css-changed="cssChanged" :css-assigned="cssAssigned" @click="onClick" @dblclick="onDoubleClick" @mouseup="onMouseUp">{{hexValue}}</span>
     <span class="user-select-none">&nbsp;</span>
     <span>{{strValue}}</span>
   </div>
@@ -49,6 +49,9 @@ export default {
         return false;
       }
       return this.value.oldValue != this.value.newValue;
+    },
+    cssAssigned: function() {
+      return this.value.assigned;
     }
   },
   methods: {
@@ -152,6 +155,10 @@ export default {
   > span[css-usage='4'][css-changed] {
     color: @color-background;
     background: @color-text4;
+  }
+  > span[css-assigned] {
+    color: @color-background !important;
+    background: #ff0 !important;
   }
 }
 </style>

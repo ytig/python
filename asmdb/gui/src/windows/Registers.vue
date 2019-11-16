@@ -23,7 +23,8 @@ export default {
       items[items.length] = {
         lineName: k,
         oldValue: null,
-        newValue: null
+        newValue: null,
+        assigned: false
       };
     }
     c = 0;
@@ -71,13 +72,19 @@ export default {
       for (var item of this.items) {
         item.oldValue = item.newValue;
         item.newValue = item.lineName in registers ? registers[item.lineName] : null;
+        item.assigned = false;
       }
     },
     onContinue: function() {
       this.disable = true;
     },
     onAssigned: function(name, value) {
-      console.log('onAssigned', name, value);
+      for (var item of this.items) {
+        if (item.lineName == name) {
+          item.newValue = value;
+          item.assigned = true;
+        }
+      }
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
