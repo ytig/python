@@ -18,6 +18,17 @@ function getChildIndex(parent, child) {
   return -1;
 }
 
+function correct(value, length) {
+  while (true) {
+    var i = value.indexOf('0x');
+    if (i < 0) {
+      break;
+    }
+    value = value.slice(i + 2);
+  }
+  return value.replace(/[^0-9a-f]/g, '').slice(0, length);
+}
+
 export default {
   data: function() {
     return {
@@ -65,7 +76,7 @@ export default {
     },
     close: function() {
       if (this.listener != null) {
-        var text = this.text.replace(/[^0-9a-f]/g, '').slice(0, this.length);
+        var text = correct(this.text, this.length);
         if (text) {
           this.listener(parseInt('0x' + text));
         }
@@ -85,7 +96,7 @@ export default {
     onCompositionEnd: function() {
       this.composition = false;
       var input = this.$refs.input;
-      input.value = input.value.replace(/[^0-9a-f]/g, '').slice(0, this.length);
+      input.value = correct(input.value, this.length);
       this.text = input.value;
     },
     onKeyPress: function(event) {
