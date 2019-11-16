@@ -6,7 +6,7 @@
       <div class="stack-draw" :style="{width:windowWidth+'px',height:items.length*lineHeight+'px'}">
         <canvas ref="canvas"></canvas>
       </div>
-      <Bytes v-for="(item, index) in items" :key="index" :startAddress="item.startAddress" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :value="item.value" :group="8*column" :showString="false" :canvasContext="index*lineHeight+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
+      <Bytes v-for="(item, index) in items" :key="index" :startAddress="item.startAddress" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :assignedNumbers="item.assignedNumbers" :value="item.value" :group="8*column" :showString="false" :canvasContext="index*lineHeight+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="sp==null"></Indicator>
   </div>
@@ -30,6 +30,7 @@ export default {
       newData: '',
       itemSelection: null,
       watchpoints: [],
+      assigned: [],
       context: '',
       pageCache: {},
       hst: []
@@ -168,6 +169,7 @@ export default {
     },
     onBreak: function(sp, stack) {
       this.disable = false;
+      this.assigned.splice(0, this.assigned.length);
       if (this.sp != sp) {
         this.hstDel();
         if (this.sp != null) {
@@ -196,7 +198,15 @@ export default {
       this.invalidate();
     },
     onAssigned: function(address, value) {
-      console.log('onAssigned', address, value);
+      if (this.sp == null) {
+        return;
+      }
+      this.assigned.push(address);
+      var offset = address - this.sp;
+      if (offset >= 0 && offset < this.newData.length) {
+        this.newData = this.newData.slice(0, offset) + String.fromCharCode(value) + this.newData.slice(offset + 1);
+        this.invalidate();
+      }
     },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
@@ -236,12 +246,17 @@ export default {
             watchingNumbers.push(watchpoint.address + j - startAddress);
           }
         }
+        var assignedNumbers = [];
+        for (var asgn of this.assigned) {
+          assignedNumbers.push(asgn - startAddress);
+        }
         lineNumber = '+0x' + lineNumber.toString(16).zfill(3);
         items[items.length] = {
           startAddress: startAddress,
           lineNumber: lineNumber,
           highlightNumber: highlightNumber,
           watchingNumbers: JSON.stringify(watchingNumbers.sort()),
+          assignedNumbers: JSON.stringify(assignedNumbers.sort()),
           value: {
             oldBytes: oldBytes,
             newBytes: newBytes

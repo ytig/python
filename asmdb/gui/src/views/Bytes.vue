@@ -45,6 +45,7 @@ export default {
     lineNumber: String,
     highlightNumber: Number,
     watchingNumbers: String,
+    assignedNumbers: String,
     value: Object,
     group: Number,
     showString: Boolean,
@@ -66,10 +67,18 @@ export default {
         }
       }
       watchingNumbers.sort();
+      var assignedNumbers = [];
+      for (var n of JSON.parse(this.assignedNumbers || '[]')) {
+        if (n >= 0 && n < this.group) {
+          assignedNumbers.push(n);
+        }
+      }
+      assignedNumbers.sort();
       return {
         lineNumber: this.lineNumber,
         highlightNumber: highlightNumber,
         watchingNumbers: watchingNumbers,
+        assignedNumbers: assignedNumbers,
         value: this.value,
         group: this.group,
         showString: this.showString,
@@ -86,7 +95,7 @@ export default {
         needLayout = true;
         needDraw = true;
       }
-      if (newValue.highlightNumber != oldValue.highlightNumber || JSON.stringify(newValue.watchingNumbers) != JSON.stringify(oldValue.watchingNumbers) || newValue.canvasContext != oldValue.canvasContext) {
+      if (newValue.highlightNumber != oldValue.highlightNumber || JSON.stringify(newValue.watchingNumbers) != JSON.stringify(oldValue.watchingNumbers) || JSON.stringify(newValue.assignedNumbers) != JSON.stringify(oldValue.assignedNumbers) || newValue.canvasContext != oldValue.canvasContext) {
         needDraw = true;
       }
       if (!newValue.lazyLayout) {
@@ -254,6 +263,9 @@ export default {
             case '4':
               ctx.fillStyle = Theme.colorText4;
               break;
+          }
+          if (self.assignedNumbers.indexOf(i) >= 0) {
+            ctx.fillStyle = '#ff0';
           }
           if (changed) {
             ctx.fillRect(coordinate.left, 1, coordinate.right - coordinate.left, h - 4);
