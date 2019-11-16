@@ -4,7 +4,7 @@
     <Navigation :name="'Memory'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <div v-show="!show&&trigger" class="memory-empty user-select-none">press enter and search an address.</div>
     <Recycler ref="recycler" class="memory-recycler" :show="show" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
-      <Bytes :startAddress="source.toStartAddress(props.index)" :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,watchpoints)" :value="props.item" :group="8*column" :showString="true" :canvasContext="props.index*lineHeight+';'+props.context" :lazyLayout="props.scrolling" @clickitem="onClickItem"></Bytes>
+      <Bytes :startAddress="source.toStartAddress(props.index)" :lineNumber="source.toLineNumber(props.index)" :highlightNumber="source.toHighlightNumber(props.index,itemSelection)" :watchingNumbers="source.toWatchingNumbers(props.index,watchpoints)" :assignedNumbers="source.toAssignedNumbers(props.index,assigned)" :value="props.item" :group="8*column" :showString="true" :canvasContext="props.index*lineHeight+';'+props.context" :lazyLayout="props.scrolling" @clickitem="onClickItem"></Bytes>
     </Recycler>
   </div>
 </template>
@@ -52,6 +52,15 @@ class Source {
       }
     }
     return JSON.stringify(watchingNumbers.sort());
+  }
+
+  toAssignedNumbers(index, assigned) {
+    var assignedNumbers = [];
+    var address = this.start + this.group * index;
+    for (var asgn of assigned) {
+      assignedNumbers.push(asgn - address);
+    }
+    return JSON.stringify(assignedNumbers.sort());
   }
 
   getRange(index) {
@@ -108,6 +117,15 @@ class Source {
     }
     this.invalidate++;
   }
+
+  onAssigned(address, value) {
+    var index = parseInt((address - this.start) / this.group);
+    var offset = address - index * this.group;
+    if (index in this) {
+      this[index].newBytes = this[index].newBytes.slice(0, offset) + String.fromCharCode(value) + this[index].newBytes.slice(offset + 1);
+      this.invalidate++;
+    }
+  }
 }
 
 export default {
@@ -120,6 +138,7 @@ export default {
       source: null,
       itemSelection: null,
       watchpoints: [],
+      assigned: [],
       hst: []
     };
   },
@@ -250,6 +269,7 @@ export default {
     onBreak: function(address, memory) {
       this.trigger = true;
       this.disable = false;
+      this.assigned.splice(0, this.assigned.length);
       if (!this.show) {
         return;
       }
@@ -267,7 +287,8 @@ export default {
       this.watchpoints = watchpoints;
     },
     onAssigned: function(address, value) {
-      console.log('onAssigned', address, value);
+      this.assigned.push(address);
+      this.source.onAssigned(address, value);
     },
     onScroll2: function(position) {
       if (this.disable) {
