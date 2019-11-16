@@ -185,6 +185,10 @@ class Debugger {
     this.pull('wpt', [delPoints, setPoints]);
   }
 
+  asgn(express) {
+    this.pull('asgn', express)
+  }
+
   iterObjects(filter, handler) {
     filter = filter.split('|');
     if (filter.indexOf('*') >= 0) {

@@ -141,7 +141,7 @@ def push_prop(name, default):
 
 
 class WsGdbController(GdbController):
-    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'mod')
+    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'asgn')
     PUSH = ('suspend', 'breakpoints', 'watchpoints',)
     suspend = push_prop('suspend', False)
     breakpoints = push_prop('breakpoints', None)
@@ -215,3 +215,6 @@ class WsGdbController(GdbController):
         for address in sorted(watchpoints.keys()):
             self.watchpoints.append(watchpoints[address])
         self.watchpoints = self.watchpoints
+
+    async def asgn(self, express):
+        notify_all(self, 'assigned', express)

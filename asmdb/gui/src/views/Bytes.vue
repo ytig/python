@@ -382,8 +382,7 @@ export default {
       if (!asmdb.getInstance().isSuspend()) {
         return;
       }
-      //todo mod mem
-      console.log(address, value);
+      asmdb.getInstance().asgn('*' + address + '=' + value);
     }
   }
 };

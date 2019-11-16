@@ -92,8 +92,7 @@ export default {
       if (!asmdb.getInstance().isSuspend()) {
         return;
       }
-      //todo mod reg
-      console.log(name, value);
+      asmdb.getInstance().asgn(name + '=' + value);
     }
   }
 };
