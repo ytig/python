@@ -266,6 +266,9 @@ export default {
     onWatchpoints: function(watchpoints) {
       this.watchpoints = watchpoints;
     },
+    onAssigned: function(address, value) {
+      console.log('onAssigned', address, value);
+    },
     onScroll2: function(position) {
       if (this.disable) {
         return;

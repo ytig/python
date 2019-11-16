@@ -131,11 +131,18 @@ class Debugger {
         });
         break;
       case 'assigned':
-        this.iterObjects('*', (object) => {
-          if (object.onAssigned) {
-            object.onAssigned(newValue);
-          }
-        });
+        var where = newValue.split('=')[0];
+        var value = newValue.split('=')[1];
+        if (where.startsWith('*')) {
+          this.iterObjects('stack|memory', (object) => {
+            object.onAssigned(parseInt(where.substring(1)), parseInt(value));
+          });
+        } else {
+          this.registers[where] = parseInt(value); //todo
+          this.iterObjects('registers', (object) => {
+            object.onAssigned(where, parseInt(value));
+          });
+        }
         break;
     }
   }
@@ -197,7 +204,7 @@ class Debugger {
   }
 
   asgn(express) {
-    this.pull('asgn', express)
+    this.pull('asgn', [express])
   }
 
   iterObjects(filter, handler) {

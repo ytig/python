@@ -76,6 +76,9 @@ export default {
     onContinue: function() {
       this.disable = true;
     },
+    onAssigned: function(name, value) {
+      console.log('onAssigned', name, value);
+    },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
     }

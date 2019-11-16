@@ -195,6 +195,9 @@ export default {
       this.watchpoints = watchpoints;
       this.invalidate();
     },
+    onAssigned: function(address, value) {
+      console.log('onAssigned', address, value);
+    },
     onClickItem: function(...args) {
       this.$emit('clickitem', ...args);
     },
