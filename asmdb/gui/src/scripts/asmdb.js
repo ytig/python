@@ -29,9 +29,13 @@ class Debugger {
     var data = JSON.parse(event.data);
     switch (data.type) {
       case 'push':
-        var oldValue = this.struct[data.key];
-        this.struct[data.key] = data.val;
-        this.push(data.key, data.val, oldValue);
+        if (data.key in this.struct) {
+          var oldValue = this.struct[data.key];
+          this.struct[data.key] = data.val;
+          this.push(data.key, data.val, oldValue);
+        } else {
+          this.push(data.key, data.val);
+        }
         break;
       case 'pull':
         if (data.tag in this.callbacks) {
@@ -123,6 +127,13 @@ class Debugger {
         this.iterObjects('*', (object) => {
           if (object.onWatchpoints) {
             object.onWatchpoints(newValue);
+          }
+        });
+        break;
+      case 'assigned':
+        this.iterObjects('*', (object) => {
+          if (object.onAssigned) {
+            object.onAssigned(newValue);
           }
         });
         break;
