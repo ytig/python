@@ -18,7 +18,7 @@ function getChildIndex(parent, child) {
   return -1;
 }
 
-function correct(value, length) {
+function correctInput(value, length) {
   while (true) {
     var i = value.indexOf('0x');
     if (i < 0) {
@@ -76,7 +76,7 @@ export default {
     },
     close: function() {
       if (this.listener != null) {
-        var text = correct(this.text, this.length);
+        var text = correctInput(this.text, this.length);
         if (text) {
           this.listener(parseInt('0x' + text));
         }
@@ -96,7 +96,7 @@ export default {
     onCompositionEnd: function() {
       this.composition = false;
       var input = this.$refs.input;
-      input.value = correct(input.value, this.length);
+      input.value = correctInput(input.value, this.length);
       this.text = input.value;
     },
     onKeyPress: function(event) {
