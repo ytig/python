@@ -52,16 +52,16 @@ export default {
       var items = [];
       for (var i = 0; i < 4; i++) {
         var title = titles[i];
-        var url = "url('/static/icons/" + icons[i] + ".png'";
+        var image = "url('/static/icons/" + icons[i] + ".png'";
         if (this.enable.enable_f) {
           items.push({
             title: title,
-            style: { backgroundImage: url }
+            style: { backgroundImage: image }
           });
         } else {
           items.push({
             title: '',
-            style: { maskImage: url }
+            style: { maskImage: image }
           });
         }
       }
