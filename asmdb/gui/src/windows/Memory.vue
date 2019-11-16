@@ -287,7 +287,9 @@ export default {
       this.watchpoints = watchpoints;
     },
     onAssigned: function(address, value) {
-      this.assigned.push(address);
+      if (this.assigned.indexOf(address) < 0) {
+        this.assigned.push(address);
+      }
       this.source.onAssigned(address, value);
     },
     onScroll2: function(position) {
