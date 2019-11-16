@@ -68,7 +68,7 @@ export default {
         var el = this.$refs.bytes;
         var rect = el.getBoundingClientRect();
         var placeholder = el.innerHTML.slice(2);
-        this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onModify.bind(this, this.value.lineName));
+        this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onAssign.bind(this, this.value.lineName));
       }
     },
     onMouseUp: function(event) {
@@ -89,11 +89,11 @@ export default {
       var placeholder = el.innerHTML.slice(2);
       items[items.length] = ['Modify register', '', asmdb.getInstance().isSuspend() && inRange];
       items[items.length - 1].event = () => {
-        this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onModify.bind(this, this.value.lineName));
+        this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onAssign.bind(this, this.value.lineName));
       };
       return items;
     },
-    onModify: function(name, value) {
+    onAssign: function(name, value) {
       if (!asmdb.getInstance().isSuspend()) {
         return;
       }

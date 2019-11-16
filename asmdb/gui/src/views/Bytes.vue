@@ -350,7 +350,7 @@ export default {
           var el = this.$el.getElementsByClassName('bytes-padding')[index];
           var rect = el.getBoundingClientRect();
           var placeholder = el.innerHTML;
-          this.$editor.alert(parseInt(rect.x + 1 - measureTextWidth(2)), parseInt(rect.y), 2, placeholder, this.onModify.bind(this, address));
+          this.$editor.alert(parseInt(rect.x + 1 - measureTextWidth(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
         }
       }
     },
@@ -387,11 +387,11 @@ export default {
       var placeholder = el.innerHTML;
       items[items.length] = ['Modify memory', '', asmdb.getInstance().isSuspend() && inRange];
       items[items.length - 1].event = () => {
-        this.$editor.alert(parseInt(rect.x + 1 - measureTextWidth(2)), parseInt(rect.y), 2, placeholder, this.onModify.bind(this, address));
+        this.$editor.alert(parseInt(rect.x + 1 - measureTextWidth(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
       };
       return items;
     },
-    onModify: function(address, value) {
+    onAssign: function(address, value) {
       if (!asmdb.getInstance().isSuspend()) {
         return;
       }
