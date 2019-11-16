@@ -77,7 +77,7 @@ export default {
     onCompositionEnd: function() {
       this.composition = false;
       var input = this.$refs.input;
-      input.value = input.value.replace(/[^0-9a-f]/g, '').substring(0, this.length);
+      input.value = input.value.replace(/[^0-9a-f]/g, '').slice(0, this.length);
       this.text = input.value;
     },
     onKeyPress: function(event) {

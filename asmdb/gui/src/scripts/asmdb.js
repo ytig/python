@@ -135,7 +135,7 @@ class Debugger {
         var value = newValue.split('=')[1];
         if (where.startsWith('*')) {
           this.iterObjects('stack|memory', (object) => {
-            object.onAssigned(parseInt(where.substring(1)), parseInt(value));
+            object.onAssigned(parseInt(where.slice(1)), parseInt(value));
           });
         } else {
           this.registers[where] = parseInt(value); //todo

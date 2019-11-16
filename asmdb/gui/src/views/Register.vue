@@ -63,7 +63,7 @@ export default {
       if (asmdb.getInstance().isSuspend() && inRange) {
         var el = this.$refs.bytes;
         var rect = el.getBoundingClientRect();
-        var placeholder = el.innerHTML.substring(2);
+        var placeholder = el.innerHTML.slice(2);
         this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onModify.bind(this, this.value.lineName));
       }
     },
@@ -81,7 +81,7 @@ export default {
       var items = [];
       var el = this.$refs.bytes;
       var rect = el.getBoundingClientRect();
-      var placeholder = el.innerHTML.substring(2);
+      var placeholder = el.innerHTML.slice(2);
       items[items.length] = ['Modify register', '', asmdb.getInstance().isSuspend() && inRange];
       items[items.length - 1].event = () => {
         this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onModify.bind(this, this.value.lineName));
