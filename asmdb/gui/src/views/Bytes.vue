@@ -266,6 +266,7 @@ export default {
           }
           if (self.assignedNumbers.indexOf(i) >= 0) {
             ctx.fillStyle = '#ff0';
+            changed = true;
           }
           if (changed) {
             ctx.fillRect(coordinate.left, 1, coordinate.right - coordinate.left, h - 4);
