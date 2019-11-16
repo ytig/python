@@ -60,7 +60,7 @@ export default {
           });
         } else {
           items.push({
-            title: title,
+            title: '',
             style: { maskImage: url }
           });
         }
