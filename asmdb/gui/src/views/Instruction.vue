@@ -13,7 +13,7 @@ function measureWidth() {
 }
 
 function measureHeight() {
-  return 18;
+  return 20;
 }
 
 export default {
@@ -56,10 +56,6 @@ export default {
     onDraw: function(ctx) {
       var w = measureWidth();
       var h = measureHeight();
-      if (this.highlight) {
-        ctx.fillStyle = Theme.colorBackgroundSelection;
-        ctx.fillRect(0, 0, w, h - 2);
-      }
       ctx.font = '12px Menlo';
       var x = 0;
       var y = 12;
@@ -82,12 +78,12 @@ export default {
         ctx.fillStyle = color;
         var r = 4;
         ctx.beginPath();
-        ctx.arc(x + r, (h - 2) / 2, 4, 0, 2 * Math.PI);
+        ctx.arc(x + r, 16 / 2, 4, 0, 2 * Math.PI);
         ctx.closePath();
         ctx.fill();
       }
       x += 16;
-      ctx.fillStyle = !this.highlight ? Theme.colorTextDarker : Theme.colorTextDark;
+      ctx.fillStyle = !this.highlight ? Theme.colorTextDarker : Theme.colorText2;
       ctx.fillText(this.address, x, y);
       x += measureText(this.address);
       x += measureText(2);
@@ -107,7 +103,7 @@ export default {
 @import '~@/styles/theme';
 
 .instruction-container {
-  height: 18px;
+  height: 20px;
   > span {
     line-height: 16px;
     font-size: 12px;

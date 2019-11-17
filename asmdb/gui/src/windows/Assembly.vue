@@ -20,7 +20,7 @@ export default {
         var j = 10000 + i;
         var addr = '0x' + j.toString(16).zfill(8);
         var mock = {
-          height: 18,
+          height: 20,
           address: addr,
           mnemonic: 'ldr',
           op_str: 'r0 r1',
