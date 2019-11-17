@@ -55,7 +55,7 @@ export default {
   },
   computed: {
     inputWidth: function() {
-      return Math.ceil(1 + measureText(this.realText, '12px Menlo'));
+      return Math.ceil(1 + measureText(this.realText));
     },
     containerLeft: function() {
       var input = this.anim.value;

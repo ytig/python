@@ -45,8 +45,8 @@ export default {
   },
   computed: {
     inputWidth: function() {
-      var w1 = measureText(this.text, '12px Menlo');
-      var w2 = measureText(this.placeholder, '12px Menlo');
+      var w1 = measureText(this.text);
+      var w2 = measureText(this.placeholder);
       return Math.ceil(1 + Math.max(w1, w2));
     },
     scale: function() {

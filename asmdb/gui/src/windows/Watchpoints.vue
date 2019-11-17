@@ -22,14 +22,6 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 
-function measureTextWidth(length) {
-  return length * 7.224609375;
-}
-
-function measureViewWidth() {
-  return Math.ceil(12 + 8 + 8 + measureTextWidth(2 + 2 * asmdb.getInstance().UNIT) + 32 + 16 + 12);
-}
-
 export default {
   data: function() {
     return {
@@ -40,7 +32,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return measureViewWidth();
+      return Math.ceil(12 + 8 + 8 + measureText(2 + 2 * asmdb.getInstance().UNIT) + 32 + 16 + 12);
     }
   },
   mounted: function() {
