@@ -38,7 +38,10 @@ class Source {
   toHighlightNumber(index, highlight) {
     var address = this.start + this.group * index;
     if (highlight != null) {
-      return highlight - address;
+      var num = highlight - address;
+      if (num >= 0 && num < this.group) {
+        return num;
+      }
     }
     return null;
   }
@@ -48,19 +51,25 @@ class Source {
     var address = this.start + this.group * index;
     for (var watchpoint of watchpoints) {
       for (var i = 0; i < asmdb.getInstance().UNIT; i++) {
-        watchingNumbers.push(watchpoint.address + i - address);
+        var num = watchpoint.address + i - address;
+        if (num >= 0 && num < this.group) {
+          watchingNumbers.push(num);
+        }
       }
     }
-    return JSON.stringify(watchingNumbers.sort());
+    return watchingNumbers.sort();
   }
 
   toAssignedNumbers(index, assigned) {
     var assignedNumbers = [];
     var address = this.start + this.group * index;
     for (var asgn of assigned) {
-      assignedNumbers.push(asgn - address);
+      var num = asgn - address;
+      if (num >= 0 && num < this.group) {
+        assignedNumbers.push(asgn - address);
+      }
     }
-    return JSON.stringify(assignedNumbers.sort());
+    return assignedNumbers.sort();
   }
 
   getRange(index) {

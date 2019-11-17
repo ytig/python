@@ -7,6 +7,7 @@
 <script>
 import Theme from '@/styles/theme';
 import asmdb from '@/scripts/asmdb';
+import InfiniteMixin from './InfiniteMixin';
 
 function measureTextWidth(length) {
   return length * 7.224609375;
@@ -34,9 +35,9 @@ function newItem(value, ...style) {
 export default {
   measureWidth: measureViewWidth,
   measureHeight: measureViewHeight,
+  mixins: [InfiniteMixin],
   data: function() {
     return {
-      dirty: false,
       items: []
     };
   },
@@ -44,105 +45,36 @@ export default {
     startAddress: Number,
     lineNumber: String,
     highlightNumber: Number,
-    watchingNumbers: String,
-    assignedNumbers: String,
+    watchingNumbers: Array,
+    assignedNumbers: Array,
     oldBytes: String,
     newBytes: String,
     group: Number,
-    showString: Boolean,
-    canvasContext: String,
-    lazyLayout: Boolean
+    showString: Boolean
   },
-  computed: {
-    self: function() {
-      var highlightNumber = this.highlightNumber;
-      if (highlightNumber != null) {
-        if (highlightNumber < 0 || highlightNumber >= this.group) {
-          highlightNumber = null;
-        }
-      }
-      var watchingNumbers = [];
-      for (var n of JSON.parse(this.watchingNumbers || '[]')) {
-        if (n >= 0 && n < this.group) {
-          watchingNumbers.push(n);
-        }
-      }
-      watchingNumbers.sort();
-      var assignedNumbers = [];
-      for (var n of JSON.parse(this.assignedNumbers || '[]')) {
-        if (n >= 0 && n < this.group) {
-          assignedNumbers.push(n);
-        }
-      }
-      assignedNumbers.sort();
-      return {
-        lineNumber: this.lineNumber,
-        highlightNumber: highlightNumber,
-        watchingNumbers: watchingNumbers,
-        assignedNumbers: assignedNumbers,
-        oldBytes: this.oldBytes,
-        newBytes: this.newBytes,
-        group: this.group,
-        showString: this.showString,
-        canvasContext: this.canvasContext,
-        lazyLayout: this.lazyLayout
-      };
-    }
-  },
-  watch: {
-    self: function(newValue, oldValue) {
-      var needLayout = false;
-      var needDraw = false;
-      if (newValue.lineNumber != oldValue.lineNumber || newValue.newBytes != oldValue.newBytes || newValue.group != oldValue.group || newValue.showString != oldValue.showString) {
-        needLayout = true;
-        needDraw = true;
-      }
-      if (newValue.highlightNumber != oldValue.highlightNumber || JSON.stringify(newValue.watchingNumbers) != JSON.stringify(oldValue.watchingNumbers) || JSON.stringify(newValue.assignedNumbers) != JSON.stringify(oldValue.assignedNumbers) || newValue.oldBytes != oldValue.oldBytes || newValue.canvasContext != oldValue.canvasContext) {
-        needDraw = true;
-      }
-      if (!newValue.lazyLayout) {
-        if (needLayout || this.dirty) {
-          this.layout();
-          this.dirty = false;
-        }
-      } else {
-        if (needLayout) {
-          this.dirty = true;
-        }
-      }
-      if (needDraw) {
-        this.draw();
-      }
-    }
-  },
-  mounted: function() {
-    if (!this.lazyLayout) {
-      this.layout();
-    } else {
-      this.dirty = true;
-    }
-    this.draw();
+  created: function() {
+    this.needLayout.push('lineNumber', 'newBytes', 'group');
+    this.needDraw.push('highlightNumber', 'watchingNumbers', 'assignedNumbers', 'oldBytes', 'showString');
   },
   methods: {
-    layout: function() {
-      var self = this.self;
+    onLayout: function() {
       var items = [];
-      items.push(newItem(self.lineNumber));
+      items.push(newItem(this.lineNumber));
       var event;
-      for (var i = 0; i < self.group; i++) {
+      for (var i = 0; i < this.group; i++) {
         if (i % 8 == 0) {
           items.push(newItem('&nbsp;'));
         }
         if (i % asmdb.getInstance().UNIT == 0) {
           items.push(newItem('&nbsp;'));
           items[items.length - 1].index = i;
-          if (self.newBytes == null) {
+          if (this.newBytes == null) {
             event = null;
-          } else if (i + asmdb.getInstance().UNIT - 1 < self.newBytes.length) {
+          } else if (i + asmdb.getInstance().UNIT - 1 < this.newBytes.length) {
             var address = 0;
             for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
               address *= 256;
-              address += self.newBytes.charCodeAt(i + j);
+              address += this.newBytes.charCodeAt(i + j);
             }
             var usage = parseInt(asmdb.getInstance().getAddressUsage(address)) - 2;
             if (usage >= 0) {
@@ -160,13 +92,13 @@ export default {
           }
           items[items.length - 1].index = i;
         }
-        if (self.newBytes == null) {
+        if (this.newBytes == null) {
           items.push(newItem('00', 'bytes-padding'));
           items[items.length - 1].index = i;
         } else {
           var charCode = '&nbsp;&nbsp;';
-          if (i < self.newBytes.length) {
-            var byte = self.newBytes.charCodeAt(i);
+          if (i < this.newBytes.length) {
+            var byte = this.newBytes.charCodeAt(i);
             charCode = byte.toString(16).zfill(2);
           }
           items.push(newItem(charCode, 'bytes-padding', event != null ? 'bytes-clickable' : ''));
@@ -178,24 +110,11 @@ export default {
       }
       this.items = items;
     },
-    draw: function() {
-      var self = this.self;
-      var cc = self.canvasContext.split(';');
-      var h = measureViewHeight();
-      var t = parseInt(cc[0]);
-      for (var i of cc[1].split(',')) {
-        var c = getContext(parseInt(i), t, h);
-        if (c != null) {
-          this.draw_(c);
-        }
-      }
-    },
-    draw_: function(ctx) {
-      var self = this.self;
-      var w = measureViewWidth(self.lineNumber.length, self.group, self.showString);
+    onDraw: function(ctx) {
+      var w = measureViewWidth(this.lineNumber.length, this.group, this.showString);
       var h = measureViewHeight();
       ctx.clearRect(0, 0, w, h);
-      if (self.highlightNumber != null) {
+      if (this.highlightNumber != null) {
         ctx.fillStyle = Theme.colorBackgroundSelection;
         ctx.fillRect(0, 0, w, h - 2);
       }
@@ -203,24 +122,24 @@ export default {
       var x = 0;
       var y = 12;
       x += 12;
-      ctx.fillStyle = self.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
-      ctx.fillText(self.lineNumber, x, y);
-      x += measureTextWidth(self.lineNumber.length);
+      ctx.fillStyle = this.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
+      ctx.fillText(this.lineNumber, x, y);
+      x += measureTextWidth(this.lineNumber.length);
       var coordinates = [];
       var usage;
-      for (var i = 0; i < self.group; i++) {
+      for (var i = 0; i < this.group; i++) {
         if (i % 8 == 0) {
           x += measureTextWidth(1);
         }
         if (i % asmdb.getInstance().UNIT == 0) {
           x += measureTextWidth(1);
-          if (self.newBytes == null) {
+          if (this.newBytes == null) {
             usage = '0';
-          } else if (i + asmdb.getInstance().UNIT - 1 < self.newBytes.length) {
+          } else if (i + asmdb.getInstance().UNIT - 1 < this.newBytes.length) {
             var address = 0;
             for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
               address *= 256;
-              address += self.newBytes.charCodeAt(i + j);
+              address += this.newBytes.charCodeAt(i + j);
             }
             var usage = asmdb.getInstance().getAddressUsage(address);
           } else {
@@ -231,13 +150,13 @@ export default {
         }
         var charCode = null;
         var changed = false;
-        if (self.newBytes == null) {
+        if (this.newBytes == null) {
           charCode = '00';
-        } else if (i < self.newBytes.length) {
-          var byte = self.newBytes.charCodeAt(i);
+        } else if (i < this.newBytes.length) {
+          var byte = this.newBytes.charCodeAt(i);
           charCode = byte.toString(16).zfill(2);
-          if (self.oldBytes != null && i < self.oldBytes.length) {
-            if (byte != self.oldBytes.charCodeAt(i)) {
+          if (this.oldBytes != null && i < this.oldBytes.length) {
+            if (byte != this.oldBytes.charCodeAt(i)) {
               changed = true;
             }
           }
@@ -251,7 +170,7 @@ export default {
         if (charCode != null) {
           switch (usage) {
             case '0':
-              ctx.fillStyle = self.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
+              ctx.fillStyle = this.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
               break;
             case '1':
               ctx.fillStyle = Theme.colorText;
@@ -266,7 +185,7 @@ export default {
               ctx.fillStyle = Theme.colorText4;
               break;
           }
-          if (self.assignedNumbers.indexOf(i) >= 0) {
+          if (this.assignedNumbers.indexOf(i) >= 0) {
             ctx.fillStyle = '#ff0';
             changed = true;
           }
@@ -275,7 +194,7 @@ export default {
             ctx.fillStyle = Theme.colorBackground;
           }
           ctx.fillText(charCode, x, y);
-          if (self.highlightNumber == i) {
+          if (this.highlightNumber == i) {
             ctx.fillRect(coordinate.left + 1, h - 5, coordinate.right - coordinate.left - 2, 1);
           }
         }
@@ -284,10 +203,10 @@ export default {
       ctx.fillStyle = Theme.colorIconBreakpoint;
       var s = 0;
       while (s < this.group) {
-        if (self.watchingNumbers.indexOf(s) >= 0) {
+        if (this.watchingNumbers.indexOf(s) >= 0) {
           var e = s + 1;
           while (e < this.group) {
-            if (self.watchingNumbers.indexOf(e) < 0) {
+            if (this.watchingNumbers.indexOf(e) < 0) {
               break;
             }
             e++;
@@ -305,15 +224,15 @@ export default {
           s++;
         }
       }
-      if (self.showString) {
+      if (this.showString) {
         x += measureTextWidth(2);
         for (var i = 0; i < this.group; i++) {
           var charCode = null;
-          if (self.newBytes == null) {
+          if (this.newBytes == null) {
             usage = '0';
             charCode = '.';
-          } else if (i < self.newBytes.length) {
-            var byte = self.newBytes.charCodeAt(i);
+          } else if (i < this.newBytes.length) {
+            var byte = this.newBytes.charCodeAt(i);
             if (byte >= 0x21 && byte <= 0x7e) {
               usage = '1';
               charCode = String.fromCharCode(byte);
@@ -325,7 +244,7 @@ export default {
           if (charCode != null) {
             switch (usage) {
               case '0':
-                ctx.fillStyle = self.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
+                ctx.fillStyle = this.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
                 break;
               case '1':
                 ctx.fillStyle = Theme.colorText;
@@ -368,12 +287,11 @@ export default {
       }
     },
     onCreateMenu: function(index) {
-      var self = this.self;
       var address = this.startAddress + index;
       var range = asmdb.getInstance().getMemoryRange();
       var inRange = address >= range[0] && address < range[1];
       var items = [];
-      var watching = self.watchingNumbers.indexOf(index) >= 0;
+      var watching = this.watchingNumbers.indexOf(index) >= 0;
       var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN && inRange;
       items[items.length] = [!watching ? 'Watching' : 'Watching done', '', watching || canWatch];
       items[items.length - 1].event = () => {

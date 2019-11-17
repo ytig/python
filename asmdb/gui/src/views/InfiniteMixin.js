@@ -1,6 +1,8 @@
 export default {
   data: function () {
     return {
+      needLayout: [],
+      needDraw: ['canvasContext'],
       oldProps: null,
       dirtyLayout: false
     };
@@ -25,20 +27,12 @@ export default {
             if (oldValue == newValue || JSON.stringify(oldValue) == JSON.stringify(newValue)) {
               continue;
             }
-            switch (key) {
-              case 'canvasContext':
-                needDraw = true;
-                break;
-              case 'lazyLayout':
-                break;
-              default:
-                if (key.endsWith('__')) {} else if (key.endsWith('_')) {
-                  needDraw = true;
-                } else {
-                  needDraw = true;
-                  needLayout = true;
-                }
-                break;
+            if (this.needLayout.indexOf(key) >= 0) {
+              needLayout = true;
+              needDraw = true;
+            }
+            if (this.needDraw.indexOf(key) >= 0) {
+              needDraw = true;
             }
           }
         }
