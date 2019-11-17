@@ -68,7 +68,7 @@ export default {
       switch (this.breaking) {
         case 0:
           if (this.hoverBreaking) {
-            color = Theme.colorIconBreakpoint;
+            color = Theme.colorIconBreakpointDark;
           }
           break;
         case 1:
