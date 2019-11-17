@@ -1,5 +1,5 @@
 <template>
-  <div class="instruction-container" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave"></div>
+  <div class="instruction-container" @mouseover="onMouseOver" @mouseout="onMouseOut"></div>
 </template>
 
 <script>
@@ -39,11 +39,11 @@ export default {
     this.needDraw.push('highlight', 'breaking');
   },
   methods: {
-    onMouseEnter: function() {
+    onMouseOver: function() {
       this.hoverBreaking = true;
       this.draw();
     },
-    onMouseLeave: function() {
+    onMouseOut: function() {
       this.hoverBreaking = false;
       this.draw();
     },
