@@ -120,7 +120,7 @@ export default {
       x += 12;
       ctx.fillStyle = this.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
       ctx.fillText(this.lineNumber, x, y);
-      x += measureText(this.lineNumber.length);
+      x += measureText(this.lineNumber);
       var coordinates = [];
       var usage;
       for (var i = 0; i < this.group; i++) {
