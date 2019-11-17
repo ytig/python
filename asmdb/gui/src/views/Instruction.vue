@@ -13,7 +13,7 @@ function measureWidth() {
 }
 
 function measureHeight() {
-  return 20;
+  return 18;
 }
 
 export default {
@@ -103,7 +103,7 @@ export default {
 @import '~@/styles/theme';
 
 .instruction-container {
-  height: 20px;
+  height: 18px;
   > span {
     line-height: 16px;
     font-size: 12px;
