@@ -27,6 +27,9 @@ export default {
           highlight: false,
           breaking: 0
         };
+        if (i == 0) {
+          mock.highlight = true;
+        }
         switch (j % 2) {
           case 1:
             mock.mnemonic = 'push';
