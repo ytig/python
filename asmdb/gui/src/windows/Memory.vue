@@ -197,8 +197,8 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items[items.length] = ['Go back', '⌫', this.hst.length > 0];
-      items[items.length] = ['Search address', '↩︎', true];
+      items.push(['Go back', '⌫', this.hst.length > 0]);
+      items.push(['Search address', '↩︎', true]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {

@@ -49,7 +49,7 @@ class Wheeling {
     }, 50);
     const frameStart = 12;
     const frameLength = 4;
-    this.histroy[this.histroy.length] = deltaY;
+    this.histroy.push(deltaY);
     if (this.histroy.length >= frameStart + frameLength) {
       var isAnim = true;
       for (var i = frameStart; i < this.histroy.length; i++) {

@@ -67,7 +67,7 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items[items.length] = ['Edit watchpoint', '↩︎', this.watchpoints.length < this.wlen];
+      items.push(['Edit watchpoint', '↩︎', this.watchpoints.length < this.wlen]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {

@@ -81,10 +81,10 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items[items.length] = ['Go back', '⌫', this.hst.length > 0];
-      items[items.length] = ['Return to SP', '↩︎', this.sp != null && this.page != 0];
-      items[items.length] = ['Previous page', '←', this.sp != null && this.page - 1 >= 0];
-      items[items.length] = ['Next page', '→', this.sp != null && this.page + 1 < 10];
+      items.push(['Go back', '⌫', this.hst.length > 0]);
+      items.push(['Return to SP', '↩︎', this.sp != null && this.page != 0]);
+      items.push(['Previous page', '←', this.sp != null && this.page - 1 >= 0]);
+      items.push(['Next page', '→', this.sp != null && this.page + 1 < 10]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
@@ -259,7 +259,7 @@ export default {
           }
         }
         lineNumber = '+0x' + lineNumber.toString(16).zfill(3);
-        items[items.length] = {
+        items.push({
           startAddress: startAddress,
           lineNumber: lineNumber,
           highlightNumber: highlightNumber,
@@ -267,7 +267,7 @@ export default {
           assignedNumbers: JSON.stringify(assignedNumbers.sort()),
           oldBytes: oldBytes,
           newBytes: newBytes
-        };
+        });
       }
       this.items.splice(0, this.items.length, ...items);
     }

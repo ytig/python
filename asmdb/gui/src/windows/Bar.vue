@@ -81,12 +81,12 @@ export default {
       if (event.button == 2) {
         var items = [];
         var fullscreen = document.fullscreenElement != null;
-        items[items.length] = ['Nexti', 'n', this.enable.enable_t];
-        items[items.length] = ['Stepi', 's', this.enable.enable_t];
-        items[items.length] = ['Continue', 'c', this.enable.enable_t];
-        items[items.length] = ['Release suspend', 'r', this.enable.enable_t];
-        items[items.length] = ['Fullscreen', 'space', !fullscreen];
-        items[items.length] = ['Exit fullscreen', '⎋', fullscreen];
+        items.push(['Nexti', 'n', this.enable.enable_t]);
+        items.push(['Stepi', 's', this.enable.enable_t]);
+        items.push(['Continue', 'c', this.enable.enable_t]);
+        items.push(['Release suspend', 'r', this.enable.enable_t]);
+        items.push(['Fullscreen', 'space', !fullscreen]);
+        items.push(['Exit fullscreen', '⎋', fullscreen]);
         this.$menu.alert(event, items, this.onClickMenu);
       }
     },

@@ -87,7 +87,7 @@ export default {
       var el = this.$refs.bytes;
       var rect = el.getBoundingClientRect();
       var placeholder = el.innerHTML.slice(2);
-      items[items.length] = ['Modify register', '', asmdb.getInstance().isSuspend() && inRange];
+      items.push(['Modify register', '', asmdb.getInstance().isSuspend() && inRange]);
       items[items.length - 1].event = () => {
         this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onAssign.bind(this, this.value.lineName));
       };

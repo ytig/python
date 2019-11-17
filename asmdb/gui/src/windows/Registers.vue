@@ -20,12 +20,12 @@ export default {
     for (var k of asmdb.getInstance().REGS) {
       lineFills[c] = Math.max(k.length, lineFills[c] || 0);
       c = (c + 1) % column;
-      items[items.length] = {
+      items.push({
         lineName: k,
         oldValue: null,
         newValue: null,
         assigned: false
-      };
+      });
     }
     c = 0;
     for (var item of items) {

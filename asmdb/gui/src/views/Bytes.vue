@@ -289,7 +289,7 @@ export default {
       var items = [];
       var watching = JSON.parse(this.watchingNumbers).indexOf(index) >= 0;
       var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN && inRange;
-      items[items.length] = [!watching ? 'Watching' : 'Watching done', '', watching || canWatch];
+      items.push([!watching ? 'Watching' : 'Watching done', '', watching || canWatch]);
       items[items.length - 1].event = () => {
         var addr = address - (address % asmdb.getInstance().UNIT);
         if (!watching) {
@@ -301,7 +301,7 @@ export default {
       var el = this.$el.getElementsByClassName('bytes-padding')[index];
       var rect = el.getBoundingClientRect();
       var placeholder = el.innerHTML;
-      items[items.length] = ['Modify memory', '', asmdb.getInstance().isSuspend() && inRange];
+      items.push(['Modify memory', '', asmdb.getInstance().isSuspend() && inRange]);
       items[items.length - 1].event = () => {
         this.$editor.alert(parseInt(rect.x + 1 - measureText(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
       };
