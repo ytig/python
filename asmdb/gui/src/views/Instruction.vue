@@ -108,5 +108,13 @@ export default {
 
 .instruction-container {
   height: 18px;
+  > span {
+    line-height: 16px;
+    font-size: 12px;
+    color: #f00;
+  }
+  > span:first-of-type {
+    margin-left: 28px;
+  }
 }
 </style>
