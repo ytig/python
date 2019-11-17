@@ -43,6 +43,9 @@ window.emptySelection = function () {
 }
 
 window.measureText = function (text, font) {
+  if (font == '12px Menlo') {
+    return 7.224609375 * text.length;
+  }
   var canvas = document.getElementById('__canvas__');
   if (!canvas) {
     canvas = document.createElement('canvas');
