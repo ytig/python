@@ -111,7 +111,7 @@ export default {
   > span {
     line-height: 16px;
     font-size: 12px;
-    color: #f00;
+    color: transparent;
   }
   > span:first-of-type {
     margin-left: 28px;
