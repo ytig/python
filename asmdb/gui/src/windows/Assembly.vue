@@ -17,8 +17,9 @@ export default {
     var source = { invalidate: 0 }; //for test
     setTimeout(() => {
       for (var i = -99; i < 100; i++) {
-        var addr = '0x' + (10000 + i).toString(16).zfill(8);
-        source[i] = {
+        var j = 10000 + i;
+        var addr = '0x' + j.toString(16).zfill(8);
+        var mock = {
           height: 18,
           address: addr,
           mnemonic: 'ldr',
@@ -26,11 +27,18 @@ export default {
           highlight: false,
           breaking: 0
         };
+        switch (j % 2) {
+          case 1:
+            mock.mnemonic = 'push';
+            mock.op_str = 'pc, [r0 + 0x1234]';
+            break;
+        }
+        source[i] = mock;
       }
       source.invalidate++;
     }, 1000);
     return {
-      instructionGroup: 4,
+      instructionGroup: 6,
       focus: false,
       disable: true,
       source: source
