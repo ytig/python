@@ -25,10 +25,17 @@ export default {
       items: []
     };
   },
-  props: {},
+  props: {
+    address: String,
+    mnemonic: String,
+    op_str: String,
+    highlight: Boolean,
+    breaking: Number,
+    group: Number
+  },
   created: function() {
-    this.needLayout.push();
-    this.needDraw.push();
+    this.needLayout.push('address', 'mnemonic', 'op_str', 'group');
+    this.needDraw.push('highlight', 'breaking');
   },
   methods: {
     onLayout: function() {
