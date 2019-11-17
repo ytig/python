@@ -44,7 +44,7 @@ window.emptySelection = function () {
 
 window.measureText = function (text, font) {
   if (typeof text == 'number') {
-    text = new Array(text + 1).join(' ');
+    return text * window.measureText(' ', font);
   }
   if (!font || font == '12px Menlo') {
     return 7.224609375 * text.length;
