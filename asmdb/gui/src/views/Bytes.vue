@@ -52,7 +52,7 @@ export default {
     group: Number,
     showString: Boolean
   },
-  created: function() {
+  beforeCreate: function() {
     this.needLayout.push('lineNumber', 'newBytes', 'group');
     this.needDraw.push('highlightNumber', 'watchingNumbers', 'assignedNumbers', 'oldBytes', 'showString');
   },
