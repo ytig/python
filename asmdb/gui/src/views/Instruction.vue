@@ -5,96 +5,35 @@
 <script>
 import Theme from '@/styles/theme';
 import asmdb from '@/scripts/asmdb';
+import InfiniteMixin from './InfiniteMixin';
 
-function measureTextWidth(length) {
-  return length * 7.224609375;
-}
-
-function measureTextHeight() {
-  return 14;
-}
-
-function measureViewWidth() {
+function measureWidth() {
   //todo
   return 0;
 }
 
-function measureViewHeight() {
-  return measureTextHeight() + 4;
+function measureHeight() {
+  return 18;
 }
 
 export default {
-  measureWidth: measureViewWidth,
-  measureHeight: measureViewHeight,
+  measureWidth: measureWidth,
+  measureHeight: measureHeight,
+  mixins: [InfiniteMixin],
   data: function() {
     return {
-      dirty: false,
       items: []
     };
   },
-  props: {
-    canvasContext: String,
-    lazyLayout: Boolean
-  },
-  computed: {
-    self: function() {
-      return {
-        canvasContext: this.canvasContext,
-        lazyLayout: this.lazyLayout
-      };
-    }
-  },
-  watch: {
-    self: function(newValue, oldValue) {
-      var needLayout = false;
-      var needDraw = false;
-      if (false) {
-        needLayout = true;
-        needDraw = true;
-      }
-      if (newValue.canvasContext != oldValue.canvasContext) {
-        needDraw = true;
-      }
-      if (!newValue.lazyLayout) {
-        if (needLayout || this.dirty) {
-          this.layout();
-          this.dirty = false;
-        }
-      } else {
-        if (needLayout) {
-          this.dirty = true;
-        }
-      }
-      if (needDraw) {
-        this.draw();
-      }
-    }
-  },
-  mounted: function() {
-    if (!this.lazyLayout) {
-      this.layout();
-    } else {
-      this.dirty = true;
-    }
-    this.draw();
-  },
+  props: {},
   methods: {
-    layout: function() {
+    onLayout: function() {
       //todo
     },
-    draw: function() {
-      var self = this.self;
-      var cc = self.canvasContext.split(';');
-      var h = measureViewHeight();
-      var t = parseInt(cc[0]);
-      for (var i of cc[1].split(',')) {
-        var c = getContext(parseInt(i), t, h);
-        if (c != null) {
-          this.draw_(c);
-        }
-      }
+    onPreDraw: function() {
+      return measureHeight();
     },
-    draw_: function(ctx) {
+    onDraw: function(ctx) {
       //todo
       ctx.font = '12px Menlo';
       var x = 0;
@@ -102,10 +41,10 @@ export default {
       x += 12 + 16;
       ctx.fillStyle = Theme.colorTextDarker;
       ctx.fillText('0x12345678  ', x, y);
-      x += measureTextWidth(12);
+      x += measureText(12);
       ctx.fillStyle = Theme.colorText2;
       ctx.fillText('ldr    ', x, y);
-      x += measureTextWidth(7);
+      x += measureText(7);
       ctx.fillStyle = Theme.colorText;
       ctx.fillText('r0, r1', x, y);
     }
