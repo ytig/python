@@ -68,7 +68,7 @@ export default {
     onLayout: function () {},
     draw: function () {
       var cc = this.canvasContext.split(';');
-      var h = 18; //todo
+      var h = this.onPreDraw();
       var t = parseInt(cc[0]);
       for (var i of cc[1].split(',')) {
         var c = getContext(parseInt(i), t, h);
@@ -76,6 +76,9 @@ export default {
           this.onDraw(c);
         }
       }
+    },
+    onPreDraw: function () {
+      return 0;
     },
     onDraw: function (ctx) {}
   }

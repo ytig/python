@@ -110,10 +110,12 @@ export default {
       }
       this.items = items;
     },
+    onPreDraw: function() {
+      return measureViewHeight();
+    },
     onDraw: function(ctx) {
       var w = measureViewWidth(this.lineNumber.length, this.group, this.showString);
       var h = measureViewHeight();
-      ctx.clearRect(0, 0, w, h);
       if (this.highlightNumber != null) {
         ctx.fillStyle = Theme.colorBackgroundSelection;
         ctx.fillRect(0, 0, w, h - 2);

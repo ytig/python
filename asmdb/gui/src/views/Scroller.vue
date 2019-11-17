@@ -194,12 +194,8 @@ export default {
       }
       this.viewport.splice(this.viewport.length, 0, ...items);
       if (sumTop - scrollTop < canvasHeight) {
-        var canvasWidth = this.$refs.container.clientWidth;
         for (var token of tokens) {
-          var ctx = getContext(token, sumTop, canvasHeight);
-          if (ctx != null) {
-            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-          }
+          getContext(token, sumTop, canvasHeight);
         }
       }
     }

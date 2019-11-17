@@ -72,6 +72,7 @@ window.getContext = function (token, top, height) {
     var s = devicePixelRatio;
     var y = top - canvasItem[2];
     canvasItem[1].setTransform(s, 0, 0, s, 0, s * y);
+    canvasItem[1].clearRect(0, 0, canvasItem[0].width / s, height);
     return canvasItem[1];
   }
   return null;
