@@ -19,7 +19,7 @@ export default {
         var needLayout = false;
         var needDraw = false;
         if (this.oldProps == null) {
-          this.oldProps = {};
+          this.oldProps = Object.assign({}, newProps);
           needLayout = true;
           needDraw = true;
         } else {
@@ -29,6 +29,7 @@ export default {
             if (oldValue == newValue) {
               continue;
             }
+            this.oldProps[key] = newValue;
             if (this.needLayout.indexOf(key) >= 0) {
               needLayout = true;
               needDraw = true;
@@ -38,7 +39,6 @@ export default {
             }
           }
         }
-        Object.assign(this.oldProps, newProps);
         if (!newProps.lazyLayout) {
           if (needLayout || this.dirtyLayout) {
             this.layout();
