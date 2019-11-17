@@ -1,5 +1,5 @@
 <template>
-  <div class="instruction-container"></div>
+  <div class="instruction-container" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave"></div>
 </template>
 
 <script>
@@ -22,6 +22,7 @@ export default {
   mixins: [InfiniteMixin],
   data: function() {
     return {
+      hoverBreaking: false,
       items: []
     };
   },
@@ -38,6 +39,14 @@ export default {
     this.needDraw.push('highlight', 'breaking');
   },
   methods: {
+    onMouseEnter: function() {
+      this.hoverBreaking = true;
+      this.draw();
+    },
+    onMouseLeave: function() {
+      this.hoverBreaking = false;
+      this.draw();
+    },
     onLayout: function() {
       //todo
     },
@@ -55,7 +64,28 @@ export default {
       var x = 0;
       var y = 12;
       x += 12;
-      //todo
+      var color = null;
+      switch (this.breaking) {
+        case 0:
+          if (this.hoverBreaking) {
+            color = Theme.colorIconBreakpoint;
+          }
+          break;
+        case 1:
+          color = Theme.colorIconBreakpoint;
+          break;
+        case 2:
+          color = Theme.colorIconBreakpoint2;
+          break;
+      }
+      if (color != null) {
+        ctx.fillStyle = color;
+        var r = 4;
+        ctx.beginPath();
+        ctx.arc(x + r, (h - 2) / 2, 4, 0, 2 * Math.PI);
+        ctx.closePath();
+        ctx.fill();
+      }
       x += 16;
       ctx.fillStyle = !this.highlight ? Theme.colorTextDarker : Theme.colorTextDark;
       ctx.fillText(this.address, x, y);
