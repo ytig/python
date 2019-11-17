@@ -22,7 +22,7 @@ export default {
           for (var key in this.oldProps) {
             var oldValue = this.oldProps[key];
             var newValue = newProps[key];
-            if (oldValue == newValue) {
+            if (oldValue == newValue || JSON.stringify(oldValue) == JSON.stringify(newValue)) {
               continue;
             }
             switch (key) {
@@ -32,8 +32,10 @@ export default {
               case 'lazyLayout':
                 break;
               default:
-                needDraw = true;
-                if (!key.endsWith('_')) {
+                if (key.endsWith('__')) {} else if (key.endsWith('_')) {
+                  needDraw = true;
+                } else {
+                  needDraw = true;
                   needLayout = true;
                 }
                 break;
@@ -72,7 +74,7 @@ export default {
     onLayout: function () {},
     draw: function () {
       var cc = this.canvasContext.split(';');
-      var h = measureViewHeight();
+      var h = 18; //todo
       var t = parseInt(cc[0]);
       for (var i of cc[1].split(',')) {
         var c = getContext(parseInt(i), t, h);
