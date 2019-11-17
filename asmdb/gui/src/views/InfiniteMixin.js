@@ -14,17 +14,19 @@ export default {
   watch: {
     $props: {
       deep: true,
+      immediate: true,
       handler: function (newProps) {
         var needLayout = false;
         var needDraw = false;
         if (this.oldProps == null) {
+          this.oldProps = {};
           needLayout = true;
           needDraw = true;
         } else {
           for (var key in this.oldProps) {
             var oldValue = this.oldProps[key];
             var newValue = newProps[key];
-            if (oldValue == newValue || JSON.stringify(oldValue) == JSON.stringify(newValue)) {
+            if (oldValue == newValue) {
               continue;
             }
             if (this.needLayout.indexOf(key) >= 0) {
@@ -36,7 +38,7 @@ export default {
             }
           }
         }
-        this.oldProps = Object.assign({}, newProps);
+        Object.assign(this.oldProps, newProps);
         if (!newProps.lazyLayout) {
           if (needLayout || this.dirtyLayout) {
             this.layout();
@@ -51,14 +53,6 @@ export default {
         }
       }
     }
-  },
-  mounted: function () {
-    if (!this.lazyLayout) {
-      this.layout();
-    } else {
-      this.dirtyLayout = true;
-    }
-    this.draw();
   },
   methods: {
     layout: function () {
