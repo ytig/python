@@ -4,7 +4,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller ref="scroller" class="assembly-scroller" :source="source" #default="props">
-          <Instruction :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
+          <Instruction :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="props.item.highlight" :breaking="props.item.breaking" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
         </Scroller>
       </div>
     </div>
@@ -17,23 +17,20 @@ export default {
     var source = { invalidate: 0 }; //for test
     setTimeout(() => {
       for (var i = -99; i < 100; i++) {
+        var addr = '0x' + (10000 + i).toString(16).zfill(8);
         source[i] = {
           height: 18,
-          lineNumber:
-            (i >= 0 ? '+' : '-') +
-            '0x' +
-            Math.abs(i)
-              .toString(16)
-              .zfill(3),
-          value: {
-            newBytes: '0000000000000000',
-            oldBytes: ''
-          }
+          address: addr,
+          mnemonic: 'ldr',
+          op_str: 'r0 r1',
+          highlight: false,
+          breaking: 0
         };
       }
       source.invalidate++;
     }, 1000);
     return {
+      instructionGroup: 4,
       focus: false,
       disable: true,
       source: source

@@ -9,7 +9,7 @@ import InfiniteMixin from './InfiniteMixin';
 
 function measureWidth() {
   //todo
-  return 0;
+  return 500;
 }
 
 function measureHeight() {
@@ -45,19 +45,29 @@ export default {
       return measureHeight();
     },
     onDraw: function(ctx) {
-      //todo
+      var w = measureWidth();
+      var h = measureHeight();
+      if (this.highlight) {
+        ctx.fillStyle = Theme.colorBackgroundSelection;
+        ctx.fillRect(0, 0, w, h - 2);
+      }
       ctx.font = '12px Menlo';
       var x = 0;
       var y = 12;
-      x += 12 + 16;
-      ctx.fillStyle = Theme.colorTextDarker;
-      ctx.fillText('0x12345678  ', x, y);
-      x += measureText(12);
+      x += 12;
+      //todo
+      x += 16;
+      ctx.fillStyle = !this.highlight ? Theme.colorTextDarker : Theme.colorTextDark;
+      ctx.fillText(this.address, x, y);
+      x += measureText(this.address);
+      x += measureText(2);
       ctx.fillStyle = Theme.colorText2;
-      ctx.fillText('ldr    ', x, y);
-      x += measureText(7);
+      ctx.fillText(this.mnemonic, x, y);
+      x += Math.max(measureText(this.mnemonic.length), measureText(this.group));
+      x += measureText(1);
       ctx.fillStyle = Theme.colorText;
-      ctx.fillText('r0, r1', x, y);
+      ctx.fillText(this.op_str, x, y);
+      x += measureText(this.op_str);
     }
   }
 };
