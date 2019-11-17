@@ -108,7 +108,7 @@ export default {
           items[items.length - 1].index = i;
         }
       }
-      this.items = items;
+      this.items.splice(0, this.items.length, ...items);
     },
     onPreDraw: function() {
       return measureViewHeight();
