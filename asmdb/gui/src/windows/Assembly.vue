@@ -29,6 +29,10 @@ export default {
         };
         if (i == 0) {
           mock.highlight = true;
+          mock.breaking = 1;
+        }
+        if (i == 1) {
+          mock.breaking = 2;
         }
         switch (j % 2) {
           case 1:
