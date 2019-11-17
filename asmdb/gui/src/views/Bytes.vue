@@ -45,8 +45,8 @@ export default {
     startAddress: Number,
     lineNumber: String,
     highlightNumber: Number,
-    watchingNumbers: Array,
-    assignedNumbers: Array,
+    watchingNumbers: String,
+    assignedNumbers: String,
     oldBytes: String,
     newBytes: String,
     group: Number,
@@ -114,6 +114,8 @@ export default {
       return measureViewHeight();
     },
     onDraw: function(ctx) {
+      var watchingNumbers = JSON.parse(this.watchingNumbers);
+      var assignedNumbers = JSON.parse(this.assignedNumbers);
       var w = measureViewWidth(this.lineNumber.length, this.group, this.showString);
       var h = measureViewHeight();
       if (this.highlightNumber != null) {
@@ -187,7 +189,7 @@ export default {
               ctx.fillStyle = Theme.colorText4;
               break;
           }
-          if (this.assignedNumbers.indexOf(i) >= 0) {
+          if (assignedNumbers.indexOf(i) >= 0) {
             ctx.fillStyle = '#ff0';
             changed = true;
           }
@@ -205,10 +207,10 @@ export default {
       ctx.fillStyle = Theme.colorIconBreakpoint;
       var s = 0;
       while (s < this.group) {
-        if (this.watchingNumbers.indexOf(s) >= 0) {
+        if (watchingNumbers.indexOf(s) >= 0) {
           var e = s + 1;
           while (e < this.group) {
-            if (this.watchingNumbers.indexOf(e) < 0) {
+            if (watchingNumbers.indexOf(e) < 0) {
               break;
             }
             e++;
@@ -293,7 +295,7 @@ export default {
       var range = asmdb.getInstance().getMemoryRange();
       var inRange = address >= range[0] && address < range[1];
       var items = [];
-      var watching = this.watchingNumbers.indexOf(index) >= 0;
+      var watching = JSON.parse(this.watchingNumbers).indexOf(index) >= 0;
       var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN && inRange;
       items[items.length] = [!watching ? 'Watching' : 'Watching done', '', watching || canWatch];
       items[items.length - 1].event = () => {

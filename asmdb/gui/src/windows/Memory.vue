@@ -57,7 +57,7 @@ class Source {
         }
       }
     }
-    return watchingNumbers.sort();
+    return JSON.stringify(watchingNumbers.sort());
   }
 
   toAssignedNumbers(index, assigned) {
@@ -69,7 +69,7 @@ class Source {
         assignedNumbers.push(asgn - address);
       }
     }
-    return assignedNumbers.sort();
+    return JSON.stringify(assignedNumbers.sort());
   }
 
   getRange(index) {

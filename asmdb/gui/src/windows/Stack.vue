@@ -263,8 +263,8 @@ export default {
           startAddress: startAddress,
           lineNumber: lineNumber,
           highlightNumber: highlightNumber,
-          watchingNumbers: watchingNumbers.sort(),
-          assignedNumbers: assignedNumbers.sort(),
+          watchingNumbers: JSON.stringify(watchingNumbers.sort()),
+          assignedNumbers: JSON.stringify(assignedNumbers.sort()),
           oldBytes: oldBytes,
           newBytes: newBytes
         };
