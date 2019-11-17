@@ -26,6 +26,10 @@ export default {
     };
   },
   props: {},
+  created: function() {
+    this.needLayout.push();
+    this.needDraw.push();
+  },
   methods: {
     onLayout: function() {
       //todo
