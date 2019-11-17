@@ -245,20 +245,26 @@ export default {
         var watchingNumbers = [];
         for (var watchpoint of this.watchpoints) {
           for (var j = 0; j < asmdb.getInstance().UNIT; j++) {
-            watchingNumbers.push(watchpoint.address + j - startAddress);
+            var num = watchpoint.address + j - startAddress;
+            if (num >= 0 && num < column) {
+              watchingNumbers.push(num);
+            }
           }
         }
         var assignedNumbers = [];
         for (var asgn of this.assigned) {
-          assignedNumbers.push(asgn - startAddress);
+          var num = asgn - startAddress;
+          if (num >= 0 && num < column) {
+            assignedNumbers.push(num);
+          }
         }
         lineNumber = '+0x' + lineNumber.toString(16).zfill(3);
         items[items.length] = {
           startAddress: startAddress,
           lineNumber: lineNumber,
           highlightNumber: highlightNumber,
-          watchingNumbers: JSON.stringify(watchingNumbers.sort()),
-          assignedNumbers: JSON.stringify(assignedNumbers.sort()),
+          watchingNumbers: watchingNumbers.sort(),
+          assignedNumbers: assignedNumbers.sort(),
           oldBytes: oldBytes,
           newBytes: newBytes
         };
