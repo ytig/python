@@ -13,7 +13,7 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 import Bytes from '@/views/Bytes';
-const pieceOf = 2400;
+const pieceOf = 147 * 16;
 
 class Source {
   constructor(start, end, group, history) {
