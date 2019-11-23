@@ -5,7 +5,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :style="{width:windowWidth+'px'}" :source="source" @scroll2="onScroll2" #default="props">
-          <Instruction :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="source.toHighlight(props.item.address,pc)" :breaking="source.toBreaking(props.item.address,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
+          <Instruction v-if="props.item.type=='instruction'" :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="source.toInstructionHighlight(props.item.address,pc)" :breaking="source.toInstructionBreaking(props.item.address,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
         </Scroller>
       </div>
     </div>
@@ -33,7 +33,7 @@ class Source {
   constructor(pc, assembly) {
     for (var i = 0; i < assembly.length; i++) {
       if (assembly[i].type == 'instruction' && assembly[i].address >= pc) {
-        this.origin = assembly[i].address;
+        this.address = assembly[i].address;
         for (var j = 0; i + j < assembly.length; j++) {
           this.append(j, assembly[i + j]);
         }
@@ -47,19 +47,17 @@ class Source {
   }
 
   append(index, value) {
-    switch (value.type) {
-      case 'instruction':
-        value.height = Instruction.measureHeight();
-        break;
-    }
+    value.height = {
+      instruction: Instruction
+    }[value.type].measureHeight(value);
     this[index] = value;
   }
 
-  toHighlight(address, highlight) {
+  toInstructionHighlight(address, highlight) {
     return address == highlight;
   }
 
-  toBreaking(address, breakpoints) {
+  toInstructionBreaking(address, breakpoints) {
     for (var breakpoint of breakpoints) {
       if (breakpoint.address == address) {
         if (breakpoint.disable) {
@@ -69,6 +67,10 @@ class Source {
       }
     }
     return 0;
+  }
+
+  onScroll(index) {
+    //todo
   }
 }
 
@@ -168,7 +170,7 @@ export default {
       this.breakpoints = breakpoints;
     },
     onScroll2: function(position) {
-      //todo
+      this.source.onScroll(position.index);
     }
   }
 };
