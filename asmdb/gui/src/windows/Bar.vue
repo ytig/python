@@ -2,46 +2,19 @@
   <div class="bar-container" @mouseup="onMouseUp">
     <div class="bar-icon"></div>
     <span class="bar-text">{{title}}</span>
-    <div class="bar-item" v-for="(item, index) in items" :key="index" :title="item.title" :style="item.style" @click="onClickItem(index)" :css-enable="enable.enable_f"></div>
+    <div class="bar-item" v-for="(item, index) in items" :key="index" :title="item.title" :style="item.style" @click="onClickItem(index)" :css-enable="enable.bool_f"></div>
   </div>
 </template>
 
 <script>
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
-
-class Enable {
-  constructor(delay) {
-    this.enable_t = false;
-    this.enable_f = false;
-    this.delay = delay;
-    this.counter = 0;
-  }
-
-  onEnable(enable) {
-    if (this.enable_t == enable) {
-      return;
-    }
-    this.enable_t = enable;
-    this.counter++;
-    if (this.enable_t) {
-      this.enable_f = true;
-    } else {
-      var counter = this.counter;
-      setTimeout(() => {
-        if (counter != this.counter) {
-          return;
-        }
-        this.enable_f = false;
-      }, this.delay);
-    }
-  }
-}
+import sloth from '@/scripts/sloth';
 
 export default {
   data: function() {
     return {
-      enable: new Enable(224),
+      enable: new sloth(224),
       title: 'com.example.app'
     };
   },
@@ -53,7 +26,7 @@ export default {
       for (var i = 0; i < 4; i++) {
         var title = titles[i];
         var image = "url('/static/icons/" + icons[i] + ".png'";
-        if (this.enable.enable_f) {
+        if (this.enable.bool_f) {
           items.push({
             title: title,
             style: { backgroundImage: image }
@@ -81,10 +54,10 @@ export default {
       if (event.button == 2) {
         var items = [];
         var fullscreen = document.fullscreenElement != null;
-        items.push(['Nexti', 'n', this.enable.enable_t]);
-        items.push(['Stepi', 's', this.enable.enable_t]);
-        items.push(['Continue', 'c', this.enable.enable_t]);
-        items.push(['Release suspend', 'r', this.enable.enable_t]);
+        items.push(['Nexti', 'n', this.enable.bool_t]);
+        items.push(['Stepi', 's', this.enable.bool_t]);
+        items.push(['Continue', 'c', this.enable.bool_t]);
+        items.push(['Release suspend', 'r', this.enable.bool_t]);
         items.push(['Fullscreen', 'space', !fullscreen]);
         items.push(['Exit fullscreen', '⎋', fullscreen]);
         this.$menu.alert(event, items, this.onClickMenu);
@@ -131,13 +104,13 @@ export default {
       }
     },
     onBreak: function() {
-      this.enable.onEnable(true);
+      this.enable.set(true);
     },
     onContinue: function() {
-      this.enable.onEnable(false);
+      this.enable.set(false);
     },
     onClickItem: function(index) {
-      if (!this.enable.enable_t) {
+      if (!this.enable.bool_t) {
         return;
       }
       switch (index) {
