@@ -77,7 +77,15 @@ class Source {
   }
 
   getDeltaY(address, position) {
-    //todo
+    for (var i = this.minIndex; i < this.maxIndex; i++) {
+      if (this[i].type == 'instruction' && this[i].address == address) {
+        var deltaY = 0;
+        for (var j = Math.min(i, position.index); j < Math.max(i, position.index); j++) {
+          deltaY += this[j].height;
+        }
+        return deltaY - position.offset;
+      }
+    }
     return null;
   }
 
