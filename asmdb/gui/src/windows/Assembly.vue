@@ -33,16 +33,18 @@ class Source {
   constructor(pc, assembly) {
     for (var i = 0; i < assembly.length; i++) {
       if (assembly[i].type == 'instruction' && assembly[i].address >= pc) {
-        this.address = assembly[i].address;
-        for (var j = 0; i + j < assembly.length; j++) {
-          this.append(j, assembly[i + j]);
-        }
-        for (var j = -1; i + j >= 0; j--) {
-          this.append(j, assembly[i + j]);
-        }
         break;
       }
     }
+    this.address = assembly[i].address;
+    for (var j = 0; i + j < assembly.length; j++) {
+      this.append(j, assembly[i + j]);
+    }
+    for (var j = -1; i + j >= 0; j--) {
+      this.append(j, assembly[i + j]);
+    }
+    this.minIndex = -i;
+    this.maxIndex = assembly.length - i;
     this.invalidate = 0;
   }
 
@@ -75,7 +77,12 @@ class Source {
   }
 
   onScroll(index) {
-    //todo
+    var preLoad = 50;
+    if (index - this.minIndex <= preLoad) {
+      //todo loadMore
+    } else if (this.maxIndex - 1 - index <= preLoad) {
+      //todo loadMore
+    }
   }
 }
 
