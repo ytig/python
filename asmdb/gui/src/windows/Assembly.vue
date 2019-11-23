@@ -82,7 +82,7 @@ class Source {
   }
 
   onScroll(index) {
-    var preLoad = 50;
+    var preLoad = 147;
     if (index - this.minIndex <= preLoad) {
       if (!this.minLoading) {
         this.minLoading = true;
