@@ -219,7 +219,6 @@ export default {
           return true;
         }
         var value = ++i / maxi;
-        value = 1 - (1 - value) * (1 - value);
         var newy = parseInt(deltaY * value);
         if (oldy != newy) {
           this.$refs.scroller.scrollBy(newy - oldy);
