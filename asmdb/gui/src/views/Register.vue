@@ -62,6 +62,10 @@ export default {
       }
     },
     onDoubleClick: function() {
+      var usage = parseInt(this.cssUsage) - 2;
+      if (usage >= 0) {
+        return;
+      }
       var range = asmdb.getInstance().getRegistersRange();
       var inRange = range.indexOf(this.value.lineName) >= 0;
       if (asmdb.getInstance().isSuspend() && inRange) {

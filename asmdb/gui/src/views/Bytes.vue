@@ -258,6 +258,9 @@ export default {
       }
     },
     onDoubleClickItem: function(index) {
+      if (this.items[index] && this.items[index].event) {
+        return;
+      }
       if (this.items[index] && this.items[index].index != undefined) {
         index = this.items[index].index;
         var address = this.startAddress + index;
