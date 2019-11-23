@@ -36,7 +36,6 @@ class Source {
         break;
       }
     }
-    this.address = assembly[i].address;
     for (var j = 0; i + j < assembly.length; j++) {
       this.append(j, assembly[i + j]);
     }
