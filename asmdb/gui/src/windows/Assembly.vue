@@ -209,7 +209,7 @@ export default {
       if (deltaY == 0) {
         return;
       }
-      var duration = 147 + (147 * Math.abs(deltaY)) / screen.height;
+      var duration = 147 + (224 * Math.abs(deltaY)) / screen.height;
       var maxi = Math.ceil((duration * 3) / 50);
       var oldy = 0;
       requestAnimationFrames(i => {
