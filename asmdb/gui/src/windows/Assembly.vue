@@ -25,14 +25,20 @@ class Source {
 export default {
   data: function() {
     return {
-      instructionGroup: 6,
-      windowWidth: 500,
       focus: false,
       disable: true,
       source: null,
       breakpoints: [],
       hst: []
     };
+  },
+  computed: {
+    windowWidth: function() {
+      return 500;
+    },
+    instructionGroup: function() {
+      return 6;
+    }
   },
   mounted: function() {
     keyboard.registerWindow(this);
