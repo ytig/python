@@ -21,7 +21,7 @@ export default {
     };
   },
   props: {
-    address: String,
+    address: Number,
     mnemonic: String,
     op_str: String,
     highlight: Boolean,
@@ -78,8 +78,9 @@ export default {
       }
       x += 16;
       ctx.fillStyle = !this.highlight ? Theme.colorTextDarker : Theme.colorText2;
-      ctx.fillText(this.address, x, y);
-      x += measureText(this.address);
+      var address = '0x' + this.address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
+      ctx.fillText(address, x, y);
+      x += measureText(address);
       x += measureText(2);
       ctx.fillStyle = Theme.colorText2;
       ctx.fillText(this.mnemonic, x, y);

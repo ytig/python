@@ -15,6 +15,7 @@
 <script>
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
+import Instruction from '@/views/Instruction';
 
 function getRange(address) {
   const pieceOf = 147 * asmdb.getInstance().UNIT;
@@ -30,8 +31,28 @@ function getRange(address) {
 
 class Source {
   constructor(pc, assembly) {
-    //todo
-    console.log(assembly);
+    for (var i = 0; i < assembly.length; i++) {
+      if (assembly[i].address >= pc) {
+        this.origin = assembly[i].address;
+        for (var j = 0; i + j < assembly.length; j++) {
+          this.append(j, assembly[i + j]);
+        }
+        for (var j = -1; i + j >= 0; j--) {
+          this.append(j, assembly[i + j]);
+        }
+        break;
+      }
+    }
+    this.invalidate = 0;
+  }
+
+  append(index, value) {
+    switch (value.type) {
+      case 'instruction':
+        value.height = Instruction.measureHeight();
+        break;
+    }
+    this[index] = value;
   }
 
   toHighlight(address, highlight) {
