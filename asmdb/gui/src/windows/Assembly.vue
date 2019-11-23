@@ -139,6 +139,7 @@ export default {
       pc: null,
       source: null,
       breakpoints: [],
+      counter: 0,
       hst: []
     };
   },
@@ -212,7 +213,11 @@ export default {
       var duration = 147 + (224 * Math.abs(deltaY)) / screen.height;
       var maxi = Math.ceil((duration * 3) / 50);
       var oldy = 0;
+      var counter = this.counter;
       requestAnimationFrames(i => {
+        if (counter != this.counter) {
+          return true;
+        }
         var value = ++i / maxi;
         value = 1 - (1 - value) * (1 - value);
         var newy = parseInt(deltaY * value);
@@ -235,6 +240,7 @@ export default {
     onBreak: function(pc, assembly) {
       this.disable = false;
       this.pc = pc;
+      this.counter++;
       if (assembly == null) {
         var deltaY = this.source.getDeltaY(pc, this.$refs.scroller.getPosition());
         if (deltaY != null) {
