@@ -151,13 +151,14 @@ class WsGdbController(GdbController):
     async def anew(cls, config):
         self = await super().anew(config)
         self.suspend = True  # for test
+        self.pc = 0x3210
         self.breakpoints = []
         self.watchpoints = []
         return self
 
     async def next(self):
         self.suspend = False
-        await asyncio.sleep(3)
+        await asyncio.sleep(0.05)
         self.suspend = True
 
     async def step(self):
@@ -184,7 +185,8 @@ class WsGdbController(GdbController):
         d = {}
         for k in ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']:
             d[k] = 0
-        d['pc'] = 0x3210
+        self.pc += 4
+        d['pc'] = self.pc
         return d
 
     async def mem(self, start, end):
