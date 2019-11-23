@@ -80,8 +80,14 @@ class Source {
     for (var i = this.minIndex; i < this.maxIndex; i++) {
       if (this[i].type == 'instruction' && this[i].address == address) {
         var deltaY = 0;
-        for (var j = Math.min(i, position.index); j < Math.max(i, position.index); j++) {
-          deltaY += this[j].height;
+        if (i < position.index) {
+          for (var j = i; j < position.index; j++) {
+            deltaY -= this[j].height;
+          }
+        } else {
+          for (var j = position.index; j < i; j++) {
+            deltaY += this[j].height;
+          }
         }
         return deltaY - position.offset;
       }
