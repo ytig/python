@@ -7,17 +7,11 @@ import Theme from '@/styles/theme';
 import asmdb from '@/scripts/asmdb';
 import InfiniteMixin from './InfiniteMixin';
 
-function measureWidth() {
-  //todo
-  return 500;
-}
-
 function measureHeight() {
   return 18;
 }
 
 export default {
-  measureWidth: measureWidth,
   measureHeight: measureHeight,
   mixins: [InfiniteMixin],
   data: function() {
@@ -54,7 +48,7 @@ export default {
       return measureHeight();
     },
     onDraw: function(ctx) {
-      var w = measureWidth();
+      var w = ctx.canvas.width / ctx.getTransform().a;
       var h = measureHeight();
       ctx.font = '12px Menlo';
       var x = 0;
