@@ -13,10 +13,10 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 import Bytes from '@/views/Bytes';
-const pieceOf = 147 * 16;
 
 class Source {
   constructor(start, end, group, history) {
+    this.pieceOf = 147 * 16;
     this.start = start;
     this.end = end;
     this.group = group;
@@ -74,9 +74,9 @@ class Source {
 
   getRange(index) {
     var offset = this.group * index;
-    offset -= offset % pieceOf;
-    var start = this.start + offset - pieceOf;
-    var end = start + 3 * pieceOf;
+    offset -= offset % this.pieceOf;
+    var start = this.start + offset - this.pieceOf;
+    var end = start + 3 * this.pieceOf;
     start = Math.max(start, this.start);
     end = Math.min(end, this.end);
     return [start, end];
@@ -85,11 +85,11 @@ class Source {
   onScroll(index) {
     var range = this.getRange(index);
     var ranges = [];
-    for (var i = 0; i < Math.ceil((range[1] - range[0]) / pieceOf); i++) {
-      var start = range[0] + i * pieceOf;
+    for (var i = 0; i < Math.ceil((range[1] - range[0]) / this.pieceOf); i++) {
+      var start = range[0] + i * this.pieceOf;
       if (this.loaded.indexOf(start) < 0) {
         this.loaded.push(start);
-        var end = Math.min(start + pieceOf, range[1]);
+        var end = Math.min(start + this.pieceOf, range[1]);
         if (ranges.length > 0 && ranges[ranges.length - 1][1] == start) {
           ranges[ranges.length - 1][1] = end;
         } else {
@@ -103,9 +103,9 @@ class Source {
   }
 
   onLoad(address, memory) {
-    if (memory.length > pieceOf) {
-      for (var i = 0; i < Math.ceil(memory.length / pieceOf); i++) {
-        this.onLoad(address + i * pieceOf, memory.slice(i * pieceOf, (i + 1) * pieceOf));
+    if (memory.length > this.pieceOf) {
+      for (var i = 0; i < Math.ceil(memory.length / this.pieceOf); i++) {
+        this.onLoad(address + i * this.pieceOf, memory.slice(i * this.pieceOf, (i + 1) * this.pieceOf));
       }
       return;
     }
