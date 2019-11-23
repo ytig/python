@@ -1,9 +1,10 @@
 <template>
-  <div class="assembly-container">
-    <Navigation :name="'Assembly'" :focus="focus" :disable="disable" :gradient="true"></Navigation>
+  <div class="assembly-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
+    <Search ref="search" :theme="0" :condition="searchTest" @search="jumpTo"></Search>
+    <Navigation :name="'Assembly'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <div class="assembly-column">
       <div class="assembly-row">
-        <Scroller ref="scroller" class="assembly-scroller" :source="source" #default="props">
+        <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :style="{width:windowWidth+'px'}" :source="source" @scroll2="onScroll2" #default="props">
           <Instruction :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="props.item.highlight" :breaking="props.item.breaking" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
         </Scroller>
       </div>
@@ -12,44 +13,95 @@
 </template>
 
 <script>
+import keyboard from '@/scripts/keyboard';
+import asmdb from '@/scripts/asmdb';
+
+class Source {
+  constructor() {
+    //todo
+  }
+}
+
 export default {
   data: function() {
-    var source = { invalidate: 0 }; //for test
-    setTimeout(() => {
-      for (var i = -99; i < 100; i++) {
-        var j = 10000 + i;
-        var addr = '0x' + j.toString(16).zfill(8);
-        var mock = {
-          height: 18,
-          address: addr,
-          mnemonic: 'ldr',
-          op_str: 'r0 r1',
-          highlight: false,
-          breaking: 0
-        };
-        if (i == 0) {
-          mock.highlight = true;
-          mock.breaking = 1;
-        }
-        if (i == 1) {
-          mock.breaking = 2;
-        }
-        switch (j % 2) {
-          case 1:
-            mock.mnemonic = 'push';
-            mock.op_str = 'pc, [r0 + 0x1234]';
-            break;
-        }
-        source[i] = mock;
-      }
-      source.invalidate++;
-    }, 1000);
     return {
       instructionGroup: 6,
+      windowWidth: 500,
       focus: false,
       disable: true,
-      source: source
+      source: null,
+      breakpoints: [],
+      hst: []
     };
+  },
+  mounted: function() {
+    keyboard.registerWindow(this);
+    asmdb.getInstance().registerEvent('assembly', this);
+  },
+  destroyed: function() {
+    asmdb.getInstance().unregisterEvent('assembly', this);
+    keyboard.unregisterWindow(this);
+  },
+  methods: {
+    searchTest: function(address) {
+      var range = asmdb.getInstance().getAssemblyRange();
+      return address >= range[0] && address < range[1];
+    },
+    requestFocus: function() {
+      keyboard.requestFocus(this);
+    },
+    onFocusChanged: function(value) {
+      this.focus = value;
+      if (!value) {
+        this.$refs.search.dismiss();
+      }
+    },
+    onMouseUp: function(event) {
+      if (event.button == 2) {
+        this.$menu.close();
+      }
+    },
+    onMouseUp2: function(evnet) {
+      var items = [];
+      items.push(['Go back', '⌫', this.hst.length > 0]);
+      items.push(['Search address', '↩︎', true]);
+      this.$menu.alert(event, items, this.onClickMenu);
+    },
+    onClickMenu: function(index) {
+      switch (index) {
+        case 0:
+          //todo hstGet
+          break;
+        case 1:
+          this.$refs.search.show();
+          break;
+      }
+    },
+    onKeyDown: function(event) {
+      var index = [8, 13].indexOf(event.keyCode);
+      if (index >= 0) {
+        this.onClickMenu(index);
+        return true;
+      } else {
+        return false;
+      }
+    },
+    jumpTo: function(address) {
+      //todo
+    },
+    onBreak: function(address, assembly) {
+      this.disable = false;
+      //todo
+    },
+    onContinue: function() {
+      this.disable = true;
+    },
+    onBreakpoints: function(breakpoints) {
+      this.breakpoints = breakpoints;
+    },
+    onScroll2: function(position) {
+      //todo
+    }
   }
 };
 </script>
@@ -70,7 +122,6 @@ export default {
       flex-grow: 1;
       overflow-x: scroll;
       .assembly-scroller {
-        width: 500px;
         height: 100%;
       }
     }
