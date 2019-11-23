@@ -76,7 +76,23 @@ class Debugger {
                 object.onBreak();
               });
             });
-            //assembly todo
+            //assembly
+            var pc = registers[this.PCNM];
+            this.iterObjects('assembly', (object) => {
+              union.wait();
+              var range = object.getRange(pc);
+              if (range == null) {
+                union.notify(() => {
+                  object.onBreak(pc, null);
+                });
+              } else {
+                this.asm(range, (assembly) => {
+                  union.notify(() => {
+                    object.onBreak(pc, assembly);
+                  });
+                });
+              }
+            });
             //registers
             union.wait();
             union.notify(() => {
@@ -140,7 +156,7 @@ class Debugger {
             object.onAssigned(parseInt(where.slice(1)), parseInt(value));
           });
         } else {
-          this.registers[where] = parseInt(value); //todo
+          this.registers[where] = parseInt(value);
           this.iterObjects('registers', (object) => {
             object.onAssigned(where, parseInt(value));
           });
@@ -179,6 +195,14 @@ class Debugger {
 
   rlse() {
     this.pull('rlse');
+  }
+
+  asm(range, success) {
+    this.pull('asm', [...range], function (ret) {
+      if (success) {
+        success(ret);
+      }
+    });
   }
 
   reg(success) {

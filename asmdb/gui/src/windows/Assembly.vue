@@ -89,7 +89,11 @@ export default {
     jumpTo: function(address) {
       //todo
     },
-    onBreak: function(address, assembly) {
+    getRange: function(pc) {
+      //todo
+      return null;
+    },
+    onBreak: function(pc, assembly) {
       this.disable = false;
       //todo
     },
