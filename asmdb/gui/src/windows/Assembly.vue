@@ -60,6 +60,14 @@ class Source {
   }
 
   toBreaking(address, breakpoints) {
+    for (var breakpoint of breakpoints) {
+      if (breakpoint.address == address) {
+        if (breakpoint.disable) {
+          return 2;
+        }
+        return 1;
+      }
+    }
     return 0;
   }
 }
