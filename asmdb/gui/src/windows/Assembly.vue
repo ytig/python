@@ -206,8 +206,22 @@ export default {
       //todo
     },
     smoothScrollBy: function(deltaY) {
-      //todo
-      this.$refs.scroller.scrollBy(deltaY);
+      if (deltaY == 0) {
+        return;
+      }
+      var duration = 147 + (147 * Math.abs(deltaY)) / screen.height;
+      var maxi = Math.ceil((duration * 3) / 50);
+      var oldy = 0;
+      requestAnimationFrames(i => {
+        var value = ++i / maxi;
+        value = 1 - (1 - value) * (1 - value);
+        var newy = parseInt(deltaY * value);
+        if (oldy != newy) {
+          this.$refs.scroller.scrollBy(newy - oldy);
+        }
+        oldy = newy;
+        return !(i < maxi);
+      });
     },
     getRange: function(pc) {
       if (this.source != null) {
