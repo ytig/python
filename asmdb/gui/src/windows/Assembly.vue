@@ -42,8 +42,14 @@ class Source {
     for (var j = -1; i + j >= 0; j--) {
       this.append(j, assembly[i + j]);
     }
+    var range = getRange(pc);
+    this.pieceOf = 147 * asmdb.getInstance().UNIT;
     this.minIndex = -i;
+    this.minAddress = range[0];
+    this.minLoading = false;
     this.maxIndex = assembly.length - i;
+    this.maxAddress = range[1];
+    this.maxLoading = false;
     this.invalidate = 0;
   }
 
@@ -78,9 +84,35 @@ class Source {
   onScroll(index) {
     var preLoad = 50;
     if (index - this.minIndex <= preLoad) {
-      //todo loadMore
+      if (!this.minLoading) {
+        this.minLoading = true;
+        var start = Math.max(this.minAddress - this.pieceOf, asmdb.getInstance().getAssemblyRange()[0]);
+        if (start < this.minAddress) {
+          var range = [start, this.minAddress];
+          asmdb.getInstance().asm(range, assembly => {
+            this.minLoading = false;
+            this.minAddress = range[0];
+            for (var i = assembly.length - 1; i >= 0; i--) {
+              this.append(--this.minIndex, assembly[i]);
+            }
+          });
+        }
+      }
     } else if (this.maxIndex - 1 - index <= preLoad) {
-      //todo loadMore
+      if (!this.maxLoading) {
+        this.maxLoading = true;
+        var end = Math.min(this.maxAddress + this.pieceOf, asmdb.getInstance().getAssemblyRange()[1]);
+        if (end > this.maxAddress) {
+          var range = [this.maxAddress, end];
+          asmdb.getInstance().asm(range, assembly => {
+            this.maxLoading = false;
+            this.maxAddress = range[1];
+            for (var i = 0; i < assembly.length; i++) {
+              this.append(this.maxIndex++, assembly[i]);
+            }
+          });
+        }
+      }
     }
   }
 }
