@@ -1,17 +1,29 @@
 <template>
   <div class="navigation-container" :css-gradient="gradient" @mouseup="onMouseUp">
-    <span class="user-select-none" :css-focus="focus" :css-disable="disable">{{name}}</span>
+    <span class="user-select-none" :css-focus="focus" :css-disable="!disable2.bool_f">{{name}}</span>
     <div v-if="gradient" class="navigation-gradient"></div>
   </div>
 </template>
 
 <script>
+import sloth from '@/scripts/sloth';
+
 export default {
+  data: function() {
+    return {
+      disable2: new sloth(224)
+    };
+  },
   props: {
     name: String,
     focus: Boolean,
     disable: Boolean,
     gradient: Boolean
+  },
+  watch: {
+    disable: function(newValue) {
+      this.disable2.set(!newValue);
+    }
   },
   methods: {
     onMouseUp: function(event) {
