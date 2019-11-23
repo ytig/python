@@ -69,6 +69,11 @@ class Source {
     return 0;
   }
 
+  getDeltaY(address, position) {
+    //todo
+    return null;
+  }
+
   onScroll(index) {
     //todo
   }
@@ -148,9 +153,16 @@ export default {
     jumpTo: function(address) {
       //todo
     },
+    smoothScrollBy: function(deltaY) {
+      //todo
+      this.$refs.scroller.scrollBy(deltaY);
+    },
     getRange: function(pc) {
       if (this.source != null) {
-        //todo try return null
+        var deltaY = this.source.getDeltaY(pc, this.$refs.scroller.getPosition());
+        if (deltaY != null && Math.abs(deltaY) < screen.height) {
+          return null;
+        }
       }
       return getRange(pc);
     },
@@ -158,7 +170,10 @@ export default {
       this.disable = false;
       this.pc = pc;
       if (assembly == null) {
-        //todo scroll by pc
+        var deltaY = this.source.getDeltaY(pc, this.$refs.scroller.getPosition());
+        if (deltaY != null) {
+          this.smoothScrollBy(deltaY);
+        }
       } else {
         this.source = new Source(pc, assembly);
       }
