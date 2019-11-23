@@ -169,8 +169,16 @@ class WsGdbController(GdbController):
     async def rlse(self):
         pass
 
-    async def asm(self):
-        pass
+    async def asm(self, start, end):
+        ret = []
+        for address in range(start, end, 4):
+            ret.append({
+                'type': 'instruction',
+                'address': address,
+                'mnemonic': 'push',
+                'op_str': 'r0 r1'
+            })
+        return ret
 
     async def reg(self):
         d = {}

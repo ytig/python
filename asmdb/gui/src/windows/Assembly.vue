@@ -5,7 +5,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :style="{width:windowWidth+'px'}" :source="source" @scroll2="onScroll2" #default="props">
-          <Instruction :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="props.item.highlight" :breaking="props.item.breaking" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
+          <Instruction :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="source.toHighlight(props.item.address,pc)" :breaking="source.toBreaking(props.item.address,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
         </Scroller>
       </div>
     </div>
@@ -16,9 +16,30 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 
+function getRange(address) {
+  const pieceOf = 147 * asmdb.getInstance().UNIT;
+  var range = asmdb.getInstance().getAssemblyRange();
+  var offset = address - range[0];
+  offset -= offset % pieceOf;
+  var start = range[0] + offset - pieceOf;
+  var end = start + 3 * pieceOf;
+  start = Math.max(start, range[0]);
+  end = Math.min(end, range[1]);
+  return [start, end];
+}
+
 class Source {
-  constructor() {
+  constructor(pc, assembly) {
     //todo
+    console.log(assembly);
+  }
+
+  toHighlight(address, highlight) {
+    return address == highlight;
+  }
+
+  toBreaking(address, breakpoints) {
+    return 0;
   }
 }
 
@@ -27,6 +48,7 @@ export default {
     return {
       focus: false,
       disable: true,
+      pc: null,
       source: null,
       breakpoints: [],
       hst: []
@@ -96,12 +118,19 @@ export default {
       //todo
     },
     getRange: function(pc) {
-      //todo
-      return null;
+      if (this.source != null) {
+        //todo try return null
+      }
+      return getRange(pc);
     },
     onBreak: function(pc, assembly) {
       this.disable = false;
-      //todo
+      this.pc = pc;
+      if (assembly == null) {
+        //todo scroll by pc
+      } else {
+        this.source = new Source(pc, assembly);
+      }
     },
     onContinue: function() {
       this.disable = true;
