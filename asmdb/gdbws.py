@@ -184,6 +184,7 @@ class WsGdbController(GdbController):
         d = {}
         for k in ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']:
             d[k] = 0
+        d['pc'] = 0x3210
         return d
 
     async def mem(self, start, end):

@@ -32,7 +32,7 @@ function getRange(address) {
 class Source {
   constructor(pc, assembly) {
     for (var i = 0; i < assembly.length; i++) {
-      if (assembly[i].address >= pc) {
+      if (assembly[i].type == 'instruction' && assembly[i].address >= pc) {
         this.origin = assembly[i].address;
         for (var j = 0; i + j < assembly.length; j++) {
           this.append(j, assembly[i + j]);
