@@ -266,7 +266,7 @@ export default {
           var maxOffset = this.$refs.scroller.$el.clientHeight;
           if (oldOffset != null && oldOffset - curOffset >= 0 && oldOffset - curOffset + this.source[oldIndex].height <= maxOffset) {
             scrollType = 1;
-          } else {
+          } else if (!(newOffset - curOffset >= 0 && newOffset - curOffset + this.source[newIndex].height <= maxOffset)) {
             scrollType = 2;
           }
         }
