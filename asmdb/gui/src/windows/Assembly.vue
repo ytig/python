@@ -16,6 +16,7 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 import Instruction from '@/views/Instruction';
+const MIN_OFFSET = 4;
 
 function getRange(address) {
   const pieceOf = 147 * asmdb.getInstance().UNIT;
@@ -280,6 +281,9 @@ export default {
         this.incomplete = 0;
         this.itemSelection = address;
         this.source = new Source(address, assembly);
+        this.$nextTick(() => {
+          this.$refs.scroller.scrollBy(-MIN_OFFSET);
+        });
       });
       this.requestFocus();
     },
@@ -319,6 +323,9 @@ export default {
       this.incomplete = 0;
       if (assembly != null) {
         this.source = new Source(pc, assembly);
+        this.$nextTick(() => {
+          this.$refs.scroller.scrollBy(-MIN_OFFSET);
+        });
       } else {
         var oldIndex = this.pc != null ? this.source.getIndex(this.pc) : null;
         var oldOffset = oldIndex != null ? this.source.getOffset({ index: oldIndex, offset: 0 }) : null;
@@ -329,12 +336,12 @@ export default {
         if (newOffset != null) {
           var maxOffset = this.$refs.scroller.$el.clientHeight;
           if (oldOffset != null && oldOffset - curOffset + this.source[oldIndex].height > 0 && oldOffset - curOffset < maxOffset) {
-            if (oldOffset - curOffset < 0 || oldOffset - curOffset + this.source[oldIndex].height > maxOffset) {
+            if (oldOffset - curOffset < MIN_OFFSET || oldOffset - curOffset + this.source[oldIndex].height > maxOffset) {
               scrollType = 2;
             } else {
               scrollType = 1;
             }
-          } else if (!(newOffset - curOffset >= 0 && newOffset - curOffset + this.source[newIndex].height <= maxOffset)) {
+          } else if (!(newOffset - curOffset >= MIN_OFFSET && newOffset - curOffset + this.source[newIndex].height <= maxOffset)) {
             scrollType = 2;
           }
         }
@@ -343,7 +350,7 @@ export default {
             this.smoothScrollBy(newOffset - oldOffset + incomplete);
             break;
           case 2:
-            this.smoothScrollBy(newOffset - curOffset);
+            this.smoothScrollBy(newOffset - curOffset - MIN_OFFSET);
             break;
         }
       }
