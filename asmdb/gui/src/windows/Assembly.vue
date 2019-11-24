@@ -30,9 +30,9 @@ function getRange(address) {
 }
 
 class Source {
-  constructor(pc, assembly) {
+  constructor(address, assembly) {
     for (var i = 0; i < assembly.length; i++) {
-      if (assembly[i].type == 'instruction' && pc >= assembly[i].address && pc < assembly[i].address + assembly[i].size) {
+      if (assembly[i].type == 'instruction' && address >= assembly[i].address && address < assembly[i].address + assembly[i].size) {
         break;
       }
     }
@@ -42,7 +42,7 @@ class Source {
     for (var j = -1; i + j >= 0; j--) {
       this.append(j, assembly[i + j]);
     }
-    var range = getRange(pc);
+    var range = getRange(address);
     this.pieceOf = 147 * asmdb.getInstance().UNIT;
     this.minIndex = -i;
     this.minAddress = range[0];
@@ -61,6 +61,9 @@ class Source {
   }
 
   toInstructionHighlight(item, highlight) {
+    if (highlight == null) {
+      return false;
+    }
     return highlight >= item.address && highlight < item.address + item.size;
   }
 
@@ -210,6 +213,12 @@ export default {
     },
     jumpTo: function(address) {
       //todo
+      var range = getRange(address);
+      asmdb.getInstance().asm(range, assembly => {
+        this.counter++;
+        this.incomplete = 0;
+        this.source = new Source(address, assembly);
+      });
     },
     smoothScrollBy: function(deltaY) {
       var duration = 147 + 77 * Math.min(Math.abs(deltaY) / screen.height, 1);
@@ -247,7 +256,7 @@ export default {
       if (assembly != null) {
         this.source = new Source(pc, assembly);
       } else {
-        var oldIndex = this.source.getIndex(this.pc);
+        var oldIndex = this.pc != null ? this.source.getIndex(this.pc) : null;
         var oldOffset = oldIndex != null ? this.source.getOffset({ index: oldIndex, offset: 0 }) : null;
         var newIndex = this.source.getIndex(pc);
         var newOffset = newIndex != null ? this.source.getOffset({ index: newIndex, offset: 0 }) : null;
