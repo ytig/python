@@ -1,5 +1,6 @@
 <template>
-  <div class="instruction-container" @mouseover="onMouseOver" @mouseout="onMouseOut">
+  <div class="instruction-container">
+    <div @mouseover="onMouseOverBpt" @mouseout="onMouseOutBpt" @click="onClickBpt"></div>
     <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value"></span>
   </div>
 </template>
@@ -25,7 +26,7 @@ export default {
   mixins: [InfiniteMixin],
   data: function() {
     return {
-      hoverBreaking: false,
+      hoverBpt: false,
       items: []
     };
   },
@@ -42,14 +43,6 @@ export default {
     this.needDraw.push('highlight', 'breaking');
   },
   methods: {
-    onMouseOver: function() {
-      this.hoverBreaking = true;
-      this.draw();
-    },
-    onMouseOut: function() {
-      this.hoverBreaking = false;
-      this.draw();
-    },
     onLayout: function() {
       var items = [];
       var address = '0x' + this.address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
@@ -77,7 +70,7 @@ export default {
       var color = null;
       switch (this.breaking) {
         case 0:
-          if (this.hoverBreaking) {
+          if (this.hoverBpt) {
             color = Theme.colorIconBreakpointDark;
           }
           break;
@@ -109,6 +102,21 @@ export default {
       ctx.fillStyle = Theme.colorText;
       ctx.fillText(this.op_str, x, y);
       x += measureText(this.op_str);
+    },
+    onMouseOverBpt: function() {
+      this.hoverBpt = true;
+      this.draw();
+    },
+    onMouseOutBpt: function() {
+      this.hoverBpt = false;
+      this.draw();
+    },
+    onClickBpt: function() {
+      if (this.breaking == 0) {
+        asmdb.getInstance().bpt([], [{ address: this.address, disable: false }]);
+      } else {
+        asmdb.getInstance().bpt([{ address: this.address }], []);
+      }
     }
   }
 };
@@ -119,6 +127,12 @@ export default {
 
 .instruction-container {
   height: 18px;
+  > div {
+    position: absolute;
+    width: 28px;
+    height: 18px;
+    cursor: pointer;
+  }
   > span {
     line-height: 16px;
     font-size: 12px;
