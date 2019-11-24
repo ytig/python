@@ -79,6 +79,18 @@ class Source {
     return 0;
   }
 
+  getPosn(position) {
+    for (var i = position.index; i < this.maxIndex; i++) {
+      if (this[i].type == 'instruction') {
+        return {
+          address: this[i].address,
+          offset: this.getOffset(position) - this.getOffset({ index: i, offset: 0 })
+        };
+      }
+    }
+    return null;
+  }
+
   getIndex(address) {
     for (var i = this.minIndex; i < this.maxIndex; i++) {
       if (this[i].type == 'instruction' && address >= this[i].address && address < this[i].address + this[i].size) {
@@ -235,17 +247,10 @@ export default {
         return true;
       }
     },
-    getPosn: function() {
-      //todo
-      return {
-        address: 0,
-        offset: 0
-      };
-    },
     jumpTo: function(address) {
       var range = getRange(address);
       asmdb.getInstance().asm(range, assembly => {
-        var posn = this.getPosn();
+        var posn = this.source != null ? this.source.getPosn(this.$refs.scroller.getPosition()) : null;
         if (posn != null && (posn.address != address || posn.offset != 0)) {
           this.hstSet(posn);
         }
