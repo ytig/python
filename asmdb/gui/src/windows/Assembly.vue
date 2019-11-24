@@ -224,6 +224,9 @@ export default {
         return false;
       }
     },
+    hstDel: function() {
+      this.hst.splice(0, this.hst.length);
+    },
     hstSet: function(posn) {
       const maxHst = 9;
       while (this.hst.length >= maxHst) {
@@ -299,6 +302,7 @@ export default {
     },
     onBreak: function(pc, assembly) {
       this.disable = false;
+      this.hstDel();
       this.counter++;
       var incomplete = this.incomplete;
       this.incomplete = 0;
