@@ -159,6 +159,7 @@ export default {
       source: null,
       breakpoints: [],
       counter: 0,
+      counter2: 0,
       incomplete: 0,
       hst: []
     };
@@ -236,7 +237,11 @@ export default {
       } else {
         var posn = this.hst.splice(this.hst.length - 1, 1)[0];
         var range = getRange(posn.address);
+        var counter2 = ++this.counter2;
         asmdb.getInstance().asm(range, assembly => {
+          if (counter2 != this.counter2) {
+            return;
+          }
           this.counter++;
           this.incomplete = 0;
           this.source = new Source(posn.address, assembly);
@@ -249,7 +254,11 @@ export default {
     },
     jumpTo: function(address) {
       var range = getRange(address);
+      var counter2 = ++this.counter2;
       asmdb.getInstance().asm(range, assembly => {
+        if (counter2 != this.counter2) {
+          return;
+        }
         var posn = this.source != null ? this.source.getPosn(this.$refs.scroller.getPosition()) : null;
         if (posn != null && (posn.address != address || posn.offset != 0)) {
           this.hstSet(posn);
