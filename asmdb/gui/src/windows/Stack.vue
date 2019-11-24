@@ -174,6 +174,9 @@ export default {
         this.hstDel();
         if (this.sp != null) {
           this.pageCache[this.sp] = this.page;
+          if (this.page == 0) {
+            delete this.pageCache[this.sp];
+          }
         }
         this.sp = sp;
         this.page = this.sp in this.pageCache ? this.pageCache[this.sp] : 0;
