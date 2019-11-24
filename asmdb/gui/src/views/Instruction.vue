@@ -35,12 +35,13 @@ export default {
     mnemonic: String,
     op_str: String,
     highlight: Boolean,
+    running: Boolean,
     breaking: Number,
     group: Number
   },
   created: function() {
     this.needLayout.push('address', 'mnemonic', 'op_str', 'group');
-    this.needDraw.push('highlight', 'breaking');
+    this.needDraw.push('highlight', 'running', 'breaking');
   },
   methods: {
     onLayout: function() {
@@ -63,6 +64,10 @@ export default {
     onDraw: function(ctx) {
       var w = ctx.canvas.width / ctx.getTransform().a;
       var h = measureHeight();
+      if (this.highlight) {
+        ctx.fillStyle = Theme.colorBackgroundSelection;
+        ctx.fillRect(0, 0, w, h - 2);
+      }
       ctx.font = '12px Menlo';
       var x = 0;
       var y = 12;
@@ -90,7 +95,7 @@ export default {
         ctx.fill();
       }
       x += 16;
-      ctx.fillStyle = !this.highlight ? Theme.colorTextDarker : Theme.colorText2;
+      ctx.fillStyle = !this.running ? (!this.highlight ? Theme.colorTextDarker : Theme.colorTextDark) : Theme.colorText2;
       var address = '0x' + this.address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
       ctx.fillText(address, x, y);
       x += measureText(address);

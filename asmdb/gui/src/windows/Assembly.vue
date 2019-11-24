@@ -5,7 +5,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :style="{width:windowWidth+'px'}" :source="source" @scroll2="onScroll2" #default="props">
-          <Instruction v-if="props.item.type=='instruction'" :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="source.toInstructionHighlight(props.item,pc)" :breaking="source.toInstructionBreaking(props.item,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
+          <Instruction v-if="props.item.type=='instruction'" :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="source.toInstructionHighlight(props.item,itemSelection)" :running="source.toInstructionRunning(props.item,pc)" :breaking="source.toInstructionBreaking(props.item,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
         </Scroller>
       </div>
     </div>
@@ -65,6 +65,13 @@ class Source {
       return false;
     }
     return highlight >= item.address && highlight < item.address + item.size;
+  }
+
+  toInstructionRunning(item, running) {
+    if (running == null) {
+      return false;
+    }
+    return running >= item.address && running < item.address + item.size;
   }
 
   toInstructionBreaking(item, breakpoints) {
@@ -158,6 +165,7 @@ export default {
       disable: true,
       pc: null,
       source: null,
+      itemSelection: null,
       breakpoints: [],
       counter: 0,
       incomplete: 0,
@@ -248,6 +256,7 @@ export default {
           }
           this.counter++;
           this.incomplete = 0;
+          this.itemSelection = null;
           this.source = new Source(posn.address, assembly);
           this.$nextTick(() => {
             this.$refs.scroller.scrollBy(posn.offset);
@@ -269,6 +278,7 @@ export default {
         }
         this.counter++;
         this.incomplete = 0;
+        this.itemSelection = address;
         this.source = new Source(address, assembly);
       });
       this.requestFocus();
@@ -341,6 +351,7 @@ export default {
     },
     onContinue: function() {
       this.disable = true;
+      this.itemSelection = null;
     },
     onBreakpoints: function(breakpoints) {
       this.breakpoints = breakpoints;
