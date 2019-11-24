@@ -318,8 +318,12 @@ export default {
         var scrollType = 0;
         if (newOffset != null) {
           var maxOffset = this.$refs.scroller.$el.clientHeight;
-          if (oldOffset != null && oldOffset - curOffset >= 0 && oldOffset - curOffset + this.source[oldIndex].height <= maxOffset) {
-            scrollType = 1;
+          if (oldOffset != null && oldOffset - curOffset + this.source[oldIndex].height > 0 && oldOffset - curOffset < maxOffset) {
+            if (oldOffset - curOffset < 0 || oldOffset - curOffset + this.source[oldIndex].height > maxOffset) {
+              scrollType = 2;
+            } else {
+              scrollType = 1;
+            }
           } else if (!(newOffset - curOffset >= 0 && newOffset - curOffset + this.source[newIndex].height <= maxOffset)) {
             scrollType = 2;
           }
