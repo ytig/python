@@ -212,19 +212,43 @@ export default {
       }
     },
     hstSet: function(posn) {
-      //todo
+      const maxHst = 9;
+      while (this.hst.length >= maxHst) {
+        this.hst.splice(0, 1);
+      }
+      this.hst.splice(this.hst.length, 0, posn);
     },
     hstGet: function() {
       if (this.hst.length <= 0) {
         return false;
       } else {
-        //todo
+        var posn = this.hst.splice(this.hst.length - 1, 1)[0];
+        var range = getRange(posn.address);
+        asmdb.getInstance().asm(range, assembly => {
+          this.counter++;
+          this.incomplete = 0;
+          this.source = new Source(posn.address, assembly);
+          this.$nextTick(() => {
+            this.$refs.scroller.scrollBy(posn.offset);
+          });
+        });
         return true;
       }
+    },
+    getPosn: function() {
+      //todo
+      return {
+        address: 0,
+        offset: 0
+      };
     },
     jumpTo: function(address) {
       var range = getRange(address);
       asmdb.getInstance().asm(range, assembly => {
+        var posn = this.getPosn();
+        if (posn != null && (posn.address != address || posn.offset != 0)) {
+          this.hstSet(posn);
+        }
         this.counter++;
         this.incomplete = 0;
         this.source = new Source(address, assembly);

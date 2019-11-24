@@ -221,7 +221,7 @@ export default {
       }
     },
     hstSet: function(posn) {
-      const maxHst = 147;
+      const maxHst = 9;
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
