@@ -242,6 +242,8 @@ export default {
     onBreak: function(pc, assembly) {
       this.disable = false;
       this.counter++;
+      var incomplete = this.incomplete;
+      this.incomplete = 0;
       if (assembly != null) {
         this.source = new Source(pc, assembly);
       } else {
@@ -261,7 +263,7 @@ export default {
         }
         switch (scrollType) {
           case 1:
-            this.smoothScrollBy(newOffset - oldOffset + this.incomplete);
+            this.smoothScrollBy(newOffset - oldOffset + incomplete);
             break;
           case 2:
             this.smoothScrollBy(newOffset - curOffset);
