@@ -79,18 +79,6 @@ class Source {
     return 0;
   }
 
-  getPosn(position) {
-    for (var i = position.index; i < this.maxIndex; i++) {
-      if (this[i].type == 'instruction') {
-        return {
-          address: this[i].address,
-          offset: this.getOffset(position) - this.getOffset({ index: i, offset: 0 })
-        };
-      }
-    }
-    return null;
-  }
-
   getIndex(address) {
     for (var i = this.minIndex; i < this.maxIndex; i++) {
       if (this[i].type == 'instruction' && address >= this[i].address && address < this[i].address + this[i].size) {
@@ -112,6 +100,18 @@ class Source {
       }
     }
     return offset + position.offset;
+  }
+
+  getPosn(position) {
+    for (var i = position.index; i < this.maxIndex; i++) {
+      if (this[i].type == 'instruction') {
+        return {
+          address: this[i].address,
+          offset: this.getOffset(position) - this.getOffset({ index: i, offset: 0 })
+        };
+      }
+    }
+    return null;
   }
 
   onScroll(index) {
