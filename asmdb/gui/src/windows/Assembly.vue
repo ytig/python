@@ -107,6 +107,7 @@ class Source {
       if (this[i].type == 'instruction') {
         return {
           address: this[i].address,
+          size: this[i].size,
           offset: this.getOffset(position) - this.getOffset({ index: i, offset: 0 })
         };
       }
@@ -263,7 +264,7 @@ export default {
           return;
         }
         var posn = this.source != null ? this.source.getPosn(this.$refs.scroller.getPosition()) : null;
-        if (posn != null && (posn.address != address || posn.offset != 0)) {
+        if (posn != null && !(address >= posn.address && address < posn.address + posn.size && posn.offset == 0)) {
           this.hstSet(posn);
         }
         this.counter++;
