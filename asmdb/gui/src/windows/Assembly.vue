@@ -144,6 +144,7 @@ export default {
       source: null,
       breakpoints: [],
       counter: 0,
+      incomplete: 0,
       hst: []
     };
   },
@@ -211,23 +212,21 @@ export default {
       //todo
     },
     smoothScrollBy: function(deltaY) {
-      if (deltaY == 0) {
-        return;
-      }
       var duration = 147 + 224 * Math.min(Math.abs(deltaY) / screen.height, 1);
       var maxi = Math.ceil((duration * 3) / 50);
-      var oldy = 0;
       var counter = this.counter;
+      this.incomplete = deltaY;
       requestAnimationFrames(i => {
         if (counter != this.counter) {
           return true;
         }
         var value = ++i / maxi;
+        var oldy = deltaY - this.incomplete;
         var newy = parseInt(deltaY * value);
         if (oldy != newy) {
           this.$refs.scroller.scrollBy(newy - oldy);
+          this.incomplete = deltaY - newy;
         }
-        oldy = newy;
         return !(i < maxi);
       });
     },
@@ -262,7 +261,7 @@ export default {
         }
         switch (scrollType) {
           case 1:
-            this.smoothScrollBy(newOffset - oldOffset);
+            this.smoothScrollBy(newOffset - oldOffset + this.incomplete);
             break;
           case 2:
             this.smoothScrollBy(newOffset - curOffset);
