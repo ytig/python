@@ -1,5 +1,7 @@
 <template>
-  <div class="instruction-container" @mouseover="onMouseOver" @mouseout="onMouseOut"></div>
+  <div class="instruction-container" @mouseover="onMouseOver" @mouseout="onMouseOut">
+    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value"></span>
+  </div>
 </template>
 
 <script>
@@ -9,6 +11,13 @@ import InfiniteMixin from './InfiniteMixin';
 
 function measureHeight() {
   return 18;
+}
+
+function newItem(value, ...style) {
+  return {
+    value: value,
+    style: style
+  };
 }
 
 export default {
@@ -42,7 +51,18 @@ export default {
       this.draw();
     },
     onLayout: function() {
-      //todo
+      var items = [];
+      var address = '0x' + this.address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
+      items.push(newItem(address));
+      items.push(newItem('&nbsp;'));
+      items.push(newItem('&nbsp;'));
+      items.push(newItem(this.mnemonic));
+      for (var i = 0; i < this.group - this.mnemonic.length; i++) {
+        items.push(newItem('&nbsp;'));
+      }
+      items.push(newItem('&nbsp;'));
+      items.push(newItem(this.op_str));
+      this.items.splice(0, this.items.length, ...items);
     },
     onPreDraw: function() {
       return measureHeight();
