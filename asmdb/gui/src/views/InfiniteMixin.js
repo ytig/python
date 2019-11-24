@@ -2,7 +2,7 @@ export default {
   data: function () {
     return {
       needLayout: [],
-      needDraw: ['canvasContext'],
+      needDraw: [],
       oldProps: null,
       dirtyLayout: false
     };
@@ -23,6 +23,7 @@ export default {
           needLayout = true;
           needDraw = true;
         } else {
+          var old_cc = this.oldProps.canvasContext.split(';');
           for (var key in this.oldProps) {
             var oldValue = this.oldProps[key];
             var newValue = newProps[key];
@@ -50,6 +51,21 @@ export default {
         }
         if (needDraw) {
           this.draw();
+        } else {
+          var new_cc = newProps.canvasContext.split(';');
+          if (old_cc[0] != new_cc[0]) {
+            this.draw();
+          } else {
+            var old_ts = old_cc[1].split(',');
+            var new_ts = new_cc[1].split(',');
+            var ts = [];
+            for (var i of new_ts) {
+              if (old_ts.indexOf(i) < 0) {
+                ts.push(i);
+              }
+            }
+            this.draw(new_cc[0] + ';' + ts.join(','));
+          }
         }
       }
     }
@@ -60,8 +76,11 @@ export default {
       this.dirtyLayout = false;
     },
     onLayout: function () {},
-    draw: function () {
-      var cc = this.canvasContext.split(';');
+    draw: function (canvasContext) {
+      if (canvasContext == undefined) {
+        canvasContext = this.canvasContext;
+      }
+      var cc = canvasContext.split(';');
       var h = this.onPreDraw();
       var t = parseInt(cc[0]);
       for (var i of cc[1].split(',')) {
