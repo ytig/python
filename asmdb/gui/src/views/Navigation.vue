@@ -21,8 +21,11 @@ export default {
     gradient: Boolean
   },
   watch: {
-    disable: function(newValue) {
-      this.disable2.set(!newValue);
+    disable: {
+      immediate: true,
+      handler: function(newValue) {
+        this.disable2.set(!newValue);
+      }
     }
   },
   methods: {
