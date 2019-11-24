@@ -5,7 +5,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :style="{width:windowWidth+'px'}" :source="source" @scroll2="onScroll2" #default="props">
-          <Instruction v-if="props.item.type=='instruction'" :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="source.toInstructionHighlight(props.item.address,pc)" :breaking="source.toInstructionBreaking(props.item.address,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
+          <Instruction v-if="props.item.type=='instruction'" :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="source.toInstructionHighlight(props.item,pc)" :breaking="source.toInstructionBreaking(props.item,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
         </Scroller>
       </div>
     </div>
@@ -32,7 +32,7 @@ function getRange(address) {
 class Source {
   constructor(pc, assembly) {
     for (var i = 0; i < assembly.length; i++) {
-      if (assembly[i].type == 'instruction' && assembly[i].address >= pc) {
+      if (assembly[i].type == 'instruction' && pc >= assembly[i].address && pc < assembly[i].address + assembly[i].size) {
         break;
       }
     }
@@ -60,13 +60,13 @@ class Source {
     this[index] = value;
   }
 
-  toInstructionHighlight(address, highlight) {
-    return address == highlight;
+  toInstructionHighlight(item, highlight) {
+    return highlight >= item.address && highlight < item.address + item.size;
   }
 
-  toInstructionBreaking(address, breakpoints) {
+  toInstructionBreaking(item, breakpoints) {
     for (var breakpoint of breakpoints) {
-      if (breakpoint.address == address) {
+      if (breakpoint.address >= item.address && breakpoint.address < item.address + item.size) {
         if (breakpoint.disable) {
           return 2;
         }
@@ -78,7 +78,7 @@ class Source {
 
   getIndex(address) {
     for (var i = this.minIndex; i < this.maxIndex; i++) {
-      if (this[i].type == 'instruction' && this[i].address == address) {
+      if (this[i].type == 'instruction' && address >= this[i].address && address < this[i].address + this[i].size) {
         return i;
       }
     }

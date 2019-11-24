@@ -176,6 +176,7 @@ class WsGdbController(GdbController):
             ret.append({
                 'type': 'instruction',
                 'address': address,
+                'size': 4,
                 'mnemonic': 'push',
                 'op_str': 'r0 r1'
             })
