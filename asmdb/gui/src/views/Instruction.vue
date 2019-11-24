@@ -77,7 +77,7 @@ export default {
         ctx.fill();
       }
       x += 16;
-      ctx.fillStyle = !this.highlight ? Theme.colorTextDarker : Theme.colorText2;
+      ctx.fillStyle = !this.highlight ? Theme.colorTextDarker : Theme.colorText;
       var address = '0x' + this.address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
       ctx.fillText(address, x, y);
       x += measureText(address);
