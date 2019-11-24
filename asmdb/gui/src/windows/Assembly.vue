@@ -159,8 +159,8 @@ export default {
       source: null,
       breakpoints: [],
       counter: 0,
-      counter2: 0,
       incomplete: 0,
+      counter2: 0,
       hst: []
     };
   },
