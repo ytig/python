@@ -1,5 +1,5 @@
 <template>
-  <div class="world-container">
+  <div class="world-container" :style="{width:screenWidth+'px'}">
     <div class="world-left-layout">
       <Bar ref="bar" class="world-bar"></Bar>
       <Assembly ref="assembly" class="world-assembly"></Assembly>
@@ -28,6 +28,11 @@ export default {
   created: function() {
     if (!asmdb.getInstance()) {
       asmdb.newInstance(); //todo catch
+    }
+  },
+  computed: {
+    screenWidth: function() {
+      return screen.width;
     }
   },
   methods: {
