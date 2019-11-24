@@ -212,7 +212,7 @@ export default {
       //todo
     },
     smoothScrollBy: function(deltaY) {
-      var duration = 147 + 224 * Math.min(Math.abs(deltaY) / screen.height, 1);
+      var duration = 147 + 77 * Math.min(Math.abs(deltaY) / screen.height, 1);
       var maxi = Math.ceil((duration * 3) / 50);
       var counter = this.counter;
       this.incomplete = deltaY;
