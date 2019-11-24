@@ -129,12 +129,11 @@ export default {
     hstDel: function() {
       this.hst.splice(0, this.hst.length);
     },
-    hstSet: function() {
+    hstSet: function(posn) {
       const maxHst = 147;
       while (this.hst.length >= maxHst) {
         this.hst.splice(0, 1);
       }
-      var posn = { page: this.page };
       this.hst.splice(this.hst.length, 0, posn);
     },
     hstGet: function() {
@@ -159,7 +158,7 @@ export default {
       }
       var index = Math.floor(offset / (row * this.column * 8));
       if (this.page != index) {
-        this.hstSet();
+        this.hstSet({ page: this.page });
       }
       this.itemSelection = offset;
       this.page = index;
