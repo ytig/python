@@ -195,7 +195,7 @@ export default {
     onClickMenu: function(index) {
       switch (index) {
         case 0:
-          //todo hstGet
+          this.hstGet();
           break;
         case 1:
           this.$refs.search.show();
@@ -211,14 +211,25 @@ export default {
         return false;
       }
     },
-    jumpTo: function(address) {
+    hstSet: function(posn) {
       //todo
+    },
+    hstGet: function() {
+      if (this.hst.length <= 0) {
+        return false;
+      } else {
+        //todo
+        return true;
+      }
+    },
+    jumpTo: function(address) {
       var range = getRange(address);
       asmdb.getInstance().asm(range, assembly => {
         this.counter++;
         this.incomplete = 0;
         this.source = new Source(address, assembly);
       });
+      this.requestFocus();
     },
     smoothScrollBy: function(deltaY) {
       var duration = 147 + 77 * Math.min(Math.abs(deltaY) / screen.height, 1);
