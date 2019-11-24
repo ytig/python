@@ -1,6 +1,6 @@
 <template>
   <div ref="container" class="recycler-container" @wheel="onWheel">
-    <div class="recycler-item" v-for="(item, index) in viewport" :key="index" :style="item.style_">
+    <div class="recycler-item" v-for="item in viewport" :key="item.id" :style="item.style_">
       <slot v-if="show&&item.key>=0" :item="item.val" :index="item.key" :context="context" :scrolling="scrolling"></slot>
     </div>
     <canvas ref="canvas1" class="recycler-draw"></canvas>
@@ -16,6 +16,7 @@ export default {
     return {
       position: { index: 0, offset: 0 },
       viewport: [],
+      viewport_: null,
       counter: 0,
       context: '',
       scrolling: false
@@ -44,9 +45,10 @@ export default {
     var length = Math.ceil(screen.height / this.lineHeight) + 1;
     var viewport = [];
     for (var i = 0; i < length; i++) {
-      viewport[i] = { key: -1, val: null, style_: { height: this.lineHeight + 'px', transform: 'translateY(0px)' } };
+      viewport[i] = { id: i, key: -1, val: null, style_: { height: this.lineHeight + 'px', transform: 'translateY(0px)' } };
     }
     this.viewport.splice(0, this.viewport.length, ...viewport);
+    this.viewport_ = viewport;
     var w = this.$refs.container.clientWidth;
     var h = length * this.lineHeight;
     this.$refs.canvas1.style.width = this.$refs.canvas2.style.width = w + 'px';
@@ -102,8 +104,9 @@ export default {
       }
     },
     invalidate: function() {
+      var length = this.viewport.length;
       var scrollTop = this.position.index * this.lineHeight + this.position.offset;
-      var height = this.viewport.length * this.lineHeight;
+      var height = length * this.lineHeight;
       var index = parseInt(scrollTop / height);
       var offset = scrollTop % height;
       var views = [this.$refs.canvas1, this.$refs.canvas2];
@@ -122,9 +125,9 @@ export default {
         tokens.push(view.token);
       }
       this.context = tokens.sort().join();
-      for (var i = 0; i < this.viewport.length; i++) {
-        var o = (this.position.index + i) % this.viewport.length;
-        var slot = this.viewport[o];
+      for (var i = 0; i < length; i++) {
+        var o = (this.position.index + i) % length;
+        var slot = this.viewport_[o];
         var key = this.position.index + i;
         if (key < 0 || key >= this.source.length) {
           key = -1;
@@ -151,6 +154,11 @@ export default {
             slot.style_.transform = transform;
           }
         }
+      }
+      if (!this.scrolling) {
+        this.viewport.sort(function(a, b) {
+          return a.key - b.key;
+        });
       }
     }
   }
