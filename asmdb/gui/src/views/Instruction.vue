@@ -112,7 +112,7 @@ export default {
       this.draw();
     },
     onClickBpt: function() {
-      if (this.breaking == 0) {
+      if (!this.breaking) {
         asmdb.getInstance().bpt([], [{ address: this.address, disable: false }]);
       } else {
         asmdb.getInstance().bpt([{ address: this.address }], []);
