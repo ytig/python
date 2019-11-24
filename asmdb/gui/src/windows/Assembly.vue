@@ -76,23 +76,27 @@ class Source {
     return 0;
   }
 
-  getDeltaY(address, position) {
+  getIndex(address) {
     for (var i = this.minIndex; i < this.maxIndex; i++) {
       if (this[i].type == 'instruction' && this[i].address == address) {
-        var deltaY = 0;
-        if (i < position.index) {
-          for (var j = i; j < position.index; j++) {
-            deltaY -= this[j].height;
-          }
-        } else {
-          for (var j = position.index; j < i; j++) {
-            deltaY += this[j].height;
-          }
-        }
-        return deltaY - position.offset;
+        return i;
       }
     }
     return null;
+  }
+
+  getOffset(position) {
+    var offset = 0;
+    if (position.index >= 0) {
+      for (var i = 0; i < position.index; i++) {
+        offset += this[i].height;
+      }
+    } else {
+      for (var i = position.index; i < 0; i++) {
+        offset -= this[i].height;
+      }
+    }
+    return offset + position.offset;
   }
 
   onScroll(index) {
@@ -210,7 +214,7 @@ export default {
       if (deltaY == 0) {
         return;
       }
-      var duration = 147 + (224 * Math.abs(deltaY)) / screen.height;
+      var duration = 147 + 224 * Math.min(Math.abs(deltaY) / screen.height, 1);
       var maxi = Math.ceil((duration * 3) / 50);
       var oldy = 0;
       var counter = this.counter;
@@ -229,8 +233,8 @@ export default {
     },
     getRange: function(pc) {
       if (this.source != null) {
-        var deltaY = this.source.getDeltaY(pc, this.$refs.scroller.getPosition());
-        if (deltaY != null && Math.abs(deltaY) < screen.height) {
+        var index = this.source.getIndex(pc);
+        if (index != null) {
           return null;
         }
       }
@@ -238,16 +242,34 @@ export default {
     },
     onBreak: function(pc, assembly) {
       this.disable = false;
-      this.pc = pc;
       this.counter++;
-      if (assembly == null) {
-        var deltaY = this.source.getDeltaY(pc, this.$refs.scroller.getPosition());
-        if (deltaY != null) {
-          this.smoothScrollBy(deltaY);
-        }
-      } else {
+      if (assembly != null) {
         this.source = new Source(pc, assembly);
+      } else {
+        var oldIndex = this.source.getIndex(this.pc);
+        var oldOffset = oldIndex != null ? this.source.getOffset({ index: oldIndex, offset: 0 }) : null;
+        var newIndex = this.source.getIndex(pc);
+        var newOffset = newIndex != null ? this.source.getOffset({ index: newIndex, offset: 0 }) : null;
+        var curOffset = this.source.getOffset(this.$refs.scroller.getPosition());
+        var scrollType = 0;
+        if (newOffset != null) {
+          var maxOffset = this.$refs.scroller.$el.clientHeight;
+          if (oldOffset != null && oldOffset - curOffset >= 0 && oldOffset - curOffset + this.source[oldIndex].height <= maxOffset) {
+            scrollType = 1;
+          } else {
+            scrollType = 2;
+          }
+        }
+        switch (scrollType) {
+          case 1:
+            this.smoothScrollBy(newOffset - oldOffset);
+            break;
+          case 2:
+            this.smoothScrollBy(newOffset - curOffset);
+            break;
+        }
       }
+      this.pc = pc;
     },
     onContinue: function() {
       this.disable = true;
