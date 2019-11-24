@@ -220,7 +220,6 @@ export default {
       this.onClickIndex(this.page + delta);
     },
     onClickIndex: function(newPage) {
-      this.hstSet();
       this.page = newPage;
       this.itemSelection = null;
       this.invalidate();
