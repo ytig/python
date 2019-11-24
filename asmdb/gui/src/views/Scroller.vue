@@ -1,6 +1,6 @@
 <template>
   <div ref="container" class="scroller-container" @wheel="onWheel">
-    <div class="scroller-item" v-for="(item, index) in viewport" :key="index" :style="item.style_">
+    <div class="scroller-item" v-for="item in viewport" :key="item.id" :style="item.style_">
       <slot v-if="item.key!=null" :item="item.val" :index="item.key" :offset="item.top" :context="context" :scrolling="scrolling"></slot>
     </div>
     <canvas ref="canvas1" class="scroller-draw"></canvas>
@@ -14,6 +14,7 @@ export default {
     return {
       position: { index: 0, offset: 0 },
       viewport: [],
+      unique: 0,
       counter: 0,
       context: '',
       scrolling: false
@@ -192,7 +193,15 @@ export default {
           }
         }
       }
+      for (var item of items) {
+        item.id = this.unique++;
+      }
       this.viewport.splice(this.viewport.length, 0, ...items);
+      if (!this.scrolling) {
+        this.viewport.sort(function(a, b) {
+          return a.top - b.top;
+        });
+      }
       if (sumTop - scrollTop < canvasHeight) {
         for (var token of tokens) {
           getContext(token, sumTop, canvasHeight);
