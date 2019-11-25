@@ -269,7 +269,28 @@ class Debugger {
           object.onBreak();
         }
         break;
-      case 'assembly': //todo
+      case 'assembly':
+        if (!suspend) {
+          object.onContinue();
+        } else {
+          this.reg((registers) => {
+            if (counter != this.counter) {
+              return;
+            }
+            var pc = registers[this.PCNM];
+            var range = object.getRange(pc);
+            if (range == null) {
+              object.onBreak(pc, null);
+            } else {
+              this.asm(range, (assembly) => {
+                if (counter != this.counter) {
+                  return;
+                }
+                object.onBreak(pc, assembly);
+              });
+            }
+          });
+        }
         break;
       case 'registers':
         if (!suspend) {
