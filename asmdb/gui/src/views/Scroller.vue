@@ -71,7 +71,7 @@ export default {
         offset += delta;
         while (offset < 0) {
           if (index - 1 in this.source) {
-            offset += this.source[index].height;
+            offset += this.source[index - 1].height;
             index--;
           } else {
             offset = 0;
