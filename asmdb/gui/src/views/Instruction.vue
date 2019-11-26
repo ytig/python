@@ -113,9 +113,11 @@ export default {
       ctx.fillStyle = Theme.colorText;
       ctx.fillText(this.op_str, x, y);
       x += measureText(this.op_str);
-      x += measureText(2);
-      ctx.fillStyle = Theme.colorTextDark;
-      ctx.fillText(this.comment, x, y);
+      if (this.comment) {
+        x += measureText(2);
+        ctx.fillStyle = Theme.colorTextDark;
+        ctx.fillText(this.comment, x, y);
+      }
     },
     onMouseOverBpt: function() {
       this.hoverBpt = true;
