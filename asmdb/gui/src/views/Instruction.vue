@@ -118,7 +118,7 @@ export default {
     },
     onClickBpt: function() {
       if (!this.breaking) {
-        asmdb.getInstance().bpt([], [{ address: this.address, disable: false }]);
+        asmdb.getInstance().bpt([], [{ address: this.address, disable: false, comment: '' }]);
       } else {
         asmdb.getInstance().bpt([{ address: this.address }], []);
       }
