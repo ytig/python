@@ -5,7 +5,7 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :source="source" @scroll2="onScroll2" #default="props">
-          <Instruction v-if="props.item.type=='instruction'" :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :highlight="source.toInstructionHighlight(props.item,itemSelection)" :running="source.toInstructionRunning(props.item,pc)" :breaking="source.toInstructionBreaking(props.item,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
+          <Instruction v-if="props.item.type=='instruction'" :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :comment="source.toInstructionComment(props.item,breakpoints)" :highlight="source.toInstructionHighlight(props.item,itemSelection)" :running="source.toInstructionRunning(props.item,pc)" :breaking="source.toInstructionBreaking(props.item,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
         </Scroller>
       </div>
     </div>
@@ -59,6 +59,15 @@ class Source {
       instruction: Instruction
     }[value.type].measureHeight(value);
     this[index] = value;
+  }
+
+  toInstructionComment(item, breakpoints) {
+    for (var breakpoint of breakpoints) {
+      if (breakpoint.address >= item.address && breakpoint.address < item.address + item.size) {
+        return breakpoint.comment;
+      }
+    }
+    return '';
   }
 
   toInstructionHighlight(item, highlight) {

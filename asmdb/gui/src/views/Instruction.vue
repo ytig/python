@@ -34,13 +34,14 @@ export default {
     address: Number,
     mnemonic: String,
     op_str: String,
+    comment: String,
     highlight: Boolean,
     running: Boolean,
     breaking: Number,
     group: Number
   },
   created: function() {
-    this.needLayout.push('address', 'mnemonic', 'op_str', 'group');
+    this.needLayout.push('address', 'mnemonic', 'op_str', 'comment', 'group');
     this.needDraw.push('highlight', 'running', 'breaking');
   },
   methods: {
@@ -56,6 +57,11 @@ export default {
       }
       items.push(newItem('&nbsp;'));
       items.push(newItem(this.op_str));
+      if (this.comment) {
+        items.push(newItem('&nbsp;'));
+        items.push(newItem('&nbsp;'));
+        items.push(newItem(this.comment));
+      }
       this.items.splice(0, this.items.length, ...items);
     },
     onPreDraw: function() {
@@ -107,6 +113,9 @@ export default {
       ctx.fillStyle = Theme.colorText;
       ctx.fillText(this.op_str, x, y);
       x += measureText(this.op_str);
+      x += measureText(2);
+      ctx.fillStyle = Theme.colorTextDark;
+      ctx.fillText(this.comment, x, y);
     },
     onMouseOverBpt: function() {
       this.hoverBpt = true;
@@ -142,6 +151,7 @@ export default {
     line-height: 16px;
     font-size: 12px;
     color: transparent;
+    white-space: nowrap;
   }
   > span:first-of-type {
     margin-left: 28px;
