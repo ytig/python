@@ -73,6 +73,7 @@ export default {
     }
     .world-assembly {
       flex-grow: 1;
+      border-top: 1px solid @color-background-dark;
       background: @color-background;
     }
     .world-python3 {
