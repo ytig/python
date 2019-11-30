@@ -74,6 +74,7 @@ export default {
     font-size: 12px;
     color: @color-text-dark;
     border: 1px solid transparent;
+    text-overflow: ellipsis;
     cursor: pointer;
   }
   .comment-input:hover {
