@@ -11,6 +11,7 @@ import editor from '@/plugins/editor';
 Vue.use(editor);
 
 import Bytes from '@/views/Bytes';
+import Comment from '@/views/Comment';
 import Gird from '@/views/Gird';
 import Indicator from '@/views/Indicator';
 import Instruction from '@/views/Instruction';
@@ -29,6 +30,7 @@ import Registers from '@/windows/Registers';
 import Stack from '@/windows/Stack';
 import Watchpoints from '@/windows/Watchpoints';
 Vue.component('Bytes', Bytes);
+Vue.component('Comment', Comment);
 Vue.component('Gird', Gird);
 Vue.component('Indicator', Indicator);
 Vue.component('Instruction', Instruction);

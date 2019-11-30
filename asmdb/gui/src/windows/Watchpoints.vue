@@ -141,7 +141,7 @@ export default {
         color: @color-text;
         cursor: pointer;
       }
-      > span:nth-of-type(3) {
+      > span:nth-last-of-type(1) {
         flex-grow: 1;
       }
       > div {

@@ -7,8 +7,9 @@
       <div class="breakpoints-item" v-for="point in breakpoints" :key="point.address" :css-disable="point.disable">
         <span></span>
         <span @click="onClickItem(point)">{{toHex(point.address)}}</span>
-        <span>{{point.comment}}</span>
-        <div class="breakpoints-icon" @click="onCommentPoint(point)"></div>
+        <Comment ref="comment" :value="point.comment" @input="onCommentPoint(point,arguments[0])"></Comment>
+        <span></span>
+        <div class="breakpoints-icon" @click="commentPoint(point)"></div>
         <div class="breakpoints-icon" @click="onTogglePoint(point)"></div>
         <div class="breakpoints-icon" @click="onSubPoint(point)"></div>
       </div>
@@ -96,8 +97,13 @@ export default {
       point.disable = !point.disable;
       asmdb.getInstance().bpt([], [point]);
     },
-    onCommentPoint: function(point) {
-      //todo
+    commentPoint: function(point) {
+      this.$refs.comment.blur();
+    },
+    onCommentPoint: function(point, comment) {
+      point = Object.assign({}, point);
+      point.comment = comment;
+      asmdb.getInstance().bpt([], [point]);
     },
     onAddPoint: function(address) {
       asmdb.getInstance().bpt([], [{ address: address, disable: false, comment: '' }]);
@@ -143,14 +149,8 @@ export default {
         cursor: pointer;
         margin-right: 8px;
       }
-      > span:nth-of-type(3) {
-        width: 0px;
+      > span:nth-last-of-type(1) {
         flex-grow: 1;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        font-size: 12px;
-        color: @color-text-dark;
       }
       > div {
         margin-left: 12px;
