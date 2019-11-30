@@ -55,7 +55,7 @@ export default {
       this.focus = value;
       if (!value) {
         this.$refs.search.dismiss();
-        for (var comment of this.$refs.comments) {
+        for (var comment of this.$refs.comments || []) {
           comment.dismiss();
         }
       }
@@ -101,7 +101,7 @@ export default {
       asmdb.getInstance().bpt([], [point]);
     },
     commentPoint: function(event) {
-      for (var comment of this.$refs.comments) {
+      for (var comment of this.$refs.comments || []) {
         if (comment.$el.parentNode.contains(event.target)) {
           comment.show();
           break;
