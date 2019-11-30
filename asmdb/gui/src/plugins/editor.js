@@ -22,9 +22,6 @@ export default {
         intercept = false;
       }
     }, true);
-    document.addEventListener('contextmenu', function (event) {
-      event.preventDefault();
-    });
     document.addEventListener('keydown', function (event) {
       if (vm.onKeyDown(event)) {
         event.stopPropagation();
