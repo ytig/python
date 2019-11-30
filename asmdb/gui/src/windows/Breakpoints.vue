@@ -99,7 +99,7 @@ export default {
     },
     commentPoint: function(event) {
       for (var comment of this.$refs.comments) {
-        if (new Array(...comment.$el.parentNode.children).indexOf(event.target) >= 0) {
+        if (comment.$el.parentNode.contains(event.target)) {
           comment.blur();
           break;
         }
