@@ -1,0 +1,43 @@
+export default {
+  data: function () {
+    return {
+      showing: false,
+      intercept: false
+    };
+  },
+  created: function () {
+    document.addEventListener('mousedown', this.onDomMouseDown, true);
+    document.addEventListener('click', this.onDomClick, true);
+    document.addEventListener('keydown', this.onDomKeyDown, true);
+  },
+  destroyed: function () {
+    document.removeEventListener('mousedown', this.onDomMouseDown, true);
+    document.removeEventListener('click', this.onDomClick, true);
+    document.removeEventListener('keydown', this.onDomKeyDown, true);
+  },
+  methods: {
+    show: function () {
+      this.showing = true;
+      this.onShow();
+    },
+    dismiss: function () {
+      this.showing = false;
+      this.onDismiss();
+    },
+    onShow: function () {},
+    onDismiss: function () {},
+    onDomMouseDown: function (event) {
+      this.intercept = this.showing;
+    },
+    onDomClick: function (event) {
+      if (this.intercept) {
+        event.stopPropagation();
+      }
+    },
+    onDomKeyDown: function (event) {
+      if (this.showing) {
+        event.stopPropagation();
+      }
+    }
+  }
+};

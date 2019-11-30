@@ -8,6 +8,7 @@
 <script>
 import Animation from '@/scripts/animation';
 import asmdb from '@/scripts/asmdb';
+import InputMixin from './InputMixin';
 
 function exec(source, locals, condition) {
   var result = null;
@@ -29,10 +30,9 @@ function exec(source, locals, condition) {
 }
 
 export default {
+  mixins: [InputMixin],
   data: function() {
     return {
-      showing: false,
-      intercept: false,
       illegal: false,
       text: '',
       realText: '',
@@ -65,26 +65,9 @@ export default {
       return 4 + 10 * output;
     }
   },
-  created: function() {
-    document.addEventListener('mousedown', this.onDomMouseDown, true);
-    document.addEventListener('click', this.onDomClick, true);
-    document.addEventListener('keydown', this.onDomKeyDown, true);
-  },
-  destroyed: function() {
-    document.removeEventListener('mousedown', this.onDomMouseDown, true);
-    document.removeEventListener('click', this.onDomClick, true);
-    document.removeEventListener('keydown', this.onDomKeyDown, true);
-  },
-  updated: function() {
-    var input = this.$refs.input;
-    if (this.showing) {
-      input.focus();
-    }
-  },
   methods: {
-    show: function() {
+    onShow: function() {
       this.locals = asmdb.getInstance().getRegisters();
-      this.showing = true;
       this.text = '';
       this.realText = '';
       this.anim.$value(0);
@@ -92,8 +75,7 @@ export default {
         this.$refs.input.focus();
       });
     },
-    dismiss: function() {
-      this.showing = false;
+    onDismiss: function() {
       this.locals = null;
     },
     onInput: function() {
@@ -118,19 +100,6 @@ export default {
     },
     onBlur: function() {
       this.dismiss();
-    },
-    onDomMouseDown: function(event) {
-      this.intercept = this.showing;
-    },
-    onDomClick: function(event) {
-      if (this.intercept) {
-        event.stopPropagation();
-      }
-    },
-    onDomKeyDown: function(event) {
-      if (this.showing) {
-        event.stopPropagation();
-      }
     }
   }
 };
