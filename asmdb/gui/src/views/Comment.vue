@@ -52,6 +52,9 @@ export default {
         this.$emit('input', this.text);
       }
     },
+    onIntercept: function() {
+      return false;
+    },
     onInput: function() {
       this.text = this.$refs.input.value;
     },

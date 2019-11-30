@@ -26,9 +26,12 @@ export default {
       this.onDismiss();
     },
     onDismiss: function () {},
+    onIntercept: function () {
+      return true;
+    },
     onDomMouseDown: function (event) {
       if (event.button == 0) {
-        this.intercept = this.showing;
+        this.intercept = this.showing && this.onIntercept();
         if (this.intercept) {
           event.stopPropagation();
         }
