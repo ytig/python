@@ -2,7 +2,6 @@ export default {
   //background
   colorBackground: '#282c34',
   colorBackgroundDark: '#21252b',
-  colorBackgroundLight: '#2c313c',
   colorBackgroundSelection: '#67769660',
   colorBackgroundSelection2: '#d7dae0',
   colorBackgroundHover: '#383e4a',
