@@ -46,6 +46,9 @@ export default {
     onDomKeyDown: function (event) {
       if (this.showing) {
         event.stopPropagation();
+        if (event.keyCode == 9) {
+          event.preventDefault();
+        }
       }
     }
   }

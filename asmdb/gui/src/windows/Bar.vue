@@ -99,7 +99,7 @@ export default {
           this.onClickMenu(index + d);
           return true;
         } else {
-          return false;
+          return event.keyCode == 9;
         }
       }
     },
