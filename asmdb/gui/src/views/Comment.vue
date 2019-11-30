@@ -38,7 +38,9 @@ export default {
     },
     onDismiss: function() {
       this.$refs.input.blur();
-      this.$emit('input', this.text);
+      if (this.text != this.value) {
+        this.$emit('input', this.text);
+      }
     },
     onInput: function() {
       this.text = this.$refs.input.value;
