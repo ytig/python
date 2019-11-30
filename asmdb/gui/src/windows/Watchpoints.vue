@@ -32,7 +32,7 @@ export default {
   },
   computed: {
     windowWidth: function() {
-      return Math.ceil(12 + 8 + 8 + measureText(2 + 2 * asmdb.getInstance().UNIT) + 32 + 16 + 12);
+      return Math.ceil(12 + 8 + 8 + measureLength(2 + 2 * asmdb.getInstance().UNIT) + 32 + 16 + 12);
     }
   },
   mounted: function() {

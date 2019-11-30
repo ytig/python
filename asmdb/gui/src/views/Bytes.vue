@@ -10,7 +10,7 @@ import asmdb from '@/scripts/asmdb';
 import InfiniteMixin from './InfiniteMixin';
 
 function measureWidth(lineNumberLength, group, showString) {
-  return Math.ceil(24 + measureText(lineNumberLength + 2 + 3 * group + parseInt(group / 8) - 2 + (showString ? 2 + group : 0)) + 2 * group);
+  return Math.ceil(24 + measureLength(lineNumberLength + 2 + 3 * group + parseInt(group / 8) - 2 + (showString ? 2 + group : 0)) + 2 * group);
 }
 
 function measureHeight() {
@@ -120,15 +120,15 @@ export default {
       x += 12;
       ctx.fillStyle = this.highlightNumber == null ? Theme.colorTextDarker : Theme.colorTextDark;
       ctx.fillText(this.lineNumber, x, y);
-      x += measureText(this.lineNumber);
+      x += measureLength(this.lineNumber.length);
       var coordinates = [];
       var usage;
       for (var i = 0; i < this.group; i++) {
         if (i % 8 == 0) {
-          x += measureText(1);
+          x += measureLength(1);
         }
         if (i % asmdb.getInstance().UNIT == 0) {
-          x += measureText(1);
+          x += measureLength(1);
           if (this.newBytes == null) {
             usage = '0';
           } else if (i + asmdb.getInstance().UNIT - 1 < this.newBytes.length) {
@@ -142,7 +142,7 @@ export default {
             usage = '1';
           }
         } else {
-          x += measureText(1);
+          x += measureLength(1);
         }
         var charCode = null;
         var changed = false;
@@ -159,7 +159,7 @@ export default {
         }
         var coordinate = {
           left: Math.round(x),
-          right: Math.round(x) + Math.ceil(measureText(2)) + 2
+          right: Math.round(x) + Math.ceil(measureLength(2)) + 2
         };
         coordinates.push(coordinate);
         x += 1;
@@ -194,7 +194,7 @@ export default {
             ctx.fillRect(coordinate.left + 1, h - 5, coordinate.right - coordinate.left - 2, 1);
           }
         }
-        x += measureText(2) + 1;
+        x += measureLength(2) + 1;
       }
       ctx.fillStyle = Theme.colorIconBreakpoint;
       var s = 0;
@@ -221,7 +221,7 @@ export default {
         }
       }
       if (this.showString) {
-        x += measureText(2);
+        x += measureLength(2);
         for (var i = 0; i < this.group; i++) {
           var charCode = null;
           if (this.newBytes == null) {
@@ -248,7 +248,7 @@ export default {
             }
             ctx.fillText(charCode, x, y);
           }
-          x += measureText(1);
+          x += measureLength(1);
         }
       }
     },
@@ -270,7 +270,7 @@ export default {
           var el = this.$el.getElementsByClassName('bytes-padding')[index];
           var rect = el.getBoundingClientRect();
           var placeholder = el.innerHTML;
-          this.$editor.alert(parseInt(rect.x + 1 - measureText(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
+          this.$editor.alert(parseInt(rect.x + 1 - measureLength(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
         }
       }
     },
@@ -306,7 +306,7 @@ export default {
       var placeholder = el.innerHTML;
       items.push(['Modify memory', '', asmdb.getInstance().isSuspend() && inRange]);
       items[items.length - 1].event = () => {
-        this.$editor.alert(parseInt(rect.x + 1 - measureText(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
+        this.$editor.alert(parseInt(rect.x + 1 - measureLength(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
       };
       return items;
     },

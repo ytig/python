@@ -43,12 +43,7 @@ window.emptySelection = function () {
 }
 
 window.measureText = function (text, font) {
-  if (typeof text == 'number') {
-    return text * window.measureText(' ', font);
-  }
-  if (!font || font == '12px Menlo') {
-    return 7.224609375 * text.length;
-  }
+  font = font || '12px Menlo';
   var canvas = document.getElementById('__canvas__');
   if (!canvas) {
     canvas = document.createElement('canvas');
@@ -59,6 +54,16 @@ window.measureText = function (text, font) {
   var context = canvas.getContext('2d');
   context.font = font;
   return context.measureText(text).width;
+}
+
+window.measureLength = function (length, font) {
+  var width;
+  if (!font || font == '12px Menlo') {
+    width = 7.224609375;
+  } else {
+    width = window.measureText(' ', font);
+  }
+  return length * width;
 }
 
 window.resetContext = function (canvas) {

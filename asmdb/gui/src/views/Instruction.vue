@@ -104,17 +104,17 @@ export default {
       ctx.fillStyle = !this.running ? (!this.highlight ? Theme.colorTextDarker : Theme.colorTextDark) : Theme.colorText2;
       var address = '0x' + this.address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
       ctx.fillText(address, x, y);
-      x += measureText(address);
-      x += measureText(2);
+      x += measureLength(address.length);
+      x += measureLength(2);
       ctx.fillStyle = Theme.colorText2;
       ctx.fillText(this.mnemonic, x, y);
-      x += Math.max(measureText(this.mnemonic.length), measureText(this.group));
-      x += measureText(1);
+      x += Math.max(measureLength(this.mnemonic.length), measureLength(this.group));
+      x += measureLength(1);
       ctx.fillStyle = Theme.colorText;
       ctx.fillText(this.op_str, x, y);
-      x += measureText(this.op_str);
+      x += measureLength(this.op_str.length);
       if (this.comment) {
-        x += measureText(2);
+        x += measureLength(2);
         ctx.fillStyle = Theme.colorTextDark;
         ctx.fillText(this.comment, x, y);
       }
