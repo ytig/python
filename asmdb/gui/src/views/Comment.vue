@@ -59,6 +59,7 @@ export default {
 
 .comment-input {
   padding-right: 4px;
+  line-height: 14px;
   font-size: 12px;
   color: @color-text-dark;
   border: 1px solid transparent;
