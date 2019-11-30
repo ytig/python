@@ -171,6 +171,7 @@ export default {
       }
       .breakpoints-icon:nth-last-of-type(3) {
         background-image: url('/static/icons/comment.png');
+        margin-left: 8px;
       }
     }
     .breakpoints-item[css-disable] {
