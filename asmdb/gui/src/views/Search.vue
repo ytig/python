@@ -126,6 +126,7 @@ export default {
     border: 1px solid transparent;
     padding: 3px 3px 1px 20px;
     max-width: 224px;
+    line-height: 14px;
     font-size: 12px;
     color: @color-text-light;
   }

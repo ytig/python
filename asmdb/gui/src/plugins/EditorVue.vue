@@ -149,6 +149,7 @@ export default {
     padding-bottom: 3px;
     padding-left: 20px;
     padding-right: 4px;
+    line-height: 14px;
     font-size: 12px;
     color: #000;
   }
