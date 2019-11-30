@@ -3,12 +3,12 @@
     <div class="world-left-layout">
       <Bar ref="bar" class="world-bar"></Bar>
       <Assembly ref="assembly" class="world-assembly"></Assembly>
+      <Python3 ref="python3" class="world-python3"></Python3>
       <div class="world-points-layout">
         <Breakpoints ref="breakpoints" class="world-breakpoints" @clickitem="onClickItem"></Breakpoints>
         <div class="world-points-split"></div>
         <Watchpoints ref="watchpoints" class="world-watchpoints" @clickitem="onClickItem"></Watchpoints>
       </div>
-      <Python3 ref="python3" class="world-python3"></Python3>
     </div>
     <div class="world-right-layout">
       <Registers ref="registers" class="world-registers" @clickitem="onClickItem"></Registers>
@@ -81,7 +81,7 @@ export default {
       display: flex;
       .world-breakpoints {
         flex-grow: 1;
-        background: @color-background;
+        background: @color-background-dark;
       }
       .world-points-split {
         width: 1px;
@@ -89,7 +89,7 @@ export default {
         background: @color-border;
       }
       .world-watchpoints {
-        background: @color-background;
+        background: @color-background-dark;
       }
     }
   }
