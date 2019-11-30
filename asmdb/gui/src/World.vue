@@ -76,7 +76,7 @@ export default {
       background: @color-background;
     }
     .world-python3 {
-      background: #001a20;
+      background: @color-background-darker;
     }
     .world-points-layout {
       display: flex;
