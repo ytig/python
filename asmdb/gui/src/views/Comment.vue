@@ -29,7 +29,7 @@ export default {
   computed: {
     inputWidth: function() {
       var w = measureText(this.text);
-      return 2 + 6 + Math.ceil(1 + w);
+      return 2 + 4 + Math.ceil(1 + w);
     }
   },
   methods: {
@@ -58,7 +58,7 @@ export default {
 @import '~@/styles/theme';
 
 .comment-input {
-  padding-right: 6px;
+  padding-right: 4px;
   font-size: 12px;
   color: @color-text-dark;
   border: 1px solid transparent;
