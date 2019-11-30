@@ -103,6 +103,7 @@ export default {
     commentPoint: function(event) {
       for (var comment of this.$refs.comments || []) {
         if (comment.$el.parentNode.contains(event.target)) {
+          comment.selectEnd();
           comment.show();
           break;
         }
