@@ -16,9 +16,14 @@ export default {
     value: String
   },
   watch: {
-    value: function(newValue, oldValue) {
-      this.text = newValue;
-      this.$refs.input.value = this.text;
+    value: {
+      immediate: true,
+      handler: function(newValue, oldValue) {
+        this.text = newValue;
+        this.$nextTick(function() {
+          this.$refs.input.value = this.text;
+        });
+      }
     }
   },
   computed: {
@@ -26,10 +31,6 @@ export default {
       var w = measureText(this.text);
       return 2 + 6 + Math.ceil(1 + w);
     }
-  },
-  mounted: function() {
-    this.text = this.value;
-    this.$refs.input.value = this.text;
   },
   methods: {
     onShow: function() {
