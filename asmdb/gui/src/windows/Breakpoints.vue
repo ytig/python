@@ -55,6 +55,9 @@ export default {
       this.focus = value;
       if (!value) {
         this.$refs.search.dismiss();
+        for (var comment of this.$refs.comments) {
+          comment.dismiss();
+        }
       }
     },
     onMouseUp: function(event) {
@@ -100,7 +103,7 @@ export default {
     commentPoint: function(event) {
       for (var comment of this.$refs.comments) {
         if (comment.$el.parentNode.contains(event.target)) {
-          comment.blur();
+          comment.show();
           break;
         }
       }
