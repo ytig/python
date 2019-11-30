@@ -20,11 +20,11 @@ export default {
       this.showing = true;
       this.onShow();
     },
+    onShow: function () {},
     dismiss: function () {
       this.showing = false;
       this.onDismiss();
     },
-    onShow: function () {},
     onDismiss: function () {},
     onDomMouseDown: function (event) {
       this.intercept = this.showing;
