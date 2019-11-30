@@ -1,5 +1,7 @@
 <template>
-  <input ref="input" class="comment-input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @keypress="onKeyPress" @focus="show" @blur="dismiss" />
+  <div ref="container" class="comment-container">
+    <input ref="input" class="comment-input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @keypress="onKeyPress" @focus="show" @blur="dismiss" />
+  </div>
 </template>
 
 <script>
@@ -9,6 +11,7 @@ export default {
   mixins: [InputMixin],
   data: function() {
     return {
+      maxWidth: 0,
       text: ''
     };
   },
@@ -29,8 +32,11 @@ export default {
   computed: {
     inputWidth: function() {
       var w = measureText(this.text);
-      return 2 + 4 + Math.ceil(1 + w);
+      return Math.min(2 + 4 + Math.ceil(1 + w), this.maxWidth);
     }
+  },
+  mounted: function() {
+    this.maxWidth = this.$refs.container.clientWidth;
   },
   methods: {
     selectEnd: function() {
@@ -61,19 +67,21 @@ export default {
 <style lang="less">
 @import '~@/styles/theme';
 
-.comment-input {
-  padding-right: 4px;
-  line-height: 14px;
-  font-size: 12px;
-  color: @color-text-dark;
-  border: 1px solid transparent;
-  cursor: pointer;
-}
-.comment-input:hover {
-  border: 1px solid @color-text-dark;
-}
-.comment-input:focus {
-  border: 1px solid @color-text-dark;
-  cursor: default;
+.comment-container {
+  .comment-input {
+    padding-right: 4px;
+    line-height: 14px;
+    font-size: 12px;
+    color: @color-text-dark;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .comment-input:hover {
+    border: 1px solid @color-text-dark;
+  }
+  .comment-input:focus {
+    border: 1px solid @color-text-dark;
+    cursor: default;
+  }
 }
 </style>

@@ -7,8 +7,7 @@
       <div class="breakpoints-item" v-for="point in breakpoints" :key="point.address" :css-disable="point.disable">
         <span></span>
         <span @click="onClickItem(point)">{{toHex(point.address)}}</span>
-        <Comment ref="comments" :point="point" :value="point.comment" @input="onCommentPoint(point, arguments[0])"></Comment>
-        <span></span>
+        <Comment ref="comments" class="breakpoints-grow" :point="point" :value="point.comment" @input="onCommentPoint(point, arguments[0])"></Comment>
         <div class="breakpoints-icon" @click="commentPoint"></div>
         <div class="breakpoints-icon" @click="onTogglePoint(point)"></div>
         <div class="breakpoints-icon" @click="onSubPoint(point)"></div>
@@ -158,19 +157,19 @@ export default {
         cursor: pointer;
         margin-right: 8px;
       }
-      > span:nth-last-of-type(1) {
+      .breakpoints-grow {
         flex-grow: 1;
       }
-      > div {
+      .breakpoints-icon {
         margin-left: 12px;
       }
-      > div:nth-last-of-type(1) {
+      .breakpoints-icon:nth-last-of-type(1) {
         background-image: url('/static/icons/sub.png');
       }
-      > div:nth-last-of-type(2) {
+      .breakpoints-icon:nth-last-of-type(2) {
         background-image: url('/static/icons/toggle.png');
       }
-      > div:nth-last-of-type(3) {
+      .breakpoints-icon:nth-last-of-type(3) {
         background-image: url('/static/icons/comment.png');
       }
     }

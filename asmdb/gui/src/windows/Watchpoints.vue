@@ -7,7 +7,7 @@
       <div class="watchpoints-item" v-for="point in watchpoints" :key="point.address">
         <span></span>
         <span @click="onClickItem(point)">{{toHex(point.address)}}</span>
-        <span></span>
+        <span class="watchpoints-grow"></span>
         <div class="watchpoints-icon" @click="onSubPoint(point)"></div>
       </div>
       <div class="watchpoints-func">
@@ -141,13 +141,13 @@ export default {
         color: @color-text;
         cursor: pointer;
       }
-      > span:nth-last-of-type(1) {
+      .watchpoints-grow {
         flex-grow: 1;
       }
-      > div {
+      .watchpoints-icon {
         margin-left: 12px;
       }
-      > div:nth-last-of-type(1) {
+      .watchpoints-icon:nth-last-of-type(1) {
         background-image: url('/static/icons/sub.png');
       }
     }
