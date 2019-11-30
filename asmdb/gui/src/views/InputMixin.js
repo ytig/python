@@ -27,11 +27,17 @@ export default {
     },
     onDismiss: function () {},
     onDomMouseDown: function (event) {
-      this.intercept = this.showing;
+      if (event.button == 0) {
+        this.intercept = this.showing;
+        if (this.intercept) {
+          event.stopPropagation();
+        }
+      }
     },
     onDomClick: function (event) {
       if (this.intercept) {
         event.stopPropagation();
+        this.intercept = false;
       }
     },
     onDomKeyDown: function (event) {
