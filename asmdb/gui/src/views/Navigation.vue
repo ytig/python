@@ -1,17 +1,30 @@
 <template>
   <div class="navigation-container" :css-gradient="gradient" @mouseup="onMouseUp">
     <span class="user-select-none" :css-focus="focus" :css-disable="!disable2.bool_f">{{name}}</span>
-    <div v-if="gradient" class="navigation-gradient"></div>
+    <div v-if="gradient" class="navigation-gradient" :style="{background:'linear-gradient('+backgroundColor+', transparent)'}"></div>
   </div>
 </template>
 
 <script>
 import sloth from '@/scripts/sloth';
 
+function getBackgroundColor(el) {
+  var defaultBackgroundColor = 'rgba(0, 0, 0, 0)';
+  while (el) {
+    var style = getComputedStyle(el);
+    if (style.backgroundColor != defaultBackgroundColor) {
+      return style.backgroundColor;
+    }
+    el = el.parentNode;
+  }
+  return defaultBackgroundColor;
+}
+
 export default {
   data: function() {
     return {
-      disable2: new sloth(224)
+      disable2: new sloth(224),
+      backgroundColor: 'transparent'
     };
   },
   props: {
@@ -27,6 +40,9 @@ export default {
         this.disable2.set(!newValue);
       }
     }
+  },
+  mounted: function() {
+    this.backgroundColor = getBackgroundColor(this.$el);
   },
   methods: {
     onMouseUp: function(event) {
@@ -65,7 +81,6 @@ export default {
     top: 36px;
     width: 100%;
     height: 2px;
-    background: linear-gradient(@color-background, transparent);
     pointer-events: none;
   }
 }
