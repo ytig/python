@@ -1,5 +1,5 @@
 <template>
-  <input ref="input" class="comment-input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @keypress="onKeyPress" @blur="onBlur" />
+  <input ref="input" class="comment-input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @keypress="onKeyPress" @focus="show" @blur="dismiss" />
 </template>
 
 <script>
@@ -47,9 +47,6 @@ export default {
       if (event.keyCode == 13) {
         this.dismiss();
       }
-    },
-    onBlur: function() {
-      this.dismiss();
     }
   }
 };

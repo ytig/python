@@ -1,7 +1,7 @@
 <template>
   <div v-show="showing" class="search-container" :style="{left:containerLeft+'px'}" :css-illegal="illegal" :css-theme="''+theme">
     <div></div>
-    <input ref="input" type="text" :style="{width:inputWidth+'px'}" v-model="text" @input="onInput" @keypress="onKeyPress" @blur="onBlur" />
+    <input ref="input" type="text" :style="{width:inputWidth+'px'}" v-model="text" @input="onInput" @keypress="onKeyPress" @blur="dismiss" />
   </div>
 </template>
 
@@ -97,9 +97,6 @@ export default {
           }
         }
       }
-    },
-    onBlur: function() {
-      this.dismiss();
     }
   }
 };
