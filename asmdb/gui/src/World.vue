@@ -73,9 +73,10 @@ export default {
     }
     .world-assembly {
       flex-grow: 1;
-      border-top: 1px solid @color-border;
-      border-bottom: 1px solid @color-border;
       background: @color-background;
+    }
+    .world-python3 {
+      background: #001a20;
     }
     .world-points-layout {
       display: flex;
