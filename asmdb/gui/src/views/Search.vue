@@ -62,7 +62,7 @@ export default {
       var K = 0.382;
       var T = 4;
       var output = Math.pow(K, (T * input - 0.25) / (T - 1)) * Math.sin(T * 2 * Math.PI * input);
-      return 4 + 10 * output;
+      return 5 + 10 * output;
     }
   },
   methods: {
@@ -108,8 +108,8 @@ export default {
 .search-container {
   position: absolute;
   z-index: 4;
-  left: 4px;
-  top: 4px;
+  left: 5px;
+  top: 5px;
   border-radius: 2px;
   box-shadow: 1px 1px @color-border-shadow;
   > div {
