@@ -1,7 +1,7 @@
 <template>
   <div class="bar-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <div class="bar-icon"></div>
-    <span class="bar-text">{{title}}</span>
+    <span class="bar-text user-select-none">{{title}}</span>
     <div class="bar-item" v-for="(item, index) in items" :key="index" :title="item.title" :style="item.style" @click="onClickItem(index)" :css-enable="enable.bool_f"></div>
   </div>
 </template>
