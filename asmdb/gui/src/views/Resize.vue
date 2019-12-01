@@ -54,6 +54,7 @@ export default {
         if (this.direction == 'row') {
           setGlobalCursor('row-resize');
         }
+        this.$emit('dragstart2');
       }
     },
     onMouseMove: function(event) {
@@ -75,6 +76,7 @@ export default {
         if (this.draging) {
           this.draging = false;
           setGlobalCursor(null);
+          this.$emit('dragend2');
         }
       }
     }
