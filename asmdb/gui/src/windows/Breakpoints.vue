@@ -125,7 +125,7 @@ export default {
 
 .breakpoints-container {
   position: relative;
-  height: 152px;
+  height: 157px;
   display: flex;
   flex-direction: column;
   .breakpoints-layout {

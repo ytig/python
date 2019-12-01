@@ -110,7 +110,7 @@ export default {
 
 .watchpoints-container {
   position: relative;
-  height: 152px;
+  height: 157px;
   display: flex;
   flex-direction: column;
   .watchpoints-layout {
