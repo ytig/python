@@ -20,7 +20,7 @@ export default {
     };
   },
   computed: {
-    windowWidth: function() {
+    windowHeight: function() {
       return Math.min(Math.max(this.curHeight + this.addHeight, this.minHeight), this.maxHeight);
     }
   },
@@ -29,7 +29,7 @@ export default {
       this.addHeight = -delta;
     },
     onDragEnd2: function() {
-      this.curHeight = this.windowWidth;
+      this.curHeight = this.windowHeight;
       this.addHeight = 0;
     }
   }
