@@ -15,7 +15,7 @@ export default {
     return {
       minHeight: 64,
       maxHeight: 200,
-      curHeight: 64,
+      curHeight: 0,
       addHeight: 0
     };
   },
@@ -24,6 +24,10 @@ export default {
       return Math.min(Math.max(this.curHeight + this.addHeight, this.minHeight), this.maxHeight);
     }
   },
+  created: function() {
+    var curHeight = localStorage.python3_height || 0;
+    this.curHeight = Math.min(Math.max(curHeight, this.minHeight), this.maxHeight);
+  },
   methods: {
     onDrag2: function(delta) {
       this.addHeight = -delta;
@@ -31,6 +35,7 @@ export default {
     onDragEnd2: function() {
       this.curHeight = this.windowHeight;
       this.addHeight = 0;
+      localStorage.python3_height = this.curHeight;
     }
   }
 };
