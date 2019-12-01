@@ -131,7 +131,7 @@ window.delContext = function (canvas) {
   }
 }
 
-document.body.addEventListener('dragstart', function (event) {
+window.addEventListener('dragstart', function (event) {
   event.preventDefault();
 });
 
