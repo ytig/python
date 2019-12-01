@@ -55,6 +55,9 @@ window.emptySelection = function () {
 }
 
 window.measureText = function (text, font) {
+  if (!text || text.length <= 0) {
+    return 0;
+  }
   font = font || '12px Menlo';
   var canvas = document.getElementById('__canvas__');
   if (!canvas) {
@@ -75,7 +78,7 @@ window.measureLength = function (length, font) {
   } else {
     width = window.measureText(' ', font);
   }
-  return length * width;
+  return Math.max(length, 0) * width;
 }
 
 window.resetContext = function (canvas) {
