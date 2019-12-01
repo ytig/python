@@ -75,6 +75,7 @@ export default {
     }
     .world-code-layout {
       position: relative;
+      height: 0px;
       flex-grow: 1;
       border-top: 1px solid @color-background-dark;
       .world-assembly {
@@ -96,7 +97,7 @@ export default {
       }
       .world-points-split {
         width: 1px;
-        height: 100%;
+        align-self: stretch;
         background: @color-border;
       }
       .world-watchpoints {
@@ -115,6 +116,7 @@ export default {
       background: @color-background;
     }
     .world-heap-layout {
+      height: 0px;
       flex-grow: 1;
       display: flex;
       border-top: 1px solid @color-border;
