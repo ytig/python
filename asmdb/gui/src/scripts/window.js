@@ -131,6 +131,17 @@ window.delContext = function (canvas) {
   }
 }
 
+window.saveStorage = function (key, value) {
+  localStorage[key] = value;
+}
+window.loadStorage = function (key, defaultValue) {
+  var value = localStorage[key];
+  if (typeof value == typeof defaultValue) {
+    return value;
+  }
+  return defaultValue;
+}
+
 window.addEventListener('dragstart', function (event) {
   event.preventDefault();
 });

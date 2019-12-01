@@ -25,7 +25,7 @@ export default {
     }
   },
   created: function() {
-    var curHeight = localStorage.python3_height || 0;
+    var curHeight = loadStorage('python3_height', 0);
     this.curHeight = Math.min(Math.max(curHeight, this.minHeight), this.maxHeight);
   },
   methods: {
@@ -35,7 +35,7 @@ export default {
     onDragEnd2: function() {
       this.curHeight = this.windowHeight;
       this.addHeight = 0;
-      localStorage.python3_height = this.curHeight;
+      saveStorage('python3_height', this.curHeight);
     }
   }
 };
