@@ -35,6 +35,18 @@ window.isChildOrMe = function (parent, child) {
   return false;
 }
 
+window.getBackgroundColor = function (el) {
+  var defaultBackgroundColor = 'rgba(0, 0, 0, 0)';
+  while (el) {
+    var style = getComputedStyle(el);
+    if (style.backgroundColor != defaultBackgroundColor) {
+      return style.backgroundColor;
+    }
+    el = el.parentNode;
+  }
+  return defaultBackgroundColor;
+}
+
 window.emptySelection = function () {
   var selection = getSelection();
   if (selection.type == 'Range') {
