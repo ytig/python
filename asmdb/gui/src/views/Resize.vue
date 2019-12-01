@@ -3,6 +3,24 @@
 </template>
 
 <script>
+function setGlobalCursor(style) {
+  style = style || 'default';
+  var cursor = document.getElementById('__cursor__');
+  if (!cursor) {
+    cursor = document.createElement('div');
+    cursor.id = '__cursor__';
+    cursor.style.position = 'fixed';
+    cursor.style.left = '0px';
+    cursor.style.top = '0px';
+    cursor.style.width = '100%';
+    cursor.style.height = '100%';
+    cursor.style.zIndex = '999';
+    document.body.appendChild(cursor);
+  }
+  cursor.style.cursor = style;
+  cursor.style.display = style == 'default' ? 'none' : '';
+}
+
 export default {
   data: function() {
     return {
@@ -30,25 +48,34 @@ export default {
         this.draging = true;
         this.clientX = event.clientX;
         this.clientY = event.clientY;
+        if (this.direction == 'col') {
+          setGlobalCursor('col-resize');
+        }
+        if (this.direction == 'row') {
+          setGlobalCursor('row-resize');
+        }
       }
     },
     onMouseMove: function(event) {
       if (this.draging) {
         var deltaX = this.clientX - event.clientX;
         var deltaY = this.clientY - event.clientY;
+        this.clientX = event.clientX;
+        this.clientY = event.clientY;
         if (this.direction == 'col') {
           this.$emit('drag2', deltaX);
         }
         if (this.direction == 'row') {
           this.$emit('drag2', deltaY);
         }
-        this.clientX = event.clientX;
-        this.clientY = event.clientY;
       }
     },
     onMouseUp: function(event) {
       if (event.button == 0) {
-        this.draging = false;
+        if (this.draging) {
+          this.draging = false;
+          setGlobalCursor(null);
+        }
       }
     }
   }
