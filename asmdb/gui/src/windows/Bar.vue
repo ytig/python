@@ -99,7 +99,11 @@ export default {
           this.onClickMenu(index + d);
           return true;
         } else {
-          return event.keyCode == 9;
+          if (event.keyCode == 9) {
+            keyboard.requestNextFocus();
+            return true;
+          }
+          return false;
         }
       }
     },
