@@ -1,10 +1,9 @@
 <template>
-  <div class="resize-container" :css-direction="direction"></div>
+  <div :style="{cursor:cursor}"></div>
 </template>
 
 <script>
 function setGlobalCursor(style) {
-  style = style || 'default';
   var cursor = document.getElementById('__cursor__');
   if (!cursor) {
     cursor = document.createElement('div');
@@ -17,8 +16,12 @@ function setGlobalCursor(style) {
     cursor.style.zIndex = '999';
     document.body.appendChild(cursor);
   }
-  cursor.style.cursor = style;
-  cursor.style.display = style == 'default' ? 'none' : '';
+  if (style) {
+    cursor.style.cursor = style;
+    cursor.style.display = '';
+  } else {
+    cursor.style.display = 'none';
+  }
 }
 
 export default {
@@ -30,7 +33,40 @@ export default {
     };
   },
   props: {
-    direction: String
+    direction: String,
+    lowest: Boolean,
+    uppest: Boolean
+  },
+  computed: {
+    cursor: function() {
+      var cursor = 'default';
+      if (this.direction == 'col') {
+        if (!this.lowest && !this.uppest) {
+          cursor = 'col-resize';
+        }
+        if (this.lowest && !this.uppest) {
+          cursor = 'e-resize';
+        }
+        if (!this.lowest && this.uppest) {
+          cursor = 'w-resize';
+        }
+      }
+      if (this.direction == 'row') {
+        if (!this.lowest && !this.uppest) {
+          cursor = 'row-resize';
+        }
+        if (this.lowest && !this.uppest) {
+          cursor = 's-resize';
+        }
+        if (!this.lowest && this.uppest) {
+          cursor = 'n-resize';
+        }
+      }
+      if (this.draging) {
+        setGlobalCursor(cursor);
+      }
+      return cursor;
+    }
   },
   created: function() {
     window.addEventListener('mousedown', this.onMouseDown);
@@ -49,24 +85,17 @@ export default {
         this.draging = true;
         this.downX = event.clientX;
         this.downY = event.clientY;
-        if (this.direction == 'col') {
-          setGlobalCursor('col-resize');
-        }
-        if (this.direction == 'row') {
-          setGlobalCursor('row-resize');
-        }
+        setGlobalCursor(this.cursor);
         this.$emit('dragstart2');
       }
     },
     onMouseMove: function(event) {
       if (this.draging) {
-        var deltaX = event.clientX - this.downX;
-        var deltaY = event.clientY - this.downY;
         if (this.direction == 'col') {
-          this.$emit('drag2', deltaX);
+          this.$emit('drag2', event.clientX - this.downX);
         }
         if (this.direction == 'row') {
-          this.$emit('drag2', deltaY);
+          this.$emit('drag2', event.clientY - this.downY);
         }
       }
     },
@@ -85,11 +114,4 @@ export default {
 
 <style lang="less">
 @import '~@/styles/theme';
-
-.resize-container[css-direction='col'] {
-  cursor: col-resize;
-}
-.resize-container[css-direction='row'] {
-  cursor: row-resize;
-}
 </style>

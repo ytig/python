@@ -1,6 +1,6 @@
 <template>
   <div class="python3-container">
-    <Resize class="python3-resize" :direction="'row'" @drag2="onDrag2" @dragend2="onDragEnd2"></Resize>
+    <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @drag2="onDrag2" @dragend2="onDragEnd2"></Resize>
     <div class="python3-test" :style="{height:windowHeight+'px'}">
       Welcome to using ASM Debugger!
       <br />Python3 is developing.
