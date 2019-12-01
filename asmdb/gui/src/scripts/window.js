@@ -132,12 +132,16 @@ window.delContext = function (canvas) {
 }
 
 window.saveStorage = function (key, value) {
-  localStorage[key] = value;
+  localStorage[key] = JSON.stringify(value);
 }
 window.loadStorage = function (key, defaultValue) {
-  var value = localStorage[key];
-  if (typeof value == typeof defaultValue) {
-    return value;
+  if (key in localStorage) {
+    try {
+      var value = JSON.parse(localStorage[key]);
+      if (typeof value == typeof defaultValue) {
+        return value;
+      }
+    } catch (error) {}
   }
   return defaultValue;
 }
