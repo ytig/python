@@ -1,5 +1,5 @@
 <template>
-  <div class="bar-container" @mouseup="onMouseUp">
+  <div class="bar-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <div class="bar-icon"></div>
     <span class="bar-text">{{title}}</span>
     <div class="bar-item" v-for="(item, index) in items" :key="index" :title="item.title" :style="item.style" @click="onClickItem(index)" :css-enable="enable.bool_f"></div>
@@ -50,6 +50,9 @@ export default {
     keyboard.setDefaultWindow(null);
   },
   methods: {
+    requestFocus: function() {
+      keyboard.requestFocus(this);
+    },
     onMouseUp: function(event) {
       if (event.button == 2) {
         var items = [];
