@@ -22,7 +22,7 @@ function dispatchEvent() {
   }
 }
 
-addEventListener('resize', dispatchEvent);
+window.addEventListener('resize', dispatchEvent);
 
 export default {
   registerEvent: registerEvent,
