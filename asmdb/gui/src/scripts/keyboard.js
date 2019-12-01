@@ -48,7 +48,7 @@ function requestNextFocus() {
   requestFocus(list[(cur + 1) % list.length]);
 }
 
-document.addEventListener('keydown', function (event) {
+window.addEventListener('keydown', function (event) {
   var consume = false;
   consume = cur >= 0 ? list[cur].onKeyDown(event) : false;
   if (!consume) {

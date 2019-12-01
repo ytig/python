@@ -8,7 +8,7 @@ export default {
     var vm = new(Vue.extend(MenuVue))();
     document.body.appendChild(vm.$mount().$el);
     var intercept = false;
-    document.addEventListener('mousedown', function (event) {
+    window.addEventListener('mousedown', function (event) {
       if (event.button == 0) {
         intercept = vm.onMouseDown(event);
         if (intercept) {
@@ -16,23 +16,23 @@ export default {
         }
       }
     }, true);
-    document.addEventListener('click', function (event) {
+    window.addEventListener('click', function (event) {
       if (intercept) {
         vm.onClick(event);
         event.stopPropagation();
         intercept = false;
       }
     }, true);
-    document.addEventListener('contextmenu', function (event) {
+    window.addEventListener('contextmenu', function (event) {
       event.preventDefault();
     });
-    document.addEventListener('keydown', function (event) {
+    window.addEventListener('keydown', function (event) {
       if (vm.onKeyDown(event)) {
         event.stopPropagation();
         event.preventDefault();
       }
     }, true);
-    document.addEventListener('wheel', function (event) {
+    window.addEventListener('wheel', function (event) {
       vm.onWheel(event);
     });
     Vue.prototype.$menu = vm;

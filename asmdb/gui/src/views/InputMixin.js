@@ -6,9 +6,9 @@ export default {
     };
   },
   created: function () {
-    document.addEventListener('mousedown', this.onDomMouseDown, true);
-    document.addEventListener('click', this.onDomClick, true);
-    document.addEventListener('keydown', this.onDomKeyDown, true);
+    window.addEventListener('mousedown', this.onDomMouseDown, true);
+    window.addEventListener('click', this.onDomClick, true);
+    window.addEventListener('keydown', this.onDomKeyDown, true);
   },
   destroyed: function () {
     document.removeEventListener('mousedown', this.onDomMouseDown, true);

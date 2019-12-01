@@ -33,9 +33,9 @@ export default {
     direction: String
   },
   created: function() {
-    document.addEventListener('mousedown', this.onMouseDown);
-    document.addEventListener('mousemove', this.onMouseMove);
-    document.addEventListener('mouseup', this.onMouseUp);
+    window.addEventListener('mousedown', this.onMouseDown);
+    window.addEventListener('mousemove', this.onMouseMove);
+    window.addEventListener('mouseup', this.onMouseUp);
   },
   destroyed: function() {
     document.removeEventListener('mousedown', this.onMouseDown);
