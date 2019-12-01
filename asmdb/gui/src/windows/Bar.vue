@@ -164,15 +164,12 @@ export default {
     width: 0px;
     flex-grow: 1;
     margin-right: 4px;
-    display: flex;
+    overflow: hidden;
     .bar-text {
       line-height: 32px;
       font-size: 16px;
       color: @color-text;
       font-family: 'Wawati SC';
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
       cursor: se-resize;
     }
   }
