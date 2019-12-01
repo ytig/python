@@ -1,7 +1,8 @@
 <template>
   <div class="bar-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
-    <div class="bar-icon"></div>
-    <span class="bar-text user-select-none">{{title}}</span>
+    <div class="bar-icon" @click="onMouseUp2"></div>
+    <span class="bar-text user-select-none" @click="onMouseUp2">{{title}}</span>
+    <span class="bar-grow"></span>
     <div class="bar-item" v-for="(item, index) in items" :key="index" :title="item.title" :style="item.style" @click="onClickItem(index)" :css-enable="enable.bool_f"></div>
   </div>
 </template>
@@ -156,18 +157,19 @@ export default {
     background-repeat: no-repeat;
     background-position: center center;
     background-image: url('/static/icons/folder.png');
+    cursor: se-resize;
   }
   .bar-text {
     margin-right: 4px;
-    width: 0px;
-    flex-grow: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     line-height: 32px;
     font-size: 16px;
     color: @color-text;
     font-family: 'Wawati SC';
+    cursor: se-resize;
+  }
+  .bar-grow {
+    width: 0px;
+    flex-grow: 1;
   }
   .bar-item {
     width: 32px;
