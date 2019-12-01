@@ -83,7 +83,7 @@ export default {
         background: @color-background;
       }
       .world-python3 {
-        position: absolute;
+        position: absolute !important;
         bottom: 0px;
         width: 100%;
         background: @color-background-light;

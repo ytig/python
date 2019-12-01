@@ -40,8 +40,13 @@ export default {
 @import '~@/styles/theme';
 
 .python3-container {
+  position: relative;
   .python3-resize {
-    height: 4px;
+    position: absolute;
+    left: 0px;
+    top: -4px;
+    width: 100%;
+    height: 8px;
   }
   .python3-test {
     padding-top: 6px;
