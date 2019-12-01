@@ -11,9 +11,9 @@ export default {
     window.addEventListener('keydown', this.onDomKeyDown, true);
   },
   destroyed: function () {
-    document.removeEventListener('mousedown', this.onDomMouseDown, true);
-    document.removeEventListener('click', this.onDomClick, true);
-    document.removeEventListener('keydown', this.onDomKeyDown, true);
+    window.removeEventListener('mousedown', this.onDomMouseDown, true);
+    window.removeEventListener('click', this.onDomClick, true);
+    window.removeEventListener('keydown', this.onDomKeyDown, true);
   },
   methods: {
     show: function () {
