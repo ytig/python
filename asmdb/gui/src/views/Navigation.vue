@@ -1,6 +1,6 @@
 <template>
   <div class="navigation-container" :css-gradient="gradient" @mouseup="onMouseUp">
-    <span class="user-select-none" :css-focus="focus" :css-disable="!disable2.bool_f">{{name}}</span>
+    <span class="user-select-none" :css-focus="focus" :css-disable="!disable2.bool_f" @click="onClick">{{name}}</span>
     <div v-if="gradient" class="navigation-gradient" :style="{background:'linear-gradient('+backgroundColor+', transparent)'}"></div>
   </div>
 </template>
@@ -33,6 +33,9 @@ export default {
     this.backgroundColor = getBackgroundColor(this.$el);
   },
   methods: {
+    onClick: function(event) {
+      this.$emit('mouseup2', event);
+    },
     onMouseUp: function(event) {
       if (event.button == 2) {
         this.$emit('mouseup2', event);
@@ -51,7 +54,7 @@ export default {
   height: 40px;
   > span {
     line-height: 40px;
-    padding-left: 12px;
+    margin-left: 12px;
     font-size: 16px;
     color: @color-text;
     font-family: 'Wawati SC';
