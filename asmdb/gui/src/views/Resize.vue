@@ -25,8 +25,8 @@ export default {
   data: function() {
     return {
       draging: false,
-      clientX: 0,
-      clientY: 0
+      downX: 0,
+      downY: 0
     };
   },
   props: {
@@ -46,8 +46,8 @@ export default {
     onMouseDown: function(event) {
       if (event.button == 0 && event.target == this.$el) {
         this.draging = true;
-        this.clientX = event.clientX;
-        this.clientY = event.clientY;
+        this.downX = event.clientX;
+        this.downY = event.clientY;
         if (this.direction == 'col') {
           setGlobalCursor('col-resize');
         }
@@ -59,10 +59,8 @@ export default {
     },
     onMouseMove: function(event) {
       if (this.draging) {
-        var deltaX = this.clientX - event.clientX;
-        var deltaY = this.clientY - event.clientY;
-        this.clientX = event.clientX;
-        this.clientY = event.clientY;
+        var deltaX = event.clientX - this.downX;
+        var deltaY = event.clientY - this.downY;
         if (this.direction == 'col') {
           this.$emit('drag2', deltaX);
         }
