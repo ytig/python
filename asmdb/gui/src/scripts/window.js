@@ -128,4 +128,8 @@ window.delContext = function (canvas) {
   }
 }
 
+document.body.addEventListener('dragstart', function (event) {
+  event.preventDefault();
+});
+
 export default {};
