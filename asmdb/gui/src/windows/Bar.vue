@@ -55,16 +55,19 @@ export default {
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
-        var items = [];
-        var fullscreen = document.fullscreenElement != null;
-        items.push(['Nexti', 'n', this.enable.bool_t]);
-        items.push(['Stepi', 's', this.enable.bool_t]);
-        items.push(['Continue', 'c', this.enable.bool_t]);
-        items.push(['Release suspend', 'r', this.enable.bool_t]);
-        items.push(['Fullscreen', 'space', !fullscreen]);
-        items.push(['Exit fullscreen', '⎋', fullscreen]);
-        this.$menu.alert(event, items, this.onClickMenu);
+        this.onMouseUp2(event);
       }
+    },
+    onMouseUp2: function(event) {
+      var items = [];
+      var fullscreen = document.fullscreenElement != null;
+      items.push(['Nexti', 'n', this.enable.bool_t]);
+      items.push(['Stepi', 's', this.enable.bool_t]);
+      items.push(['Continue', 'c', this.enable.bool_t]);
+      items.push(['Release suspend', 'r', this.enable.bool_t]);
+      items.push(['Fullscreen', 'space', !fullscreen]);
+      items.push(['Exit fullscreen', '⎋', fullscreen]);
+      this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
       switch (index) {
