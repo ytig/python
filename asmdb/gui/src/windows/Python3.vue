@@ -1,6 +1,6 @@
 <template>
   <div class="python3-container">
-    <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @drag2="onDrag2" @dragend2="onDragEnd2"></Resize>
+    <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
     <div class="python3-test" :style="{height:windowHeight+'px'}">
       Welcome to using ASM Debugger!
       <br />Python3 is developing.
@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     onDrag2: function(delta) {
-      this.addHeight = -delta;
+      this.addHeight = delta;
     },
     onDragEnd2: function() {
       this.curHeight = this.windowHeight;
