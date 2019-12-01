@@ -217,14 +217,15 @@ export default {
 
 .scroller-container {
   overflow: hidden;
+  position: relative;
   contain: strict;
   .scroller-item {
-    position: fixed;
+    position: absolute;
     contain: strict;
     width: 100%;
   }
   .scroller-draw {
-    position: fixed;
+    position: absolute;
     contain: strict;
     pointer-events: none;
   }

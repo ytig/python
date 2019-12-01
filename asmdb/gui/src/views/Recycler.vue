@@ -170,14 +170,15 @@ export default {
 
 .recycler-container {
   overflow: hidden;
+  position: relative;
   contain: strict;
   .recycler-item {
-    position: fixed;
+    position: absolute;
     contain: strict;
     width: 100%;
   }
   .recycler-draw {
-    position: fixed;
+    position: absolute;
     contain: strict;
     pointer-events: none;
   }
