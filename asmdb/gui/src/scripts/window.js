@@ -37,7 +37,7 @@ window.isChildOrMe = function (parent, child) {
 
 window.getBackgroundColor = function (el) {
   var defaultBackgroundColor = 'rgba(0, 0, 0, 0)';
-  while (el) {
+  while (el && el != document) {
     var style = getComputedStyle(el);
     if (style.backgroundColor != defaultBackgroundColor) {
       return style.backgroundColor;
