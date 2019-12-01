@@ -41,6 +41,7 @@ export default {
     window.removeEventListener('mousedown', this.onMouseDown);
     window.removeEventListener('mousemove', this.onMouseMove);
     window.removeEventListener('mouseup', this.onMouseUp);
+    this.onMouseUp({ button: 0 });
   },
   methods: {
     onMouseDown: function(event) {
