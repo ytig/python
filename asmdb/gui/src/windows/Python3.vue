@@ -44,9 +44,9 @@ export default {
   .python3-resize {
     position: absolute;
     left: 0px;
-    top: -4px;
+    top: -2px;
     width: 100%;
-    height: 8px;
+    height: 4px;
   }
   .python3-test {
     padding-top: 6px;
