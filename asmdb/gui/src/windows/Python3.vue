@@ -1,5 +1,5 @@
 <template>
-  <div class="python3-container">>>></div>
+  <div class="python3-container">>>> Hello World!</div>
 </template>
 
 <script>

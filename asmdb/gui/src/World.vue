@@ -2,8 +2,10 @@
   <div class="world-container" :style="{width:screenWidth+'px'}">
     <div class="world-left-layout">
       <Bar ref="bar" class="world-bar"></Bar>
-      <Assembly ref="assembly" class="world-assembly"></Assembly>
-      <Python3 ref="python3" class="world-python3"></Python3>
+      <div class="world-code-layout">
+        <Assembly ref="assembly" class="world-assembly"></Assembly>
+        <Python3 ref="python3" class="world-python3"></Python3>
+      </div>
       <div class="world-points-layout">
         <Breakpoints ref="breakpoints" class="world-breakpoints" @clickitem="onClickItem"></Breakpoints>
         <div class="world-points-split"></div>
@@ -71,13 +73,20 @@ export default {
     .world-bar {
       background: @color-background-dark;
     }
-    .world-assembly {
+    .world-code-layout {
+      position: relative;
       flex-grow: 1;
       border-top: 1px solid @color-background-dark;
-      background: @color-background;
-    }
-    .world-python3 {
-      background: @color-background-darker;
+      .world-assembly {
+        height: 100%;
+        background: @color-background;
+      }
+      .world-python3 {
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+        background: @color-background-darker;
+      }
     }
     .world-points-layout {
       display: flex;
