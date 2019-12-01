@@ -86,7 +86,13 @@ export default {
       }
     },
     onBreakpoints: function(breakpoints) {
-      this.breakpoints = breakpoints;
+      this.breakpoints.splice(0, this.breakpoints.length, ...breakpoints);
+      this.breakpoints.sort((p1, p2) => {
+        if (p1.disable != p2.disable) {
+          return p1.disable ? 1 : -1;
+        }
+        return p1.address - p2.address;
+      });
     },
     onClickItem: function(point) {
       this.$emit('clickitem', 0, point.address);
