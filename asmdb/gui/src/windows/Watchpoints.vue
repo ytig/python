@@ -89,7 +89,10 @@ export default {
       }
     },
     onWatchpoints: function(watchpoints) {
-      this.watchpoints = watchpoints;
+      this.watchpoints.splice(0, this.watchpoints.length, ...watchpoints);
+      this.watchpoints.sort((p1, p2) => {
+        return p1.address - p2.address;
+      });
     },
     onClickItem: function(point) {
       this.$emit('clickitem', 1, point.address);
