@@ -3,7 +3,7 @@
     <div>
       <div></div>
     </div>
-    <span class="navigationpy-icon" @click="onClick"></span>
+    <span class="navigationpy-icon" :css-focus="focus" @click="onClick"></span>
     <div>
       <div @click="onClick"></div>
     </div>
@@ -79,6 +79,9 @@ export default {
     background-repeat: no-repeat;
     background-position: center center;
     background-image: url('/static/icons/terminal.png');
+  }
+  .navigationpy-icon[css-focus] {
+    filter: brightness(147%);
   }
   .navigationpy-text {
     font-size: 14px;
