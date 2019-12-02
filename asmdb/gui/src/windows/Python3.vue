@@ -47,7 +47,7 @@ export default {
     },
     onMouseUp: function(event) {
       if (event.button == 2) {
-        this.$menu.close();
+        this.onMouseUp2(event);
       }
     },
     onMouseUp2: function(evnet) {

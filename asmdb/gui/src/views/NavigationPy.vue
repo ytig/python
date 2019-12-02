@@ -1,5 +1,5 @@
 <template>
-  <div class="navigationpy-container" @mouseup="onMouseUp">
+  <div class="navigationpy-container">
     <div>
       <div></div>
     </div>
@@ -20,12 +20,6 @@ export default {
   methods: {
     onClick: function(event) {
       this.$emit('mouseup2', event);
-    },
-    onMouseUp: function(event) {
-      if (event.button == 2) {
-        this.$emit('mouseup2', event);
-        event.stopPropagation();
-      }
     }
   }
 };
