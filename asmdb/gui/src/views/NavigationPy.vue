@@ -1,9 +1,10 @@
 <template>
   <div class="navigationpy-container">
-    <div class="navigationpy-background"></div>
-    <div class="navigationpy-mask"></div>
-    <div class="navigationpy-icon"></div>
-    <div class="navigationpy-text">python3</div>
+    <div></div>
+    <span class="navigationpy-icon"></span>
+    <div></div>
+    <span class="navigationpy-text" :css-focus="focus">python3</span>
+    <div></div>
   </div>
 </template>
 
@@ -23,32 +24,35 @@ export default {
 @import '~@/styles/theme';
 
 .navigationpy-container {
-  height: 32px;
+  background: linear-gradient(fadeout(@color-background, 38%), @color-background);
+  height: 16px;
   display: flex;
   align-items: center;
-  position: relative;
-  .navigationpy-background {
-    position: absolute;
+  > * {
+    position: relative;
     left: 0px;
-    top: 16px;
-    width: 100%;
-    height: 16px;
-    background: #282c34e0;
-    border-top: 1px solid @color-border-light;
+    top: -8px;
   }
-  .navigationpy-mask {
-    position: absolute;
-    left: 12px;
-    top: 16px;
-    width: 68px;
+  > div {
+    background: @color-border-light;
+  }
+  > div:nth-of-type(1) {
+    width: 12px;
     height: 1px;
-    background: @color-background;
-    // border-top-right-radius: 9px;
-    // border-right: 1px solid @color-border-light;
+  }
+  > div:nth-of-type(2) {
+    width: 8px;
+    height: 1px;
+  }
+  > div:nth-of-type(3) {
+    flex-grow: 1;
+    height: 1px;
+    pointer-events: none;
+  }
+  > span {
+    cursor: se-resize;
   }
   .navigationpy-icon {
-    z-index: 1;
-    margin-left: 12px;
     width: 16px;
     height: 16px;
     background-size: 16px 16px;
@@ -57,11 +61,12 @@ export default {
     background-image: url('/static/icons/terminal.png');
   }
   .navigationpy-text {
-    z-index: 1;
-    margin-left: 8px;
-    color: @color-text;
     font-size: 14px;
     font-family: 'Wawati SC';
+    color: @color-text;
+  }
+  .navigationpy-text[css-focus] {
+    color: @color-text-light;
   }
 }
 </style>
