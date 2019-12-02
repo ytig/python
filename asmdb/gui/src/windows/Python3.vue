@@ -1,6 +1,7 @@
 <template>
   <div class="python3-container">
     <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
+    <NavigationPy></NavigationPy>
     <div class="python3-test" :style="{height:windowHeight+'px'}">
       Welcome to using ASM Debugger!
       <br />Python3 is developing.
@@ -54,11 +55,11 @@ export default {
     height: 4px;
   }
   .python3-test {
-    padding-top: 6px;
     padding-left: 12px;
     line-height: 18px;
     color: @color-text;
     font-size: 12px;
+    background: @color-background-light;
   }
 }
 </style>
