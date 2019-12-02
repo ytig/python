@@ -1,6 +1,7 @@
 <template>
   <div class="navigationpy-container">
     <div class="navigationpy-background"></div>
+    <div class="navigationpy-mask"></div>
     <div class="navigationpy-icon"></div>
     <div class="navigationpy-text">python3</div>
   </div>
@@ -29,10 +30,21 @@ export default {
   .navigationpy-background {
     position: absolute;
     left: 0px;
-    bottom: 0px;
+    top: 16px;
     width: 100%;
     height: 16px;
     background: @color-background-light;
+    border-top: 1px solid @color-border-light;
+  }
+  .navigationpy-mask {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100px;
+    height: 17px;
+    background: @color-background-light;
+    border-top-right-radius: 9px;
+    border-right: 1px solid @color-border-light;
   }
   .navigationpy-icon {
     z-index: 1;
