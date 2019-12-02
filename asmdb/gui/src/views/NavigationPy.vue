@@ -39,12 +39,12 @@ export default {
   .navigationpy-mask {
     position: absolute;
     left: 0px;
-    top: 0px;
-    width: 100px;
-    height: 17px;
+    top: 16px;
+    width: 80px;
+    height: 1px;
     background: @color-background-light;
-    border-top-right-radius: 9px;
-    border-right: 1px solid @color-border-light;
+    // border-top-right-radius: 9px;
+    // border-right: 1px solid @color-border-light;
   }
   .navigationpy-icon {
     z-index: 1;
