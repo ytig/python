@@ -33,16 +33,16 @@ export default {
     top: 16px;
     width: 100%;
     height: 16px;
-    background: @color-background-light;
+    background: #282c34e0;
     border-top: 1px solid @color-border-light;
   }
   .navigationpy-mask {
     position: absolute;
-    left: 0px;
+    left: 12px;
     top: 16px;
-    width: 80px;
+    width: 68px;
     height: 1px;
-    background: @color-background-light;
+    background: @color-background;
     // border-top-right-radius: 9px;
     // border-right: 1px solid @color-border-light;
   }
