@@ -7,7 +7,7 @@
     <div>
       <div @click="onClick"></div>
     </div>
-    <span class="navigationpy-text" :css-focus="focus" @click="onClick">python3</span>
+    <span class="navigationpy-text user-select-none" :css-focus="focus" @click="onClick">python3</span>
     <div></div>
   </div>
 </template>
