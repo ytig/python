@@ -1,22 +1,33 @@
 <template>
-  <div class="navigationpy-container">
-    <div></div>
-    <span class="navigationpy-icon"></span>
-    <div></div>
-    <span class="navigationpy-text" :css-focus="focus">python3</span>
+  <div class="navigationpy-container" @mouseup="onMouseUp">
+    <div>
+      <div></div>
+    </div>
+    <span class="navigationpy-icon" @click="onClick"></span>
+    <div>
+      <div @click="onClick"></div>
+    </div>
+    <span class="navigationpy-text" :css-focus="focus" @click="onClick">python3</span>
     <div></div>
   </div>
 </template>
 
 <script>
 export default {
-  data: function() {
-    return {};
-  },
   props: {
     focus: Boolean
   },
-  methods: {}
+  methods: {
+    onClick: function(event) {
+      this.$emit('mouseup2', event);
+    },
+    onMouseUp: function(event) {
+      if (event.button == 2) {
+        this.$emit('mouseup2', event);
+        event.stopPropagation();
+      }
+    }
+  }
 };
 </script>
 
@@ -35,6 +46,12 @@ export default {
   }
   > div {
     background: @color-border-light;
+    > div {
+      position: relative;
+      left: 0px;
+      top: -8px;
+      height: 16px;
+    }
   }
   > div:nth-of-type(1) {
     width: 12px;
@@ -43,6 +60,9 @@ export default {
   > div:nth-of-type(2) {
     width: 8px;
     height: 1px;
+    > div {
+      cursor: se-resize;
+    }
   }
   > div:nth-of-type(3) {
     flex-grow: 1;
