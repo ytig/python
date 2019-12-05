@@ -28,6 +28,7 @@ export default {
   data: function() {
     return {
       draging: false,
+      moved: false,
       downX: 0,
       downY: 0
     };
@@ -83,6 +84,7 @@ export default {
     onMouseDown: function(event) {
       if (event.button == 0 && event.target == this.$el) {
         this.draging = true;
+        this.moved = false;
         this.downX = event.clientX;
         this.downY = event.clientY;
         setGlobalCursor(this.cursor);
@@ -91,6 +93,7 @@ export default {
     },
     onMouseMove: function(event) {
       if (this.draging) {
+        this.moved = true;
         if (this.direction == 'col') {
           this.$emit('drag2', event.clientX - this.downX);
         }
@@ -104,7 +107,7 @@ export default {
         if (this.draging) {
           this.draging = false;
           setGlobalCursor(null);
-          this.$emit('dragend2');
+          this.$emit('dragend2', this.moved);
         }
       }
     }
