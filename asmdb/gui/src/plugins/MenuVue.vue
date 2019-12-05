@@ -33,7 +33,7 @@ export default {
       this.left = 0;
       this.top = 0;
       this.show = true;
-      this.items = items || [['undefined', '', false]];
+      this.items = items || [['nothing', '', false]];
       this.listener = listener || null;
       this.$nextTick(function() {
         var view = this.$refs.container;
