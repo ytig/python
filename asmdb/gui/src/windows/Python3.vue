@@ -67,7 +67,7 @@ export default {
           return true;
         }
         var t = ++i / maxi;
-        t = Math.cos((t + 1) * Math.PI) / 2 + 0.5;
+        t = 1 - (1 - t) * (1 - t);
         this.curHeight = parseInt((1 - t) * from + t * to);
         return !(i < maxi);
       });
