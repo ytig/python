@@ -84,12 +84,7 @@ export default {
         this.addHeight = 0;
         saveStorage('python3_height', this.curHeight);
       } else {
-        var newHeight = this.curHeight;
-        if (this.curHeight == this.minHeight) {
-          newHeight = this.maxHeight;
-        } else if (this.curHeight == this.maxHeight) {
-          newHeight = this.minHeight;
-        }
+        var newHeight = this.curHeight != this.minHeight ? this.minHeight : this.maxHeight;
         this.smoothDragTo(newHeight);
         saveStorage('python3_height', newHeight);
       }
