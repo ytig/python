@@ -59,7 +59,7 @@ export default {
     },
     smoothDragTo: function(to) {
       var from = this.curHeight;
-      var duration = 147 + (77 * Math.abs(to - from)) / (this.maxHeight - this.minHeight);
+      var duration = 147;
       var maxi = Math.ceil((duration * 3) / 50);
       var counter = this.counter;
       requestAnimationFrames(i => {
