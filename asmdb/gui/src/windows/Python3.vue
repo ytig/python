@@ -101,9 +101,9 @@ export default {
   .python3-resize {
     position: absolute;
     left: 0px;
-    top: -2px;
+    top: -4px;
     width: 100%;
-    height: 4px;
+    height: 8px;
   }
   .python3-test {
     padding-left: 12px;
