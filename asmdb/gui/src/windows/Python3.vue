@@ -1,6 +1,6 @@
 <template>
   <div class="python3-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp" float>
-    <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
+    <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @dragstart2="onDragStart2" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
     <NavigationPy :focus="focus" @mouseup2="onMouseUp2"></NavigationPy>
     <div class="python3-test" :style="{height:windowHeight+'px'}">
       Welcome to using ASM Debugger!
@@ -20,7 +20,8 @@ export default {
       maxHeight: 18 * 18 + 6,
       curHeight: 0,
       addHeight: 0,
-      focus: false
+      focus: false,
+      counter: 0
     };
   },
   computed: {
@@ -56,13 +57,42 @@ export default {
     onKeyDown: function(event) {
       return false;
     },
+    smoothDragTo: function(to) {
+      var from = this.curHeight;
+      var duration = 147 + (77 * Math.abs(to - from)) / (this.maxHeight - this.minHeight);
+      var maxi = Math.ceil((duration * 3) / 50);
+      var counter = this.counter;
+      requestAnimationFrames(i => {
+        if (counter != this.counter) {
+          return true;
+        }
+        var t = ++i / maxi;
+        t = Math.cos((t + 1) * Math.PI) / 2 + 0.5;
+        this.curHeight = parseInt((1 - t) * from + t * to);
+        return !(i < maxi);
+      });
+    },
+    onDragStart2: function() {
+      this.counter++;
+    },
     onDrag2: function(delta) {
       this.addHeight = delta;
     },
-    onDragEnd2: function() {
-      this.curHeight = this.windowHeight;
-      this.addHeight = 0;
-      saveStorage('python3_height', this.curHeight);
+    onDragEnd2: function(moved) {
+      if (moved) {
+        this.curHeight = this.windowHeight;
+        this.addHeight = 0;
+        saveStorage('python3_height', this.curHeight);
+      } else {
+        var newHeight = this.curHeight;
+        if (this.curHeight == this.minHeight) {
+          newHeight = this.maxHeight;
+        } else if (this.curHeight == this.maxHeight) {
+          newHeight = this.minHeight;
+        }
+        this.smoothDragTo(newHeight);
+        saveStorage('python3_height', newHeight);
+      }
     }
   }
 };
