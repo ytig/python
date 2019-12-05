@@ -74,7 +74,7 @@ export default {
     background-image: url('/static/icons/terminal.png');
   }
   .navigationpy-icon[css-focus] {
-    filter: brightness(128%);
+    filter: brightness(125%);
   }
   .navigationpy-text {
     font-size: 14px;
