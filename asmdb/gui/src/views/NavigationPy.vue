@@ -29,7 +29,7 @@ export default {
 @import '~@/styles/theme';
 
 .navigationpy-container {
-  background: linear-gradient(fadeout(@color-background, 38%), @color-background);
+  background: @color-background;
   height: 16px;
   display: flex;
   align-items: center;
