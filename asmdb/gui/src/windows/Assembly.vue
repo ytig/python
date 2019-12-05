@@ -18,6 +18,19 @@ import asmdb from '@/scripts/asmdb';
 import Instruction from '@/views/Instruction';
 const MIN_OFFSET = 4;
 
+function getFloatHeight(el) {
+  var height = 0;
+  for (var node of el.parentNode.childNodes) {
+    if (node == el) {
+      continue;
+    }
+    if (node.attributes && 'float' in node.attributes) {
+      height = Math.max(height, node.clientHeight);
+    }
+  }
+  return height;
+}
+
 function getRange(address) {
   const pieceOf = 147 * asmdb.getInstance().UNIT;
   var range = asmdb.getInstance().getAssemblyRange();
@@ -340,7 +353,7 @@ export default {
         var curOffset = this.source.getOffset(this.$refs.scroller.getPosition());
         var scrollType = 0;
         if (newOffset != null) {
-          var maxOffset = Math.ceil((this.$refs.scroller.$el.clientHeight * 2) / 3);
+          var maxOffset = this.$refs.scroller.$el.clientHeight - getFloatHeight(this.$el);
           if (oldOffset != null && oldOffset - curOffset + this.source[oldIndex].height > 0 && oldOffset - curOffset < maxOffset) {
             if (oldOffset - curOffset < MIN_OFFSET || oldOffset - curOffset + this.source[oldIndex].height > maxOffset) {
               scrollType = 2;

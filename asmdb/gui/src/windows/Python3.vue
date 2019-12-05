@@ -1,5 +1,5 @@
 <template>
-  <div class="python3-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
+  <div class="python3-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp" float>
     <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
     <NavigationPy :focus="focus" @mouseup2="onMouseUp2"></NavigationPy>
     <div class="python3-test" :style="{height:windowHeight+'px'}">
