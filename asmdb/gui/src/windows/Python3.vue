@@ -85,7 +85,6 @@ export default {
     line-height: 18px;
     color: @color-text;
     font-size: 12px;
-    background: @color-background;
   }
 }
 </style>

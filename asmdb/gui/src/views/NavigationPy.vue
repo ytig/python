@@ -29,7 +29,6 @@ export default {
 @import '~@/styles/theme';
 
 .navigationpy-container {
-  background: @color-background;
   height: 16px;
   display: flex;
   align-items: center;

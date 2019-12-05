@@ -86,6 +86,7 @@ export default {
         position: absolute !important;
         bottom: 0px;
         width: 100%;
+        background: @color-background;
       }
     }
     .world-points-layout {
