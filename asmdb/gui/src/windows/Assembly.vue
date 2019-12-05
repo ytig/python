@@ -340,7 +340,7 @@ export default {
         var curOffset = this.source.getOffset(this.$refs.scroller.getPosition());
         var scrollType = 0;
         if (newOffset != null) {
-          var maxOffset = Math.ceil(this.$refs.scroller.$el.clientHeight * 0.618);
+          var maxOffset = Math.ceil((this.$refs.scroller.$el.clientHeight * 2) / 3);
           if (oldOffset != null && oldOffset - curOffset + this.source[oldIndex].height > 0 && oldOffset - curOffset < maxOffset) {
             if (oldOffset - curOffset < MIN_OFFSET || oldOffset - curOffset + this.source[oldIndex].height > maxOffset) {
               scrollType = 2;
