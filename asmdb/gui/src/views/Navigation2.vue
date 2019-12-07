@@ -1,17 +1,22 @@
 <template>
   <div class="navigation2-container">
-    <div>
-      <div></div>
+    <div class="navigation2-content">
+      <div>
+        <div></div>
+      </div>
+      <span class="navigation2-icon" :style="{backgroundImage:backgroundImage}" :css-focus="focus" @click="onClick"></span>
+      <div @click="onClick">
+        <div></div>
+      </div>
+      <span class="navigation2-text user-select-none" :css-focus="focus" @click="onClick">{{name}}</span>
+      <div>
+        <div></div>
+        <slot></slot>
+      </div>
     </div>
-    <span class="navigation2-icon" :style="{backgroundImage:backgroundImage}" :css-focus="focus" @click="onClick"></span>
-    <div @click="onClick">
-      <div></div>
-    </div>
-    <span class="navigation2-text user-select-none" :css-focus="focus" @click="onClick">{{name}}</span>
-    <div>
-      <div></div>
-      <slot></slot>
-    </div>
+    <div class="navigation2-transparent"></div>
+    <div class="navigation2-background"></div>
+    <div class="navigation2-gradient"></div>
   </div>
 </template>
 
@@ -42,53 +47,74 @@ export default {
 @import '~@/styles/theme';
 
 .navigation2-container {
-  height: 16px;
-  display: flex;
-  align-items: center;
-  background: linear-gradient(transparent, transparent 50%, @color-background 50%, @color-background);
-  > div {
-    position: relative;
-    height: 100%;
-    > div:first-child {
-      position: absolute;
-      left: 0px;
-      top: 8px;
-      width: 100%;
-      height: 1px;
-      background: @color-border-light;
-      pointer-events: none;
+  position: relative;
+  .navigation2-content {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    > div {
+      position: relative;
+      height: 100%;
+      > div:first-child {
+        position: absolute;
+        left: 0px;
+        top: 8px;
+        width: 100%;
+        height: 1px;
+        background: @color-border-light;
+        pointer-events: none;
+      }
+    }
+    > div:nth-of-type(1) {
+      width: 12px;
+    }
+    > div:nth-of-type(2) {
+      width: 8px;
+      cursor: se-resize;
+    }
+    > div:nth-of-type(3) {
+      flex-grow: 1;
+    }
+    > span {
+      cursor: se-resize;
+    }
+    .navigation2-icon {
+      width: 16px;
+      height: 16px;
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+      background-position: center center;
+    }
+    .navigation2-icon[css-focus] {
+      filter: brightness(138%);
+    }
+    .navigation2-text {
+      font-size: 14px;
+      font-family: 'Wawati SC';
+      color: @color-text;
+    }
+    .navigation2-text[css-focus] {
+      color: @color-text-light;
     }
   }
-  > div:nth-of-type(1) {
-    width: 12px;
+  .navigation2-transparent {
+    height: 8px;
   }
-  > div:nth-of-type(2) {
-    width: 8px;
-    cursor: se-resize;
+  .navigation2-background {
+    height: 10px;
+    background: @color-background;
   }
-  > div:nth-of-type(3) {
-    flex-grow: 1;
-  }
-  > span {
-    cursor: se-resize;
-  }
-  .navigation2-icon {
-    width: 16px;
-    height: 16px;
-    background-size: 16px 16px;
-    background-repeat: no-repeat;
-    background-position: center center;
-  }
-  .navigation2-icon[css-focus] {
-    filter: brightness(138%);
-  }
-  .navigation2-text {
-    font-size: 14px;
-    font-family: 'Wawati SC';
-    color: @color-text;
-  }
-  .navigation2-text[css-focus] {
-    color: @color-text-light;
+  .navigation2-gradient {
+    position: absolute;
+    left: 0px;
+    top: 16px;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(@color-background, @color-background 50%, transparent);
   }
 }
 </style>
