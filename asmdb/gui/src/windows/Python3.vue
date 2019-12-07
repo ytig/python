@@ -6,6 +6,12 @@
     <div class="python3-test" :style="{height:windowHeight+'px'}">
       Welcome to using ASM Debugger!
       <br />Python3 is developing.
+      <br />>>> 1 + 1
+      <br />2
+      <br />>>> 1 + 2
+      <br />3
+      <br />>>> 1 + 3
+      <br />4
       <br />>>>
     </div>
   </div>
