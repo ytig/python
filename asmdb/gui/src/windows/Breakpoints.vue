@@ -66,14 +66,16 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items.push(['Delete all', '', this.breakpoints.length > 0]);
+      items.push(['Delete all', '⇧⌫', this.breakpoints.length > 0]);
       items.push(['Edit breakpoint', '↩︎', true]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
       switch (index) {
         case 0:
-          asmdb.getInstance().bpt(this.breakpoints, []);
+          if (this.breakpoints.length > 0) {
+            asmdb.getInstance().bpt(this.breakpoints, []);
+          }
           break;
         case 1:
           this.$refs.search.show();
@@ -81,13 +83,23 @@ export default {
       }
     },
     onKeyDown: function(event) {
-      var d = 1;
-      var index = [13].indexOf(event.keyCode);
+      var d = 0;
+      var index = [8].indexOf(event.keyCode);
       if (index >= 0) {
+        if (!event.shiftKey) {
+          return false;
+        }
         this.onClickMenu(index + d);
         return true;
       } else {
-        return false;
+        d += 1;
+        index = [13].indexOf(event.keyCode);
+        if (index >= 0) {
+          this.onClickMenu(index + d);
+          return true;
+        } else {
+          return false;
+        }
       }
     },
     onBreakpoints: function(breakpoints) {
