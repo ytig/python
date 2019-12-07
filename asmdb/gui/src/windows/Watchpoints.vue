@@ -67,12 +67,16 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
+      items.push(['Delete all', '', this.watchpoints.length > 0]);
       items.push(['Edit watchpoint', '↩︎', this.watchpoints.length < this.wlen]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
       switch (index) {
         case 0:
+          asmdb.getInstance().wpt(this.watchpoints, []);
+          break;
+        case 1:
           if (this.watchpoints.length < this.wlen) {
             this.$refs.search.show();
           }
@@ -80,9 +84,10 @@ export default {
       }
     },
     onKeyDown: function(event) {
+      var d = 1;
       var index = [13].indexOf(event.keyCode);
       if (index >= 0) {
-        this.onClickMenu(index);
+        this.onClickMenu(index + d);
         return true;
       } else {
         return false;
