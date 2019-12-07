@@ -90,7 +90,7 @@ export default {
       background-position: center center;
     }
     .navigation2-icon[css-focus] {
-      filter: brightness(138%);
+      filter: brightness(128%);
     }
     .navigation2-text {
       font-size: 14px;
