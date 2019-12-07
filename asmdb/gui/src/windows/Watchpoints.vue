@@ -11,7 +11,7 @@
         <div class="watchpoints-icon" @click="onSubPoint(point)"></div>
       </div>
       <div class="watchpoints-func">
-        <div v-show="watchpoints.length<wlen" class="watchpoints-icon" @click="onClickMenu(0)"></div>
+        <div v-show="watchpoints.length<wlen" class="watchpoints-icon" @click="onClickMenu(1)"></div>
       </div>
       <div></div>
     </div>

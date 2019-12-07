@@ -13,7 +13,7 @@
         <div class="breakpoints-icon" @click="onSubPoint(point)"></div>
       </div>
       <div class="breakpoints-func">
-        <div class="breakpoints-icon" @click="onClickMenu(0)"></div>
+        <div class="breakpoints-icon" @click="onClickMenu(1)"></div>
       </div>
       <div></div>
     </div>
