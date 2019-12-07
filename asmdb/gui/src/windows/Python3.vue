@@ -103,8 +103,10 @@ export default {
     height: 8px;
   }
   .python3-test {
+    overflow-y: scroll;
     background: @color-background;
     padding-left: 12px;
+    padding-bottom: 4px;
     line-height: 18px;
     color: @color-text;
     font-size: 12px;
