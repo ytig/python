@@ -45,6 +45,7 @@ export default {
   height: 16px;
   display: flex;
   align-items: center;
+  background: linear-gradient(transparent, transparent 50%, @color-background 50%, @color-background);
   > div {
     position: relative;
     height: 100%;
