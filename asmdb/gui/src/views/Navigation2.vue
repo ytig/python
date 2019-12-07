@@ -1,13 +1,13 @@
 <template>
-  <div class="navigationpy-container">
+  <div class="navigation2-container">
     <div>
       <div></div>
     </div>
-    <span class="navigationpy-icon" :css-focus="focus" @click="onClick"></span>
+    <span class="navigation2-icon" :style="{backgroundImage:backgroundImage}" :css-focus="focus" @click="onClick"></span>
     <div>
       <div @click="onClick"></div>
     </div>
-    <span class="navigationpy-text user-select-none" :css-focus="focus" @click="onClick">python3</span>
+    <span class="navigation2-text user-select-none" :css-focus="focus" @click="onClick">{{name}}</span>
     <div></div>
   </div>
 </template>
@@ -15,7 +15,17 @@
 <script>
 export default {
   props: {
+    name: String,
     focus: Boolean
+  },
+  computed: {
+    backgroundImage: function() {
+      var icons = {
+        python3: 'terminal'
+      };
+      var url = '/static/icons/' + icons[this.name] + '.png';
+      return "url('" + url + "')";
+    }
   },
   methods: {
     onClick: function(event) {
@@ -28,7 +38,7 @@ export default {
 <style lang="less">
 @import '~@/styles/theme';
 
-.navigationpy-container {
+.navigation2-container {
   height: 16px;
   display: flex;
   align-items: center;
@@ -65,23 +75,22 @@ export default {
   > span {
     cursor: se-resize;
   }
-  .navigationpy-icon {
+  .navigation2-icon {
     width: 16px;
     height: 16px;
     background-size: 16px 16px;
     background-repeat: no-repeat;
     background-position: center center;
-    background-image: url('/static/icons/terminal.png');
   }
-  .navigationpy-icon[css-focus] {
+  .navigation2-icon[css-focus] {
     filter: brightness(138%);
   }
-  .navigationpy-text {
+  .navigation2-text {
     font-size: 14px;
     font-family: 'Wawati SC';
     color: @color-text;
   }
-  .navigationpy-text[css-focus] {
+  .navigation2-text[css-focus] {
     color: @color-text-light;
   }
 }

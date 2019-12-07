@@ -1,7 +1,7 @@
 <template>
   <div class="python3-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp" float>
     <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @dragstart2="onDragStart2" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
-    <NavigationPy :focus="focus" @mouseup2="onMouseUp2"></NavigationPy>
+    <Navigation2 :name="'python3'" :focus="focus" @mouseup2="onMouseUp2"></Navigation2>
     <div class="python3-test" :style="{height:windowHeight+'px'}">
       Welcome to using ASM Debugger!
       <br />Python3 is developing.
