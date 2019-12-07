@@ -4,11 +4,14 @@
       <div></div>
     </div>
     <span class="navigation2-icon" :style="{backgroundImage:backgroundImage}" :css-focus="focus" @click="onClick"></span>
-    <div>
-      <div @click="onClick"></div>
+    <div @click="onClick">
+      <div></div>
     </div>
     <span class="navigation2-text user-select-none" :css-focus="focus" @click="onClick">{{name}}</span>
-    <div></div>
+    <div>
+      <div></div>
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -42,35 +45,28 @@ export default {
   height: 16px;
   display: flex;
   align-items: center;
-  > * {
-    position: relative;
-    left: 0px;
-    top: -8px;
-  }
   > div {
-    background: @color-border-light;
-    > div {
-      position: relative;
+    position: relative;
+    height: 100%;
+    > div:first-child {
+      position: absolute;
       left: 0px;
-      top: -8px;
-      height: 16px;
+      top: 8px;
+      width: 100%;
+      height: 1px;
+      background: @color-border-light;
+      pointer-events: none;
     }
   }
   > div:nth-of-type(1) {
     width: 12px;
-    height: 1px;
   }
   > div:nth-of-type(2) {
     width: 8px;
-    height: 1px;
-    > div {
-      cursor: se-resize;
-    }
+    cursor: se-resize;
   }
   > div:nth-of-type(3) {
     flex-grow: 1;
-    height: 1px;
-    pointer-events: none;
   }
   > span {
     cursor: se-resize;
