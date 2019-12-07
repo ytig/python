@@ -112,6 +112,7 @@ export default {
     overflow-y: scroll;
     background: @color-background;
     padding-left: 12px;
+    padding-top: 2px;
     padding-bottom: 4px;
     line-height: 18px;
     color: @color-text;
