@@ -27,6 +27,10 @@ class Debugger {
     this.ws.onmessage = this.onMessage.bind(this);
   }
 
+  finish() {
+    this.ws.close();
+  }
+
   onMessage(event) {
     var data = JSON.parse(event.data);
     switch (data.type) {
@@ -464,7 +468,12 @@ function getInstance() {
   return instance;
 }
 
+function oldInstance() {
+  instance.finish();
+}
+
 export default {
   newInstance: newInstance,
-  getInstance: getInstance
+  getInstance: getInstance,
+  oldInstance: oldInstance
 };

@@ -27,15 +27,16 @@
 import asmdb from '@/scripts/asmdb';
 
 export default {
-  created: function() {
-    if (!asmdb.getInstance()) {
-      asmdb.newInstance(); //todo catch
-    }
-  },
   computed: {
     screenWidth: function() {
       return screen.width;
     }
+  },
+  created: function() {
+    asmdb.newInstance();
+  },
+  destroyed: function() {
+    asmdb.oldInstance();
   },
   methods: {
     onClickItem: function(usage, address) {
