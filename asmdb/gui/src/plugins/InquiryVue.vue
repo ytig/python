@@ -126,7 +126,7 @@ export default {
       .inquiry-button {
         width: 0px;
         flex-grow: 1;
-        line-height: 30px;
+        line-height: 28px;
         text-align: center;
         font-size: 12px;
         color: @color-text-menu;
