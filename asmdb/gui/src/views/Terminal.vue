@@ -35,5 +35,6 @@ export default {
   line-height: 18px;
   color: @color-text;
   font-size: 12px;
+  word-break: break-word;
 }
 </style>
