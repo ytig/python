@@ -32,7 +32,7 @@ export default {
   padding-top: 2px;
   padding-right: 12px;
   padding-bottom: 4px;
-  line-height: 18px;
+  line-height: 16px;
   color: @color-text;
   font-size: 12px;
   word-break: break-word;

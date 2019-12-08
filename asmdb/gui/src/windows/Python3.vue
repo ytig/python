@@ -13,8 +13,8 @@ import keyboard from '@/scripts/keyboard';
 export default {
   data: function() {
     return {
-      minHeight: 18 * 5 + 6,
-      maxHeight: 18 * 18 + 6,
+      minHeight: 16 * 5 + 6,
+      maxHeight: 16 * 20 + 6,
       curHeight: 0,
       addHeight: 0,
       focus: false,
