@@ -108,14 +108,16 @@ export default {
       }
       .inquiry-text {
         margin-left: 8px;
-        margin-right: 12px;
+        margin-right: 20px;
         font-size: 12px;
         color: @color-text-menu;
       }
     }
     .inquiry-message {
-      margin: 12px;
+      margin-left: 12px;
       margin-top: 8px;
+      margin-right: 20px;
+      margin-bottom: 12px;
       line-height: 18px;
       font-size: 12px;
       color: @color-text-menu;
