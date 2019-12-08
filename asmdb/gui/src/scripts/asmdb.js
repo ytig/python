@@ -470,6 +470,7 @@ function getInstance() {
 
 function oldInstance() {
   instance.finish();
+  instance = null;
 }
 
 export default {
