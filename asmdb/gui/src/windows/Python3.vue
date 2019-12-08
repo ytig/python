@@ -3,7 +3,7 @@
     <Navigation2 class="python3-navigation2" :name="'python3'" :focus="focus" @mouseup2="onMouseUp2">
       <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @dragstart2="onDragStart2" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
     </Navigation2>
-    <Terminal :style="{height:windowHeight+'px'}"></Terminal>
+    <Terminal class="python3-terminal" :style="{height:windowHeight+'px'}"></Terminal>
   </div>
 </template>
 
@@ -97,6 +97,9 @@ export default {
   .python3-resize {
     margin-top: 4px;
     height: 8px;
+  }
+  .python3-terminal {
+    background: @color-background;
   }
 }
 </style>

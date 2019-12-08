@@ -28,7 +28,6 @@ export default {
 
 .terminal-container {
   overflow-y: scroll;
-  background: @color-background;
   padding-left: 12px;
   padding-top: 2px;
   padding-bottom: 4px;
