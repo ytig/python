@@ -57,7 +57,9 @@ export default {
       }
     },
     onQuit: function() {
-      console.log('quit');
+      this.$inquiry.alert('Your process is offline, Do you want to quit now?', () => {
+        this.$router.replace('/hello');
+      });
     }
   }
 };

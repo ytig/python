@@ -7,6 +7,8 @@ Vue.use(VueRouter);
 
 import menu from '@/plugins/menu';
 Vue.use(menu);
+import inquiry from '@/plugins/inquiry';
+Vue.use(inquiry);
 import editor from '@/plugins/editor';
 Vue.use(editor);
 
