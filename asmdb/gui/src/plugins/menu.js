@@ -29,7 +29,9 @@ export default {
     window.addEventListener('keydown', function (event) {
       if (vm.onKeyDown(event)) {
         event.stopPropagation();
-        event.preventDefault();
+        if (event.keyCode == 9) {
+          event.preventDefault();
+        }
       }
     }, true);
     window.addEventListener('wheel', function (event) {
