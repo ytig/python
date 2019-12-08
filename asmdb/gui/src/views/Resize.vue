@@ -28,9 +28,10 @@ export default {
   data: function() {
     return {
       draging: false,
-      moved: false,
+      downT: 0,
       downX: 0,
-      downY: 0
+      downY: 0,
+      moved: false
     };
   },
   props: {
@@ -84,9 +85,10 @@ export default {
     onMouseDown: function(event) {
       if (event.button == 0 && event.target == this.$el) {
         this.draging = true;
-        this.moved = false;
+        this.downT = new Date().getTime();
         this.downX = event.clientX;
         this.downY = event.clientY;
+        this.moved = false;
         setGlobalCursor(this.cursor);
         this.$emit('dragstart2');
       }
@@ -107,7 +109,7 @@ export default {
         if (this.draging) {
           this.draging = false;
           setGlobalCursor(null);
-          this.$emit('dragend2', this.moved);
+          this.$emit('dragend2', this.moved || new Date().getTime() - this.downT >= 224);
         }
       }
     }
