@@ -2,6 +2,10 @@
   <div v-show="anim.value!=0" class="inquiry-container" :style="{background:background}">
     <div class="inquiry-grow"></div>
     <div class="inquiry-content" :style="{opacity:opacity,transform:transform}">
+      <div class="inquiry-title">
+        <div class="inquiry-icon" :style="{backgroundImage:backgroundImage}"></div>
+        <div class="inquiry-text">{{text}}</div>
+      </div>
       <div class="inquiry-message">{{message}}</div>
       <div class="inquiry-button2">
         <span class="inquiry-button user-select-none" @click="onClickItem(0, ...arguments)">Yes</span>
@@ -19,12 +23,18 @@ import Animation from '@/scripts/animation';
 export default {
   data: function() {
     return {
+      icon: '',
+      text: '',
       message: '',
       listener: null,
       anim: new Animation(Animation.ease_out(224))
     };
   },
   computed: {
+    backgroundImage: function() {
+      var url = '/static/icons/' + this.icon + '.png';
+      return "url('" + url + "')";
+    },
     background: function() {
       return 'rgba(0, 0, 0, ' + this.anim.value * 0.5 + ')';
     },
@@ -36,8 +46,10 @@ export default {
     }
   },
   methods: {
-    alert: function(message, listener) {
+    alert: function(icon, text, message, listener) {
       this.anim.$target(1);
+      this.icon = icon;
+      this.text = text;
       this.message = message;
       this.listener = listener || null;
     },
@@ -72,7 +84,6 @@ export default {
   top: 0px;
   width: 100%;
   height: 100%;
-  background: #00000080;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -80,15 +91,31 @@ export default {
     flex-grow: 1;
   }
   .inquiry-content {
-    min-width: 201px;
-    max-width: 401px;
+    width: 264px;
     background: @color-background-dark;
     box-shadow: 6px 12px 12px @color-border-shadow;
+    .inquiry-title {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      .inquiry-icon {
+        margin-left: 12px;
+        width: 16px;
+        height: 16px;
+        background-size: 16px 16px;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-image: url('https://www.jetbrains.com/help/img/idea/2019.3/icons.actions.quickfixBulb@2x.png');
+      }
+      .inquiry-text {
+        margin-left: 8px;
+        font-size: 12px;
+        color: @color-text-menu;
+      }
+    }
     .inquiry-message {
-      padding-left: 12px;
-      padding-top: 16px;
-      padding-right: 20px;
-      padding-bottom: 12px;
+      margin: 12px;
+      margin-top: 8px;
       line-height: 18px;
       font-size: 12px;
       color: @color-text-menu;
@@ -99,7 +126,7 @@ export default {
       .inquiry-button {
         width: 0px;
         flex-grow: 1;
-        line-height: 32px;
+        line-height: 30px;
         text-align: center;
         font-size: 12px;
         color: @color-text-menu;
