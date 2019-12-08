@@ -69,6 +69,7 @@ export default {
       items.push(['Release suspend', 'r', this.enable.bool_t]);
       items.push(['Fullscreen', 'space', !fullscreen]);
       items.push(['Exit fullscreen', '⎋', fullscreen]);
+      items.push(['Quit', '', true]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
@@ -88,6 +89,9 @@ export default {
           if (document.fullscreenElement != null) {
             document.exitFullscreen();
           }
+          break;
+        case 6:
+          this.$router.replace('/hello');
           break;
       }
     },
