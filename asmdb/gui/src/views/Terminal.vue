@@ -30,6 +30,7 @@ export default {
   overflow-y: scroll;
   padding-left: 12px;
   padding-top: 2px;
+  padding-right: 12px;
   padding-bottom: 4px;
   line-height: 18px;
   color: @color-text;
