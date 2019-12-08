@@ -62,10 +62,8 @@ export default {
       return show;
     },
     onClickItem: function(index, event) {
-      if (index == 0) {
-        if (this.listener != null) {
-          this.listener();
-        }
+      if (index == 0 && this.listener != null) {
+        this.listener();
       }
       this.close();
       event.stopPropagation();
