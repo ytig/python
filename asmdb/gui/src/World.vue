@@ -57,9 +57,10 @@ export default {
       }
     },
     onQuit: function() {
-      this.$inquiry.alert('Your process is offline, Do you want to quit now?', () => {
-        this.$router.replace('/hello');
-      });
+      this.$inquiry.alert('Your process is offline, Do you want to quit now?', this.quit.bind(this));
+    },
+    quit: function() {
+      this.$router.replace('/hello');
     }
   }
 };

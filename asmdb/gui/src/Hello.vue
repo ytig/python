@@ -19,7 +19,7 @@ export default {
 @import '~@/styles/theme';
 
 .hello-container {
-  background: #fff;
+  background: @color-background;
   width: 100%;
   height: 100%;
   display: flex;
@@ -27,6 +27,7 @@ export default {
   > span {
     align-self: center;
     font-size: 16px;
+    color: @color-text;
   }
 }
 </style>
