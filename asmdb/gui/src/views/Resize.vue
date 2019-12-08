@@ -43,7 +43,7 @@ export default {
       var cursor = 'default';
       if (this.direction == 'col') {
         if (!this.lowest && !this.uppest) {
-          cursor = 'col-resize';
+          cursor = 'ew-resize';
         }
         if (this.lowest && !this.uppest) {
           cursor = 'e-resize';
@@ -54,7 +54,7 @@ export default {
       }
       if (this.direction == 'row') {
         if (!this.lowest && !this.uppest) {
-          cursor = 'row-resize';
+          cursor = 'ns-resize';
         }
         if (this.lowest && !this.uppest) {
           cursor = 's-resize';

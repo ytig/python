@@ -158,7 +158,7 @@ export default {
     background-repeat: no-repeat;
     background-position: center center;
     background-image: url('/static/icons/folder.png');
-    cursor: se-resize;
+    cursor: context-menu;
   }
   .bar-grow {
     width: 0px;
@@ -170,7 +170,7 @@ export default {
       font-size: 16px;
       color: @color-text;
       font-family: 'Wawati SC';
-      cursor: se-resize;
+      cursor: context-menu;
     }
   }
   .bar-item {

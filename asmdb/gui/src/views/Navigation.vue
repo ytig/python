@@ -59,7 +59,7 @@ export default {
     color: @color-text;
     font-family: 'Wawati SC';
     transition-delay: 1ms;
-    cursor: se-resize;
+    cursor: context-menu;
   }
   > span[css-focus] {
     color: @color-text-light;

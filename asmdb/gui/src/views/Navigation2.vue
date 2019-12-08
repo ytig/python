@@ -74,13 +74,13 @@ export default {
     }
     > div:nth-of-type(2) {
       width: 8px;
-      cursor: se-resize;
+      cursor: context-menu;
     }
     > div:nth-of-type(3) {
       flex-grow: 1;
     }
     > span {
-      cursor: se-resize;
+      cursor: context-menu;
     }
     .navigation2-icon {
       width: 16px;
