@@ -159,15 +159,21 @@ class WsGdbController(GdbController):
         return self
 
     async def next(self):
+        if not self.suspend:
+            return
         self.suspend = False
-        await asyncio.sleep(0.05)
+        await super().next()
         self.suspend = True
 
     async def step(self):
         pass
 
     async def cont(self):
-        pass
+        if not self.suspend:
+            return
+        self.suspend = False
+        await super().cont()
+        self.suspend = True
 
     async def rlse(self):
         self.quit = True

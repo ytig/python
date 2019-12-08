@@ -34,17 +34,38 @@ class GdbController:
         self = cls()
         self.process = await gdb_startup(config)
         self.cmdlock = asyncio.Lock()
+        self.onelock = asyncio.Lock()
+        self.twolock = asyncio.Lock()
         return self
 
     async def adel(self):
         self.process.send_signal(signal.SIGINT)
         self.process.stdin.write(b'quit\n')
 
-    def sigint(self):
-        if self.cmdlock.locked():
-            self.process.send_signal(signal.SIGINT)
-
     async def _command(self, command):
         async with self.cmdlock:
             self.process.stdin.write(command.encode() + b'\n')
             return (await gdb_readlines(self.process.stdout)).decode()
+
+    async def command(self, command, wait=False):
+        if not wait:
+            async with self.onelock:
+                if self.cmdlock.locked():
+                    self.process.send_signal(signal.SIGINT)
+                return await self._command(command)
+        else:
+            async with self.twolock:
+                while True:
+                    text = await self._command(command)
+                    if False:  # todo filter sigint
+                        return text
+
+    async def next(self):
+        await self.command('next')
+
+    async def cont(self):
+        await self.command('continue', wait=True)
+
+    async def mem(self, start, end):
+        # todo
+        pass
