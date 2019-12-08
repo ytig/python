@@ -34,8 +34,10 @@ export default {
   },
   created: function() {
     asmdb.newInstance();
+    asmdb.getInstance().registerEvent('world', this);
   },
   destroyed: function() {
+    asmdb.getInstance().unregisterEvent('world', this);
     asmdb.oldInstance();
   },
   methods: {
@@ -53,6 +55,9 @@ export default {
           this.$refs.memory.jumpTo(address);
           break;
       }
+    },
+    onQuit: function() {
+      console.log('quit');
     }
   }
 };

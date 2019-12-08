@@ -142,7 +142,8 @@ def push_prop(name, default):
 
 class WsGdbController(GdbController):
     PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'asgn')
-    PUSH = ('suspend', 'breakpoints', 'watchpoints',)
+    PUSH = ('quit', 'suspend', 'breakpoints', 'watchpoints',)
+    quit = push_prop('quit', False)
     suspend = push_prop('suspend', False)
     breakpoints = push_prop('breakpoints', None)
     watchpoints = push_prop('watchpoints', None)
@@ -150,6 +151,7 @@ class WsGdbController(GdbController):
     @classmethod
     async def anew(cls, config):
         self = await super().anew(config)
+        self.quit = False
         self.suspend = True  # for test
         self.pc = 0x3210
         self.breakpoints = []
@@ -168,7 +170,8 @@ class WsGdbController(GdbController):
         pass
 
     async def rlse(self):
-        pass
+        if not self.quit:
+            self.quit = True
 
     async def asm(self, start, end):
         ret = []

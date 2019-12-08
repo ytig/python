@@ -63,6 +63,13 @@ class Debugger {
 
   push(attrName, newValue, oldValue) {
     switch (attrName) {
+      case 'quit':
+        if (newValue) {
+          this.iterObjects('world', (object) => {
+            object.onQuit();
+          });
+        }
+        break;
       case 'suspend':
         this.counter++;
         if (newValue) {
