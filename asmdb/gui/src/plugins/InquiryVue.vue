@@ -42,7 +42,6 @@ export default {
           this.listener();
         }
       }
-      this.listener = null;
       this.close();
       event.stopPropagation();
     }
