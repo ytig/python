@@ -3,17 +3,7 @@
     <Navigation2 class="python3-navigation2" :name="'python3'" :focus="focus" @mouseup2="onMouseUp2">
       <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @dragstart2="onDragStart2" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
     </Navigation2>
-    <div class="python3-test" :style="{height:windowHeight+'px'}">
-      Welcome to using ASM Debugger!
-      <br />Python3 is developing.
-      <br />>>> 1 + 1
-      <br />2
-      <br />>>> 1 + 2
-      <br />3
-      <br />>>> 1 + 3
-      <br />4
-      <br />>>>
-    </div>
+    <Terminal :style="{height:windowHeight+'px'}"></Terminal>
   </div>
 </template>
 
@@ -107,16 +97,6 @@ export default {
   .python3-resize {
     margin-top: 4px;
     height: 8px;
-  }
-  .python3-test {
-    overflow-y: scroll;
-    background: @color-background;
-    padding-left: 12px;
-    padding-top: 2px;
-    padding-bottom: 4px;
-    line-height: 18px;
-    color: @color-text;
-    font-size: 12px;
   }
 }
 </style>
