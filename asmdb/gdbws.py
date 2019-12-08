@@ -170,8 +170,7 @@ class WsGdbController(GdbController):
         pass
 
     async def rlse(self):
-        if not self.quit:
-            self.quit = True
+        self.quit = True
 
     async def asm(self, start, end):
         ret = []
