@@ -1,7 +1,7 @@
 <template>
-  <div v-show="show" class="inquiry-container">
+  <div v-show="anim.value!=0" class="inquiry-container" :style="{background:background}">
     <div class="inquiry-grow"></div>
-    <div class="inquiry-content">
+    <div class="inquiry-content" :style="{opacity:opacity,transform:transform}">
       <div class="inquiry-message">{{message}}</div>
       <div class="inquiry-button2">
         <span class="inquiry-button user-select-none" @click="onClickItem(0, ...arguments)">Yes</span>
@@ -14,27 +14,40 @@
 </template>
 
 <script>
+import Animation from '@/scripts/animation';
+
 export default {
   data: function() {
     return {
-      show: false,
       message: '',
-      listener: null
+      listener: null,
+      anim: new Animation(Animation.ease_out(224))
     };
+  },
+  computed: {
+    background: function() {
+      return 'rgba(0, 0, 0, ' + this.anim.value * 0.5 + ')';
+    },
+    opacity: function() {
+      return this.anim.value;
+    },
+    transform: function() {
+      return 'translateY(' + (1 - this.anim.value) * 50 + '%)';
+    }
   },
   methods: {
     alert: function(message, listener) {
-      this.show = true;
+      this.anim.$target(1);
       this.message = message;
       this.listener = listener || null;
     },
     close: function() {
-      this.show = false;
-      this.message = '';
+      this.anim.$target(0);
       this.listener = null;
     },
     onKeyDown: function(event) {
-      return this.show;
+      var show = this.anim.value != this.anim.target || this.anim.value != 0;
+      return show;
     },
     onClickItem: function(index, event) {
       if (index == 0) {
