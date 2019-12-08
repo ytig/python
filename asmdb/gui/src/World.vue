@@ -61,7 +61,7 @@ export default {
       this.$menu.close();
       this.$editor.close();
       keyboard.requestFocus(this);
-      this.$inquiry.alert('Your process is offline, Do you want to quit now?', this.quit.bind(this));
+      this.$inquiry.alert('The program is disconnected, Do you want to quit?', this.quit.bind(this));
     },
     quit: function() {
       this.$router.replace('/hello');
