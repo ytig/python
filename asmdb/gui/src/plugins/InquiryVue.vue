@@ -105,7 +105,6 @@ export default {
         background-size: 16px 16px;
         background-repeat: no-repeat;
         background-position: center center;
-        background-image: url('https://www.jetbrains.com/help/img/idea/2019.3/icons.actions.quickfixBulb@2x.png');
       }
       .inquiry-text {
         margin-left: 8px;
