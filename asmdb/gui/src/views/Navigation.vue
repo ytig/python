@@ -11,7 +11,7 @@ import sloth from '@/scripts/sloth';
 export default {
   data: function() {
     return {
-      disable2: new sloth(224),
+      disable2: new sloth(999),
       backgroundColor: 'transparent'
     };
   },

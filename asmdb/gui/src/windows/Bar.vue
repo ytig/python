@@ -16,7 +16,7 @@ import sloth from '@/scripts/sloth';
 export default {
   data: function() {
     return {
-      enable: new sloth(224),
+      enable: new sloth(999),
       title: 'com.example.app'
     };
   },
