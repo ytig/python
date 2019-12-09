@@ -46,7 +46,11 @@ class GdbController:
     async def __command(self, command):
         async with self.cmdlock:
             self.process.stdin.write(command.encode() + b'\n')
-            return (await gdb_readlines(self.process.stdout)).decode()
+            # return (await gdb_readlines(self.process.stdout)).decode()
+            print(command)
+            text = (await gdb_readlines(self.process.stdout)).decode()
+            print(text, end='')
+            return text
 
     async def _command(self, command, wait=False):
         if not wait:
