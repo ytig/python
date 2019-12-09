@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import tempfile
 import signal
 import asyncio
 from asyncio import subprocess
@@ -79,12 +80,11 @@ class GdbController:
             registers[words[0]] = int(words[1], 16)
         return registers
 
-    async def _xb(self, start, end):
-        length = end - start
-        text = await self._command(f'x/{length}xb {start}')
-        bArr = []
-        for line in text.split():
-            if ':' in line:
-                continue
-            bArr.append(int(line[2:], 16))
-        return bytes(bArr)
+    async def _dump(self, start, end):
+        temp = tempfile.NamedTemporaryFile()
+        try:
+            text = await self._command(f'dump binary memory {temp.name} {start} {end}')
+            temp.seek(0)
+            return temp.read()
+        finally:
+            temp.close()

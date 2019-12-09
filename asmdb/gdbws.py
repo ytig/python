@@ -194,7 +194,7 @@ class WsGdbController(GdbController):
         return await self._info_registers()
 
     async def mem(self, start, end):
-        return await self._xb(start, end)
+        return await self._dump(start, end)
 
     async def bpt(self, del_points, set_points):
         breakpoints = {}
