@@ -42,30 +42,44 @@ class GdbController:
         self.process.send_signal(signal.SIGINT)
         self.process.stdin.write(b'quit\n')
 
-    async def _command(self, command):
+    async def __command(self, command):
         async with self.cmdlock:
             self.process.stdin.write(command.encode() + b'\n')
             return (await gdb_readlines(self.process.stdout)).decode()
 
-    async def command(self, command, wait=False):
+    async def _command(self, command, wait=False):
         if not wait:
             async with self.onelock:
                 if self.cmdlock.locked():
                     self.process.send_signal(signal.SIGINT)
-                return await self._command(command)
+                return await self.__command(command)
         else:
             async with self.twolock:
                 while True:
-                    text = await self._command(command)
-                    if False:  # todo filter sigint
+                    text = await self.__command(command)
+                    if 'SIGINT' not in text:
                         return text
 
-    async def next(self):
-        await self.command('next')
+    async def _nexti(self):
+        await self._command('nexti')
 
-    async def cont(self):
-        await self.command('continue', wait=True)
+    async def _continue(self):
+        await self._command('continue', wait=True)
 
-    async def mem(self, start, end):
-        # todo
-        pass
+    async def _xb(self, start, end):
+        length = end - start
+        text = await self._command(f'x/{length}xb {start}')
+        bArr = []
+        for line in text.split():
+            if ':' in line:
+                continue
+            bArr.append(int(line[2:], 16))
+        return bytes(bArr)
+
+    async def _info_registers(self):
+        registers = {}
+        text = await self._command('info registers')
+        for line in text.strip().split('\n'):
+            words = line.split()
+            registers[words[0]] = int(words[1], 16)
+        return registers
