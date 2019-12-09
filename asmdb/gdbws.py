@@ -162,7 +162,7 @@ class WsGdbController(GdbController):
         if not self.suspend:
             return
         self.suspend = False
-        await super().next()
+        await self._nexti()
         self.suspend = True
 
     async def step(self):
@@ -172,7 +172,7 @@ class WsGdbController(GdbController):
         if not self.suspend:
             return
         self.suspend = False
-        await super().cont()
+        await self._continue()
         self.suspend = True
 
     async def rlse(self):
@@ -191,22 +191,10 @@ class WsGdbController(GdbController):
         return ret
 
     async def reg(self):
-        d = {}
-        for k in ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']:
-            d[k] = 0
-        self.pc += 4
-        d['pc'] = self.pc
-        return d
+        return await self._info_registers()
 
     async def mem(self, start, end):
-        import random
-        ret = b''
-        for i in range(end - start):
-            if random.random() < 0.01:
-                ret += b'\x00'
-            else:
-                ret += b'\x66'
-        return ret
+        return await self._xb(start, end)
 
     async def bpt(self, del_points, set_points):
         breakpoints = {}

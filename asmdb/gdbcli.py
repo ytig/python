@@ -66,6 +66,14 @@ class GdbController:
     async def _continue(self):
         await self._command('continue', wait=True)
 
+    async def _info_registers(self):
+        registers = {}
+        text = await self._command('info registers')
+        for line in text.strip().split('\n'):
+            words = line.split()
+            registers[words[0]] = int(words[1], 16)
+        return registers
+
     async def _xb(self, start, end):
         length = end - start
         text = await self._command(f'x/{length}xb {start}')
@@ -75,11 +83,3 @@ class GdbController:
                 continue
             bArr.append(int(line[2:], 16))
         return bytes(bArr)
-
-    async def _info_registers(self):
-        registers = {}
-        text = await self._command('info registers')
-        for line in text.strip().split('\n'):
-            words = line.split()
-            registers[words[0]] = int(words[1], 16)
-        return registers
