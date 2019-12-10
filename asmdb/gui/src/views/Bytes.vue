@@ -277,6 +277,15 @@ export default {
     onMouseUpItem: function(index, event) {
       if (event.button == 2) {
         if (this.items[index] && this.items[index].index != undefined) {
+          var selection = getSelection();
+          var floor = this.items[index].index - (this.items[index].index % asmdb.getInstance().UNIT);
+          var anchor = 0;
+          while (this.items[anchor].index == undefined || this.items[anchor].index < floor) {
+            anchor++;
+          }
+          var focus = anchor + 2 * asmdb.getInstance().UNIT;
+          selection.collapse(this.$el, anchor);
+          selection.extend(this.$el, focus);
           var menu = this.onCreateMenu(this.items[index].index);
           this.$menu.alert(event, menu, i => {
             menu[i].event();
