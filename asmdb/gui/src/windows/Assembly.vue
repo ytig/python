@@ -198,7 +198,7 @@ export default {
   },
   computed: {
     instructionGroup: function() {
-      return 6;
+      return 7;
     }
   },
   mounted: function() {
