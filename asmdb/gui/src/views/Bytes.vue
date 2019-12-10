@@ -290,6 +290,16 @@ export default {
       var range = asmdb.getInstance().getMemoryRange();
       var inRange = address >= range[0] && address < range[1];
       var items = [];
+      var intValue = 0;
+      var i = index - (index % asmdb.getInstance().UNIT);
+      for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
+        intValue *= 256;
+        intValue += (this.newBytes || '').charCodeAt(i + j) || 0;
+      }
+      items.push(['Copy', '', true]);
+      items[items.length - 1].event = () => {
+        copyText('0x' + intValue.toString(16));
+      };
       var watching = JSON.parse(this.watchingNumbers).indexOf(index) >= 0;
       var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN && inRange;
       items.push([!watching ? 'Watching' : 'Watching done', '', watching || canWatch]);
