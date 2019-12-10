@@ -54,6 +54,21 @@ window.emptySelection = function () {
   }
 }
 
+window.copyText = function (text) {
+  var textarea = document.getElementById('__textarea__');
+  if (!textarea) {
+    textarea = document.createElement('textarea');
+    textarea.id = '__textarea__';
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    textarea.style.pointerEvents = 'none';
+    document.body.appendChild(textarea);
+  }
+  textarea.value = text;
+  textarea.select();
+  document.execCommand('copy');
+}
+
 window.measureText = function (text, font) {
   if (!text || text.length <= 0) {
     return 0;
