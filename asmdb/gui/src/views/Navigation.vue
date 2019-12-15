@@ -61,6 +61,7 @@ export default {
   position: relative;
   height: 40px;
   display: flex;
+  align-items: flex-start;
   > span {
     margin-top: 9px;
     margin-right: 12px;
