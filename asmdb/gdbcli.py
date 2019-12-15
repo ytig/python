@@ -84,6 +84,8 @@ class GdbController:
         temp = tempfile.NamedTemporaryFile()
         try:
             text = await self._command(f'dump binary memory {temp.name} {start} {end}')
+            if 'Cannot access memory' in text:
+                raise EOFError(text.strip())
             temp.seek(0)
             return temp.read()
         finally:
