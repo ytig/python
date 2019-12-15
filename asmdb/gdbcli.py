@@ -16,7 +16,7 @@ async def gdb_startup(config):
     for x in xs:
         args.append('-ex')
         args.append(x)
-    process = await asyncio.create_subprocess_exec('gdb', *args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    process = await asyncio.create_subprocess_exec('gdb', *args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, limit=2**20)
     await gdb_readlines(process.stdout)
     return process
 
