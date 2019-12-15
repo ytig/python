@@ -153,7 +153,6 @@ class WsGdbController(GdbController):
         self = await super().anew(config)
         self.quit = False
         self.suspend = True  # for test
-        self.pc = 0x3210
         self.breakpoints = []
         self.watchpoints = []
         return self
