@@ -69,13 +69,31 @@ class GdbController:
 
     async def _nexti(self):
         text = await self._command('nexti')
-        if re.search(r'The program is not being run.', text):
+        if re.search(r'Remote connection closed|The program is not being run.', text):
             raise GdbError(text.strip())
 
     async def _continue(self):
         text = await self._command('continue', wait=True)
-        if re.search(r'The program is not being run.', text):
+        if re.search(r'Remote connection closed|he program is not being run.', text):
             raise GdbError(text.strip())
+
+    async def _info_proc_mappings(self):
+        maps = []
+        text = await self._command('info proc mappings')
+        if re.search(r'Remote connection closed|No current process: you must name one.', text):
+            raise GdbError(text.strip())
+        for line in text.strip().split('\n'):
+            if '0x' not in line:
+                continue
+            words = line.split(maxsplit=4)
+            maps.append({
+                'startAddress': int(words[0], 16),
+                'endAddress': int(words[1], 16),
+                'size': int(words[2], 16),
+                'offset': int(words[3], 16),
+                'objfile': words[-1] if len(words) == 5 else '',
+            })
+        return maps
 
     async def _info_registers(self):
         registers = {}
