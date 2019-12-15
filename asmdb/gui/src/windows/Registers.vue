@@ -69,11 +69,15 @@ export default {
     onBreak: function(registers) {
       this.disable = false;
       this.empty = false;
+      var items = [];
       for (var item of this.items) {
+        item = Object.assign({}, item);
         item.oldValue = item.newValue;
         item.newValue = item.lineName in registers ? registers[item.lineName] : null;
         item.assigned = false;
+        items.push(item);
       }
+      this.items.splice(0, this.items.length, ...items);
     },
     onContinue: function() {
       this.disable = true;
