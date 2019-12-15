@@ -1,7 +1,7 @@
 <template>
   <div class="assembly-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" :theme="0" :condition="searchTest" @search="jumpTo"></Search>
-    <Navigation :name="'Assembly'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
+    <Navigation :name="'Assembly'" :label="'libc.so|.text'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :source="source" @scroll2="onScroll2" #default="props">

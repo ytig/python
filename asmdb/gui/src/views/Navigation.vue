@@ -1,6 +1,8 @@
 <template>
   <div class="navigation-container" :css-gradient="gradient" @mouseup="onMouseUp">
     <span class="user-select-none" :css-focus="focus" :css-disable="!disable2.bool_f" @click="onClick">{{name}}</span>
+    <div class="navigation-grow"></div>
+    <span v-for="(item, index) in labels" :key="index">{{item}}</span>
     <div v-if="gradient" class="navigation-gradient" :style="{background:'linear-gradient('+backgroundColor+', transparent)'}"></div>
   </div>
 </template>
@@ -17,6 +19,7 @@ export default {
   },
   props: {
     name: String,
+    label: String,
     focus: Boolean,
     disable: Boolean,
     gradient: Boolean
@@ -27,6 +30,11 @@ export default {
       handler: function(newValue) {
         this.disable2.set(!newValue);
       }
+    }
+  },
+  computed: {
+    labels: function() {
+      return (this.label || '').split('|');
     }
   },
   mounted: function() {
@@ -52,20 +60,28 @@ export default {
 .navigation-container {
   position: relative;
   height: 40px;
+  display: flex;
   > span {
-    line-height: 40px;
-    margin-left: 12px;
-    font-size: 16px;
+    margin-top: 9px;
+    margin-right: 12px;
     color: @color-text;
     font-family: 'Wawati SC';
-    transition-delay: 1ms;
-    cursor: context-menu;
+    font-size: 14px;
   }
   > span[css-focus] {
     color: @color-text-light;
   }
   > span[css-disable] {
     text-decoration: line-through;
+  }
+  > span:first-child {
+    margin-left: 12px;
+    font-size: 16px;
+    transition-delay: 1ms;
+    cursor: context-menu;
+  }
+  .navigation-grow {
+    flex-grow: 1;
   }
   .navigation-gradient {
     position: absolute;
