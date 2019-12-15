@@ -82,6 +82,7 @@ export default {
     flex-grow: 1;
     display: flex;
     justify-content: flex-end;
+    overflow: hidden;
     > span {
       margin: 9px 12px 0px 0px;
       font-size: 14px;
