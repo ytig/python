@@ -142,11 +142,12 @@ def push_prop(name, default):
 
 class WsGdbController(GdbController):
     PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'asgn')
-    PUSH = ('quit', 'suspend', 'breakpoints', 'watchpoints',)
+    PUSH = ('quit', 'suspend', 'breakpoints', 'watchpoints', 'maps',)
     quit = push_prop('quit', False)
     suspend = push_prop('suspend', False)
     breakpoints = push_prop('breakpoints', None)
     watchpoints = push_prop('watchpoints', None)
+    maps = push_prop('maps', None)
 
     @classmethod
     async def anew(cls, config):
@@ -155,6 +156,7 @@ class WsGdbController(GdbController):
         self.suspend = True  # for test
         self.breakpoints = []
         self.watchpoints = []
+        self.maps = await self._info_proc_mappings()
         return self
 
     async def next(self):
@@ -195,7 +197,14 @@ class WsGdbController(GdbController):
         return await self._info_registers()
 
     async def mem(self, start, end):
-        return await self._dump(start, end)
+        data = b'\x00' * (end - start)
+        for i in self.maps:
+            _start = max(i['start'], start)
+            _end = min(i['end'], end)
+            if _end - _start <= 0:
+                continue
+            data = data[:_start - start] + await self._dump(_start, _end) + data[_end - start:]
+        return data
 
     async def bpt(self, del_points, set_points):
         breakpoints = {}
