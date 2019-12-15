@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import re
 import tempfile
 import signal
 import asyncio
@@ -67,14 +68,20 @@ class GdbController:
                         return text
 
     async def _nexti(self):
-        await self._command('nexti')
+        text = await self._command('nexti')
+        if re.search(r'The program is not being run.', text):
+            raise GdbError(text.strip())
 
     async def _continue(self):
-        await self._command('continue', wait=True)
+        text = await self._command('continue', wait=True)
+        if re.search(r'The program is not being run.', text):
+            raise GdbError(text.strip())
 
     async def _info_registers(self):
         registers = {}
         text = await self._command('info registers')
+        if re.search(r'The program has no registers now.', text):
+            raise GdbError(text.strip())
         for line in text.strip().split('\n'):
             words = line.split()
             registers[words[0]] = int(words[1], 16)
@@ -84,8 +91,8 @@ class GdbController:
         temp = tempfile.NamedTemporaryFile()
         try:
             text = await self._command(f'dump binary memory {temp.name} {start} {end}')
-            if 'Cannot access memory' in text:
-                raise EOFError(text.strip())
+            if re.search(r'Cannot access memory at address', text):
+                raise GdbError(text.strip())
             temp.seek(0)
             return temp.read()
         finally:
