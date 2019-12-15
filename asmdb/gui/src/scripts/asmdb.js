@@ -15,7 +15,8 @@ class Debugger {
     this.struct = {
       suspend: false,
       breakpoints: [],
-      watchpoints: []
+      watchpoints: [],
+      maps: []
     };
     this.counter = 0;
     this.registers = null;
@@ -376,7 +377,7 @@ class Debugger {
   }
 
   getAssemblyRange() {
-    return [0, Math.pow(16, 2 * this.UNIT)]; //todo
+    return [0, Math.pow(16, 2 * this.UNIT)];
   }
 
   getRegistersRange() {
@@ -399,7 +400,16 @@ class Debugger {
     if (delta >= 0 && delta < 400 * 10) {
       return '3';
     }
-    //todo
+    for (var map of this.struct.maps) {
+      if (int >= map.start && int < map.end) {
+        if (/\.so$/.test(map.objfile)) {
+          return '2';
+        }
+        if (/alloc|malloc/.test(map.objfile)) {
+          return '4';
+        }
+      }
+    }
     return '1';
   }
 
