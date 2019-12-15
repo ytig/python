@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     labels: function() {
-      return (this.label || '').split('|');
+      return (this.label || '').split('|').filter(item => item);
     }
   },
   mounted: function() {
