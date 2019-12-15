@@ -87,10 +87,8 @@ class GdbController:
                 continue
             words = line.split(maxsplit=4)
             maps.append({
-                'startAddress': int(words[0], 16),
-                'endAddress': int(words[1], 16),
-                'size': int(words[2], 16),
-                'offset': int(words[3], 16),
+                'start': int(words[0], 16),
+                'end': int(words[1], 16),
                 'objfile': words[-1] if len(words) == 5 else '',
             })
         return maps
