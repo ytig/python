@@ -405,7 +405,7 @@ class Debugger {
         if (/\.so$/.test(map.objfile)) {
           return '2';
         }
-        if (/alloc|malloc/.test(map.objfile)) {
+        if (/stack|alloc|malloc/.test(map.objfile)) {
           return '4';
         }
       }
@@ -422,6 +422,21 @@ class Debugger {
             str = '"\'"';
           } else {
             str = "'" + String.fromCharCode(int) + "'";
+          }
+        }
+        break;
+      case '2':
+        var pc = this.registers[this.PCNM];
+        for (var map of this.struct.maps) {
+          if (int >= map.start && int < map.end) {
+            if (pc >= map.start && pc < map.end) {
+              var delta = int - map.start + map.offset;
+              str = '~0x' + delta.toString(16);
+            } else {
+              var strArr = map.objfile.split('/');
+              str = strArr[strArr.length - 1];
+            }
+            break;
           }
         }
         break;
