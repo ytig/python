@@ -91,6 +91,7 @@ class GdbController:
                 'end': int(words[1], 16),
                 'offset': int(words[3], 16),
                 'objfile': words[-1] if len(words) == 5 else '',
+                'section': '.todo',
             })
         return maps
 
