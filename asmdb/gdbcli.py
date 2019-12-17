@@ -79,6 +79,7 @@ class GdbController:
 
     async def _info_maps(self):
         maps = []
+        base = {}
         text = await self._command('info proc mappings')
         if re.search(r'Remote connection closed|No current process: you must name one.', text):
             raise GdbError(text.strip())
@@ -89,10 +90,13 @@ class GdbController:
             maps.append({
                 'start': int(words[0], 16),
                 'end': int(words[1], 16),
-                'offset': 0,  # todo
+                'offset': 0,
                 'target': words[-1] if len(words) == 5 else '',
                 'section': '',
             })
+            m = maps[-1]
+            if m['target'] and m['target'] not in base:
+                base[m['target']] = m['start']
         text = await self._command('info target')
         proc = re.search(r'Symbols from "target:(.*)"\.', text).group(1)
         for line in text.strip().split('\n'):
@@ -114,7 +118,7 @@ class GdbController:
                         maps.insert(c, {
                             'start': m['start'],
                             'end': start,
-                            'offset': 0,  # todo
+                            'offset': 0,
                             'target': m['target'],
                             'section': m['section'],
                         })
@@ -123,7 +127,7 @@ class GdbController:
                         maps.insert(c, {
                             'start': end,
                             'end': m['end'],
-                            'offset': 0,  # todo
+                            'offset': 0,
                             'target': m['target'],
                             'section': m['section'],
                         })
@@ -132,7 +136,7 @@ class GdbController:
             maps.append({
                 'start': start,
                 'end': end,
-                'offset': 0,  # todo
+                'offset': start - base.get(target, start),
                 'target': target,
                 'section': section,
             })
