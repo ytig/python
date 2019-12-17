@@ -402,7 +402,7 @@ class Debugger {
     }
     for (var m of this.struct.maps) {
       if (int >= m.start && int < m.end) {
-        if (m.section) {
+        if (/\.init|\.text|\.fini/.test(m.section)) {
           return '2';
         }
         if (/stack|alloc/.test(m.target)) {
