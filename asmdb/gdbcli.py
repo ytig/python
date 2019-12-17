@@ -77,7 +77,7 @@ class GdbController:
         if re.search(r'Remote connection closed|he program is not being run.', text):
             raise GdbError(text.strip())
 
-    async def _info_proc_mappings(self):
+    async def _info_maps(self):
         maps = []
         text = await self._command('info proc mappings')
         if re.search(r'Remote connection closed|No current process: you must name one.', text):
@@ -89,11 +89,54 @@ class GdbController:
             maps.append({
                 'start': int(words[0], 16),
                 'end': int(words[1], 16),
-                'offset': int(words[3], 16),
-                'objfile': words[-1] if len(words) == 5 else '',
-                'section': '.todo',
+                'offset': 0,  # todo
+                'target': words[-1] if len(words) == 5 else '',
+                'section': '',
             })
-        return maps
+        text = await self._command('info target')
+        proc = re.search(r'Symbols from "target:(.*)"\.', text).group(1)
+        for line in text.strip().split('\n'):
+            if ' is .' not in line:
+                continue
+            if ' in target:' not in line:
+                line += ' in target:' + proc
+            words = line.split(maxsplit=3)
+            start = int(words[0], 16)
+            end = int(words[2], 16)
+            section, target, = words[3][3:].split(' in target:', maxsplit=1)
+            c = 0
+            while c < len(maps):
+                m = maps[c]
+                if not (end <= m['start'] or start >= m['end']):
+                    maps.pop(c)
+                    c -= 1
+                    if start > m['start']:
+                        maps.insert(c, {
+                            'start': m['start'],
+                            'end': start,
+                            'offset': 0,  # todo
+                            'target': m['target'],
+                            'section': m['section'],
+                        })
+                        c += 1
+                    if m['end'] > end:
+                        maps.insert(c, {
+                            'start': end,
+                            'end': m['end'],
+                            'offset': 0,  # todo
+                            'target': m['target'],
+                            'section': m['section'],
+                        })
+                        c += 1
+                c += 1
+            maps.append({
+                'start': start,
+                'end': end,
+                'offset': 0,  # todo
+                'target': target,
+                'section': section,
+            })
+        return sorted(filter(lambda i: i['end'] > i['start'], maps), key=lambda i: i['start'])
 
     async def _info_registers(self):
         registers = {}

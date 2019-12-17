@@ -156,7 +156,7 @@ class WsGdbController(GdbController):
         self.suspend = True  # for test
         self.breakpoints = []
         self.watchpoints = []
-        self.maps = await self._info_proc_mappings()
+        self.maps = await self._info_maps()
         return self
 
     async def next(self):

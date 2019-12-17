@@ -400,12 +400,12 @@ class Debugger {
     if (delta >= 0 && delta < 400 * 10) {
       return '3';
     }
-    for (var map of this.struct.maps) {
-      if (int >= map.start && int < map.end) {
-        if (map.section) {
+    for (var m of this.struct.maps) {
+      if (int >= m.start && int < m.end) {
+        if (m.section) {
           return '2';
         }
-        if (/stack|alloc/.test(map.objfile)) {
+        if (/stack|alloc/.test(m.target)) {
           return '4';
         }
       }
@@ -427,20 +427,20 @@ class Debugger {
         break;
       case '2':
         var pc = this.registers[this.PCNM];
-        var objfile;
-        for (var map of this.struct.maps) {
-          if (pc >= map.start && pc < map.end) {
-            objfile = map.objfile;
+        var target;
+        for (var m of this.struct.maps) {
+          if (pc >= m.start && pc < m.end) {
+            target = m.target;
             break;
           }
         }
-        for (var map of this.struct.maps) {
-          if (int >= map.start && int < map.end) {
-            if (map.objfile == objfile) {
-              var delta = int - map.start + map.offset;
+        for (var m of this.struct.maps) {
+          if (int >= m.start && int < m.end) {
+            if (m.target == target) {
+              var delta = int - m.start + m.offset;
               str = '~0x' + delta.toString(16);
             } else {
-              var strArr = map.objfile.split('/');
+              var strArr = m.target.split('/');
               str = strArr[strArr.length - 1];
             }
             break;
