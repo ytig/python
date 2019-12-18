@@ -390,7 +390,7 @@ export default {
         address = current.address + current.size;
       }
       var info = asmdb.getInstance().getAddressInfo(address);
-      if (info && info.section) {
+      if (info) {
         this.label = info.target.substring(info.target.lastIndexOf('/') + 1) + '|' + info.section;
       } else {
         this.label = '';

@@ -12,7 +12,7 @@ import InputMixin from './InputMixin';
 
 function exec(source, locals, condition) {
   if (source.startsWith('~')) {
-    source = '__base__ + ' + (source.substring(1) || '0');
+    source = '__base__ + (' + (source.substring(1) || '0') + ')';
   }
   var result = null;
   try {
