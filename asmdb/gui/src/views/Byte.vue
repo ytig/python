@@ -45,11 +45,10 @@ export default {
       items.push(newItem(address));
       items.push(newItem('&nbsp;'));
       items.push(newItem('&nbsp;'));
-      var byte = this.value.charCodeAt(0);
-      items.push(newItem(byte.toString(16).zfill(2)));
-      if (byte >= 0x21 && byte <= 0x7e) {
+      items.push(newItem(this.value.toString(16).zfill(2)));
+      if (this.value >= 0x21 && this.value <= 0x7e) {
         items.push(newItem('&nbsp;'));
-        charCode = String.fromCharCode(byte);
+        var charCode = String.fromCharCode(this.value);
         items.push(newItem(charCode));
       }
       this.items.splice(0, this.items.length, ...items);
@@ -74,13 +73,12 @@ export default {
       x += measureLength(address.length);
       x += measureLength(2);
       ctx.fillStyle = Theme.colorText;
-      var byte = this.value.charCodeAt(0);
-      ctx.fillText(byte.toString(16).zfill(2), x, y);
+      ctx.fillText(this.value.toString(16).zfill(2), x, y);
       x += measureLength(2);
-      if (byte >= 0x21 && byte <= 0x7e) {
+      if (this.value >= 0x21 && this.value <= 0x7e) {
         x += measureLength(1);
         ctx.fillStyle = Theme.colorTextDark;
-        charCode = String.fromCharCode(byte);
+        var charCode = String.fromCharCode(this.value);
         ctx.fillText(charCode, x, y);
       }
     }

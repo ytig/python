@@ -180,14 +180,14 @@ class WsGdbController(GdbController):
         self.quit = True
 
     async def asm(self, start, end):  # todo
+        mem = await self.mem(start, end)
         ret = []
-        for i in range((end - start) // 2):
+        for i in range((end - start)):
             ret.append({
-                'type': 'instruction',
-                'address': start + 2 * i,
-                'size': 2,
-                'mnemonic': 'push',
-                'op_str': 'r0 r1',
+                'type': 'byte',
+                'address': start + i,
+                'size': 1,
+                'value': mem[i],
             })
         return ret
 
