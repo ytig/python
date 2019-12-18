@@ -372,6 +372,15 @@ class Debugger {
     return this.struct.suspend;
   }
 
+  getAddressInfo(address) {
+    for (var info of this.struct.maps) {
+      if (address >= info.start && address < info.end) {
+        return info;
+      }
+    }
+    return null;
+  }
+
   getRegisters() {
     return Object.assign({}, this.registers);
   }
@@ -400,14 +409,20 @@ class Debugger {
     if (delta >= 0 && delta < 400 * 10) {
       return '3';
     }
-    for (var m of this.struct.maps) {
-      if (int >= m.start && int < m.end) {
-        if (/\.init|\.text|\.fini/.test(m.section)) {
+    var info = this.getAddressInfo(int);
+    var target = this.getAddressInfo(this.registers[this.PCNM]);
+    target = target != null ? target.target : null;
+    if (info) {
+      if (/\/data\/app\/.*\.so$/.test(info.target) || info.target == target) {
+        if (/\.init|\.text|\.fini/.test(info.section)) {
           return '2';
         }
-        if (/stack|alloc/.test(m.target)) {
+        if (/\.data|\.bss/.test(info.section)) {
           return '4';
         }
+      }
+      if (/stack|alloc/.test(info.target)) { //todo
+        return '4';
       }
     }
     return '1';
@@ -426,24 +441,16 @@ class Debugger {
         }
         break;
       case '2':
-        var pc = this.registers[this.PCNM];
-        var target;
-        for (var m of this.struct.maps) {
-          if (pc >= m.start && pc < m.end) {
-            target = m.target;
-            break;
-          }
-        }
-        for (var m of this.struct.maps) {
-          if (int >= m.start && int < m.end) {
-            if (m.target == target) {
-              var delta = int - m.start + m.offset;
-              str = '~0x' + delta.toString(16);
-            } else {
-              var strArr = m.target.split('/');
-              str = strArr[strArr.length - 1];
-            }
-            break;
+        var info = this.getAddressInfo(int);
+        var target = this.getAddressInfo(this.registers[this.PCNM]);
+        target = target != null ? target.target : null;
+        if (info) {
+          if (info.target == target) {
+            var delta = int - info.start + info.offset;
+            str = '~0x' + delta.toString(16);
+          } else {
+            var strArr = info.target.split('/');
+            str = strArr[strArr.length - 1];
           }
         }
         break;
