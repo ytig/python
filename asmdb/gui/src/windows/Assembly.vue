@@ -1,7 +1,7 @@
 <template>
   <div class="assembly-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <Search ref="search" :theme="0" :condition="searchTest" @search="jumpTo"></Search>
-    <Navigation :name="'Assembly'" :label="'libc.so|.text'" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
+    <Navigation :name="'Assembly'" :label="label" :focus="focus" :disable="disable" :gradient="true" @mouseup2="onMouseUp2"></Navigation>
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :source="source" @scroll2="onScroll2" #default="props">
@@ -186,6 +186,7 @@ export default {
     return {
       focus: false,
       disable: true,
+      label: '',
       pc: null,
       source: null,
       itemSelection: null,
@@ -383,6 +384,12 @@ export default {
       this.breakpoints = breakpoints;
     },
     onScroll2: function(position) {
+      var info = asmdb.getInstance().getAddressInfo(this.source[position.index].address);
+      if (info && info.section) {
+        this.label = info.target.substring(info.target.lastIndexOf('/') + 1) + '|' + info.section;
+      } else {
+        this.label = '';
+      }
       this.source.onScroll(position.index);
     }
   }

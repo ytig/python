@@ -457,8 +457,7 @@ class Debugger {
             var delta = int - info.start + info.offset;
             str = '~0x' + delta.toString(16);
           } else {
-            var strArr = info.target.split('/');
-            str = strArr[strArr.length - 1];
+            str = info.target.substring(info.target.lastIndexOf('/') + 1);
           }
         }
         break;
