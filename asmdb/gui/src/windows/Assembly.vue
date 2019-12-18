@@ -391,7 +391,7 @@ export default {
       }
       var info = asmdb.getInstance().getAddressInfo(address);
       if (info) {
-        this.label = info.target.substring(info.target.lastIndexOf('/') + 1) + '|' + info.section;
+        this.label = info.section + '|' + info.target.substring(info.target.lastIndexOf('/') + 1);
       } else {
         this.label = '';
       }
