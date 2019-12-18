@@ -373,12 +373,20 @@ class Debugger {
   }
 
   getAddressInfo(address) {
-    for (var info of this.struct.maps) {
-      if (address >= info.start && address < info.end) {
-        return info;
+    var index = binarySearch(this.struct.maps, function (info) {
+      if (address < info.start) {
+        return -1;
       }
+      if (address >= info.end) {
+        return 1;
+      }
+      return 0;
+    });
+    if (index >= 0) {
+      return this.struct.maps[index];
+    } else {
+      return null;
     }
-    return null;
   }
 
   getRegisters() {

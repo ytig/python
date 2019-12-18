@@ -6,6 +6,24 @@ String.prototype.zfill = function (size) {
   return str;
 }
 
+window.binarySearch = function (items, comparator) {
+  var low = 0;
+  var high = items.length - 1;
+  while (low <= high) {
+    var mid = (low + high) >>> 1;
+    var delta = comparator(items[mid]);
+    if (delta == 0) {
+      return mid;
+    }
+    if (delta > 0) {
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+  return -(low + 1);
+}
+
 window.parseSignedInt = function (float) {
   if (float >= 0) {
     return parseInt(float);
