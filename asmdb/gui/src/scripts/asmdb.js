@@ -421,11 +421,11 @@ class Debugger {
     var target = this.getAddressInfo(this.registers[this.PCNM]);
     target = target != null ? target.target : null;
     if (info) {
-      if (/\/data\/app\/.*\.so$/.test(info.target) || info.target == target) {
-        if (/\.init|\.text|\.fini/.test(info.section)) {
+      if (/^\/data\/app\/.*\.so$/.test(info.target) || info.target == target) {
+        if (/^\.text$|^\.plt$|^\.init|^\.fini/.test(info.section)) {
           return '2';
         }
-        if (/\.data|\.bss/.test(info.section)) {
+        if (/^\.data$|^\.bss$/.test(info.section)) {
           return '4';
         }
       }
