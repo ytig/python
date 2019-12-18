@@ -32,7 +32,7 @@ function getFloatHeight(el) {
 }
 
 function getRange(address) {
-  const pieceOf = 147 * asmdb.getInstance().UNIT;
+  const pieceOf = 150 * asmdb.getInstance().UNIT;
   var range = asmdb.getInstance().getAssemblyRange();
   var offset = address - range[0];
   offset -= offset % pieceOf;
@@ -46,7 +46,7 @@ function getRange(address) {
 class Source {
   constructor(address, assembly) {
     for (var i = 0; i < assembly.length; i++) {
-      if (assembly[i].type == 'instruction' && address >= assembly[i].address && address < assembly[i].address + assembly[i].size) {
+      if (address >= assembly[i].address && address < assembly[i].address + assembly[i].size) {
         break;
       }
     }
@@ -57,7 +57,7 @@ class Source {
       this.append(j, assembly[i + j]);
     }
     var range = getRange(address);
-    this.pieceOf = 147 * asmdb.getInstance().UNIT;
+    this.pieceOf = 150 * asmdb.getInstance().UNIT;
     this.minIndex = -i;
     this.minAddress = range[0];
     this.minLoading = false;
@@ -111,7 +111,7 @@ class Source {
 
   getIndex(address) {
     for (var i = this.minIndex; i < this.maxIndex; i++) {
-      if (this[i].type == 'instruction' && address >= this[i].address && address < this[i].address + this[i].size) {
+      if (address >= this[i].address && address < this[i].address + this[i].size) {
         return i;
       }
     }
@@ -134,7 +134,7 @@ class Source {
 
   getPosn(position) {
     for (var i = position.index; i < this.maxIndex; i++) {
-      if (this[i].type == 'instruction') {
+      if (this[i].size > 0) {
         return {
           address: this[i].address,
           size: this[i].size,
@@ -146,7 +146,7 @@ class Source {
   }
 
   onScroll(index) {
-    var preLoad = 147;
+    var preLoad = 150;
     if (index - this.minIndex <= preLoad) {
       if (!this.minLoading) {
         this.minLoading = true;
