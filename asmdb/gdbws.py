@@ -179,17 +179,15 @@ class WsGdbController(GdbController):
     async def rlse(self):
         self.quit = True
 
-    async def asm(self, start, end):
-        import capstone  # todo
-        memory = await self._dump(start, end)
+    async def asm(self, start, end):  # todo
         ret = []
-        for i in capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_THUMB).disasm(memory, start):
+        for i in range((end - start) / 2):
             ret.append({
                 'type': 'instruction',
-                'address': i.address,
-                'size': i.size,
-                'mnemonic': i.mnemonic,
-                'op_str': i.op_str
+                'address': start + 2 * i,
+                'size': 2,
+                'mnemonic': 'push',
+                'op_str': 'r0 r1',
             })
         return ret
 
