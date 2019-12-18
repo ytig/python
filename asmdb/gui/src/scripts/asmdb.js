@@ -429,7 +429,7 @@ class Debugger {
           return '4';
         }
       }
-      if (/stack|alloc/.test(info.target)) { //todo
+      if (/malloc/.test(info.target)) { //todo
         return '4';
       }
     }
