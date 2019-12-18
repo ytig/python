@@ -137,7 +137,6 @@ class Source {
       if (this[i].size > 0) {
         return {
           address: this[i].address,
-          size: this[i].size,
           offset: this.getOffset(position) - this.getOffset({ index: i, offset: 0 })
         };
       }
@@ -293,16 +292,19 @@ export default {
         if (counter2 != this.counter2) {
           return;
         }
-        var posn = this.source != null ? this.source.getPosn(this.$refs.scroller.getPosition()) : null;
-        if (posn != null && !(address >= posn.address && address < posn.address + posn.size && posn.offset == 0)) {
-          this.hstSet(posn);
-        }
+        var old_posn = this.source != null ? this.source.getPosn(this.$refs.scroller.getPosition()) : null;
         this.counter++;
         this.incomplete = 0;
         this.itemSelection = address;
         this.source = new Source(address, assembly);
         this.$nextTick(() => {
           this.$refs.scroller.scrollBy(-MIN_OFFSET);
+          if (old_posn != null) {
+            var new_posn = this.source.getPosn(this.$refs.scroller.getPosition());
+            if (old_posn.address != new_posn.address || old_posn.offset != new_posn.offset) {
+              this.hstSet(old_posn);
+            }
+          }
         });
       });
       this.requestFocus();
