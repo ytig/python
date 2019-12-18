@@ -5,7 +5,8 @@
     <div class="assembly-column">
       <div class="assembly-row">
         <Scroller v-if="source!=null" ref="scroller" class="assembly-scroller" :source="source" @scroll2="onScroll2" #default="props">
-          <Instruction v-if="props.item.type=='instruction'" :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :comment="source.toInstructionComment(props.item,breakpoints)" :highlight="source.toInstructionHighlight(props.item,itemSelection)" :running="source.toInstructionRunning(props.item,pc)" :breaking="source.toInstructionBreaking(props.item,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
+          <Byte v-if="props.item.type=='byte'" :address="props.item.address" :value="props.item.value" :highlight="source.toContains(props.item,itemSelection)" :running="source.toContains(props.item,pc)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Byte>
+          <Instruction v-if="props.item.type=='instruction'" :address="props.item.address" :mnemonic="props.item.mnemonic" :op_str="props.item.op_str" :comment="source.toInstructionComment(props.item,breakpoints)" :highlight="source.toContains(props.item,itemSelection)" :running="source.toContains(props.item,pc)" :breaking="source.toInstructionBreaking(props.item,breakpoints)" :group="instructionGroup" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></Instruction>
         </Scroller>
       </div>
     </div>
@@ -15,6 +16,7 @@
 <script>
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
+import Byte from '@/views/Byte';
 import Instruction from '@/views/Instruction';
 const MIN_OFFSET = 4;
 
@@ -69,32 +71,17 @@ class Source {
 
   append(index, value) {
     value.height = {
+      byte: Byte,
       instruction: Instruction
     }[value.type].measureHeight(value);
     this[index] = value;
   }
 
-  toInstructionComment(item, breakpoints) {
-    for (var breakpoint of breakpoints) {
-      if (breakpoint.address >= item.address && breakpoint.address < item.address + item.size) {
-        return breakpoint.comment;
-      }
-    }
-    return '';
-  }
-
-  toInstructionHighlight(item, highlight) {
-    if (highlight == null) {
+  toContains(item, address) {
+    if (address == null) {
       return false;
     }
-    return highlight >= item.address && highlight < item.address + item.size;
-  }
-
-  toInstructionRunning(item, running) {
-    if (running == null) {
-      return false;
-    }
-    return running >= item.address && running < item.address + item.size;
+    return address >= item.address && address < item.address + item.size;
   }
 
   toInstructionBreaking(item, breakpoints) {
@@ -107,6 +94,15 @@ class Source {
       }
     }
     return 0;
+  }
+
+  toInstructionComment(item, breakpoints) {
+    for (var breakpoint of breakpoints) {
+      if (breakpoint.address >= item.address && breakpoint.address < item.address + item.size) {
+        return breakpoint.comment;
+      }
+    }
+    return '';
   }
 
   getIndex(address) {
