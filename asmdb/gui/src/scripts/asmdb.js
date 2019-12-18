@@ -389,10 +389,20 @@ class Debugger {
     }
   }
 
+  getAddressLabel(address) {
+    var info = this.getAddressInfo(address);
+    if (info != null) {
+      return info.section + '|' + info.target.substring(Math.max(info.target.lastIndexOf('/'), info.target.lastIndexOf('@')) + 1);
+    }
+    return null;
+  }
+
   getAddressBase() {
     if (this.registers != null) {
       var info = this.getAddressInfo(this.registers[this.PCNM]);
-      return info.start - info.offset;
+      if (info != null) {
+        return info.start - info.offset;
+      }
     }
     return null;
   }
@@ -465,7 +475,7 @@ class Debugger {
             var delta = int - info.start + info.offset;
             str = '~0x' + delta.toString(16);
           } else {
-            str = info.target.substring(info.target.lastIndexOf('/') + 1);
+            str = info.target.substring(Math.max(info.target.lastIndexOf('/'), info.target.lastIndexOf('@')) + 1);
           }
         }
         break;

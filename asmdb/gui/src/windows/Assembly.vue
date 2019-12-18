@@ -181,7 +181,7 @@ export default {
     return {
       focus: false,
       disable: true,
-      label: '',
+      label: null,
       pc: null,
       source: null,
       itemSelection: null,
@@ -389,12 +389,7 @@ export default {
       } else {
         address = current.address + current.size;
       }
-      var info = asmdb.getInstance().getAddressInfo(address);
-      if (info) {
-        this.label = info.section + '|' + info.target.substring(info.target.lastIndexOf('/') + 1);
-      } else {
-        this.label = '';
-      }
+      this.label = asmdb.getInstance().getAddressLabel(address);
       this.source.onScroll(position.index);
     }
   }
