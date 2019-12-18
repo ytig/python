@@ -384,7 +384,14 @@ export default {
       this.breakpoints = breakpoints;
     },
     onScroll2: function(position) {
-      var info = asmdb.getInstance().getAddressInfo(this.source[position.index].address);
+      var current = this.source[position.index];
+      var address;
+      if (current.height - position.offset > MIN_OFFSET) {
+        address = current.address;
+      } else {
+        address = current.address + current.size;
+      }
+      var info = asmdb.getInstance().getAddressInfo(address);
       if (info && info.section) {
         this.label = info.target.substring(info.target.lastIndexOf('/') + 1) + '|' + info.section;
       } else {
