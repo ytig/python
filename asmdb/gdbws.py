@@ -181,7 +181,7 @@ class WsGdbController(GdbController):
 
     async def asm(self, start, end):  # todo
         ret = []
-        for i in range((end - start) / 2):
+        for i in range((end - start) // 2):
             ret.append({
                 'type': 'instruction',
                 'address': start + 2 * i,
