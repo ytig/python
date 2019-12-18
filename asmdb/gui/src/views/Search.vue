@@ -11,6 +11,9 @@ import asmdb from '@/scripts/asmdb';
 import InputMixin from './InputMixin';
 
 function exec(source, locals, condition) {
+  if (source.startsWith('~')) {
+    source = '__base__ + ' + (source.substring(1) || '0');
+  }
   var result = null;
   try {
     var keys = [];
@@ -68,6 +71,10 @@ export default {
   methods: {
     onShow: function() {
       this.locals = asmdb.getInstance().getRegisters();
+      var base = asmdb.getInstance().getAddressBase();
+      if (base != null) {
+        this.locals.__base__ = base;
+      }
       this.text = '';
       this.realText = '';
       this.anim.$value(0);

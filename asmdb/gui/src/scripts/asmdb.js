@@ -389,6 +389,14 @@ class Debugger {
     }
   }
 
+  getAddressBase() {
+    if (this.registers != null) {
+      var info = this.getAddressInfo(this.registers[this.PCNM]);
+      return info.start - info.offset;
+    }
+    return null;
+  }
+
   getRegisters() {
     return Object.assign({}, this.registers);
   }
