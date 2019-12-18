@@ -391,7 +391,7 @@ class Debugger {
 
   getAddressLabel(address) {
     var info = this.getAddressInfo(address);
-    if (info != null) {
+    if (info) {
       return info.section + '|' + info.target.substring(Math.max(info.target.lastIndexOf('/'), info.target.lastIndexOf('@')) + 1);
     }
     return null;
@@ -400,7 +400,7 @@ class Debugger {
   getAddressBase() {
     if (this.registers != null) {
       var info = this.getAddressInfo(this.registers[this.PCNM]);
-      if (info != null) {
+      if (info) {
         return info.start - info.offset;
       }
     }
