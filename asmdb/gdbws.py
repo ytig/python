@@ -163,7 +163,7 @@ class WsGdbController(GdbController):
         lo = binary_search(self.maps, lambda i: -1 if start < i['start'] else (1 if start >= i['end'] else 0))
         if lo < 0:
             lo = -1 - lo
-        hi = binary_search(self.maps, lambda i: -1 if end < i['start'] else (1 if end >= i['end'] else 0))
+        hi = binary_search(self.maps, lambda i: -1 if (end - 1) < i['start'] else (1 if (end - 1) >= i['end'] else 0))
         if hi < 0:
             hi = -1 - hi
         else:
@@ -206,13 +206,19 @@ class WsGdbController(GdbController):
         return await self._info_registers()
 
     async def mem(self, start, end):
-        data = b'\x00' * (end - start)
+        data = b''
+        cursor = start
         for i in self.maps_at(start, end):
-            _start = max(i['start'], start)
-            _end = min(i['end'], end)
-            if _end - _start <= 0:
-                continue
-            data = data[:_start - start] + await self._dump(_start, _end) + data[_end - start:]
+            if i['start'] > cursor:
+                data += b'\x00' * (i['start'] - cursor)
+                cursor = i['start']
+            min_end = min(i['end'], end)
+            if min_end > cursor:
+                data += await self._dump(cursor, min_end)
+                cursor = min_end
+        if end > cursor:
+            data += b'\x00' * (end - cursor)
+            cursor = end
         return data
 
     async def bpt(self, del_points, set_points):
