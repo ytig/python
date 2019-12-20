@@ -2,7 +2,7 @@
 import json
 import base64
 import asyncio
-from .gdbcli import GdbController, GdbError
+from .gdbcli import GdbController, GdbError, binary_search
 SESSIONS = {}
 
 
@@ -159,6 +159,17 @@ class WsGdbController(GdbController):
         self.maps = await self._info_maps()
         return self
 
+    def maps_at(self, start, end):
+        lo = binary_search(self.maps, lambda i: start - i['start'])
+        if lo < 0:
+            lo = -1 - lo
+        hi = binary_search(self.maps, lambda i: end - i['end'])
+        if hi < 0:
+            hi = -1 - hi
+        else:
+            hi += 1
+        return self.maps[lo:hi]
+
     async def next(self):
         if not self.suspend:
             return
@@ -196,7 +207,7 @@ class WsGdbController(GdbController):
 
     async def mem(self, start, end):
         data = b'\x00' * (end - start)
-        for i in self.maps:
+        for i in self.maps_at(start, end):
             _start = max(i['start'], start)
             _end = min(i['end'], end)
             if _end - _start <= 0:

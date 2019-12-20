@@ -31,6 +31,21 @@ class GdbError(RuntimeError):
     pass
 
 
+def binary_search(a, x):
+    lo = 0
+    hi = len(a) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        delta = x(a[mid])
+        if delta == 0:
+            return mid
+        if delta > 0:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -(lo + 1)
+
+
 class GdbController:
     @classmethod
     async def anew(cls, config):
