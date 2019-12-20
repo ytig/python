@@ -30,7 +30,7 @@ export default {
   },
   props: {
     address: Number,
-    value: String,
+    value: Number,
     highlight: Boolean,
     running: Boolean
   },
