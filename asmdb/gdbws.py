@@ -160,10 +160,10 @@ class WsGdbController(GdbController):
         return self
 
     def maps_at(self, start, end):
-        lo = binary_search(self.maps, lambda i: start - i['start'])
+        lo = binary_search(self.maps, lambda i: -1 if start < i['start'] else (1 if start >= i['end'] else 0))
         if lo < 0:
             lo = -1 - lo
-        hi = binary_search(self.maps, lambda i: end - i['end'])
+        hi = binary_search(self.maps, lambda i: -1 if end < i['start'] else (1 if end >= i['end'] else 0))
         if hi < 0:
             hi = -1 - hi
         else:
