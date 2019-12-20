@@ -297,7 +297,7 @@ export default {
           this.$refs.scroller.scrollBy(-MIN_OFFSET);
           if (old_posn != null) {
             var new_posn = this.source.getPosn(this.$refs.scroller.getPosition());
-            if (old_posn.address != new_posn.address || old_posn.offset != new_posn.offset) {
+            if (new_posn == null || (old_posn.address != new_posn.address || old_posn.offset != new_posn.offset)) {
               this.hstSet(old_posn);
             }
           }
