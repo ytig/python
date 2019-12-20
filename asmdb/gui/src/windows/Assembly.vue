@@ -332,7 +332,7 @@ export default {
         var index = this.source.getIndex(this.pc);
         if (index != null) {
           var mark = this.source.getOffset({ index: index, offset: 0 }) - this.source.getOffset(this.$refs.scroller.getPosition());
-          mark += this.incomplete;
+          mark -= this.incomplete;
           var maxOffset = this.$refs.scroller.$el.clientHeight - getFloatHeight(this.$el);
           if (mark >= MIN_OFFSET && mark + this.source[index].height <= maxOffset) {
             return mark;
@@ -345,12 +345,23 @@ export default {
       this.disable = false;
       this.hstDel();
       var mark = this.getMark();
+      var posn = this.source != null ? this.source.getPosn(this.$refs.scroller.getPosition()) : null;
       this.counter++;
       this.incomplete = 0;
       this.pc = pc;
       this.source = new Source(pc, assembly);
       this.$nextTick(() => {
-        this.$refs.scroller.scrollBy(-mark);
+        var start = -mark;
+        var end = -mark;
+        if (posn != null) {
+          var index = this.source.getIndex(posn.address);
+          if (index != null) {
+            var offset = this.source.getOffset({ index: index, offset: posn.offset });
+            start = offset;
+          }
+        }
+        this.$refs.scroller.scrollBy(start);
+        this.smoothScrollBy(end - start);
       });
     },
     onContinue: function() {
