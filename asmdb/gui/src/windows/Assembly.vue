@@ -325,54 +325,33 @@ export default {
       });
     },
     getRange: function(pc) {
+      return getRange(pc);
+    },
+    getMark: function() {
       if (this.source != null) {
-        var index = this.source.getIndex(pc);
+        var index = this.source.getIndex(this.pc);
         if (index != null) {
-          return null;
+          var mark = this.source.getOffset({ index: index, offset: 0 }) - this.source.getOffset(this.$refs.scroller.getPosition());
+          mark += this.incomplete;
+          var maxOffset = this.$refs.scroller.$el.clientHeight - getFloatHeight(this.$el);
+          if (mark >= MIN_OFFSET && mark + this.source[index].height <= maxOffset) {
+            return mark;
+          }
         }
       }
-      return getRange(pc);
+      return MIN_OFFSET;
     },
     onBreak: function(pc, assembly) {
       this.disable = false;
       this.hstDel();
+      var mark = this.getMark();
       this.counter++;
-      var incomplete = this.incomplete;
       this.incomplete = 0;
-      if (assembly != null) {
-        this.source = new Source(pc, assembly);
-        this.$nextTick(() => {
-          this.$refs.scroller.scrollBy(-MIN_OFFSET);
-        });
-      } else {
-        var oldIndex = this.pc != null ? this.source.getIndex(this.pc) : null;
-        var oldOffset = oldIndex != null ? this.source.getOffset({ index: oldIndex, offset: 0 }) : null;
-        var newIndex = this.source.getIndex(pc);
-        var newOffset = newIndex != null ? this.source.getOffset({ index: newIndex, offset: 0 }) : null;
-        var curOffset = this.source.getOffset(this.$refs.scroller.getPosition());
-        var scrollType = 0;
-        if (newOffset != null) {
-          var maxOffset = this.$refs.scroller.$el.clientHeight - getFloatHeight(this.$el);
-          if (oldOffset != null && oldOffset - curOffset + this.source[oldIndex].height > 0 && oldOffset - curOffset < maxOffset) {
-            if (oldOffset - curOffset < MIN_OFFSET || oldOffset - curOffset + this.source[oldIndex].height > maxOffset) {
-              scrollType = 2;
-            } else {
-              scrollType = 1;
-            }
-          } else if (!(newOffset - curOffset >= MIN_OFFSET && newOffset - curOffset + this.source[newIndex].height <= maxOffset)) {
-            scrollType = 2;
-          }
-        }
-        switch (scrollType) {
-          case 1:
-            this.smoothScrollBy(newOffset - oldOffset + incomplete);
-            break;
-          case 2:
-            this.smoothScrollBy(newOffset - curOffset - MIN_OFFSET);
-            break;
-        }
-      }
       this.pc = pc;
+      this.source = new Source(pc, assembly);
+      this.$nextTick(() => {
+        this.$refs.scroller.scrollBy(-mark);
+      });
     },
     onContinue: function() {
       this.disable = true;
