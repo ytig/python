@@ -51,8 +51,8 @@ export default {
   z-index: 7;
   left: 0px;
   right: 0px;
-  bottom: 60px;
-  width: 40%;
+  bottom: 44px;
+  width: 44%;
   margin: 0 auto;
   display: flex;
   justify-content: center;
