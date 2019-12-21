@@ -319,7 +319,7 @@ export default {
       var index = this.source.getIndex(address);
       if (index != null) {
         var delta = this.source.getOffset({ index: index, offset: -MIN_OFFSET }) - this.source.getOffset(this.$refs.scroller.getPosition());
-        return delta + this.incomplete != 0;
+        return delta - this.incomplete != 0;
       } else {
         return true;
       }
