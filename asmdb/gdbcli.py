@@ -9,7 +9,7 @@ from asyncio import subprocess
 async def gdb_startup(config):
     xs = []
     xs.append('set pagination off')
-    xs.append('target remote 127.0.0.1:5039')
+    # xs.append('target remote 127.0.0.1:5039')
     # todo
     args = []
     args.append('--nx')
