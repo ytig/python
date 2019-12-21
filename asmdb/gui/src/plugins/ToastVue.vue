@@ -34,7 +34,7 @@ export default {
           return;
         }
         this.close();
-      }, time);
+      }, time + 147);
     },
     close: function() {
       this.anim.$target(0);
@@ -51,17 +51,18 @@ export default {
   z-index: 7;
   left: 0px;
   right: 0px;
-  bottom: 44px;
-  width: 44%;
+  bottom: 0px;
+  width: 38%;
+  height: 38%;
   margin: 0 auto;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   pointer-events: none;
   > span {
     padding: 8px 12px;
     background: @color-background-dark;
-    box-shadow: 2px 4px 6px @color-border-shadow;
+    box-shadow: 2px 4px 8px @color-border-shadow;
     color: @color-text-menu;
     font-size: 12px;
     word-break: break-word;

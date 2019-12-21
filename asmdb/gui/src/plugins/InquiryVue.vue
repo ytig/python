@@ -42,7 +42,7 @@ export default {
       return this.anim.value;
     },
     transform: function() {
-      return 'translateY(' + (1 - this.anim.value) * 50 + '%)';
+      return 'translateY(' + (1 - this.anim.value) * 25 + '%)';
     }
   },
   methods: {
