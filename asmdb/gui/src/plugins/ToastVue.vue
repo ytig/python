@@ -61,7 +61,7 @@ export default {
   > span {
     padding: 8px 12px;
     background: @color-background-dark;
-    box-shadow: 0px 2px 6px @color-border-shadow;
+    box-shadow: 2px 4px 6px @color-border-shadow;
     color: @color-text-menu;
     font-size: 12px;
     word-break: break-word;
