@@ -41,13 +41,6 @@ function requestFocus(object) {
   }
 }
 
-function requestNextFocus() {
-  if (list.length <= 0) {
-    return;
-  }
-  requestFocus(list[(cur + 1) % list.length]);
-}
-
 window.addEventListener('keydown', function (event) {
   var consume = false;
   consume = cur >= 0 ? list[cur].onKeyDown(event) : false;
@@ -63,6 +56,5 @@ export default {
   setDefaultWindow: setDefaultWindow,
   registerWindow: registerWindow,
   unregisterWindow: unregisterWindow,
-  requestFocus: requestFocus,
-  requestNextFocus: requestNextFocus
+  requestFocus: requestFocus
 };
