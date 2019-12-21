@@ -67,7 +67,7 @@ export default {
       items.push(['Stepi', 's', this.enable.bool_t]);
       items.push(['Continue', 'c', this.enable.bool_t]);
       items.push(['Release suspend', 'r', this.enable.bool_t]);
-      items.push(['Fullscreen', 'space', !fullscreen]);
+      items.push(['Fullscreen', '⌃F', !fullscreen]);
       items.push(['Exit fullscreen', '⎋', fullscreen]);
       items.push(['Quit', '', true]);
       this.$menu.alert(event, items, this.onClickMenu);
@@ -106,14 +106,22 @@ export default {
         return true;
       } else {
         d += 4;
-        index = [32, 27].indexOf(event.keyCode);
+        var index = ['f'].indexOf(event.key);
         if (index >= 0) {
+          if (event.altKey || !event.ctrlKey || event.metaKey || event.shiftKey) {
+            return false;
+          }
           this.onClickMenu(index + d);
           return true;
-        } else if (event.keyCode == 9) {
-          return true;
         } else {
-          return false;
+          d += 1;
+          index = [27].indexOf(event.keyCode);
+          if (index >= 0) {
+            this.onClickMenu(index + d);
+            return true;
+          } else {
+            return event.keyCode == 9;
+          }
         }
       }
     },
