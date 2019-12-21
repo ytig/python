@@ -228,6 +228,7 @@ export default {
       var items = [];
       items.push(['Go back', '⌫', this.hst.length > 0]);
       items.push(['Search address', '↩︎', true]);
+      items.push(['Return to PC', 'space', this.needReturnTo()]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
@@ -238,10 +239,15 @@ export default {
         case 1:
           this.$refs.search.show();
           break;
+        case 2:
+          if (this.needReturnTo()) {
+            this.returnTo();
+          }
+          break;
       }
     },
     onKeyDown: function(event) {
-      var index = [8, 13].indexOf(event.keyCode);
+      var index = [8, 13, 32].indexOf(event.keyCode);
       if (index >= 0) {
         this.onClickMenu(index);
         return true;
@@ -305,8 +311,47 @@ export default {
       });
       this.requestFocus();
     },
+    needReturnTo: function() {
+      if (this.pc == null) {
+        return false;
+      }
+      var address = this.pc;
+      var index = this.source.getIndex(address);
+      if (index != null) {
+        var delta = this.source.getOffset({ index: index, offset: -MIN_OFFSET }) - this.source.getOffset(this.$refs.scroller.getPosition());
+        return delta != 0;
+      } else {
+        return true;
+      }
+    },
+    returnTo: function() {
+      if (this.pc == null) {
+        return;
+      }
+      var address = this.pc;
+      var index = this.source.getIndex(address);
+      if (index != null) {
+        var delta = this.source.getOffset({ index: index, offset: -MIN_OFFSET }) - this.source.getOffset(this.$refs.scroller.getPosition());
+        this.smoothScrollBy(delta);
+      } else {
+        var range = getRange(address);
+        var counter2 = ++this.counter2;
+        asmdb.getInstance().asm(range, assembly => {
+          if (counter2 != this.counter2) {
+            return;
+          }
+          this.counter++;
+          this.incomplete = 0;
+          this.itemSelection = null;
+          this.source = new Source(address, assembly);
+          this.$nextTick(() => {
+            this.$refs.scroller.scrollBy(-MIN_OFFSET);
+          });
+        });
+      }
+    },
     smoothScrollBy: function(deltaY) {
-      var duration = 147 + 77 * Math.min(Math.abs(deltaY) / screen.height, 1);
+      var duration = 147 + 147 * Math.min(Math.abs(deltaY) / screen.height, 1);
       var maxi = Math.ceil((duration * 3) / 50);
       var counter = this.counter;
       this.incomplete = deltaY;

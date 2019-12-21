@@ -82,7 +82,7 @@ export default {
     onMouseUp2: function(evnet) {
       var items = [];
       items.push(['Go back', '⌫', this.hst.length > 0]);
-      items.push(['Return to SP', '↩︎', this.sp != null && this.page != 0]);
+      items.push(['Return to SP', 'space', this.sp != null && this.page != 0]);
       items.push(['Previous page', '←', this.sp != null && this.page - 1 >= 0]);
       items.push(['Next page', '→', this.sp != null && this.page + 1 < 10]);
       this.$menu.alert(event, items, this.onClickMenu);
@@ -110,7 +110,7 @@ export default {
       }
     },
     onKeyDown: function(event) {
-      var index = [8, 13, 37, 39].indexOf(event.keyCode);
+      var index = [8, 32, 37, 39].indexOf(event.keyCode);
       if (index >= 0) {
         this.onClickMenu(index);
         return true;
