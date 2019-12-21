@@ -13,6 +13,10 @@
 </template>
 
 <script>
+//width height
+//tab scroll up down
+//ctrl+c ctrl+d
+//color bg \b
 export default {
   data: function() {
     return {};
