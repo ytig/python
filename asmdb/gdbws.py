@@ -205,7 +205,7 @@ class WsGdbController(GdbController):
 
     async def reg(self):
         # return await self._info_registers()
-        return dict([(k, 0,) for k in ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']])
+        return dict([(k, 1470,) for k in ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']])
 
     async def mem(self, start, end):
         data = b''
