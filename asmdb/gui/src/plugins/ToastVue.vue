@@ -51,7 +51,7 @@ export default {
   z-index: 7;
   left: 0px;
   right: 0px;
-  bottom: 40px;
+  bottom: 60px;
   width: 40%;
   margin: 0 auto;
   display: flex;
