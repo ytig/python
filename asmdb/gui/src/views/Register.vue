@@ -94,6 +94,7 @@ export default {
       var placeholder = text.slice(2);
       items.push(['Copy', '', true]);
       items[items.length - 1].event = () => {
+        this.$toast.alert('Text Copied');
         copyText(text);
       };
       items.push(['Modify register', '', asmdb.getInstance().isSuspend() && inRange]);

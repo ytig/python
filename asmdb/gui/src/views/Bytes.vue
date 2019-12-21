@@ -307,6 +307,7 @@ export default {
       }
       items.push(['Copy', '', true]);
       items[items.length - 1].event = () => {
+        this.$toast.alert('Text Copied');
         copyText('0x' + intValue.toString(16));
       };
       var watching = JSON.parse(this.watchingNumbers).indexOf(index) >= 0;

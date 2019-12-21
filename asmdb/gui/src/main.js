@@ -11,6 +11,8 @@ import inquiry from '@/plugins/inquiry';
 Vue.use(inquiry);
 import editor from '@/plugins/editor';
 Vue.use(editor);
+import toast from '@/plugins/toast';
+Vue.use(toast);
 
 import Byte from '@/views/Byte';
 import Bytes from '@/views/Bytes';
