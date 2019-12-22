@@ -161,10 +161,10 @@ class WsGdbController(GdbController):
         # self.maps = await self._info_maps()
         self.maps = []
         self.terminal = ptyprocess.PtyProcess.spawn(['python3'])
-        self._readb = b''
+        self._readb = b''  # todo true?
 
         def read_t():
-            asyncio.set_event_loop(asyncio.new_event_loop())
+            asyncio.set_event_loop(asyncio.new_event_loop())  # todo asyncio bug fix
             while True:
                 try:
                     b = self.terminal.read()
