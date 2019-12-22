@@ -1,7 +1,9 @@
 #!/usr/local/bin/python3
 import json
 import base64
+import threading
 import asyncio
+import ptyprocess
 from .gdbcli import GdbController, GdbError, binary_search
 SESSIONS = {}
 
@@ -141,7 +143,7 @@ def push_prop(name, default):
 
 
 class WsGdbController(GdbController):
-    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'asgn')
+    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'asgn', 'setwinsize', 'readb', 'writeb',)
     PUSH = ('quit', 'suspend', 'breakpoints', 'watchpoints', 'maps',)
     quit = push_prop('quit', False)
     suspend = push_prop('suspend', False)
@@ -158,7 +160,23 @@ class WsGdbController(GdbController):
         self.watchpoints = []
         # self.maps = await self._info_maps()
         self.maps = []
+        self.terminal = ptyprocess.PtyProcess.spawn(['python3'])
+        self._readb = b''
+
+        def read_t():
+            while True:
+                try:
+                    b = self.terminal.read()
+                    self._readb += b
+                    notify_all(self, 'readb', b)
+                except EOFError:
+                    break
+        threading.Thread(target=read_t).start()
         return self
+
+    async def adel(self):
+        self.terminal.close()
+        await super().adel()
 
     def maps_at(self, start, end):
         lo = binary_search(self.maps, lambda i: -1 if start < i['start'] else (1 if start >= i['end'] else 0))
@@ -253,3 +271,12 @@ class WsGdbController(GdbController):
 
     async def asgn(self, express):
         notify_all(self, 'assigned', express)
+
+    def setwinsize(self, rows, cols):
+        self.terminal.setwinsize(rows, cols)
+
+    def writeb(self, b):
+        self.terminal.write(b)
+
+    def readb(self):
+        return self._readb
