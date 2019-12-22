@@ -9,6 +9,7 @@
 
 <script>
 import keyboard from '@/scripts/keyboard';
+import asmdb from '@/scripts/asmdb';
 
 export default {
   data: function() {
@@ -32,8 +33,10 @@ export default {
   },
   mounted: function() {
     keyboard.registerWindow(this);
+    asmdb.getInstance().registerEvent('python3', this);
   },
   destroyed: function() {
+    asmdb.getInstance().unregisterEvent('python3', this);
     keyboard.unregisterWindow(this);
   },
   methods: {
@@ -53,6 +56,9 @@ export default {
     },
     onKeyDown: function(event) {
       return false;
+    },
+    onRead: function(bytes) {
+      console.log(bytes);
     },
     smoothDragTo: function(to) {
       var from = this.curHeight;

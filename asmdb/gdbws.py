@@ -168,7 +168,7 @@ class WsGdbController(GdbController):
                 try:
                     b = self.terminal.read()
                     self._readb += b
-                    notify_all(self, 'readb', b)
+                    # notify_all(self, 'readb', b)
                 except EOFError:
                     break
         threading.Thread(target=read_t).start()
@@ -272,11 +272,11 @@ class WsGdbController(GdbController):
     async def asgn(self, express):
         notify_all(self, 'assigned', express)
 
-    def setwinsize(self, rows, cols):
+    async def setwinsize(self, rows, cols):
         self.terminal.setwinsize(rows, cols)
 
-    def writeb(self, b):
+    async def writeb(self, b):
         self.terminal.write(b)
 
-    def readb(self):
+    async def readb(self):
         return self._readb

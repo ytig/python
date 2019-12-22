@@ -18,6 +18,7 @@ class Debugger {
       watchpoints: [],
       maps: []
     };
+    this.readb = '';
     this.counter = 0;
     this.registers = null;
     this.tag = 0;
@@ -25,11 +26,21 @@ class Debugger {
     this.objects = {};
     this.ws = new WebSocket('ws://localhost:8080/ws');
     // this.ws = new WebSocket('ws://' + location.host + '/ws');
+    this.state = 0;
+    this.ws.onopen = this.onOpen.bind(this);
     this.ws.onmessage = this.onMessage.bind(this);
+    this.ws.onclose = this.onClose.bind(this);
+    this.pull('readb', [], (b) => {
+      this.push('readb', b);
+    });
   }
 
   finish() {
     this.ws.close();
+  }
+
+  onOpen() {
+    this.state = 1;
   }
 
   onMessage(event) {
@@ -60,6 +71,10 @@ class Debugger {
         }
         break;
     }
+  }
+
+  onClose() {
+    this.state = -1;
   }
 
   push(attrName, newValue, oldValue) {
@@ -174,6 +189,12 @@ class Debugger {
           });
         }
         break;
+      case 'readb':
+        this.readb += newValue;
+        this.iterObjects('python3', (object) => {
+          object.onRead(this.readb);
+        });
+        break;
     }
   }
 
@@ -190,7 +211,18 @@ class Debugger {
         failure: failure
       };
     }
-    this.ws.send(JSON.stringify(data));
+    if (this.state != 0) {
+      this.ws.send(JSON.stringify(data));
+    } else {
+      var runnable = () => {
+        if (this.state != 0) {
+          this.ws.send(JSON.stringify(data));
+        } else {
+          setTimeout(runnable);
+        }
+      }
+      setTimeout(runnable);
+    }
   }
 
   next() {
@@ -244,6 +276,14 @@ class Debugger {
   asgn(express) {
     this.pull('asgn', [express]);
     this.push('assigned', express);
+  }
+
+  setwinsize(rows, cols) {
+    this.pull('setwinsize', [rows, cols]);
+  }
+
+  writeb(b) {
+    this.pull('writeb', [b]);
   }
 
   iterObjects(filter, handler) {
@@ -347,6 +387,9 @@ class Debugger {
             });
           }
         }
+        break;
+      case 'python3':
+        object.onRead(this.readb);
         break;
     }
     if (object.onBreakpoints) {
