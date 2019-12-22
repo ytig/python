@@ -18,7 +18,7 @@ class Debugger {
       watchpoints: [],
       maps: []
     };
-    this.readb = '';
+    this.readb = null;
     this.counter = 0;
     this.registers = null;
     this.tag = 0;
@@ -31,6 +31,7 @@ class Debugger {
     this.ws.onmessage = this.onMessage.bind(this);
     this.ws.onclose = this.onClose.bind(this);
     this.pull('readb', [], (b) => {
+      this.readb = '';
       this.push('readb', b);
     });
   }
@@ -190,10 +191,12 @@ class Debugger {
         }
         break;
       case 'readb':
-        this.readb += newValue;
-        this.iterObjects('python3', (object) => {
-          object.onRead(this.readb);
-        });
+        if (this.readb != null) {
+          this.readb += newValue;
+          this.iterObjects('python3', (object) => {
+            object.onRead(this.readb);
+          });
+        }
         break;
     }
   }
@@ -389,7 +392,9 @@ class Debugger {
         }
         break;
       case 'python3':
-        object.onRead(this.readb);
+        if (this.readb != null) {
+          object.onRead(this.readb);
+        }
         break;
     }
     if (object.onBreakpoints) {
