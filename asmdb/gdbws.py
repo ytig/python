@@ -164,18 +164,20 @@ class WsGdbController(GdbController):
         self._readb = b''
 
         def read_t():
+            asyncio.set_event_loop(asyncio.new_event_loop())
             while True:
                 try:
                     b = self.terminal.read()
                     self._readb += b
-                    # notify_all(self, 'readb', b)
+                    notify_all(self, 'readb', b)
                 except EOFError:
                     break
         threading.Thread(target=read_t).start()
         return self
 
     async def adel(self):
-        self.terminal.close()
+        self.terminal.sendcontrol('c')
+        self.terminal.write(b'exit()\n')
         await super().adel()
 
     def maps_at(self, start, end):
