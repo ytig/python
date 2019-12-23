@@ -1,27 +1,46 @@
 <template>
   <div class="terminal-container">
-    Welcome to using ASM Debugger!
-    <br />Python3 is developing.
-    <br />>>> 1 + 1
-    <br />2
-    <br />>>> 1 + 2
-    <br />3
-    <br />>>> 1 + 3
-    <br />4
-    <br />>>>
+    <TerminalParent class="terminal-parent" :source="source" #default="props">
+      <TerminalChild :value="props.item.value" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
+    </TerminalParent>
   </div>
 </template>
 
 <script>
 import resize from '@/scripts/resize';
+import TerminalParent from './Terminal_parent';
+import TerminalChild from './Terminal_child';
 //foucs
 //width height -> setwinsize
 //linux bytes
 //input -> writeb 粘贴，中文输入：悬浮
 //scroll infinite
 export default {
+  components: {
+    TerminalParent: TerminalParent,
+    TerminalChild: TerminalChild
+  },
   data: function() {
-    return {};
+    var source = {};
+    source[0] = {
+      value: 'Python 3.6.3 (default, Oct  4 2017, 06:09:05) ',
+      height: 16
+    };
+    source[1] = {
+      value: '[GCC 4.2.1 Compatible Apple LLVM 8.0.0 (clang-800.0.42.1)] on darwin',
+      height: 16
+    };
+    source[2] = {
+      value: 'Type "help", "copyright", "credits" or "license" for more information.',
+      height: 16
+    };
+    source[3] = {
+      value: '>>> ',
+      height: 16
+    };
+    return {
+      source: source
+    };
   },
   mounted: function() {
     resize.registerEvent(this);
@@ -39,14 +58,8 @@ export default {
 @import '~@/styles/theme';
 
 .terminal-container {
-  overflow-y: scroll;
-  padding-left: 12px;
-  padding-top: 2px;
-  padding-right: 12px;
-  padding-bottom: 4px;
-  line-height: 16px;
-  color: @color-text;
-  font-size: 12px;
-  word-break: break-word;
+  .terminal-parent {
+    height: 100%;
+  }
 }
 </style>
