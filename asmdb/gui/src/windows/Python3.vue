@@ -9,6 +9,7 @@
 
 <script>
 import keyboard from '@/scripts/keyboard';
+import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
 
 export default {
@@ -21,6 +22,11 @@ export default {
       focus: false,
       counter: 0
     };
+  },
+  watch: {
+    windowHeight: function() {
+      this.$nextTick(resize.dispatchEvent);
+    }
   },
   computed: {
     windowHeight: function() {

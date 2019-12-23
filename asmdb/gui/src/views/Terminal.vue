@@ -13,17 +13,25 @@
 </template>
 
 <script>
-//width height
-//tab scroll up down
-//ctrl+c ctrl+d
-//color bg \b
+import resize from '@/scripts/resize';
+//foucs
+//width height -> setwinsize
+//linux bytes
+//input -> writeb 粘贴，中文输入：悬浮
+//scroll infinite
 export default {
   data: function() {
     return {};
   },
-  mounted: function() {},
-  destroyed: function() {},
-  methods: {}
+  mounted: function() {
+    resize.registerEvent(this);
+  },
+  destroyed: function() {
+    resize.unregisterEvent(this);
+  },
+  methods: {
+    onResize: function() {}
+  }
 };
 </script>
 
