@@ -191,6 +191,7 @@ class WsGdbController(GdbController):
     breakpoints = push_prop('breakpoints', None)
     watchpoints = push_prop('watchpoints', None)
     maps = push_prop('maps', None)
+    lenb = push_prop('lenb', 0)
 
     @classmethod
     async def anew(cls, config):
