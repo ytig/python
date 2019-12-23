@@ -18,7 +18,7 @@ class Debugger {
       watchpoints: [],
       maps: []
     };
-    this.readb = null;
+    this.rb = '';
     this.counter = 0;
     this.registers = null;
     this.tag = 0;
@@ -30,10 +30,6 @@ class Debugger {
     this.ws.onopen = this.onOpen.bind(this);
     this.ws.onmessage = this.onMessage.bind(this);
     this.ws.onclose = this.onClose.bind(this);
-    this.pull('readb', [], (b) => {
-      this.readb = '';
-      this.push('readb', b);
-    });
   }
 
   finish() {
@@ -190,13 +186,17 @@ class Debugger {
           });
         }
         break;
-      case 'readb':
-        if (this.readb != null) {
-          this.readb += newValue;
-          this.iterObjects('python3', (object) => {
-            object.onRead(this.readb);
-          });
-        }
+      case 'lenb':
+        var offset = this.rb.length;
+        this.readb(offset, (ab) => {
+          ab = ab.substring(this.rb.length - offset);
+          if (ab.length > 0) {
+            this.rb += ab;
+            this.iterObjects('python3', (object) => {
+              object.onRead(this.rb);
+            });
+          }
+        });
         break;
     }
   }
@@ -283,6 +283,14 @@ class Debugger {
 
   setwinsize(rows, cols) {
     this.pull('setwinsize', [rows, cols]);
+  }
+
+  readb(offset, success) {
+    this.pull('readb', [offset], function (ret) {
+      if (success) {
+        success(atob(ret));
+      }
+    });
   }
 
   writeb(b) {
@@ -392,9 +400,7 @@ class Debugger {
         }
         break;
       case 'python3':
-        if (this.readb != null) {
-          object.onRead(this.readb);
-        }
+        object.onRead(this.rb);
         break;
     }
     if (object.onBreakpoints) {

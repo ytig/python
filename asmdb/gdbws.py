@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import json
 import base64
-import threading
+import tempfile
 import asyncio
 import ptyprocess
 from .gdbcli import GdbController, GdbError, binary_search
@@ -142,9 +142,50 @@ def push_prop(name, default):
     return property(fget, fset, fdel)
 
 
+class Terminal(asyncio.Protocol):
+    @classmethod
+    async def anew(cls, argv, notify_len):
+        self = cls()
+        self.logfile = tempfile.NamedTemporaryFile()
+        self.process = ptyprocess.PtyProcess.spawn(argv)
+        self.notify_len = notify_len
+        await asyncio.get_event_loop().connect_read_pipe(self, self.process)
+        return self
+
+    async def adel(self):
+        self.process.sendcontrol('c')
+        self.process.write(b'exit()\n')
+        self.logfile.close()
+
+    def data_received(self, data):
+        if self.logfile.closed:
+            return
+        self.logfile.seek(0, 2)
+        self.logfile.write(data)
+        self.notify_len(len(self))
+
+    async def setwinsize(self, rows, cols):
+        self.process.setwinsize(rows, cols)
+
+    async def readb(self, offset):
+        if self.logfile.closed:
+            raise IOError
+        self.logfile.seek(offset)
+        return self.logfile.read()
+
+    async def writeb(self, b):
+        self.process.write(b)
+
+    def __len__(self):
+        return self.logfile.seek(0, 2)
+
+    def __call__(self):
+        return self
+
+
 class WsGdbController(GdbController):
     PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'asgn', 'setwinsize', 'readb', 'writeb',)
-    PUSH = ('quit', 'suspend', 'breakpoints', 'watchpoints', 'maps',)
+    PUSH = ('quit', 'suspend', 'breakpoints', 'watchpoints', 'maps', 'lenb',)
     quit = push_prop('quit', False)
     suspend = push_prop('suspend', False)
     breakpoints = push_prop('breakpoints', None)
@@ -160,25 +201,25 @@ class WsGdbController(GdbController):
         self.watchpoints = []
         # self.maps = await self._info_maps()
         self.maps = []
-        self.terminal = ptyprocess.PtyProcess.spawn(['python3'])
-        self._readb = b''  # todo true?
-
-        def read_t():
-            asyncio.set_event_loop(asyncio.new_event_loop())  # todo asyncio bug fix
-            while True:
-                try:
-                    b = self.terminal.read()
-                    self._readb += b
-                    notify_all(self, 'readb', b)
-                except EOFError:
-                    break
-        threading.Thread(target=read_t).start()
+        self.terminal = await Terminal.anew(['python3'], self.lenb_setter)
+        self.lenb = 0
         return self
 
     async def adel(self):
-        self.terminal.sendcontrol('c')
-        self.terminal.write(b'exit()\n')
+        await self.terminal.adel()
         await super().adel()
+
+    def lenb_setter(self, lenb):
+        self.lenb = lenb
+
+    async def setwinsize(self, *args, **kwargs):
+        return await self.terminal.setwinsize(*args, **kwargs)
+
+    async def readb(self, *args, **kwargs):
+        return await self.terminal.readb(*args, **kwargs)
+
+    async def writeb(self, *args, **kwargs):
+        return await self.terminal.writeb(*args, **kwargs)
 
     def maps_at(self, start, end):
         lo = binary_search(self.maps, lambda i: -1 if start < i['start'] else (1 if start >= i['end'] else 0))
@@ -273,12 +314,3 @@ class WsGdbController(GdbController):
 
     async def asgn(self, express):
         notify_all(self, 'assigned', express)
-
-    async def setwinsize(self, rows, cols):
-        self.terminal.setwinsize(rows, cols)
-
-    async def writeb(self, b):
-        self.terminal.write(b)
-
-    async def readb(self):
-        return self._readb
