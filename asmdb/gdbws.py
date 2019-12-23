@@ -202,16 +202,13 @@ class WsGdbController(GdbController):
         self.watchpoints = []
         # self.maps = await self._info_maps()
         self.maps = []
-        self.terminal = await Terminal.anew(['python3'], self.lenb_setter)
+        self.terminal = await Terminal.anew(['python3'], lambda lenb: setattr(self, 'lenb', lenb))
         self.lenb = 0
         return self
 
     async def adel(self):
         await self.terminal.adel()
         await super().adel()
-
-    def lenb_setter(self, lenb):
-        self.lenb = lenb
 
     async def setwinsize(self, *args, **kwargs):
         return await self.terminal.setwinsize(*args, **kwargs)
