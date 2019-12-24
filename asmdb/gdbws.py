@@ -153,7 +153,7 @@ class Terminal(asyncio.Protocol):
         return self
 
     async def adel(self):
-        if self.process.isalive():
+        if not self.process.fileobj.closed:
             self.process.sendcontrol('c')
             self.process.write(b'exit()\n')
         self.logfile.close()
@@ -176,8 +176,9 @@ class Terminal(asyncio.Protocol):
         return self.logfile.read()
 
     async def writeb(self, b):
-        if self.process.isalive():
-            self.process.write(b)
+        if self.process.fileobj.closed:
+            raise IOError
+        self.process.write(b)
 
     def __len__(self):
         return self.logfile.seek(0, 2)
