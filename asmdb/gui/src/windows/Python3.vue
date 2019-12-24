@@ -63,8 +63,8 @@ export default {
     onKeyDown: function(event) {
       return false;
     },
-    onRead: function(bytes) {
-      console.log(bytes);
+    onRead: function(utf8) {
+      console.log(utf8);
     },
     smoothDragTo: function(to) {
       var from = this.curHeight;
