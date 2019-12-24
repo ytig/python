@@ -1,6 +1,6 @@
 <template>
   <div class="terminal-child-container">
-    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value"></span>
+    <pre v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value"></pre>
   </div>
 </template>
 
@@ -59,13 +59,13 @@ export default {
 
 .terminal-child-container {
   height: 16px;
-  > span {
+  > pre {
     line-height: 16px;
     font-size: 12px;
     color: transparent;
     word-break: break-word;
   }
-  > span:first-of-type {
+  > pre:first-of-type {
     margin-left: 12px;
   }
 }
