@@ -21,11 +21,13 @@ export default {
   watch: {
     value: {
       immediate: true,
-      handler: function(newValue, oldValue) {
+      handler: function callee(newValue, oldValue) {
+        if (this.$el == undefined) {
+          this.$nextTick(callee.bind(this, ...arguments));
+          return;
+        }
         this.text = newValue;
-        this.$nextTick(function() {
-          this.$refs.input.value = this.text;
-        });
+        this.$refs.input.value = newValue;
       }
     }
   },

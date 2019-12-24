@@ -15,7 +15,11 @@ export default {
     $props: {
       deep: true,
       immediate: true,
-      handler: function (newProps) {
+      handler: function callee(newProps) {
+        if (this.$el == undefined) {
+          this.$nextTick(callee.bind(this, ...arguments));
+          return;
+        }
         var needLayout = false;
         var needDraw = false;
         if (this.oldProps == null) {
