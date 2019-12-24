@@ -68,7 +68,9 @@ export default {
                 ts.push(i);
               }
             }
-            this.draw(new_cc[0] + ';' + ts.join(','));
+            if (ts.length > 0) {
+              this.draw(new_cc[0] + ';' + ts.join(','));
+            }
           }
         }
       }
