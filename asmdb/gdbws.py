@@ -153,8 +153,9 @@ class Terminal(asyncio.Protocol):
         return self
 
     async def adel(self):
-        self.process.sendcontrol('c')
-        self.process.write(b'exit()\n')
+        if self.process.isalive():
+            self.process.sendcontrol('c')
+            self.process.write(b'exit()\n')
         self.logfile.close()
 
     def data_received(self, data):
@@ -165,7 +166,8 @@ class Terminal(asyncio.Protocol):
         self.notify_len(len(self))
 
     async def setwinsize(self, rows, cols):
-        self.process.setwinsize(rows, cols)
+        if self.process.isalive():
+            self.process.setwinsize(rows, cols)
 
     async def readb(self, offset):
         if self.logfile.closed:
@@ -174,7 +176,8 @@ class Terminal(asyncio.Protocol):
         return self.logfile.read()
 
     async def writeb(self, b):
-        self.process.write(b)
+        if self.process.isalive():
+            self.process.write(b)
 
     def __len__(self):
         return self.logfile.seek(0, 2)
