@@ -18,6 +18,7 @@ class Debugger {
       watchpoints: [],
       maps: []
     };
+    this.lenb = 0;
     this.utf8 = '';
     this.counter = 0;
     this.registers = null;
@@ -187,10 +188,13 @@ class Debugger {
         }
         break;
       case 'lenb':
-        var offset = this.utf8.length;
-        this.readu(offset, (u) => {
-          u = u.substring(this.utf8.length - offset);
-          if (u.length > 0) {
+        var lenb = this.lenb;
+        var lenu = this.utf8.length;
+        this.readu(lenb, (u, l) => {
+          l -= (this.lenb - lenb);
+          u = u.substring(this.utf8.length - lenu);
+          if (l > 0) {
+            this.lenb += l;
             this.utf8 += u;
             this.iterObjects('python3', (object) => {
               object.onRead(this.utf8);
@@ -288,14 +292,15 @@ class Debugger {
   readu(offset, success) {
     this.pull('readb', [offset], function (ret) {
       if (success) {
-        success(decodeURIComponent(escape(atob(ret))));
+        var b = atob(ret);
+        success(decodeURIComponent(escape(b)), b.length);
       }
     });
   }
 
   writeu(u) {
-    var b64 = btoa(unescape(encodeURIComponent(u)));
-    this.pull('writeb', [b64]);
+    var b = unescape(encodeURIComponent(u));
+    this.pull('writeb', [btoa(b)]);
   }
 
   iterObjects(filter, handler) {
