@@ -43,7 +43,7 @@ export default {
       this.items.splice(0, this.items.length, ...items);
     },
     onPreDraw: function() {
-      return measureHeight(this.$parent.$el.clientWidth, this.value);
+      return measureHeight(this.$el.clientWidth, this.value);
     },
     onDraw: function(ctx) {
       ctx.font = '12px Menlo';
