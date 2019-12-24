@@ -171,13 +171,13 @@ class Terminal(asyncio.Protocol):
 
     async def readb(self, offset):
         if self.logfile.closed:
-            raise IOError
+            raise IOError('read of closed file')
         self.logfile.seek(offset)
         return self.logfile.read()
 
     async def writeb(self, b):
         if self.process.fileobj.closed:
-            raise IOError
+            raise IOError('write to closed file')
         self.process.write(b)
 
     def __len__(self):
