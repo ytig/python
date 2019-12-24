@@ -210,14 +210,15 @@ class WsGdbController(GdbController):
         await self.terminal.adel()
         await super().adel()
 
-    async def setwinsize(self, *args, **kwargs):
-        return await self.terminal.setwinsize(*args, **kwargs)
+    async def setwinsize(self, rows, cols):
+        return await self.terminal.setwinsize(rows, cols)
 
-    async def readb(self, *args, **kwargs):
-        return await self.terminal.readb(*args, **kwargs)
+    async def readb(self, offset):
+        return await self.terminal.readb(offset)
 
-    async def writeb(self, *args, **kwargs):
-        return await self.terminal.writeb(*args, **kwargs)
+    async def writeb(self, b64):
+        b = base64.b64decode(b64)
+        return await self.terminal.writeb(b)
 
     def maps_at(self, start, end):
         lo = binary_search(self.maps, lambda i: -1 if start < i['start'] else (1 if start >= i['end'] else 0))
