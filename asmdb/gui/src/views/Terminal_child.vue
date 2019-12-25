@@ -8,10 +8,16 @@ import InfiniteMixin from './InfiniteMixin';
 
 function wrapstring(width, value) {
   var strArr = [];
-  while (value) {
-    var index = 1;
-    while (index < value.length && measureText(value.substring(0, index + 1)) < width) {
-      index++;
+  while (false) {
+    var index = value.length;
+    while (measureText(value.substring(0, index)) > width) {
+      if (index == value.length) {
+        var limit = parseInt(width / 7);
+        if (measureText(value.substring(0, limit)) > width) {
+          index = Math.min(index, limit);
+        }
+      }
+      index--;
     }
     strArr.push(value.substring(0, index));
     value = value.substring(index);
