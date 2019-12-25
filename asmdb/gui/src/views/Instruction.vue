@@ -61,10 +61,7 @@ export default {
       if (this.comment) {
         items.push(newItem('&nbsp;&nbsp;'));
         for (var s of this.comment) {
-          if (s == ' ') {
-            s = '&nbsp;';
-          }
-          items.push(newItem(s));
+          items.push(newItem(s == ' ' ? '&nbsp;' : s));
         }
       }
       this.items.splice(0, this.items.length, ...items);
