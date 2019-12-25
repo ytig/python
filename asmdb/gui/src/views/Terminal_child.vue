@@ -1,7 +1,5 @@
 <template>
-  <div class="terminal-child-container">
-    <pre v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value"></pre>
-  </div>
+  <div class="terminal-child-container">{{value_}}</div>
 </template>
 
 <script>
@@ -24,7 +22,7 @@ export default {
   mixins: [InfiniteMixin],
   data: function() {
     return {
-      items: []
+      value_: ''
     };
   },
   props: {
@@ -38,9 +36,7 @@ export default {
   },
   methods: {
     onLayout: function() {
-      var items = [];
-      items.push(newItem(this.value));
-      this.items.splice(0, this.items.length, ...items);
+      this.value_ = this.value;
     },
     onPreDraw: function() {
       return measureHeight(this.$el.clientWidth, this.value);
@@ -58,15 +54,12 @@ export default {
 @import '~@/styles/theme';
 
 .terminal-child-container {
-  height: 16px;
-  > pre {
-    line-height: 16px;
-    font-size: 12px;
-    color: transparent;
-    word-break: break-word;
-  }
-  > pre:first-of-type {
-    margin-left: 12px;
-  }
+  padding-left: 12px;
+  padding-right: 12px;
+  font-size: 12px;
+  line-height: 16px;
+  color: transparent;
+  word-break: break-all;
+  white-space: pre-wrap;
 }
 </style>
