@@ -60,7 +60,9 @@ export default {
       items.push(newItem(this.op_str));
       if (this.comment) {
         items.push(newItem('&nbsp;&nbsp;'));
-        items.push(newItem(this.comment));
+        for (var s of this.comment) {
+          items.push(newItem(s));
+        }
       }
       this.items.splice(0, this.items.length, ...items);
     },
