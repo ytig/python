@@ -6,8 +6,21 @@
 import Theme from '@/styles/theme';
 import InfiniteMixin from './InfiniteMixin';
 
+function wrapstring(width, value) {
+  var strArr = [];
+  while (value) {
+    var index = 1;
+    while (index < value.length && measureText(value.substring(0, index + 1)) < width) {
+      index++;
+    }
+    strArr.push(value.substring(0, index));
+    value = value.substring(index);
+  }
+  return strArr;
+}
+
 function measureHeight(width, value) {
-  return 16; //todo wrap
+  return 16 * Math.max(wrapstring(width, value).length, 1);
 }
 
 function newItem(value, ...style) {
@@ -39,12 +52,18 @@ export default {
       this.value_ = this.value;
     },
     onPreDraw: function() {
-      return measureHeight(this.$el.clientWidth, this.value);
+      return measureHeight(this.$el.clientWidth - 24, this.value);
     },
     onDraw: function(ctx) {
       ctx.font = '12px Menlo';
+      var x = 0;
+      var y = 12;
+      x += 12;
       ctx.fillStyle = Theme.colorText;
-      ctx.fillText(this.value, 12, 12);
+      for (var line of wrapstring(this.$el.clientWidth - 24, this.value)) {
+        ctx.fillText(line, x, y);
+        y += 16;
+      }
     }
   }
 };
