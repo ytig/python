@@ -51,10 +51,12 @@ export default {
       items.push(newItem(address));
       items.push(newItem('&nbsp;&nbsp;'));
       items.push(newItem(this.mnemonic));
+      var space = '';
       for (var i = 0; i < this.group - this.mnemonic.length; i++) {
-        items.push(newItem('&nbsp;'));
+        space += '&nbsp;';
       }
-      items.push(newItem('&nbsp;'));
+      space += '&nbsp;';
+      items.push(newItem(space));
       items.push(newItem(this.op_str));
       if (this.comment) {
         items.push(newItem('&nbsp;&nbsp;'));
