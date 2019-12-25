@@ -45,13 +45,11 @@ export default {
     };
   },
   props: {
-    focus: Boolean,
-    cursor: Number,
     value: String
   },
   created: function() {
     this.needLayout.push('value');
-    this.needDraw.push('focus', 'cursor');
+    this.needDraw.push();
   },
   methods: {
     onLayout: function() {
