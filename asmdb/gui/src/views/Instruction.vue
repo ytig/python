@@ -62,10 +62,9 @@ export default {
         items.push(newItem('&nbsp;&nbsp;'));
         for (var s of this.comment) {
           if (s == ' ') {
-            items.push(newItem('&nbsp;'));
-          } else {
-            items.push(newItem(s));
+            s = '&nbsp;';
           }
+          items.push(newItem(s));
         }
       }
       this.items.splice(0, this.items.length, ...items);
