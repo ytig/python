@@ -49,8 +49,7 @@ export default {
       var items = [];
       var address = '0x' + this.address.toString(16).zfill(2 * asmdb.getInstance().UNIT);
       items.push(newItem(address));
-      items.push(newItem('&nbsp;'));
-      items.push(newItem('&nbsp;'));
+      items.push(newItem('&nbsp;&nbsp;'));
       items.push(newItem(this.mnemonic));
       for (var i = 0; i < this.group - this.mnemonic.length; i++) {
         items.push(newItem('&nbsp;'));
@@ -58,8 +57,7 @@ export default {
       items.push(newItem('&nbsp;'));
       items.push(newItem(this.op_str));
       if (this.comment) {
-        items.push(newItem('&nbsp;'));
-        items.push(newItem('&nbsp;'));
+        items.push(newItem('&nbsp;&nbsp;'));
         items.push(newItem(this.comment));
       }
       this.items.splice(0, this.items.length, ...items);
