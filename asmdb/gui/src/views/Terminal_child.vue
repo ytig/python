@@ -1,5 +1,5 @@
 <template>
-  <div class="terminal-child-container">{{value_}}</div>
+  <div class="terminal-child-container" v-html="value_"></div>
 </template>
 
 <script>
