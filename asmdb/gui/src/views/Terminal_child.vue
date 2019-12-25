@@ -8,7 +8,7 @@ import InfiniteMixin from './InfiniteMixin';
 
 function wrapstring(width, value) {
   var strArr = [];
-  while (false) {
+  while (value) {
     var index = value.length;
     while (measureText(value.substring(0, index)) > width) {
       if (index == value.length) {
