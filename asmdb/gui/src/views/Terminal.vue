@@ -25,7 +25,7 @@ class Source {
     this.background = '';
     this.color = '';
     this.invalidate = 0;
-    this.r1('\r\n');
+    this.readu('\r\n');
   }
 
   setwinsize(width, height) {
@@ -42,36 +42,37 @@ class Source {
   }
 
   readu(utf8) {
-    for (var item of this.splitu(utf8, /\r\n/)) {
-      switch (item[0]) {
+    for (var item of this.splitu(utf8, /\r\n/, /\x02/)) {
+      var type = item[0];
+      var value = item[1];
+      switch (type) {
         case 0:
-          this.r0(item[1]);
+          var newValue = this[this.length - 1].value.substring(0, this.cursor) + value + this[this.length - 1].value.substring(this.cursor + value.length);
+          this[this.length - 1].value = newValue;
+          var newStyles = JSON.parse(this[this.length - 1].styles);
+          newStyles = [[newValue.length, '', '']]; //todo
+          this[this.length - 1].styles = JSON.stringify(newStyles);
+          this[this.length - 1].height = TerminalChild.measureHeight(this.width, newValue);
+          this.cursor += value.length;
           break;
         case 1:
-          this.r1(item[1]);
+          this[this.length++] = {
+            value: '',
+            styles: '[]',
+            height: TerminalChild.measureHeight(this.width, '')
+          };
+          this.cursor = 0;
+          break;
+        case 2:
+          switch (value) {
+            case '\x02':
+              this.cursor--;
+              break;
+          }
           break;
       }
     }
     this.invalidate++;
-  }
-
-  r0(utf8) {
-    var newValue = this[this.length - 1].value.substring(0, this.cursor) + utf8 + this[this.length - 1].value.substring(this.cursor + utf8.length);
-    this[this.length - 1].value = newValue;
-    var newStyles = JSON.parse(this[this.length - 1].styles);
-    newStyles = [[newValue.length, '', '']]; //todo
-    this[this.length - 1].styles = JSON.stringify(newStyles);
-    this[this.length - 1].height = TerminalChild.measureHeight(this.width, newValue);
-    this.cursor += utf8.length;
-  }
-
-  r1(utf8) {
-    this[this.length++] = {
-      value: '',
-      styles: '[]',
-      height: TerminalChild.measureHeight(this.width, '')
-    };
-    this.cursor = 0;
   }
 
   splitu(utf8, ...patterns) {
