@@ -45,11 +45,12 @@ export default {
     };
   },
   props: {
-    value: String
+    value: String,
+    styles: String
   },
   created: function() {
     this.needLayout.push('value');
-    this.needDraw.push();
+    this.needDraw.push('styles');
   },
   methods: {
     onLayout: function() {
@@ -59,13 +60,39 @@ export default {
       return measureHeight(this.$el.clientWidth - 24, this.value);
     },
     onDraw: function(ctx) {
+      var styles = JSON.parse(this.styles);
       ctx.font = '12px Menlo';
       var x = 0;
-      var y = 12;
-      x += 12;
-      ctx.fillStyle = Theme.colorText;
+      var y = 0;
+      var style = { size: 0 };
       for (var line of wrapstring(this.$el.clientWidth - 24, this.value)) {
-        ctx.fillText(line, x, y);
+        x = 12;
+        while (line) {
+          while (!style.size) {
+            style = {
+              size: styles[0][0],
+              background: styles[0][1],
+              color: styles[0][2]
+            };
+            styles.splice(0, 1);
+          }
+          var len = Math.min(line.length, style.size);
+          var text = line.substring(0, len);
+          var width = measureText(text);
+          if (style.background) {
+            ctx.fillStyle = style.background;
+            ctx.fillRect(x, y, width, 16);
+          }
+          if (style.color) {
+            ctx.fillStyle = style.color;
+          } else {
+            ctx.fillStyle = !style.background ? Theme.colorText : Theme.colorBackground;
+          }
+          ctx.fillText(text, x, y + 12);
+          x += width;
+          line = line.substring(len);
+          style.size -= len;
+        }
         y += 16;
       }
     }

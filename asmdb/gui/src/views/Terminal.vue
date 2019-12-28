@@ -1,7 +1,7 @@
 <template>
   <div class="terminal-container">
     <TerminalParent class="terminal-parent" :source="source" #default="props">
-      <TerminalChild :value="props.item.value" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
+      <TerminalChild :value="props.item.value" :styles="props.item.styles" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
     </TerminalParent>
   </div>
 </template>
@@ -23,19 +23,8 @@ export default {
   data: function() {
     var source = {};
     source[0] = {
-      value: 'Python 3.6.3 (default, Oct  4 2017, 06:09:05) ',
-      height: 16
-    };
-    source[1] = {
-      value: '[GCC 4.2.1 Compatible Apple LLVM 8.0.0 (clang-800.0.42.1)] on darwin',
-      height: 16
-    };
-    source[2] = {
-      value: 'Type "help", "copyright", "credits" or "license" for more information.',
-      height: 16
-    };
-    source[3] = {
-      value: '>>> ',
+      value: '1234',
+      styles: JSON.stringify([[2, 'red', ''], [2, '', '']]),
       height: 16
     };
     return {
