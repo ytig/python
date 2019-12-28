@@ -1,10 +1,10 @@
 <template>
   <div ref="container" class="scroller-container" @wheel="onWheel">
+    <canvas ref="canvas1" class="scroller-draw"></canvas>
+    <canvas ref="canvas2" class="scroller-draw"></canvas>
     <div class="scroller-item" v-for="item in viewport" :key="item.id" :style="item.style_">
       <slot v-if="item.key!=null" :item="item.val" :index="item.key" :offset="item.top" :context="context" :scrolling="scrolling"></slot>
     </div>
-    <canvas ref="canvas1" class="scroller-draw"></canvas>
-    <canvas ref="canvas2" class="scroller-draw"></canvas>
   </div>
 </template>
 
@@ -219,15 +219,15 @@ export default {
   overflow: hidden;
   position: relative;
   contain: strict;
-  .scroller-item {
-    position: absolute;
-    contain: strict;
-    width: 100%;
-  }
   .scroller-draw {
     position: absolute;
     contain: strict;
     pointer-events: none;
+  }
+  .scroller-item {
+    position: absolute;
+    contain: strict;
+    width: 100%;
   }
 }
 </style>

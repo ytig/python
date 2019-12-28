@@ -1,10 +1,10 @@
 <template>
   <div ref="container" class="recycler-container" @wheel="onWheel">
+    <canvas ref="canvas1" class="recycler-draw"></canvas>
+    <canvas ref="canvas2" class="recycler-draw"></canvas>
     <div class="recycler-item" v-for="item in viewport" :key="item.id" :style="item.style_">
       <slot v-if="show&&item.key>=0" :item="item.val" :index="item.key" :context="context" :scrolling="scrolling"></slot>
     </div>
-    <canvas ref="canvas1" class="recycler-draw"></canvas>
-    <canvas ref="canvas2" class="recycler-draw"></canvas>
   </div>
 </template>
 
@@ -172,15 +172,15 @@ export default {
   overflow: hidden;
   position: relative;
   contain: strict;
-  .recycler-item {
-    position: absolute;
-    contain: strict;
-    width: 100%;
-  }
   .recycler-draw {
     position: absolute;
     contain: strict;
     pointer-events: none;
+  }
+  .recycler-item {
+    position: absolute;
+    contain: strict;
+    width: 100%;
   }
 }
 </style>
