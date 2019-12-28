@@ -61,7 +61,7 @@ class Source {
       }
       return;
     }
-    var newValue = this[this.length - 1].value.substring(0, this.cursor) + utf8 + this[this.length - 1].value.substring(this.cursor);
+    var newValue = this[this.length - 1].value.substring(0, this.cursor) + utf8 + this[this.length - 1].value.substring(this.cursor + utf8.length);
     this[this.length - 1].value = newValue;
     this[this.length - 1].styles = JSON.stringify([[newValue.length, '', '']]); //todo
     this[this.length - 1].height = TerminalChild.measureHeight(this.width, newValue);
