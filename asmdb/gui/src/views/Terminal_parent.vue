@@ -169,7 +169,7 @@ export default {
           items.push(item);
         }
         sumTop += this.source[i].height;
-        if (sumTop - scrollTop >= canvasHeight) {
+        if (sumTop - scrollTop > canvasHeight) {
           break;
         }
       }
