@@ -42,26 +42,15 @@ class Source {
   }
 
   readu(utf8) {
-    for (var item of this.splitu(utf8, /\r\n/, /\x08|\x1b\[\d{0,}[A-D]/)) {
+    for (var item of this.splitu(utf8, /\r\n/, /\x08|\x1b\[\d{0,}[A-D]/, /\x1b\[K/)) {
       var type = item[0];
       var value = item[1];
       switch (type) {
         case 0:
-          var newValue = this[this.length - 1].value.substring(0, this.cursor) + value;
-          this[this.length - 1].value = newValue;
-          var newStyles = JSON.parse(this[this.length - 1].styles);
-          newStyles = [[newValue.length, '', '']]; //todo
-          this[this.length - 1].styles = JSON.stringify(newStyles);
-          this[this.length - 1].height = TerminalChild.measureHeight(this.width, newValue);
-          this.cursor += value.length;
+          this.insert(value);
           break;
         case 1:
-          this[this.length++] = {
-            value: '',
-            styles: '[]',
-            height: TerminalChild.measureHeight(this.width, '')
-          };
-          this.cursor = 0;
+          this.newline();
           break;
         case 2:
           if (value == '\x08') {
@@ -78,9 +67,31 @@ class Source {
             }
           }
           break;
+        case 3:
+          this.insert('');
+          break;
       }
     }
     this.invalidate++;
+  }
+
+  insert(value) {
+    var newValue = this[this.length - 1].value.substring(0, this.cursor) + value;
+    this[this.length - 1].value = newValue;
+    var newStyles = JSON.parse(this[this.length - 1].styles);
+    newStyles = [[newValue.length, '', '']]; //todo
+    this[this.length - 1].styles = JSON.stringify(newStyles);
+    this[this.length - 1].height = TerminalChild.measureHeight(this.width, newValue);
+    this.cursor += value.length;
+  }
+
+  newline() {
+    this[this.length++] = {
+      value: '',
+      styles: '[]',
+      height: TerminalChild.measureHeight(this.width, '')
+    };
+    this.cursor = 0;
   }
 
   splitu(utf8, ...patterns) {
