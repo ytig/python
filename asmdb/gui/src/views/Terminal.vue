@@ -52,7 +52,7 @@ export default {
           this.$nextTick(callee.bind(this, ...arguments));
           return;
         }
-        this.source = new Source(this.$el.width - 24, newValue);
+        this.source = new Source(this.$el.clientWidth - 24, newValue);
       }
     }
   },
