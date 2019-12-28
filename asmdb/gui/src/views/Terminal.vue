@@ -42,12 +42,12 @@ class Source {
   }
 
   readu(utf8) {
-    for (var item of this.splitu(utf8, /\r\n/, /\x02/)) {
+    for (var item of this.splitu(utf8, /\r\n/, /\x08/)) {
       var type = item[0];
       var value = item[1];
       switch (type) {
         case 0:
-          var newValue = this[this.length - 1].value.substring(0, this.cursor) + value + this[this.length - 1].value.substring(this.cursor + value.length);
+          var newValue = this[this.length - 1].value.substring(0, this.cursor) + value;
           this[this.length - 1].value = newValue;
           var newStyles = JSON.parse(this[this.length - 1].styles);
           newStyles = [[newValue.length, '', '']]; //todo
@@ -65,7 +65,7 @@ class Source {
           break;
         case 2:
           switch (value) {
-            case '\x02':
+            case '\x08':
               this.cursor--;
               break;
           }
