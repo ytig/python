@@ -42,7 +42,7 @@ class Source {
   }
 
   readu(utf8) {
-    this._readu();
+    this._readu(utf8);
     this.invalidate++;
   }
 
