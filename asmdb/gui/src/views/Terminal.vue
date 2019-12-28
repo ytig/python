@@ -8,6 +8,7 @@
 
 <script>
 import resize from '@/scripts/resize';
+import asmdb from '@/scripts/asmdb';
 import TerminalParent from './Terminal_parent';
 import TerminalChild from './Terminal_child';
 //foucs
