@@ -42,9 +42,10 @@ class Source {
   }
 
   readu(utf8) {
-    for (var item of this.splitu(utf8, /\r\n/, /\x08/, /\x1b\[\d{0,}C/, /\x1b\[K|\x1b\[1P/)) {
+    for (var item of this.splitu(utf8, /\r\n/, /\x07/, /\x08/, /\x1b\[\d{0,}C/, /\x1b\[K/, /\x1b\[\d{0,}P/)) {
       var type = item[0];
       var value = item[1];
+      console.log(type, value);
       switch (type) {
         case 0:
           this.insert(value);
@@ -53,13 +54,20 @@ class Source {
           this.newline();
           break;
         case 2:
-          this.cursor--;
           break;
         case 3:
+          this.cursor--;
+          break;
+        case 4:
           var n = parseInt(value.substring(2, value.length - 1) | '1');
           this.cursor += n;
           break;
-        case 4:
+        case 5:
+          this.insert('');
+          break;
+        case 6:
+          var n = parseInt(value.substring(2, value.length - 1) | '1');
+          this.cursor -= n - 1;
           this.insert('');
           break;
       }
