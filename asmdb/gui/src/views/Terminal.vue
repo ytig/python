@@ -66,8 +66,6 @@ class Source {
           this.insert('');
           break;
         case 6:
-          var n = parseInt(value.substring(2, value.length - 1) | '1');
-          this.cursor -= n - 1;
           this.insert('');
           break;
       }
