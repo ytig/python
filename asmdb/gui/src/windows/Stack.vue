@@ -6,7 +6,7 @@
       <div class="stack-draw" :style="{width:windowWidth+'px',height:items.length*lineHeight+'px'}">
         <canvas ref="canvas"></canvas>
       </div>
-      <Bytes v-for="(item, index) in items" :key="index" :startAddress="item.startAddress" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :assignedNumbers="item.assignedNumbers" :oldBytes="item.oldBytes" :newBytes="item.newBytes" :group="8*column" :showString="false" :canvasContext="index*lineHeight+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
+      <Bytes class="stack-item" v-for="(item, index) in items" :key="index" :startAddress="item.startAddress" :lineNumber="item.lineNumber" :highlightNumber="item.highlightNumber" :watchingNumbers="item.watchingNumbers" :assignedNumbers="item.assignedNumbers" :oldBytes="item.oldBytes" :newBytes="item.newBytes" :group="8*column" :showString="false" :canvasContext="index*lineHeight+';'+context" :lazyLayout="false" @clickitem="onClickItem"></Bytes>
     </div>
     <Indicator :size="10" :value="page" @input="onClickIndex" :disable="sp==null"></Indicator>
   </div>
@@ -292,6 +292,10 @@ export default {
       position: absolute;
       overflow: hidden;
       pointer-events: none;
+    }
+    .stack-item {
+      position: relative;
+      z-index: 1;
     }
   }
 }
