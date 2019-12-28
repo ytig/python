@@ -104,7 +104,7 @@ export default {
           if (c <= line.length) {
             x = measureText(line.substring(0, c));
             var w = measureText(line.substring(c, c + 1) || ' ');
-            ctx.fillStyle = style.colorBackground; //todo
+            ctx.fillStyle = '#ffffffc9'; //todo
             ctx.fillRect(x, y + 1, w, 14);
             break;
           }
