@@ -79,6 +79,10 @@ export default {
         case 'ArrowRight':
           asmdb.getInstance().writeu('\x06');
           break;
+        case 'ArrowUp':
+          break;
+        case 'ArrowDown':
+          break;
         case 'Alt':
         case 'Control':
         case 'Meta':
