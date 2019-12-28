@@ -81,7 +81,7 @@ export default {
           var width = measureText(text);
           if (style.background) {
             ctx.fillStyle = style.background;
-            ctx.fillRect(x, y, width, 16);
+            ctx.fillRect(x, y + 1, width, 14);
           }
           if (style.color) {
             ctx.fillStyle = style.color;
