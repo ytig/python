@@ -42,7 +42,7 @@ class Source {
   }
 
   readu(utf8) {
-    for (var item of this.splitu(utf8, /\r\n/, /\x08|\x1b\[\d{0,}[A-D]/, /\x1b\[K/)) {
+    for (var item of this.splitu(utf8, /\r\n/, /\x08/, /\x1b\[\d{0,}C/, /\x1b\[K|\x1b\[1P/)) {
       var type = item[0];
       var value = item[1];
       switch (type) {
@@ -53,21 +53,13 @@ class Source {
           this.newline();
           break;
         case 2:
-          if (value == '\x08') {
-            this.cursor--;
-          } else {
-            var n = parseInt(value.substring(2, value.length - 1) | '1');
-            switch (value.substring(value.length - 1)) {
-              case 'C':
-                this.cursor += n;
-                break;
-              case 'D':
-                this.cursor -= n;
-                break;
-            }
-          }
+          this.cursor--;
           break;
         case 3:
+          var n = parseInt(value.substring(2, value.length - 1) | '1');
+          this.cursor += n;
+          break;
+        case 4:
           this.insert('');
           break;
       }
