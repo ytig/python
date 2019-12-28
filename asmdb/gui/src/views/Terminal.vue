@@ -69,8 +69,11 @@ class Source {
           } else {
             var n = parseInt(value.substring(2, value.length - 1) | '1');
             switch (value.substring(value.length - 1)) {
-              case 'D':
+              case 'C':
                 this.cursor += n;
+                break;
+              case 'D':
+                this.cursor -= n;
                 break;
             }
           }
