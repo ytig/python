@@ -1,7 +1,7 @@
 <template>
   <div class="terminal-container">
     <TerminalParent v-if="source!=null" class="terminal-parent" :source="source" #default="props">
-      <TerminalChild :value="props.item.value" :styles="props.item.styles" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
+      <TerminalChild :value="props.item.value" :styles="props.item.styles" :cursor="source.toCursor(props.index)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
     </TerminalParent>
   </div>
 </template>
@@ -26,6 +26,14 @@ class Source {
     this.color = '';
     this.invalidate = 0;
     this.readu('\r\n');
+  }
+
+  toCursor(index) {
+    if (index == this.length - 1) {
+      return this.cursor;
+    } else {
+      return null;
+    }
   }
 
   setwinsize(width, height) {

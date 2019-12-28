@@ -46,11 +46,12 @@ export default {
   },
   props: {
     value: String,
-    styles: String
+    styles: String,
+    cursor: Number
   },
   created: function() {
     this.needLayout.push('value');
-    this.needDraw.push('styles');
+    this.needDraw.push('styles', 'cursor');
   },
   methods: {
     onLayout: function() {
@@ -65,7 +66,8 @@ export default {
       var x = 0;
       var y = 0;
       var style = { size: 0 };
-      for (var line of wrapstring(this.$el.clientWidth, this.value)) {
+      var lines = wrapstring(this.$el.clientWidth, this.value);
+      for (var line of lines) {
         x = 0;
         while (line) {
           while (!style.size) {
@@ -94,6 +96,21 @@ export default {
           style.size -= len;
         }
         y += 16;
+      }
+      if (this.cursor != null) {
+        y = 0;
+        var c = this.cursor;
+        for (var line of lines) {
+          if (c <= line.length) {
+            x = measureText(line.substring(0, c));
+            var w = measureText(line.substring(c, c + 1) || ' ');
+            ctx.fillStyle = style.colorBackground; //todo
+            ctx.fillRect(x, y + 1, w, 14);
+            break;
+          }
+          c -= line.length;
+          y += 16;
+        }
       }
     }
   }
