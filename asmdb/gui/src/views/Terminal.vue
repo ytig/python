@@ -25,7 +25,7 @@ class Source {
     this.background = '';
     this.color = '';
     this.invalidate = 0;
-    this.readu('\r\n');
+    this.r1('\r\n');
   }
 
   setwinsize(width, height) {
@@ -42,29 +42,20 @@ class Source {
   }
 
   readu(utf8) {
-    this._readu(utf8);
+    for (var item of this.splitu(utf8, /\r\n/)) {
+      switch (item[0]) {
+        case 0:
+          this.r0(item[1]);
+          break;
+        case 1:
+          this.r1(item[1]);
+          break;
+      }
+    }
     this.invalidate++;
   }
 
-  _readu(utf8) {
-    if (!utf8) {
-      return;
-    }
-    if (utf8.indexOf('\r\n') >= 0) {
-      var i = 0;
-      for (var line of utf8.split('\r\n')) {
-        if (i++ != 0) {
-          this[this.length++] = {
-            value: '',
-            styles: '[]',
-            height: TerminalChild.measureHeight(this.width, '')
-          };
-          this.cursor = 0;
-        }
-        this._readu(line);
-      }
-      return;
-    }
+  r0(utf8) {
     var newValue = this[this.length - 1].value.substring(0, this.cursor) + utf8 + this[this.length - 1].value.substring(this.cursor + utf8.length);
     this[this.length - 1].value = newValue;
     var newStyles = JSON.parse(this[this.length - 1].styles);
@@ -72,6 +63,41 @@ class Source {
     this[this.length - 1].styles = JSON.stringify(newStyles);
     this[this.length - 1].height = TerminalChild.measureHeight(this.width, newValue);
     this.cursor += utf8.length;
+  }
+
+  r1(utf8) {
+    this[this.length++] = {
+      value: '',
+      styles: '[]',
+      height: TerminalChild.measureHeight(this.width, '')
+    };
+    this.cursor = 0;
+  }
+
+  splitu(utf8, ...patterns) {
+    var result = [[0, utf8]];
+    var type = 0;
+    for (var pattern of patterns) {
+      type++;
+      var i = -1;
+      while (++i < result.length) {
+        if (result[i][0] != 0) {
+          continue;
+        }
+        var text = result[i][1];
+        var matcher = pattern.exec(text);
+        if (!matcher) {
+          continue;
+        }
+        result.splice(i, 1, [0, text.substring(0, matcher.index)], [type, matcher[0]], [0, text.substring(matcher.index + matcher[0].length)]);
+      }
+    }
+    for (var i = result.length - 1; i >= 0; i--) {
+      if (!result[i][1]) {
+        result.splice(i, 1);
+      }
+    }
+    return result;
   }
 }
 
