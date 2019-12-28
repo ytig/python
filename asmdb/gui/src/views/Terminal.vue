@@ -1,6 +1,6 @@
 <template>
   <div class="terminal-container">
-    <TerminalParent class="terminal-parent" :source="source" #default="props">
+    <TerminalParent v-if="source!=null" class="terminal-parent" :source="source" #default="props">
       <TerminalChild :value="props.item.value" :styles="props.item.styles" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
     </TerminalParent>
   </div>
@@ -15,21 +15,46 @@ import TerminalChild from './Terminal_child';
 //linux bytes
 //input -> writeb 粘贴，中文输入：悬浮
 //scroll infinite
+class Source {
+  constructor(width, utf8) {
+    //todo
+    var i = 0;
+    for (var line of utf8.split('\r\n')) {
+      this[i++] = {
+        value: line,
+        styles: JSON.stringify([[line.length, '', '']]),
+        height: TerminalChild.measureHeight(width, line)
+      };
+    }
+    this.invalidate = 0;
+  }
+}
+
 export default {
   components: {
     TerminalParent: TerminalParent,
     TerminalChild: TerminalChild
   },
   data: function() {
-    var source = {};
-    source[0] = {
-      value: '1234',
-      styles: JSON.stringify([[2, 'red', ''], [2, '', '']]),
-      height: 16
-    };
     return {
-      source: source
+      source: null
     };
+  },
+  props: {
+    foucs: Boolean,
+    utf8: String
+  },
+  watch: {
+    utf8: {
+      immediate: true,
+      handler: function callee(newValue, oldValue) {
+        if (this.$el == undefined) {
+          this.$nextTick(callee.bind(this, ...arguments));
+          return;
+        }
+        this.source = new Source(this.$el.width - 24, newValue);
+      }
+    }
   },
   mounted: function() {
     resize.registerEvent(this);
@@ -48,6 +73,7 @@ export default {
 
 .terminal-container {
   .terminal-parent {
+    margin: 0px 12px;
     height: 100%;
   }
 }

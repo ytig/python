@@ -57,7 +57,7 @@ export default {
       this.value_ = this.value;
     },
     onPreDraw: function() {
-      return measureHeight(this.$el.clientWidth - 24, this.value);
+      return measureHeight(this.$el.clientWidth, this.value);
     },
     onDraw: function(ctx) {
       var styles = JSON.parse(this.styles);
@@ -65,8 +65,8 @@ export default {
       var x = 0;
       var y = 0;
       var style = { size: 0 };
-      for (var line of wrapstring(this.$el.clientWidth - 24, this.value)) {
-        x = 12;
+      for (var line of wrapstring(this.$el.clientWidth, this.value)) {
+        x = 0;
         while (line) {
           while (!style.size) {
             style = {
@@ -104,8 +104,6 @@ export default {
 @import '~@/styles/theme';
 
 .terminal-child-container {
-  padding-left: 12px;
-  padding-right: 12px;
   font-size: 12px;
   line-height: 16px;
   color: transparent;

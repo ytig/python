@@ -3,7 +3,7 @@
     <Navigation2 class="python3-navigation2" :name="'python3'" :focus="focus" @mouseup2="onMouseUp2">
       <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @dragstart2="onDragStart2" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
     </Navigation2>
-    <Terminal class="python3-terminal" :style="{height:windowHeight+'px'}"></Terminal>
+    <Terminal class="python3-terminal" :style="{height:windowHeight+'px'}" :focus="focus" :utf8="utf8"></Terminal>
   </div>
 </template>
 
@@ -20,6 +20,7 @@ export default {
       curHeight: 0,
       addHeight: 0,
       focus: false,
+      utf8: '',
       counter: 0
     };
   },
@@ -64,7 +65,7 @@ export default {
       return false;
     },
     onRead: function(utf8) {
-      console.log(utf8);
+      this.utf8 = utf8;
     },
     smoothDragTo: function(to) {
       var from = this.curHeight;
