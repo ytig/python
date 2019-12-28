@@ -42,6 +42,11 @@ class Source {
   }
 
   readu(utf8) {
+    this._readu();
+    this.invalidate++;
+  }
+
+  _readu(utf8) {
     if (!utf8) {
       return;
     }
@@ -55,18 +60,18 @@ class Source {
             height: TerminalChild.measureHeight(this.width, '')
           };
           this.cursor = 0;
-          this.invalidate++;
         }
-        this.readu(line);
+        this._readu(line);
       }
       return;
     }
     var newValue = this[this.length - 1].value.substring(0, this.cursor) + utf8 + this[this.length - 1].value.substring(this.cursor + utf8.length);
     this[this.length - 1].value = newValue;
-    this[this.length - 1].styles = JSON.stringify([[newValue.length, '', '']]); //todo
+    var newStyles = JSON.parse(this[this.length - 1].styles);
+    newStyles = [[newValue.length, '', '']]; //todo
+    this[this.length - 1].styles = JSON.stringify(newStyles);
     this[this.length - 1].height = TerminalChild.measureHeight(this.width, newValue);
     this.cursor += utf8.length;
-    this.invalidate++;
   }
 }
 
