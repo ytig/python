@@ -80,9 +80,10 @@ export default {
           asmdb.getInstance().writeu('\x06');
           break;
         case 'ArrowUp':
-          asmdb.getInstance().writeu('中');
+          asmdb.getInstance().writeu('\x10');
           break;
         case 'ArrowDown':
+          asmdb.getInstance().writeu('\x0e');
           break;
         case 'Alt':
         case 'Control':
