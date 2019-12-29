@@ -11,6 +11,8 @@ import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
 import TerminalParent from './Terminal_parent';
 import TerminalChild from './Terminal_child';
+const WIDTH0 = TerminalChild.WIDTH0;
+const HEIGHT0 = TerminalChild.HEIGHT0;
 //focus
 //width height -> setwinsize
 //linux bytes
@@ -21,11 +23,15 @@ class Source {
     this.width = 0;
     this.height = 0;
     this.length = 0;
+    this[this.length++] = {
+      value: '',
+      styles: '[]',
+      height: HEIGHT0
+    };
     this.cursor = 0;
     this.background = '';
     this.color = '';
     this.invalidate = 0;
-    this.readu('\n');
   }
 
   toCursor(index, focus) {
@@ -47,14 +53,14 @@ class Source {
     if (this.height != height) {
       this.height = height;
     }
-    asmdb.getInstance().setwinsize(parseInt(height / 16), parseInt(width / 7));
+    asmdb.getInstance().setwinsize(parseInt(height / HEIGHT0), parseInt(width / WIDTH0));
   }
 
   readu(utf8) {
     for (var i = 0; i < utf8.length; i++) {
       console.log(utf8.charCodeAt(i), utf8.substring(i, i + 1));
     }
-    var N = parseInt(this.width / 7);
+    var N = parseInt(this.width / WIDTH0);
     for (var item of this.splitu(utf8, /\x0a/, /\x0d/, /\x07/, /\x08/, /\x1b\[\d{0,}A/, /\x1b\[\d{0,}B/, /\x1b\[\d{0,}C/, /\x1b\[\d{0,}D/, /\x1b\[K/, /\x1b\[\d{0,}P/)) {
       var type = item[0];
       var value = item[1];
@@ -131,12 +137,19 @@ class Source {
   }
 
   newline() {
-    this[this.length++] = {
-      value: '',
-      styles: '[]',
-      height: TerminalChild.measureHeight(this.width, '')
-    };
-    this.cursor = 0;
+    var current = this[this.length - 1];
+    var N = parseInt(this.width / WIDTH0);
+    var row = parseInt(this.cursor / N);
+    if (row >= parseInt(current.height / HEIGHT0) - 1) {
+      this[this.length++] = {
+        value: '',
+        styles: '[]',
+        height: HEIGHT0
+      };
+      this.cursor = 0;
+    } else {
+      this.cursor = (row + 1) * N;
+    }
   }
 
   splitu(utf8, ...patterns) {

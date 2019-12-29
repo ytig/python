@@ -109,7 +109,7 @@ export default {
       }
       if (this.cursor != null) {
         var cursor = JSON.parse(this.cursor);
-        var N = parseInt(this.$el.clientWidth / 7);
+        var N = parseInt(this.$el.clientWidth / WIDTH0);
         var row = parseInt(cursor[0] / N);
         var col = cursor[0] % N;
         var x1 = WIDTH0 * col;
