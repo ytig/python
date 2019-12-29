@@ -108,7 +108,7 @@ class Source {
     var newStyles = JSON.parse(current.styles);
     var insertStyles = [];
     for (var i = 0; i < value.length; i++) {
-      insertStyles.push([1, this.background, this.color]);
+      insertStyles.push([this.background, this.color]);
     }
     newStyles.splice(this.cursor, cols, ...insertStyles);
     current.value = newValue;

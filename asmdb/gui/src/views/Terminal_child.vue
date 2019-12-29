@@ -64,7 +64,7 @@ export default {
   },
   methods: {
     onLayout: function() {
-      this.value_ = this.value;
+      this.value_ = this.value; //todo padding?
     },
     onPreDraw: function() {
       return measureHeight(this.$el.clientWidth, this.value);
@@ -74,20 +74,15 @@ export default {
       ctx.font = '12px Menlo';
       var x = 0;
       var y = 0;
-      var style = { size: 0 };
       var lines = wrapstring(this.$el.clientWidth, this.value);
       for (var line of lines) {
         for (var i = 0; i < line.length; i++) {
           var char = line.charAt(i);
           var width = measureChar(char);
-          while (!style.size) {
-            style = {
-              size: styles[0][0],
-              background: styles[0][1],
-              color: styles[0][2]
-            };
-            styles.splice(0, 1);
-          }
+          var style = {
+            background: styles[i][1],
+            color: styles[i][2]
+          };
           if (style.background) {
             ctx.fillStyle = style.background;
             ctx.fillRect(x, y + 1, width, 14);
@@ -99,45 +94,44 @@ export default {
           }
           ctx.fillText(char, x, y + 12);
           x += width;
-          style.size -= 1;
         }
         x = 0;
         y += 16;
       }
       if (this.cursor != null) {
         var cursor = JSON.parse(this.cursor);
-        y = 0;
-        var c = cursor[0];
-        for (var line of lines) {
-          if (c < line.length || (c == line.length && line == lines[lines.length - 1])) {
-            var char = line.charAt(c);
-            x = measureChar(line.substring(0, c));
-            var w = measureChar(' ');
-            ctx.fillStyle = Theme.colorText;
-            var x1 = x;
-            var x2 = x1 + w;
-            var y1 = y + 1;
-            var y2 = y1 + 14;
-            if (!cursor[1]) {
-              ctx.fillRect(x1, y1, 1, y2 - y1);
-              ctx.fillRect(x1, y1, x2 - x1, 1);
-              ctx.fillRect(x2 - 1, y1, 1, y2 - y1);
-              ctx.fillRect(x1, y2 - 1, x2 - x1, 1);
-            } else {
-              ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
-              if (char) {
-                ctx.save();
-                ctx.rect(x1, y1, x2 - x1, y2 - y1);
-                ctx.clip();
-                ctx.fillStyle = Theme.colorBackground;
-                ctx.fillText(char, x, y + 12);
-                ctx.restore();
-              }
+        var N = parseInt(this.$el.clientWidth / 7);
+        var row = parseInt(cursor[0] / N);
+        var col = cursor[0] % N;
+        var x1 = 7 * col;
+        var x2 = x1 + 7;
+        var y1 = 16 * row + 1;
+        var y2 = y1 + 14;
+        if (!cursor[1]) {
+          ctx.fillStyle = Theme.colorText;
+          ctx.fillRect(x1, y1, 1, y2 - y1);
+          ctx.fillRect(x1, y1, x2 - x1, 1);
+          ctx.fillRect(x2 - 1, y1, 1, y2 - y1);
+          ctx.fillRect(x1, y2 - 1, x2 - x1, 1);
+        } else {
+          ctx.fillStyle = Theme.colorText;
+          ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+          if (row < lines.length) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(x1, y1, x2 - x1, y2 - y1);
+            ctx.clip();
+            ctx.fillStyle = Theme.colorBackground;
+            x = 0;
+            y = 16 * row;
+            var line = lines[row];
+            for (var i = 0; i < line.length; i++) {
+              var char = line.charAt(i);
+              ctx.fillText(char, x, y + 12);
+              x += measureChar(char);
             }
-            break;
+            ctx.restore();
           }
-          c -= line.length;
-          y += 16;
         }
       }
     }
