@@ -80,6 +80,7 @@ export default {
           asmdb.getInstance().writeu('\x06');
           break;
         case 'ArrowUp':
+          asmdb.getInstance().writeu('中');
           break;
         case 'ArrowDown':
           break;
