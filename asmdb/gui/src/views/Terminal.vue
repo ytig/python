@@ -89,7 +89,8 @@ class Source {
   }
 
   insert(value) {
-    var newValue = this[this.length - 1].value.substring(0, this.cursor) + value;
+    var cols = Math.ceil(TerminalChild.measureChar(value) / TerminalChild.measureChar(' '));
+    var newValue = this[this.length - 1].value.substring(0, this.cursor) + value + this[this.length - 1].value.substring(this.cursor + cols);
     this[this.length - 1].value = newValue;
     var newStyles = JSON.parse(this[this.length - 1].styles);
     newStyles = [[newValue.length, '', '']]; //todo
