@@ -46,7 +46,6 @@ function newItem(value, ...style) {
 
 export default {
   measureChar: measureChar,
-  wrapstring: wrapstring,
   measureHeight: measureHeight,
   mixins: [InfiniteMixin],
   data: function() {

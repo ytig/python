@@ -54,7 +54,8 @@ class Source {
     for (var i = 0; i < utf8.length; i++) {
       console.log(utf8.charCodeAt(i), utf8.substring(i, i + 1));
     }
-    for (var item of this.splitu(utf8, /\x0a/, /\x0d/, /\x07/, /\x08/, /\x1b\[\d{0,}A/, /\x1b\[\d{0,}C/, /\x1b\[K/, /\x1b\[\d{0,}P/)) {
+    var N = parseInt(this.width / 7);
+    for (var item of this.splitu(utf8, /\x0a/, /\x0d/, /\x07/, /\x08/, /\x1b\[\d{0,}A/, /\x1b\[\d{0,}B/, /\x1b\[\d{0,}C/, /\x1b\[\d{0,}D/, /\x1b\[K/, /\x1b\[\d{0,}P/)) {
       var type = item[0];
       var value = item[1];
       switch (type) {
@@ -65,7 +66,7 @@ class Source {
           this.newline();
           break;
         case 2:
-          this.cr();
+          this.cursor -= this.cursor % N;
           break;
         case 3:
           break;
@@ -73,18 +74,27 @@ class Source {
           this.cursor--;
           break;
         case 5:
-          this.cursor = 0; //todo
+          var n = parseInt(value.substring(2, value.length - 1) | '1');
+          this.cursor -= n * N;
           break;
         case 6:
           var n = parseInt(value.substring(2, value.length - 1) | '1');
-          this.cursor += n;
+          this.cursor += n * N;
           break;
         case 7:
-          this.delete();
+          var n = parseInt(value.substring(2, value.length - 1) | '1');
+          this.cursor += n;
           break;
         case 8:
           var n = parseInt(value.substring(2, value.length - 1) | '1');
-          this.delete(n);
+          this.cursor -= n;
+          break;
+        case 9:
+          this.delete();
+          break;
+        case 10:
+          var n = parseInt(value.substring(2, value.length - 1) | '1');
+          this.delete(n); //todo bug fix?
           break;
       }
     }
@@ -127,16 +137,6 @@ class Source {
       height: TerminalChild.measureHeight(this.width, '')
     };
     this.cursor = 0;
-  }
-
-  cr() {
-    var current = this[this.length - 1];
-    var lines = TerminalChild.wrapstring(this.width, current.value);
-    if (lines.length > 0) {
-      this.cursor = current.value.length - lines[lines.length - 1].length;
-    } else {
-      this.cursor = 0;
-    }
   }
 
   splitu(utf8, ...patterns) {
