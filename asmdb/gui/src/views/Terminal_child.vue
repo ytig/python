@@ -110,7 +110,7 @@ export default {
         y = 0;
         var c = cursor[0];
         for (var line of lines) {
-          if (c < line.length) {
+          if (c < line.length || (c == line.length && line == lines[lines.length - 1])) {
             var char = line.charAt(c);
             x = measureChar(line.substring(0, c));
             var w = measureChar(' ');
