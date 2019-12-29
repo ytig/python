@@ -78,10 +78,11 @@ class Source {
           this.cursor += n;
           break;
         case 6:
-          this.insert('');
+          this.delete();
           break;
         case 7:
-          this.insert('');
+          var n = parseInt(value.substring(2, value.length - 1) | '1');
+          this.delete(n); //todo
           break;
       }
     }
@@ -89,14 +90,32 @@ class Source {
   }
 
   insert(value) {
+    var current = this[this.length - 1];
     var cols = Math.ceil(TerminalChild.measureChar(value) / TerminalChild.measureChar(' '));
-    var newValue = this[this.length - 1].value.substring(0, this.cursor) + value + this[this.length - 1].value.substring(this.cursor + cols);
-    this[this.length - 1].value = newValue;
-    var newStyles = JSON.parse(this[this.length - 1].styles);
-    newStyles = [[newValue.length, '', '']]; //todo
-    this[this.length - 1].styles = JSON.stringify(newStyles);
-    this[this.length - 1].height = TerminalChild.measureHeight(this.width, newValue);
+    var newValue = current.value.substring(0, this.cursor) + value + current.value.substring(this.cursor + cols);
+    var newStyles = JSON.parse(current.styles);
+    var insertStyles = [];
+    for (var i = 0; i < value.length; i++) {
+      insertStyles.push([1, this.background, this.color]);
+    }
+    newStyles.splice(this.cursor, cols, ...insertStyles);
+    current.value = newValue;
+    current.styles = JSON.stringify(newStyles);
+    current.height = TerminalChild.measureHeight(this.width, newValue);
     this.cursor += value.length;
+  }
+
+  delete(n) {
+    var current = this[this.length - 1];
+    if (n == undefined) {
+      n = current.value.length - this.cursor;
+    }
+    var newValue = current.value.substring(0, this.cursor) + current.value.substring(this.cursor + n);
+    var newStyles = JSON.parse(current.styles);
+    newStyles.splice(this.cursor, n);
+    current.value = newValue;
+    current.styles = JSON.stringify(newStyles);
+    current.height = TerminalChild.measureHeight(this.width, newValue);
   }
 
   newline() {
