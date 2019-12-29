@@ -82,7 +82,7 @@ class Source {
           break;
         case 7:
           var n = parseInt(value.substring(2, value.length - 1) | '1');
-          this.delete(n); //todo
+          this.delete(n);
           break;
       }
     }
