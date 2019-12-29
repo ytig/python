@@ -47,13 +47,17 @@ class Source {
     if (this.height != height) {
       this.height = height;
     }
+    // asmdb.getInstance().setwinsize(7, 7);
+    // asmdb.getInstance().setwinsize(parseInt(height / 16), parseInt(width / measureLength(1)));
   }
 
   readu(utf8) {
-    for (var item of this.splitu(utf8, /\r\n/, /\x07/, /\x08/, /\x1b\[\d{0,}C/, /\x1b\[K/, /\x1b\[\d{0,}P/)) {
+    for (var i = 0; i < utf8.length; i++) {
+      console.log(utf8.charCodeAt(i), utf8.substring(i, i + 1));
+    }
+    for (var item of this.splitu(utf8, /\x0d\x0a/, /\x07/, /\x08/, /\x1b\[\d{0,}C/, /\x1b\[K/, /\x1b\[\d{0,}P/)) {
       var type = item[0];
       var value = item[1];
-      console.log(type, value);
       switch (type) {
         case 0:
           this.insert(value);
