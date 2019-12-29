@@ -143,7 +143,7 @@ export default {
     height: 8px;
   }
   .python3-terminal {
-    width: 150px; //for test
+    width: 94px; //for test
     background: @color-background;
   }
 }
