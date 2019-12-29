@@ -6,18 +6,26 @@
 import Theme from '@/styles/theme';
 import InfiniteMixin from './InfiniteMixin';
 
+function measureChar(char) {
+  var width = 0;
+  for (var i = 0; i < char.length; i++) {
+    var charCode = char.charCodeAt(i);
+    width += charCode < 256 ? 7 : 14; //todo
+  }
+  return width;
+}
+
 function wrapstring(width, value) {
   var strArr = [];
   while (value) {
-    var index = value.length;
-    while (measureText(value.substring(0, index)) > width) {
-      if (index == value.length) {
-        var limit = parseInt(width / 7);
-        if (measureText(value.substring(0, limit)) > width) {
-          index = Math.min(index, limit);
-        }
+    var index = 1;
+    var width_ = measureChar(value.charAt(0));
+    while (index < value.length) {
+      width_ += measureChar(value.charAt(index));
+      if (width_ > width) {
+        break;
       }
-      index--;
+      index++;
     }
     strArr.push(value.substring(0, index));
     value = value.substring(index);
@@ -37,6 +45,7 @@ function newItem(value, ...style) {
 }
 
 export default {
+  measureChar: measureChar,
   measureHeight: measureHeight,
   mixins: [InfiniteMixin],
   data: function() {
@@ -68,8 +77,9 @@ export default {
       var style = { size: 0 };
       var lines = wrapstring(this.$el.clientWidth, this.value);
       for (var line of lines) {
-        x = 0;
-        while (line) {
+        for (var i = 0; i < line.length; i++) {
+          var char = line.charAt(i);
+          var width = measureChar(char);
           while (!style.size) {
             style = {
               size: styles[0][0],
@@ -78,9 +88,6 @@ export default {
             };
             styles.splice(0, 1);
           }
-          var len = Math.min(line.length, style.size);
-          var text = line.substring(0, len);
-          var width = measureText(text);
           if (style.background) {
             ctx.fillStyle = style.background;
             ctx.fillRect(x, y + 1, width, 14);
@@ -90,11 +97,11 @@ export default {
           } else {
             ctx.fillStyle = !style.background ? Theme.colorText : Theme.colorBackground;
           }
-          ctx.fillText(text, x, y + 12);
+          ctx.fillText(char, x, y + 12);
           x += width;
-          line = line.substring(len);
-          style.size -= len;
+          style.size -= 1;
         }
+        x = 0;
         y += 16;
       }
       if (this.cursor != null) {
@@ -103,9 +110,9 @@ export default {
         var c = cursor[0];
         for (var line of lines) {
           if (c <= line.length) {
-            var word = line.substring(c, c + 1);
-            x = measureText(line.substring(0, c));
-            var w = measureText(' ');
+            var char = line.charAt(c);
+            x = measureChar(line.substring(0, c));
+            var w = measureChar(' ');
             ctx.fillStyle = Theme.colorText;
             var x1 = x;
             var x2 = x1 + w;
@@ -118,12 +125,12 @@ export default {
               ctx.fillRect(x1, y2 - 1, x2 - x1, 1);
             } else {
               ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
-              if (word) {
+              if (char) {
                 ctx.save();
                 ctx.rect(x1, y1, x2 - x1, y2 - y1);
                 ctx.clip();
                 ctx.fillStyle = Theme.colorBackground;
-                ctx.fillText(word, x, y + 12);
+                ctx.fillText(char, x, y + 12);
                 ctx.restore();
               }
             }
