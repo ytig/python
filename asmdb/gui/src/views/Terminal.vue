@@ -25,7 +25,7 @@ class Source {
     this.background = '';
     this.color = '';
     this.invalidate = 0;
-    this.readu('\r\n');
+    this.readu('\n');
   }
 
   toCursor(index, focus) {
@@ -66,7 +66,7 @@ class Source {
           this.newline();
           break;
         case 2:
-          this.cursor = 0;
+          this.cr();
           break;
         case 3:
           break;
@@ -125,6 +125,16 @@ class Source {
       height: TerminalChild.measureHeight(this.width, '')
     };
     this.cursor = 0;
+  }
+
+  cr() {
+    var current = this[this.length - 1];
+    var lines = TerminalChild.wrapstring(this.width, current.value);
+    if (lines.length > 0) {
+      this.cursor = current.value.length - lines[lines.length - 1].length;
+    } else {
+      this.cursor = 0;
+    }
   }
 
   splitu(utf8, ...patterns) {

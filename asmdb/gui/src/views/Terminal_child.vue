@@ -46,6 +46,7 @@ function newItem(value, ...style) {
 
 export default {
   measureChar: measureChar,
+  wrapstring: wrapstring,
   measureHeight: measureHeight,
   mixins: [InfiniteMixin],
   data: function() {
@@ -109,7 +110,7 @@ export default {
         y = 0;
         var c = cursor[0];
         for (var line of lines) {
-          if (c <= line.length) {
+          if (c < line.length) {
             var char = line.charAt(c);
             x = measureChar(line.substring(0, c));
             var w = measureChar(' ');
