@@ -5,12 +5,18 @@
 <script>
 import Theme from '@/styles/theme';
 import InfiniteMixin from './InfiniteMixin';
+const WIDTH0 = 7;
+const HEIGHT0 = 16;
 
 function measureChar(char) {
   var width = 0;
   for (var i = 0; i < char.length; i++) {
-    var charCode = char.charCodeAt(i);
-    width += charCode < 256 ? 7 : 14; //todo
+    var charCode = char.charCodeAt(i); //todo
+    if (charCode < 256) {
+      width += WIDTH0;
+    } else {
+      window += 2 * WIDTH0;
+    }
   }
   return width;
 }
@@ -34,7 +40,7 @@ function wrapstring(width, value) {
 }
 
 function measureHeight(width, value) {
-  return 16 * Math.max(wrapstring(width, value).length, 1);
+  return HEIGHT0 * Math.max(wrapstring(width, value).length, 1);
 }
 
 function newItem(value, ...style) {
@@ -45,6 +51,8 @@ function newItem(value, ...style) {
 }
 
 export default {
+  WIDTH0: WIDTH0,
+  HEIGHT0: HEIGHT0,
   measureChar: measureChar,
   measureHeight: measureHeight,
   mixins: [InfiniteMixin],
@@ -70,6 +78,7 @@ export default {
       return measureHeight(this.$el.clientWidth, this.value);
     },
     onDraw: function(ctx) {
+      const PADDING0 = (HEIGHT0 - 14) / 2;
       var styles = JSON.parse(this.styles);
       ctx.font = '12px Menlo';
       var x = 0;
@@ -85,27 +94,27 @@ export default {
           };
           if (style.background) {
             ctx.fillStyle = style.background;
-            ctx.fillRect(x, y + 1, width, 14);
+            ctx.fillRect(x, y + PADDING0, width, 14);
           }
           if (style.color) {
             ctx.fillStyle = style.color;
           } else {
             ctx.fillStyle = !style.background ? Theme.colorText : Theme.colorBackground;
           }
-          ctx.fillText(char, x, y + 12);
+          ctx.fillText(char, x, y + PADDING0 + 11);
           x += width;
         }
         x = 0;
-        y += 16;
+        y += HEIGHT0;
       }
       if (this.cursor != null) {
         var cursor = JSON.parse(this.cursor);
         var N = parseInt(this.$el.clientWidth / 7);
         var row = parseInt(cursor[0] / N);
         var col = cursor[0] % N;
-        var x1 = 7 * col;
-        var x2 = x1 + 7;
-        var y1 = 16 * row + 1;
+        var x1 = WIDTH0 * col;
+        var x2 = x1 + WIDTH0;
+        var y1 = HEIGHT0 * row + PADDING0;
         var y2 = y1 + 14;
         if (!cursor[1]) {
           ctx.fillStyle = Theme.colorText;
@@ -123,11 +132,11 @@ export default {
             ctx.clip();
             ctx.fillStyle = Theme.colorBackground;
             x = 0;
-            y = 16 * row;
+            y = HEIGHT0 * row;
             var line = lines[row];
             for (var i = 0; i < line.length; i++) {
               var char = line.charAt(i);
-              ctx.fillText(char, x, y + 12);
+              ctx.fillText(char, x, y + PADDING0 + 11);
               x += measureChar(char);
             }
             ctx.restore();
