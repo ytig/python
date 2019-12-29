@@ -55,7 +55,7 @@ class Source {
     for (var i = 0; i < utf8.length; i++) {
       console.log(utf8.charCodeAt(i), utf8.substring(i, i + 1));
     }
-    for (var item of this.splitu(utf8, /\x0d\x0a/, /\x07/, /\x08/, /\x1b\[\d{0,}C/, /\x1b\[K/, /\x1b\[\d{0,}P/)) {
+    for (var item of this.splitu(utf8, /\x0a/, /\x0d/, /\x07/, /\x08/, /\x1b\[\d{0,}C/, /\x1b\[K/, /\x1b\[\d{0,}P/)) {
       var type = item[0];
       var value = item[1];
       switch (type) {
@@ -66,18 +66,21 @@ class Source {
           this.newline();
           break;
         case 2:
+          this.cursor = 0;
           break;
         case 3:
-          this.cursor--;
           break;
         case 4:
+          this.cursor--;
+          break;
+        case 5:
           var n = parseInt(value.substring(2, value.length - 1) | '1');
           this.cursor += n;
           break;
-        case 5:
+        case 6:
           this.insert('');
           break;
-        case 6:
+        case 7:
           this.insert('');
           break;
       }
