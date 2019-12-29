@@ -47,8 +47,7 @@ class Source {
     if (this.height != height) {
       this.height = height;
     }
-    // asmdb.getInstance().setwinsize(7, 7);
-    // asmdb.getInstance().setwinsize(parseInt(height / 16), parseInt(width / measureLength(1)));
+    asmdb.getInstance().setwinsize(parseInt(height / 16), parseInt(width / 7));
   }
 
   readu(utf8) {
