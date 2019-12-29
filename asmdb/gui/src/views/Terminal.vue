@@ -1,7 +1,7 @@
 <template>
   <div class="terminal-container">
     <TerminalParent v-if="source!=null" class="terminal-parent" :source="source" #default="props">
-      <TerminalChild :value="props.item.value" :styles="props.item.styles" :cursor="source.toCursor(props.index)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
+      <TerminalChild :value="props.item.value" :styles="props.item.styles" :cursor="source.toCursor(props.index,focus)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
     </TerminalParent>
   </div>
 </template>
@@ -11,7 +11,7 @@ import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
 import TerminalParent from './Terminal_parent';
 import TerminalChild from './Terminal_child';
-//foucs
+//focus
 //width height -> setwinsize
 //linux bytes
 //input -> writeb 粘贴，中文输入：悬浮
@@ -28,9 +28,9 @@ class Source {
     this.readu('\r\n');
   }
 
-  toCursor(index) {
+  toCursor(index, focus) {
     if (index == this.length - 1) {
-      return this.cursor;
+      return JSON.stringify([this.cursor, focus]);
     } else {
       return null;
     }
@@ -138,7 +138,7 @@ export default {
     };
   },
   props: {
-    foucs: Boolean,
+    focus: Boolean,
     utf8: String
   },
   watch: {

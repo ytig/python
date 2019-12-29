@@ -47,7 +47,7 @@ export default {
   props: {
     value: String,
     styles: String,
-    cursor: Number
+    cursor: String
   },
   created: function() {
     this.needLayout.push('value');
@@ -98,14 +98,35 @@ export default {
         y += 16;
       }
       if (this.cursor != null) {
+        var cursor = JSON.parse(this.cursor);
         y = 0;
-        var c = this.cursor;
+        var c = cursor[0];
         for (var line of lines) {
           if (c <= line.length) {
+            var word = line.substring(c, c + 1);
             x = measureText(line.substring(0, c));
-            var w = measureText(line.substring(c, c + 1) || ' ');
-            ctx.fillStyle = '#ffffffc9'; //todo
-            ctx.fillRect(x, y + 1, w, 14);
+            var w = measureText(' ');
+            ctx.fillStyle = Theme.colorText;
+            var x1 = x;
+            var x2 = x1 + w;
+            var y1 = y + 1;
+            var y2 = y1 + 14;
+            if (!cursor[1]) {
+              ctx.fillRect(x1, y1, 1, y2 - y1);
+              ctx.fillRect(x1, y1, x2 - x1, 1);
+              ctx.fillRect(x2 - 1, y1, 1, y2 - y1);
+              ctx.fillRect(x1, y2 - 1, x2 - x1, 1);
+            } else {
+              ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+              if (word) {
+                ctx.save();
+                ctx.rect(x1, y1, x2 - x1, y2 - y1);
+                ctx.clip();
+                ctx.fillStyle = Theme.colorBackground;
+                ctx.fillText(word, x, y + 12);
+                ctx.restore();
+              }
+            }
             break;
           }
           c -= line.length;
