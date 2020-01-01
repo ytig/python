@@ -209,7 +209,11 @@ class Source {
   escK() {
     //todo fix
     var N = parseInt(this.width / WIDTH0);
-    this[this.index].words.splice(this.offset, 999);
+    var words = [];
+    for (var i = 0; i < N - (this.offset % N); i++) {
+      words.push(new Word(' ', '', ''));
+    }
+    this[this.index].words.splice(this.offset, words.length, ...words);
     this[this.index].invalidate();
   }
 
