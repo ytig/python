@@ -131,18 +131,28 @@ class Source {
   };
 
   input(utf8) {
-    if (utf8.length > 1) {
-      for (var s of utf8) {
-        this.input(s);
-      }
-      return;
+    for (var char of utf8) {
+      //todo
+      var w = TerminalChild.measureChar(char) / WIDTH0;
+      this[this.index].words.push(new Word(char, this.background, this.color));
+      this[this.index].invalidate();
+      this.offset++;
     }
-    this[this.index].words.push(new Word(utf8, this.background, this.color));
-    this[this.index].invalidate();
-    this.offset++; //todo
   }
 
-  lf() {}
+  lf() {
+    var N = parseInt(this.width / WIDTH0);
+    var row = this[this.index].height / HEIGHT0;
+    if (this.offset + N < row * N) {
+      this.offset += N - (this.offset % N);
+    } else {
+      if (this.index == this.length - 1) {
+        this[this.length++] = new Line(this.width);
+      }
+      this.index++;
+      this.offset = 0;
+    }
+  }
 
   cr() {}
 
