@@ -116,18 +116,13 @@ export default {
       }
       if (this.cursor != null) {
         var cursor = JSON.parse(this.cursor);
-        var N = parseInt(this.$el.clientWidth / WIDTH0);
-        var row = parseInt(cursor[0] / N);
-        var col = cursor[0] % N;
-        if (lines.length > 0 && row >= lines.length) {
-          row = lines.length - 1;
-          col = N - 1;
-        }
+        var row = cursor[0];
+        var col = cursor[1];
         var x1 = WIDTH0 * col;
         var x2 = x1 + WIDTH0;
         var y1 = HEIGHT0 * row + PADDING0;
         var y2 = y1 + 14;
-        if (!cursor[1]) {
+        if (!cursor[2]) {
           ctx.fillStyle = Theme.colorText;
           ctx.fillRect(x1, y1, 1, y2 - y1);
           ctx.fillRect(x1, y1, x2 - x1, 1);

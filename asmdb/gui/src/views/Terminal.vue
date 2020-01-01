@@ -79,7 +79,8 @@ class Source {
     this.length = 0;
     this[this.length++] = new Line(this.width);
     this.index = 0;
-    this.offset = 0;
+    this.row = 0;
+    this.col = 0;
     this.background = '';
     this.color = '';
     this.invalidate = 0;
@@ -87,8 +88,9 @@ class Source {
   }
 
   toCursor(index, focus) {
+    var COL = parseInt(this.width / WIDTH0);
     if (index == this.index) {
-      return JSON.stringify([this.offset, focus]);
+      return JSON.stringify([this.row, Math.min(this.col, COL - 1), focus]);
     } else {
       return null;
     }
@@ -131,32 +133,38 @@ class Source {
   };
 
   input(utf8) {
+    var COL = parseInt(this.width / WIDTH0);
     for (var char of utf8) {
       var w = TerminalChild.measureChar(char) / WIDTH0;
       //todo fix
-      this[this.index].words.splice(this.offset, 1, new Word(char, this.background, this.color));
+      this[this.index].words.splice(this.row * COL + this.col, 1, new Word(char, this.background, this.color));
       this[this.index].invalidate();
-      this.offset++; //fix auto wrap bug
+      if (this.col < COL) {
+        this.col++;
+      } else {
+        this.row++;
+        this.col = 1;
+      }
     }
   }
 
   lf() {
-    var N = parseInt(this.width / WIDTH0);
-    var row = this[this.index].height / HEIGHT0;
-    if (this.offset + N < row * N) {
-      this.offset += N - (this.offset % N);
+    var ROW = this[this.index].height / HEIGHT0;
+    if (this.row + 1 < ROW) {
+      this.row++;
+      this.col = 0;
     } else {
       if (this.index == this.length - 1) {
         this[this.length++] = new Line(this.width);
       }
       this.index++;
-      this.offset = 0;
+      this.row = 0;
+      this.col = 0;
     }
   }
 
   cr() {
-    var N = parseInt(this.width / WIDTH0);
-    this.offset -= this.offset % N;
+    this.col = 0;
   }
 
   bel() {}
@@ -167,53 +175,50 @@ class Source {
 
   escA(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
-    var N = parseInt(this.width / WIDTH0);
     for (var i = 0; i < n; i++) {
-      if (this.offset - N >= 0) {
-        this.offset -= N;
+      if (this.row - 1 >= 0) {
+        this.row--;
       }
     }
   }
 
   escB(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
-    var N = parseInt(this.width / WIDTH0);
-    var row = this[this.index].height / HEIGHT0;
+    var ROW = this[this.index].height / HEIGHT0;
     for (var i = 0; i < n; i++) {
-      if (this.offset + N < row * N) {
-        this.offset += N;
+      if (this.row + 1 < ROW) {
+        this.row++;
       }
     }
   }
 
   escC(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
-    var N = parseInt(this.width / WIDTH0);
+    var COL = parseInt(this.width / WIDTH0);
     for (var i = 0; i < n; i++) {
-      if (this.offset % N != N - 1) {
-        this.offset++;
+      if (this.col + 1 <= COL) {
+        this.col++;
       }
     }
   }
 
   escD(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
-    var N = parseInt(this.width / WIDTH0);
     for (var i = 0; i < n; i++) {
-      if (this.offset % N != 0) {
-        this.offset--;
+      if (this.col - 1 >= 0) {
+        this.col--;
       }
     }
   }
 
   escK() {
     //todo fix
-    var N = parseInt(this.width / WIDTH0);
+    var COL = parseInt(this.width / WIDTH0);
     var words = [];
-    for (var i = 0; i < N - (this.offset % N); i++) {
+    for (var i = 0; i < COL - this.col; i++) {
       words.push(new Word(' ', '', ''));
     }
-    this[this.index].words.splice(this.offset, words.length, ...words);
+    this[this.index].words.splice(this.row * COL + this.col, words.length, ...words);
     this[this.index].invalidate();
   }
 
