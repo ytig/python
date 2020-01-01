@@ -136,7 +136,7 @@ class Source {
       //todo fix
       this[this.index].words.splice(this.offset, 1, new Word(char, this.background, this.color));
       this[this.index].invalidate();
-      this.offset++;
+      this.offset++; //fix auto wrap bug
     }
   }
 
