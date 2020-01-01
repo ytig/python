@@ -94,7 +94,7 @@ export default {
           if (event.altKey || event.ctrlKey || event.metaKey) {
             return false;
           }
-          asmdb.getInstance().writeu(event.key);
+          asmdb.getInstance().writeu(event.key == 'Z' ? '中' : event.key);
           break;
       }
       return true;

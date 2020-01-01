@@ -17,7 +17,7 @@ function measureChar(char) {
     if (charCode < 256) {
       width += WIDTH0;
     } else {
-      window += 2 * WIDTH0;
+      width += 2 * WIDTH0;
     }
   }
   return width;
@@ -119,7 +119,7 @@ export default {
         var N = parseInt(this.$el.clientWidth / WIDTH0);
         var row = parseInt(cursor[0] / N);
         var col = cursor[0] % N;
-        if (row >= lines.length) {
+        if (lines.length > 0 && row >= lines.length) {
           row = lines.length - 1;
           col = N - 1;
         }
@@ -136,7 +136,7 @@ export default {
         } else {
           ctx.fillStyle = Theme.colorText;
           ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
-          if (row < lines.length) {
+          if (row >= 0 && row < lines.length) {
             ctx.save();
             ctx.beginPath();
             ctx.rect(x1, y1, x2 - x1, y2 - y1);
