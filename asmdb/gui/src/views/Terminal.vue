@@ -209,12 +209,8 @@ class Source {
   escK() {
     //todo fix
     var N = parseInt(this.width / WIDTH0);
-    var row = this[this.index].height / HEIGHT0;
-    if (this.offset + N < row * N) {
-    } else {
-      this[this.index].words.splice(this.offset, 999);
-      this[this.index].invalidate();
-    }
+    this[this.index].words.splice(this.offset, 999);
+    this[this.index].invalidate();
   }
 
   escP(utf8) {
