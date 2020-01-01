@@ -13,169 +13,157 @@ import TerminalParent from './Terminal_parent';
 import TerminalChild from './Terminal_child';
 const WIDTH0 = TerminalChild.WIDTH0;
 const HEIGHT0 = TerminalChild.HEIGHT0;
-//focus
-//width height -> setwinsize
-//linux bytes
-//input -> writeb 粘贴，中文输入：悬浮
-//scroll infinite
+
+function splitu(utf8, ...patterns) {
+  var result = [[0, utf8]];
+  var type = 0;
+  for (var pattern of patterns) {
+    type++;
+    var i = -1;
+    while (++i < result.length) {
+      if (result[i][0] != 0) {
+        continue;
+      }
+      var text = result[i][1];
+      var matcher = pattern.exec(text);
+      if (!matcher) {
+        continue;
+      }
+      result.splice(i, 1, [0, text.substring(0, matcher.index)], [type, matcher[0]], [0, text.substring(matcher.index + matcher[0].length)]);
+    }
+  }
+  for (var i = result.length - 1; i >= 0; i--) {
+    if (!result[i][1]) {
+      result.splice(i, 1);
+    }
+  }
+  return result;
+}
+
+class Item {
+  constructor(width) {
+    this.width = width;
+    this.value = '';
+    this.styles = '[]';
+    this.height = HEIGHT0;
+  }
+
+  onResize(width) {
+    this.width = width;
+    this.height = TerminalChild.measureHeight(this.width, this.value);
+  }
+}
+
 class Source {
-  constructor() {
-    this.width = 0;
-    this.height = 0;
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
     this.length = 0;
-    this[this.length++] = {
-      value: '',
-      styles: '[]',
-      height: HEIGHT0
-    };
-    this.cursor = 0;
+    this[this.length++] = new Item(this.width);
+    this.index = 0;
+    this.offset = 0;
     this.background = '';
     this.color = '';
     this.invalidate = 0;
+    this.setwinsize();
   }
 
   toCursor(index, focus) {
-    if (index == this.length - 1) {
-      return JSON.stringify([this.cursor, focus]);
+    if (index == this.index) {
+      return JSON.stringify([this.offset, focus]);
     } else {
       return null;
     }
   }
 
-  setwinsize(width, height) {
+  onResize(width, height) {
+    var changed = false;
     if (this.width != width) {
       this.width = width;
+      changed = true;
       for (var i = 0; i < this.length; i++) {
-        this[i].height = TerminalChild.measureHeight(this.width, this[i].value);
+        this[i].onResize(width);
       }
       this.invalidate++;
     }
     if (this.height != height) {
       this.height = height;
+      changed = true;
     }
-    asmdb.getInstance().setwinsize(parseInt(height / HEIGHT0), parseInt(width / WIDTH0));
+    if (changed) {
+      this.setwinsize();
+    }
+  }
+
+  setwinsize() {
+    asmdb.getInstance().setwinsize(parseInt(this.height / HEIGHT0), parseInt(this.width / WIDTH0));
+  }
+
+  router = {
+    lf: /\x0a/,
+    cr: /\x0d/,
+    bel: /\x07/,
+    bs: /\x08/,
+    escA: /\x1b\[\d{0,}A/,
+    escB: /\x1b\[\d{0,}B/,
+    escC: /\x1b\[\d{0,}C/,
+    escD: /\x1b\[\d{0,}D/,
+    escK: /\x1b\[K/,
+    escP: /\x1b\[\d{0,}P/
+  };
+
+  input(utf8) {
+    if (utf8.length > 1) {
+      for (var s of utf8) {
+        this.input(s);
+      }
+      return;
+    }
+    //todo
+  }
+
+  lf() {}
+
+  cr() {}
+
+  bel() {}
+
+  bs() {}
+
+  escA(utf8) {
+    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+  }
+
+  escB(utf8) {
+    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+  }
+
+  escC(utf8) {
+    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+  }
+
+  escD(utf8) {
+    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+  }
+
+  escK() {}
+
+  escP(utf8) {
+    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
   }
 
   readu(utf8) {
-    for (var i = 0; i < utf8.length; i++) {
-      console.log(utf8.charCodeAt(i), utf8.substring(i, i + 1));
+    var keys = [];
+    var values = [];
+    for (var key in this.router) {
+      keys.push(key);
+      values.push(this.router[key]);
     }
-    var N = parseInt(this.width / WIDTH0);
-    for (var item of this.splitu(utf8, /\x0a/, /\x0d/, /\x07/, /\x08/, /\x1b\[\d{0,}A/, /\x1b\[\d{0,}B/, /\x1b\[\d{0,}C/, /\x1b\[\d{0,}D/, /\x1b\[K/, /\x1b\[\d{0,}P/)) {
-      var type = item[0];
-      var value = item[1];
-      switch (type) {
-        case 0:
-          this.insert(value);
-          break;
-        case 1:
-          this.newline();
-          break;
-        case 2:
-          this.cursor -= this.cursor % N;
-          break;
-        case 3:
-          break;
-        case 4:
-          this.cursor--;
-          break;
-        case 5:
-          var n = parseInt(value.substring(2, value.length - 1) | '1');
-          this.cursor -= n * N;
-          break;
-        case 6:
-          var n = parseInt(value.substring(2, value.length - 1) | '1');
-          this.cursor += n * N;
-          break;
-        case 7:
-          var n = parseInt(value.substring(2, value.length - 1) | '1');
-          this.cursor += n;
-          break;
-        case 8:
-          var n = parseInt(value.substring(2, value.length - 1) | '1');
-          this.cursor -= n;
-          break;
-        case 9:
-          this.delete();
-          break;
-        case 10:
-          var n = parseInt(value.substring(2, value.length - 1) | '1');
-          this.delete(n); //todo bug fix?
-          break;
-      }
+    keys.splice(0, 0, 'input');
+    for (var item of splitu(utf8, ...values)) {
+      this[keys[item[0]]](item[1]);
     }
     this.invalidate++;
-  }
-
-  insert(value) {
-    var current = this[this.length - 1];
-    var cols = Math.ceil(TerminalChild.measureChar(value) / TerminalChild.measureChar(' '));
-    var newValue = current.value.substring(0, this.cursor) + value + current.value.substring(this.cursor + cols);
-    var newStyles = JSON.parse(current.styles);
-    var insertStyles = [];
-    for (var i = 0; i < value.length; i++) {
-      insertStyles.push([this.background, this.color]);
-    }
-    newStyles.splice(this.cursor, cols, ...insertStyles);
-    current.value = newValue;
-    current.styles = JSON.stringify(newStyles);
-    current.height = TerminalChild.measureHeight(this.width, newValue);
-    this.cursor += value.length;
-  }
-
-  delete(n) {
-    var current = this[this.length - 1];
-    if (n == undefined) {
-      n = current.value.length - this.cursor;
-    }
-    var newValue = current.value.substring(0, this.cursor) + current.value.substring(this.cursor + n);
-    var newStyles = JSON.parse(current.styles);
-    newStyles.splice(this.cursor, n);
-    current.value = newValue;
-    current.styles = JSON.stringify(newStyles);
-    current.height = TerminalChild.measureHeight(this.width, newValue);
-  }
-
-  newline() {
-    var current = this[this.length - 1];
-    var N = parseInt(this.width / WIDTH0);
-    var row = parseInt(this.cursor / N);
-    if (row >= parseInt(current.height / HEIGHT0) - 1) {
-      this[this.length++] = {
-        value: '',
-        styles: '[]',
-        height: HEIGHT0
-      };
-      this.cursor = 0;
-    } else {
-      this.cursor = (row + 1) * N;
-    }
-  }
-
-  splitu(utf8, ...patterns) {
-    var result = [[0, utf8]];
-    var type = 0;
-    for (var pattern of patterns) {
-      type++;
-      var i = -1;
-      while (++i < result.length) {
-        if (result[i][0] != 0) {
-          continue;
-        }
-        var text = result[i][1];
-        var matcher = pattern.exec(text);
-        if (!matcher) {
-          continue;
-        }
-        result.splice(i, 1, [0, text.substring(0, matcher.index)], [type, matcher[0]], [0, text.substring(matcher.index + matcher[0].length)]);
-      }
-    }
-    for (var i = result.length - 1; i >= 0; i--) {
-      if (!result[i][1]) {
-        result.splice(i, 1);
-      }
-    }
-    return result;
   }
 }
 
@@ -202,8 +190,7 @@ export default {
           return;
         }
         if (this.source == null) {
-          this.source = new Source();
-          this.onResize();
+          this.source = new Source(this.$el.clientWidth - 24, this.$el.clientHeight);
         }
         this.source.readu(oldValue == undefined ? newValue : newValue.substring(oldValue.length));
       }
@@ -218,7 +205,7 @@ export default {
   methods: {
     onResize: function() {
       if (this.source != null) {
-        this.source.setwinsize(this.$el.clientWidth - 24, this.$el.clientHeight);
+        this.source.onResize(this.$el.clientWidth - 24, this.$el.clientHeight);
       }
     }
   }
