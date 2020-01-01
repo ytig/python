@@ -169,15 +169,20 @@ class Source {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
     var N = parseInt(this.width / WIDTH0);
     for (var i = 0; i < n; i++) {
-      //todo
+      if (this.offset - N >= 0) {
+        this.offset -= N;
+      }
     }
   }
 
   escB(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
     var N = parseInt(this.width / WIDTH0);
+    var row = this[this.index].height / HEIGHT0;
     for (var i = 0; i < n; i++) {
-      //todo
+      if (this.offset + N < row * N) {
+        this.offset += N;
+      }
     }
   }
 
@@ -201,10 +206,20 @@ class Source {
     }
   }
 
-  escK() {}
+  escK() {
+    //todo fix
+    var N = parseInt(this.width / WIDTH0);
+    var row = this[this.index].height / HEIGHT0;
+    if (this.offset + N < row * N) {
+    } else {
+      this[this.index].words.splice(this.offset, 999);
+      this[this.index].invalidate();
+    }
+  }
 
   escP(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    this.escK(); //todo fix
+    // var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
   }
 
   readu(utf8) {
