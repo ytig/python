@@ -91,6 +91,9 @@ export default {
         case 'Shift':
           return false;
         default:
+          if (event.altKey || event.ctrlKey || event.metaKey) {
+            return false;
+          }
           asmdb.getInstance().writeu(event.key);
           break;
       }

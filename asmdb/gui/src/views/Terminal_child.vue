@@ -1,5 +1,7 @@
 <template>
-  <div class="terminal-child-container" v-html="value_"></div>
+  <div class="terminal-child-container">
+    <span v-for="(item, index) in items" :key="index" :class="item.style" v-html="item.value"></span>
+  </div>
 </template>
 
 <script>
@@ -58,7 +60,7 @@ export default {
   mixins: [InfiniteMixin],
   data: function() {
     return {
-      value_: ''
+      items: []
     };
   },
   props: {
@@ -72,7 +74,12 @@ export default {
   },
   methods: {
     onLayout: function() {
-      this.value_ = this.value; //todo padding?
+      var items = [];
+      for (var s of this.value) {
+        var w = measureChar(s) / WIDTH0;
+        items.push(newItem(s == ' ' ? '&nbsp;' : s, 'terminal-child-span' + w));
+      }
+      this.items.splice(0, this.items.length, ...items);
     },
     onPreDraw: function() {
       return measureHeight(this.$el.clientWidth, this.value);
@@ -156,10 +163,17 @@ export default {
 @import '~@/styles/theme';
 
 .terminal-child-container {
-  font-size: 12px;
-  line-height: 16px;
-  color: transparent;
-  word-break: break-all;
-  white-space: pre-wrap;
+  > span {
+    display: inline-block;
+    line-height: 16px;
+    font-size: 12px;
+    color: transparent;
+  }
+  .terminal-child-span1 {
+    width: 7px;
+  }
+  .terminal-child-span2 {
+    width: 14px;
+  }
 }
 </style>
