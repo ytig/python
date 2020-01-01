@@ -132,9 +132,9 @@ class Source {
 
   input(utf8) {
     for (var char of utf8) {
-      //todo
       var w = TerminalChild.measureChar(char) / WIDTH0;
-      this[this.index].words.push(new Word(char, this.background, this.color));
+      //todo fix
+      this[this.index].words.splice(this.offset, 1, new Word(char, this.background, this.color));
       this[this.index].invalidate();
       this.offset++;
     }
@@ -161,7 +161,9 @@ class Source {
 
   bel() {}
 
-  bs() {}
+  bs() {
+    this.escD('\x1b[D');
+  }
 
   escA(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
@@ -206,6 +208,9 @@ class Source {
   }
 
   readu(utf8) {
+    for (var char of utf8) {
+      console.log(char.charCodeAt(0), char);
+    }
     var keys = [];
     var values = [];
     for (var key in this.router) {
