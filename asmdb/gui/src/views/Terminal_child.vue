@@ -76,8 +76,14 @@ export default {
     onLayout: function() {
       var items = [];
       for (var s of this.value) {
-        var w = measureChar(s) / WIDTH0;
-        items.push(newItem(s == ' ' ? '&nbsp;' : s, 'terminal-child-span' + w));
+        if (s == ' ') {
+          items.push(newItem('&nbsp;', 'terminal-child-span1'));
+        } else if (s == '\u200b') {
+          items.push(newItem('&nbsp;', 'terminal-child-span1', 'user-select-none'));
+        } else {
+          var w = measureChar(s) / WIDTH0;
+          items.push(newItem(s, 'terminal-child-span' + w));
+        }
       }
       this.items.splice(0, this.items.length, ...items);
     },

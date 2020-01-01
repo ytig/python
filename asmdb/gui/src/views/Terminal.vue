@@ -216,7 +216,7 @@ class Source {
     var COL = parseInt(this.width / WIDTH0);
     var words = [];
     for (var i = 0; i < COL - this.col; i++) {
-      words.push(new Word(' ', '', ''));
+      words.push(new Word('\u200b', '', ''));
     }
     this[this.index].words.splice(this.row * COL + this.col, words.length, ...words);
     this[this.index].invalidate();
