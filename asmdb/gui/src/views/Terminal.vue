@@ -154,7 +154,10 @@ class Source {
     }
   }
 
-  cr() {}
+  cr() {
+    var N = parseInt(this.width / WIDTH0);
+    this.offset -= this.offset % N;
+  }
 
   bel() {}
 
@@ -162,18 +165,38 @@ class Source {
 
   escA(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var N = parseInt(this.width / WIDTH0);
+    for (var i = 0; i < n; i++) {
+      //todo
+    }
   }
 
   escB(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var N = parseInt(this.width / WIDTH0);
+    for (var i = 0; i < n; i++) {
+      //todo
+    }
   }
 
   escC(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var N = parseInt(this.width / WIDTH0);
+    for (var i = 0; i < n; i++) {
+      if (this.offset % N != N - 1) {
+        this.offset++;
+      }
+    }
   }
 
   escD(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var N = parseInt(this.width / WIDTH0);
+    for (var i = 0; i < n; i++) {
+      if (this.offset % N != 0) {
+        this.offset--;
+      }
+    }
   }
 
   escK() {}
