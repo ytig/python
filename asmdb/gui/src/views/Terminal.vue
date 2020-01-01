@@ -40,24 +40,35 @@ function splitu(utf8, ...patterns) {
   return result;
 }
 
-class Item {
+class Word {
+  constructor(value, ...styles) {
+    this.value = value;
+    this.styles = styles;
+  }
+}
+
+class Line {
   constructor(width) {
     this.width = width;
-    this.value = '';
-    this._styles = [];
-    this.styles = JSON.stringify(this._styles);
-    this.height = HEIGHT0;
+    this.words = [];
+    this.invalidate();
   }
 
-  setChar(offset, char, ...styles) {
-    this.value += char;
-    this._styles.push(styles); //todo
-    this.styles = JSON.stringify(this._styles);
+  invalidate() {
+    var value = '';
+    var styles = [];
+    for (var word of this.words) {
+      value += word.value;
+      styles.push(word.styles);
+    }
+    this.value = value;
+    this.styles = JSON.stringify(styles);
+    this.height = TerminalChild.measureHeight(this.width, this.value);
   }
 
   onResize(width) {
     this.width = width;
-    this.height = TerminalChild.measureHeight(this.width, this.value);
+    this.invalidate();
   }
 }
 
@@ -66,7 +77,7 @@ class Source {
     this.width = width;
     this.height = height;
     this.length = 0;
-    this[this.length++] = new Item(this.width);
+    this[this.length++] = new Line(this.width);
     this.index = 0;
     this.offset = 0;
     this.background = '';
@@ -126,7 +137,8 @@ class Source {
       }
       return;
     }
-    this[this.index].setChar(this.offset, utf8, this.background, this.color);
+    this[this.index].words.push(new Word(utf8, this.background, this.color));
+    this[this.index].invalidate();
     this.offset++; //todo
   }
 
