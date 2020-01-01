@@ -44,8 +44,15 @@ class Item {
   constructor(width) {
     this.width = width;
     this.value = '';
-    this.styles = '[]';
+    this._styles = [];
+    this.styles = JSON.stringify(this._styles);
     this.height = HEIGHT0;
+  }
+
+  setChar(offset, char, ...styles) {
+    this.value += char;
+    this._styles.push(styles); //todo
+    this.styles = JSON.stringify(this._styles);
   }
 
   onResize(width) {
@@ -119,7 +126,8 @@ class Source {
       }
       return;
     }
-    //todo
+    this[this.index].setChar(this.offset, utf8, this.background, this.color);
+    this.offset++; //todo
   }
 
   lf() {}
