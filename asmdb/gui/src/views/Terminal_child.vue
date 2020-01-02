@@ -5,7 +5,7 @@
 </template>
 
 <script>
-var eaw = require('eastasianwidth');
+import eastasianwidth from 'eastasianwidth';
 import Theme from '@/styles/theme';
 import InfiniteMixin from './InfiniteMixin';
 const WIDTH0 = 7;
@@ -14,7 +14,7 @@ const HEIGHT0 = 16;
 function measureChar(char) {
   var width = 0;
   for (var c of char) {
-    width += eaw.characterLength(c) * WIDTH0;
+    width += eastasianwidth.characterLength(c) * WIDTH0;
   }
   return width;
 }
