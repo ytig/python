@@ -91,7 +91,6 @@ class Source {
     this.color = '';
     this.background = '';
     this.invalidate = 0;
-    this.setwinsize();
   }
 
   toCursor(index, focus) {
@@ -104,10 +103,8 @@ class Source {
   }
 
   onResize(width, height) {
-    var changed = false;
     if (this.width != width) {
       this.width = width;
-      changed = true;
       for (var i = 0; i < this.length; i++) {
         this[i].onResize(width);
       }
@@ -115,15 +112,7 @@ class Source {
     }
     if (this.height != height) {
       this.height = height;
-      changed = true;
     }
-    if (changed) {
-      this.setwinsize();
-    }
-  }
-
-  setwinsize() {
-    asmdb.getInstance().setwinsize(parseInt(this.height / HEIGHT0), parseInt(this.width / WIDTH0));
   }
 
   word(char = '\u200b') {
