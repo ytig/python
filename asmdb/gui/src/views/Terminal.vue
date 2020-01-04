@@ -75,9 +75,8 @@ class Line {
 }
 
 class Source {
-  constructor(width, height) {
+  constructor(width) {
     this.width = width;
-    this.height = height;
     this.length = 0;
     this[this.length++] = new Line(this.width);
     this.index = 0;
@@ -102,16 +101,13 @@ class Source {
     }
   }
 
-  onResize(width, height) {
+  onResize(width) {
     if (this.width != width) {
       this.width = width;
       for (var i = 0; i < this.length; i++) {
         this[i].onResize(width);
       }
       this.invalidate++;
-    }
-    if (this.height != height) {
-      this.height = height;
     }
   }
 
@@ -433,7 +429,7 @@ export default {
           return;
         }
         if (this.source == null) {
-          this.source = new Source(this.$el.clientWidth - 24, this.$el.clientHeight);
+          this.source = new Source(this.$el.clientWidth - 24);
         }
         this.source.readu(oldValue == undefined ? newValue : newValue.substring(oldValue.length));
       }
@@ -448,7 +444,7 @@ export default {
   methods: {
     onResize: function() {
       if (this.source != null) {
-        this.source.onResize(this.$el.clientWidth - 24, this.$el.clientHeight);
+        this.source.onResize(this.$el.clientWidth - 24);
       }
     }
   }
