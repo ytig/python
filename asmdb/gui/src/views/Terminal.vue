@@ -9,8 +9,10 @@
 <script>
 import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
+import Theme from '@/styles/theme';
 import TerminalParent from './Terminal_parent';
 import TerminalChild from './Terminal_child';
+const COLORS = [Theme.colorBackground, Theme.colorText2, Theme.colorText5, Theme.colorText4, Theme.colorText3, Theme.colorBackgroundPopup2, Theme.colorBackgroundPopup, Theme.colorText];
 const WIDTH0 = TerminalChild.WIDTH0;
 const HEIGHT0 = TerminalChild.HEIGHT0;
 
@@ -137,7 +139,8 @@ class Source {
     escC: /\x1b\[\d{0,}C/,
     escD: /\x1b\[\d{0,}D/,
     escK: /\x1b\[K/,
-    escP: /\x1b\[\d{0,}P/
+    escP: /\x1b\[\d{0,}P/,
+    escm: /\x1b\[[\d;]{0,}m/
   };
 
   position(cursor) {
@@ -367,6 +370,20 @@ class Source {
     this.col = col;
     this[this.index].words.splice(this.position(cursor).index, width, ...words);
     this[this.index].invalidate();
+  }
+
+  escm(utf8) {
+    for (var m of utf8.substring(2, utf8.length - 1).split(';')) {
+      m = parseInt(m);
+      if (m == 0) {
+        this.background = '';
+        this.color = '';
+      } else if (m >= 30 && m <= 37) {
+        this.color = COLORS[m - 30];
+      } else if (m >= 40 && m <= 47) {
+        this.background = COLORS[m - 40];
+      }
+    }
   }
 
   readu(utf8) {

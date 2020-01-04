@@ -20,6 +20,7 @@ export default {
   colorText2: '#e06c75',
   colorText3: '#61afef',
   colorText4: '#e5c07b',
+  colorText5: '#98c379',
   colorTextShadow: '#00000080',
   colorTextMenu: '#c8c8c8',
   colorTextMenuDark: '#9da5b4',
