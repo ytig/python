@@ -332,19 +332,18 @@ class Source {
   }
 
   escK() {
-    //todo fix
     var COL = parseInt(this.width / WIDTH0);
-    var words = [];
-    for (var i = 0; i < COL - this.col; i++) {
-      words.push(this.word());
-    }
-    this[this.index].words.splice(this.row * COL + this.col, words.length, ...words);
-    this[this.index].invalidate();
+    var cursor = this.row * COL + this.col;
+    var n = COL - (cursor % COL);
+    this.escP('\x1b[' + n + 'P');
   }
 
   escP(utf8) {
-    this.escK(); //todo fix
-    // var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var COL = parseInt(this.width / WIDTH0);
+    for (var i = 0; i < n; i++) {
+      //todo
+    }
   }
 
   readu(utf8) {
