@@ -98,8 +98,13 @@ export default {
           var char = line.charAt(i);
           var width = measureChar(char);
           var style = {
-            background: styles[i][0],
-            color: styles[i][1]
+            bright: styles[i][0],
+            underline: styles[i][1],
+            flash: styles[i][2],
+            inverse: styles[i][3],
+            invisable: styles[i][4],
+            color: styles[i][5],
+            background: styles[i][6]
           };
           if (style.background) {
             ctx.fillStyle = style.background;

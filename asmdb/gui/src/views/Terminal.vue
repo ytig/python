@@ -83,8 +83,13 @@ class Source {
     this.index = 0;
     this.row = 0;
     this.col = 0;
-    this.background = '';
+    this.bright = false;
+    this.underline = false;
+    this.flash = false;
+    this.inverse = false;
+    this.invisable = false;
     this.color = '';
+    this.background = '';
     this.invalidate = 0;
     this.setwinsize();
   }
@@ -123,9 +128,9 @@ class Source {
 
   word(char = '\u200b') {
     if (char == '\u200b') {
-      return new Word(char, '', '');
+      return new Word(char, false, false, false, false, false, '', '');
     } else {
-      return new Word(char, this.background, this.color);
+      return new Word(char, this.bright, this.underline, this.flash, this.inverse, this.invisable, this.color, this.background);
     }
   }
 
@@ -376,8 +381,23 @@ class Source {
     for (var m of utf8.substring(2, utf8.length - 1).split(';')) {
       m = parseInt(m);
       if (m == 0) {
-        this.background = '';
+        this.bright = false;
+        this.underline = false;
+        this.flash = false;
+        this.inverse = false;
+        this.invisable = false;
         this.color = '';
+        this.background = '';
+      } else if (m == 1) {
+        this.bright = true;
+      } else if (m == 4) {
+        this.underline = true;
+      } else if (m == 5) {
+        this.flash = true;
+      } else if (m == 7) {
+        this.inverse = true;
+      } else if (m == 8) {
+        this.invisable = true;
       } else if (m >= 30 && m <= 37) {
         this.color = COLORS[m - 30];
       } else if (m >= 40 && m <= 47) {
