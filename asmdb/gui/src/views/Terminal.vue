@@ -407,9 +407,6 @@ class Source {
   }
 
   readu(utf8) {
-    for (var char of utf8) {
-      console.log(char.charCodeAt(0), char);
-    }
     var keys = [];
     var values = [];
     for (var key in this.router) {
