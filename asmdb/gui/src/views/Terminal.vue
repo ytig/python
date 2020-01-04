@@ -141,6 +141,7 @@ class Source {
   };
 
   position(cursor) {
+    var COL = parseInt(this.width / WIDTH0);
     var index = 0;
     var offset = 0;
     var eof = this[this.index].words.length > 0 ? null : 0;
@@ -184,9 +185,10 @@ class Source {
   input(utf8) {
     var COL = parseInt(this.width / WIDTH0);
     for (var char of utf8) {
+      var cursor = this.row * COL + this.col;
       var width = TerminalChild.measureChar(char) / WIDTH0;
       if (width == 1) {
-        var p = this.position(this.row * COL + this.col);
+        var p = this.position(cursor);
         if (p.eof != null) {
           for (var i = 0; i < p.eof; i++) {
             this[this.index].words.push(this.word());
@@ -209,15 +211,47 @@ class Source {
           }
         }
       } else {
-        var p = this.position(this.row * COL + this.col);
+        var p = this.position(cursor);
         if (p.eof != null) {
           for (var i = 0; i < p.eof; i++) {
             this[this.index].words.push(this.word());
           }
           this[this.index].words.push(this.word(char));
         } else {
-          var w = TerminalChild.measureChar(this[this.index].words[index].value) / WIDTH0;
-          //todo
+          var w = TerminalChild.measureChar(this[this.index].words[p.index].value) / WIDTH0;
+          if (p.offset >= 0) {
+            if (w == 1) {
+              var p2 = this.position(cursor + 1);
+              if (p2.eof != null || p2.offset < 0) {
+                this[this.index].words.splice(p.index, 1, this.word(char));
+              } else {
+                var w2 = TerminalChild.measureChar(this[this.index].words[p2.index].value) / WIDTH0;
+                if (w2 == 1) {
+                  this[this.index].words.splice(p.index, 2, this.word(char));
+                } else {
+                  this[this.index].words.splice(p.index, 2, this.word(char), this.word());
+                }
+              }
+            } else {
+              if (p.offset == 0) {
+                this[this.index].words.splice(p.index, 1, this.word(char));
+              } else {
+                var p2 = this.position(cursor + 1);
+                if (p2.eof != null || p2.offset < 0) {
+                  this[this.index].words.splice(p.index, 1, this.word(), this.word(char));
+                } else {
+                  var w2 = TerminalChild.measureChar(this[this.index].words[p2.index].value) / WIDTH0;
+                  if (w2 == 1) {
+                    this[this.index].words.splice(p.index, 2, this.word(), this.word(char));
+                  } else {
+                    this[this.index].words.splice(p.index, 2, this.word(), this.word(char), this.word());
+                  }
+                }
+              }
+            }
+          } else {
+            //todo
+          }
         }
       }
       this[this.index].invalidate();
