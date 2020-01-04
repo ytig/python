@@ -183,4 +183,15 @@ window.addEventListener('dragstart', function (event) {
   event.preventDefault();
 });
 
+window.playSound = function (src) {
+  var audio = document.getElementById('__audio__');
+  if (!audio) {
+    audio = document.createElement('audio');
+    audio.id = '__audio__';
+    document.body.appendChild(audio);
+  }
+  audio.src = src;
+  audio.play();
+}
+
 export default {};

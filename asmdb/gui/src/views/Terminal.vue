@@ -167,7 +167,9 @@ class Source {
     this.col = 0;
   }
 
-  bel() {}
+  bel() {
+    playSound('/static/sounds/bel.mp3');
+  }
 
   bs() {
     this.escD('\x1b[D');
