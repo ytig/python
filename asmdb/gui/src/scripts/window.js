@@ -171,7 +171,7 @@ window.loadStorage = function (key, defaultValue) {
   if (key in localStorage) {
     try {
       var value = JSON.parse(localStorage[key]);
-      if (typeof value == typeof defaultValue) {
+      if (defaultValue == undefined || typeof value == typeof defaultValue) {
         return value;
       }
     } catch (error) {}
