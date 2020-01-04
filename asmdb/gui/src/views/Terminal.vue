@@ -294,7 +294,7 @@ class Source {
   }
 
   escA(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
     for (var i = 0; i < n; i++) {
       if (this.row - 1 >= 0) {
         this.row--;
@@ -303,7 +303,7 @@ class Source {
   }
 
   escB(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
     var ROW = this[this.index].height / HEIGHT0;
     for (var i = 0; i < n; i++) {
       if (this.row + 1 < ROW) {
@@ -313,7 +313,7 @@ class Source {
   }
 
   escC(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
     var COL = parseInt(this.width / WIDTH0);
     for (var i = 0; i < n; i++) {
       if (this.col + 1 <= COL) {
@@ -323,7 +323,7 @@ class Source {
   }
 
   escD(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
     for (var i = 0; i < n; i++) {
       if (this.col - 1 >= 0) {
         this.col--;
@@ -336,7 +336,7 @@ class Source {
   }
 
   escP(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
+    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
     var COL = parseInt(this.width / WIDTH0);
     var cursor = this.row * COL + this.col;
     var col = this.col;
