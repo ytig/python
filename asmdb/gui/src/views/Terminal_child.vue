@@ -106,16 +106,21 @@ export default {
             color: styles[i][5],
             background: styles[i][6]
           };
-          if (style.background) {
-            ctx.fillStyle = style.background;
-            ctx.fillRect(x, y + PADDING0, width, 14);
+          if (!style.invisable) {
+            if (style.inverse || style.background) {
+              ctx.fillStyle = !style.inverse ? style.background : style.color || Theme.colorText;
+              ctx.fillRect(x, y + PADDING0, width, 14);
+            }
+            if (style.inverse || style.color) {
+              ctx.fillStyle = !style.inverse ? style.color : style.background || Theme.colorBackground;
+            } else {
+              ctx.fillStyle = !style.background ? (!style.bright ? Theme.colorText : Theme.colorTextLight) : Theme.colorBackground;
+            }
+            ctx.fillText(char, x, y + PADDING0 + 11);
+            if (style.underline) {
+              ctx.fillRect(x, y + PADDING0 + 12, width, 1);
+            }
           }
-          if (style.color) {
-            ctx.fillStyle = style.color;
-          } else {
-            ctx.fillStyle = !style.background ? Theme.colorText : Theme.colorBackground;
-          }
-          ctx.fillText(char, x, y + PADDING0 + 11);
           x += width;
         }
         x = 0;
