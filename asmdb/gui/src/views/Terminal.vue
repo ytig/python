@@ -143,37 +143,37 @@ class Source {
   input(utf8) {
     var COL = parseInt(this.width / WIDTH0);
     for (var char of utf8) {
-      var width = TerminalChild.measureChar(char) / WIDTH0;
-      if (width == 1) {
-        var index = 0;
-        var offset = 0;
-        var eof = this[this.index].words.length > 0 ? -1 : 0;
-        var c = 0;
-        while (c++ < this.row * COL + this.col) {
-          if (eof >= 0) {
-            eof++;
-          } else {
-            var w = TerminalChild.measureChar(this[this.index].words[index].value) / WIDTH0;
-            offset++;
-            if (offset >= w) {
-              if (index + 1 < this[this.index].words.length) {
-                index++;
-                w = TerminalChild.measureChar(this[this.index].words[index].value) / WIDTH0;
-                if (w == 1) {
+      var index = 0;
+      var offset = 0;
+      var eof = this[this.index].words.length > 0 ? -1 : 0;
+      var c = 0;
+      while (c++ < this.row * COL + this.col) {
+        if (eof >= 0) {
+          eof++;
+        } else {
+          var w = TerminalChild.measureChar(this[this.index].words[index].value) / WIDTH0;
+          offset++;
+          if (offset >= w) {
+            if (index + 1 < this[this.index].words.length) {
+              index++;
+              w = TerminalChild.measureChar(this[this.index].words[index].value) / WIDTH0;
+              if (w == 1) {
+                offset = 0;
+              } else {
+                if (c % COL != COL - 1) {
                   offset = 0;
                 } else {
-                  if (c % COL != COL - 1) {
-                    offset = 0;
-                  } else {
-                    offset = -1;
-                  }
+                  offset = -1;
                 }
-              } else {
-                eof = 0;
               }
+            } else {
+              eof = 0;
             }
           }
         }
+      }
+      var width = TerminalChild.measureChar(char) / WIDTH0;
+      if (width == 1) {
         if (eof >= 0) {
           for (var i = 0; i < eof; i++) {
             this[this.index].words.push(this.word());
@@ -196,7 +196,14 @@ class Source {
           }
         }
       } else {
-        //todo w=2
+        if (eof >= 0) {
+          for (var i = 0; i < eof; i++) {
+            this[this.index].words.push(this.word());
+          }
+          this[this.index].words.push(this.word(char));
+        } else {
+          //todo
+        }
       }
       this[this.index].invalidate();
       if (this.col + width <= COL) {
