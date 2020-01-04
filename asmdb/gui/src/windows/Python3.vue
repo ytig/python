@@ -41,7 +41,7 @@ export default {
   mounted: function() {
     keyboard.registerWindow(this);
     asmdb.getInstance().registerEvent('python3', this);
-    this.setwinsize(this.curHeight);
+    this.setWindowSize(this.curHeight);
   },
   destroyed: function() {
     asmdb.getInstance().unregisterEvent('python3', this);
@@ -129,15 +129,15 @@ export default {
         this.curHeight = this.windowHeight;
         this.addHeight = 0;
         saveStorage('python3_height', this.curHeight);
-        this.setwinsize(this.curHeight);
+        this.setWindowSize(this.curHeight);
       } else {
         var newHeight = this.curHeight != this.minHeight ? this.minHeight : this.maxHeight;
         this.smoothDragTo(newHeight);
         saveStorage('python3_height', newHeight);
-        this.setwinsize(newHeight);
+        this.setWindowSize(newHeight);
       }
     },
-    setwinsize(height) {
+    setWindowSize(height) {
       var width = this.$el.clientWidth - 24;
       asmdb.getInstance().setwinsize(parseInt(height / 16), parseInt(width / 7));
     }
