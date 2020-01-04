@@ -332,18 +332,41 @@ class Source {
   }
 
   escK() {
-    var COL = parseInt(this.width / WIDTH0);
-    var cursor = this.row * COL + this.col;
-    var n = COL - (cursor % COL);
-    this.escP('\x1b[' + n + 'P');
+    this.escP('\x1b[999P');
   }
 
   escP(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) | '1');
     var COL = parseInt(this.width / WIDTH0);
-    for (var i = 0; i < n; i++) {
-      //todo
+    var cursor = this.row * COL + this.col;
+    var col = this.col;
+    if (COL - col <= 0) {
+      return;
     }
+    var words = [];
+    for (var c = cursor + n; c < (this.row + 1) * COL; c++) {
+      var p = this.position(c);
+      if (p.eof != null || p.offset < 0) {
+        break;
+      }
+      if (p.offset == 0) {
+        words.push(this[this.index].words[p.index]);
+      } else {
+        if (c == cursor + n) {
+          words.push(this.word());
+        }
+      }
+    }
+    var width = 0;
+    for (var word of words) {
+      width += TerminalChild.measureChar(word.value) / WIDTH0;
+    }
+    for (var i = 0; i < COL - col; i++) {
+      this.input('\u200b');
+    }
+    this.col = col;
+    this[this.index].words.splice(this.position(cursor).index, width, ...words);
+    this[this.index].invalidate();
   }
 
   readu(utf8) {
