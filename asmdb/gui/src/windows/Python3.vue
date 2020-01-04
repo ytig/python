@@ -142,7 +142,7 @@ export default {
     },
     setWindowSize() {
       var width = this.$el.clientWidth - 24;
-      var height = loadStorage('python3_height');
+      var height = loadStorage('python3_height', 0);
       asmdb.getInstance().setwinsize(parseInt(height / 16), parseInt(width / 7));
     }
   }
