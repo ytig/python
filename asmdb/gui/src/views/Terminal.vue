@@ -168,7 +168,7 @@ class Source {
   }
 
   bel() {
-    playSound('/static/sounds/bel.mp3');
+    playSound('/static/sounds/bel.aiff');
   }
 
   bs() {
