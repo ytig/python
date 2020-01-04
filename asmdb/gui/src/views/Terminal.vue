@@ -195,15 +195,15 @@ class Source {
             this[this.index].words.splice(index, 0, this.word(char));
           }
         }
-        this[this.index].invalidate();
-        if (this.col < COL) {
-          this.col++;
-        } else {
-          this.row++;
-          this.col = 1;
-        }
       } else {
         //todo w=2
+      }
+      this[this.index].invalidate();
+      if (this.col + width <= COL) {
+        this.col += width;
+      } else {
+        this.row++;
+        this.col = width;
       }
     }
   }
