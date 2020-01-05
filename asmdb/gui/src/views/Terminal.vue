@@ -474,8 +474,14 @@ export default {
         return;
       }
       var cursor = this.source.getCursor(parent.getPosition());
-      this.inputLeft = cursor[0];
-      this.inputTop = Math.min(Math.max(cursor[1], 0), this.$el.clientHeight - 14);
+      var h = 14;
+      if (cursor[1] <= -h || cursor[1] >= this.$el.clientHeight) {
+        this.inputLeft = 0;
+        this.inputTop = this.$el.clientHeight - h;
+      } else {
+        this.inputLeft = cursor[0];
+        this.inputTop = cursor[1];
+      }
     }
   }
 };
