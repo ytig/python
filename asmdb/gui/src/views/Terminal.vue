@@ -7,7 +7,6 @@
 </template>
 
 <script>
-import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
 import Theme from '@/styles/theme';
 import TerminalParent from './Terminal_parent';
@@ -104,11 +103,6 @@ class Line {
     this.styles = JSON.stringify(styles);
     this.height = TerminalChild.measureHeight(this.width, value);
   }
-
-  onResize(width) {
-    this.width = width;
-    this.invalidate();
-  }
 }
 
 class Source {
@@ -135,16 +129,6 @@ class Source {
       return JSON.stringify([this.row, Math.min(this.col, COL - 1), focus]);
     } else {
       return null;
-    }
-  }
-
-  onResize(width) {
-    if (this.width != width) {
-      this.width = width;
-      for (var i = 0; i < this.length; i++) {
-        this[i].onResize(width);
-      }
-      this.invalidate++;
     }
   }
 
@@ -444,19 +428,7 @@ export default {
       }
     }
   },
-  mounted: function() {
-    resize.registerEvent(this);
-  },
-  destroyed: function() {
-    resize.unregisterEvent(this);
-  },
-  methods: {
-    onResize: function() {
-      if (this.source != null) {
-        this.source.onResize(this.$el.clientWidth - 24);
-      }
-    }
-  }
+  methods: {}
 };
 </script>
 
