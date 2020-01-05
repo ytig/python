@@ -171,7 +171,6 @@ class Source {
             line.words.push(this.word());
           }
           line.words.push(this.word(char));
-          line.limit += p.eof + 1;
         } else {
           var w = TerminalChild.measureChar(line.words[p.index].value) / WIDTH0;
           if (p.offset >= 0) {
@@ -201,16 +200,12 @@ class Source {
             line.words.push(this.word());
           }
           line.words.push(this.word(char));
-          line.limit += p.eof + 2;
         } else {
           var w = TerminalChild.measureChar(line.words[p.index].value) / WIDTH0;
           if (w == 1) {
             var p2 = this.position(cursor + 1);
             if (p2.eof != null || p2.offset < 0) {
               line.words.splice(p.index, 1, this.word(char));
-              if (p2.eof != null) {
-                line.limit++;
-              }
             } else {
               var w2 = TerminalChild.measureChar(line.words[p2.index].value) / WIDTH0;
               if (w2 == 1) {
@@ -226,9 +221,6 @@ class Source {
               var p2 = this.position(cursor + 1);
               if (p2.eof != null || p2.offset < 0) {
                 line.words.splice(p.index, 1, this.word(), this.word(char));
-                if (p2.eof != null) {
-                  line.limit++;
-                }
               } else {
                 var w2 = TerminalChild.measureChar(line.words[p2.index].value) / WIDTH0;
                 if (w2 == 1) {
@@ -247,6 +239,7 @@ class Source {
         this.row++;
         this.col = width;
       }
+      line.limit = Math.max(line.limit, this.row * COL + this.col);
     }
     line.invalidate();
   }
