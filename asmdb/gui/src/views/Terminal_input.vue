@@ -1,6 +1,6 @@
 <template>
   <div class="terminal-input-container">
-    <input ref="input" class="terminal-input-input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @compositionstart="onCompositionStart" @compositionend="onCompositionEnd" @keypress="onKeyPress" @blur="onBlur" />
+    <input ref="input" class="terminal-input-input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @compositionstart="onCompositionStart" @compositionend="onCompositionEnd" @blur="onBlur" />
   </div>
 </template>
 
@@ -63,7 +63,6 @@ export default {
       this.$emit('input', input.value);
       input.value = '';
     },
-    onKeyPress: function(event) {},
     onBlur: function() {},
     onDomKeyDown: function(event) {
       if (this.focus) {
