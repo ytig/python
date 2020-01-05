@@ -5,7 +5,7 @@
 </template>
 
 <script>
-var MouseMixin = {
+const MouseMixin = {
   data: function() {
     return {
       touching: false
