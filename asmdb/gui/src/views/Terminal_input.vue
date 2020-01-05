@@ -5,7 +5,36 @@
 </template>
 
 <script>
+var MouseMixin = {
+  data: function() {
+    return {
+      touching: false
+    };
+  },
+  created: function() {
+    window.addEventListener('mousedown', this.onDomMouseDown, true);
+    window.addEventListener('mouseup', this.onDomMouseUp, true);
+  },
+  destroyed: function() {
+    window.removeEventListener('mousedown', this.onDomMouseDown, true);
+    window.removeEventListener('mouseup', this.onDomMouseUp, true);
+  },
+  methods: {
+    onDomMouseDown: function(event) {
+      if (event.button == 0) {
+        this.touching = true;
+      }
+    },
+    onDomMouseUp: function(event) {
+      if (event.button == 0) {
+        this.touching = false;
+      }
+    }
+  }
+};
+
 export default {
+  mixins: [MouseMixin],
   data: function() {
     return {
       composition: false,
@@ -82,9 +111,16 @@ export default {
     },
     onBlur: function() {
       if (this.focus) {
-        //todo requestAnimationFrames
-        //todo !pressed && !selection
-        this.$refs.input.focus();
+        requestAnimationFrames(i => {
+          if (!this.focus) {
+            return true;
+          }
+          var canFocus = !this.touching && getSelection().type != 'Range';
+          if (canFocus) {
+            this.$refs.input.focus();
+          }
+          return canFocus;
+        });
       }
     },
     onDomKeyDown: function(event) {
