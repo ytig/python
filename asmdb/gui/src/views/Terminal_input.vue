@@ -115,11 +115,11 @@ export default {
           if (!this.focus) {
             return true;
           }
-          var canFocus = !this.touching && getSelection().type != 'Range';
-          if (canFocus) {
+          var autoFocus = !this.touching && getSelection().type != 'Range';
+          if (autoFocus) {
             this.$refs.input.focus();
           }
-          return canFocus;
+          return autoFocus;
         });
       }
     },
