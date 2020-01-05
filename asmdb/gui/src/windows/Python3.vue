@@ -66,42 +66,7 @@ export default {
       this.$menu.alert(event);
     },
     onKeyDown: function(event) {
-      //for test
-      switch (event.key) {
-        case 'Enter':
-          asmdb.getInstance().writeu('\n');
-          break;
-        case 'Backspace':
-          asmdb.getInstance().writeu('\x08');
-          break;
-        case 'Tab':
-          asmdb.getInstance().writeu('\x09');
-          break;
-        case 'ArrowLeft':
-          asmdb.getInstance().writeu('\x02');
-          break;
-        case 'ArrowRight':
-          asmdb.getInstance().writeu('\x06');
-          break;
-        case 'ArrowUp':
-          asmdb.getInstance().writeu('\x10');
-          break;
-        case 'ArrowDown':
-          asmdb.getInstance().writeu('\x0e');
-          break;
-        case 'Alt':
-        case 'Control':
-        case 'Meta':
-        case 'Shift':
-          return false;
-        default:
-          if (event.altKey || event.ctrlKey || event.metaKey) {
-            return false;
-          }
-          asmdb.getInstance().writeu(event.key == 'Z' ? '中' : event.key);
-          break;
-      }
-      return true;
+      return false;
     },
     onRead: function(utf8) {
       this.utf8 = utf8;

@@ -3,6 +3,7 @@
     <TerminalParent v-if="source!=null" class="terminal-parent" :source="source" #default="props">
       <TerminalChild :value="props.item.value" :styles="props.item.styles" :cursor="source.toCursor(props.index,focus)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
     </TerminalParent>
+    <TerminalInput :focus="focus" @input="onInput"></TerminalInput>
   </div>
 </template>
 
@@ -11,6 +12,7 @@ import asmdb from '@/scripts/asmdb';
 import Theme from '@/styles/theme';
 import TerminalParent from './Terminal_parent';
 import TerminalChild from './Terminal_child';
+import TerminalInput from './Terminal_input';
 const COLORS = [Theme.colorBackground, Theme.colorText2, Theme.colorText5, Theme.colorText4, Theme.colorText3, Theme.colorBackgroundPopup2, Theme.colorBackgroundPopup, Theme.colorText];
 const WIDTH0 = TerminalChild.WIDTH0;
 const HEIGHT0 = TerminalChild.HEIGHT0;
@@ -395,7 +397,8 @@ class Source {
 export default {
   components: {
     TerminalParent: TerminalParent,
-    TerminalChild: TerminalChild
+    TerminalChild: TerminalChild,
+    TerminalInput: TerminalInput
   },
   data: function() {
     return {
@@ -421,7 +424,11 @@ export default {
       }
     }
   },
-  methods: {}
+  methods: {
+    onInput: function(utf8) {
+      asmdb.getInstance().writeu(utf8);
+    }
+  }
 };
 </script>
 
