@@ -181,6 +181,7 @@ class Source {
 
   input(utf8) {
     var COL = parseInt(this.width / WIDTH0);
+    var line = this[this.index];
     for (var char of utf8) {
       var cursor = this.row * COL + this.col;
       var width = TerminalChild.measureChar(char) / WIDTH0;
@@ -188,23 +189,23 @@ class Source {
         var p = this.position(cursor);
         if (p.eof != null) {
           for (var i = 0; i < p.eof; i++) {
-            this[this.index].words.push(this.word());
+            line.words.push(this.word());
           }
-          this[this.index].words.push(this.word(char));
+          line.words.push(this.word(char));
         } else {
-          var w = TerminalChild.measureChar(this[this.index].words[p.index].value) / WIDTH0;
+          var w = TerminalChild.measureChar(line.words[p.index].value) / WIDTH0;
           if (p.offset >= 0) {
             if (w == 1) {
-              this[this.index].words.splice(p.index, 1, this.word(char));
+              line.words.splice(p.index, 1, this.word(char));
             } else {
               if (p.offset == 0) {
-                this[this.index].words.splice(p.index, 1, this.word(char), this.word());
+                line.words.splice(p.index, 1, this.word(char), this.word());
               } else {
-                this[this.index].words.splice(p.index, 1, this.word(), this.word(char));
+                line.words.splice(p.index, 1, this.word(), this.word(char));
               }
             }
           } else {
-            this[this.index].words.splice(p.index, 0, this.word(char));
+            line.words.splice(p.index, 0, this.word(char));
           }
         }
       } else {
@@ -217,43 +218,42 @@ class Source {
         }
         if (p.eof != null) {
           for (var i = 0; i < p.eof; i++) {
-            this[this.index].words.push(this.word());
+            line.words.push(this.word());
           }
-          this[this.index].words.push(this.word(char));
+          line.words.push(this.word(char));
         } else {
-          var w = TerminalChild.measureChar(this[this.index].words[p.index].value) / WIDTH0;
+          var w = TerminalChild.measureChar(line.words[p.index].value) / WIDTH0;
           if (w == 1) {
             var p2 = this.position(cursor + 1);
             if (p2.eof != null || p2.offset < 0) {
-              this[this.index].words.splice(p.index, 1, this.word(char));
+              line.words.splice(p.index, 1, this.word(char));
             } else {
-              var w2 = TerminalChild.measureChar(this[this.index].words[p2.index].value) / WIDTH0;
+              var w2 = TerminalChild.measureChar(line.words[p2.index].value) / WIDTH0;
               if (w2 == 1) {
-                this[this.index].words.splice(p.index, 2, this.word(char));
+                line.words.splice(p.index, 2, this.word(char));
               } else {
-                this[this.index].words.splice(p.index, 2, this.word(char), this.word());
+                line.words.splice(p.index, 2, this.word(char), this.word());
               }
             }
           } else {
             if (p.offset == 0) {
-              this[this.index].words.splice(p.index, 1, this.word(char));
+              line.words.splice(p.index, 1, this.word(char));
             } else {
               var p2 = this.position(cursor + 1);
               if (p2.eof != null || p2.offset < 0) {
-                this[this.index].words.splice(p.index, 1, this.word(), this.word(char));
+                line.words.splice(p.index, 1, this.word(), this.word(char));
               } else {
-                var w2 = TerminalChild.measureChar(this[this.index].words[p2.index].value) / WIDTH0;
+                var w2 = TerminalChild.measureChar(line.words[p2.index].value) / WIDTH0;
                 if (w2 == 1) {
-                  this[this.index].words.splice(p.index, 2, this.word(), this.word(char));
+                  line.words.splice(p.index, 2, this.word(), this.word(char));
                 } else {
-                  this[this.index].words.splice(p.index, 2, this.word(), this.word(char), this.word());
+                  line.words.splice(p.index, 2, this.word(), this.word(char), this.word());
                 }
               }
             }
           }
         }
       }
-      this[this.index].invalidate();
       if (this.col + width <= COL) {
         this.col += width;
       } else {
@@ -261,6 +261,7 @@ class Source {
         this.col = width;
       }
     }
+    line.invalidate();
   }
 
   lf() {
@@ -340,6 +341,7 @@ class Source {
     if (COL - col <= 0) {
       return;
     }
+    var line = this[this.index];
     var words = [];
     for (var c = cursor + n; c < (this.row + 1) * COL; c++) {
       var p = this.position(c);
@@ -347,7 +349,7 @@ class Source {
         break;
       }
       if (p.offset == 0) {
-        words.push(this[this.index].words[p.index]);
+        words.push(line.words[p.index]);
       } else {
         if (c == cursor + n) {
           words.push(this.word());
@@ -362,8 +364,8 @@ class Source {
       this.input('\u200b');
     }
     this.col = col;
-    this[this.index].words.splice(this.position(cursor).index, width, ...words);
-    this[this.index].invalidate();
+    line.words.splice(this.position(cursor).index, width, ...words);
+    line.invalidate();
   }
 
   escm(utf8) {
