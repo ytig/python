@@ -59,8 +59,9 @@ export default {
     },
     onCompositionEnd: function() {
       this.composition = false;
-      this.$emit('input', this.$refs.input.value);
-      this.$refs.input.value = '';
+      var input = this.$refs.input;
+      this.$emit('input', input.value);
+      input.value = '';
     },
     onKeyPress: function(event) {},
     onBlur: function() {},
