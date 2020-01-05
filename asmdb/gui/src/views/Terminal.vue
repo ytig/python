@@ -465,7 +465,7 @@ export default {
       }
       var cursor = this.source.getCursor(parent.getPosition());
       this.inputLeft = cursor[0];
-      this.inputTop = cursor[1];
+      this.inputTop = Math.min(Math.max(cursor[1], 0), this.$el.clientHeight - 14);
     }
   }
 };

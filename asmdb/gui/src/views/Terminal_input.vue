@@ -158,6 +158,7 @@ export default {
   background: @color-text;
   pointer-events: none;
   .terminal-input-input {
+    max-width: 147px;
     font-size: 12px;
     line-height: 14px;
     color: @color-background;
