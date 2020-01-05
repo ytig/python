@@ -155,9 +155,6 @@ export default {
 @import '~@/styles/theme';
 
 .terminal-input-container {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
   background: @color-text;
   pointer-events: none;
   .terminal-input-input {

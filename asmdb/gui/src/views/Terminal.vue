@@ -1,9 +1,9 @@
 <template>
   <div class="terminal-container">
-    <TerminalParent v-if="source!=null" class="terminal-parent" :source="source" #default="props">
+    <TerminalParent ref="parent" v-if="source!=null" class="terminal-parent" :source="source" @scroll2="onScroll2" #default="props">
       <TerminalChild :value="props.item.value" :styles="props.item.styles" :cursor="source.toCursor(props.index,focus)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
     </TerminalParent>
-    <TerminalInput :focus="focus" @input="onInput"></TerminalInput>
+    <TerminalInput class="terminal-input" :style="{left:inputLeft+'px',top:inputTop+'px'}" :focus="focus" @input="onInput"></TerminalInput>
   </div>
 </template>
 
@@ -123,6 +123,14 @@ class Source {
     this.color = '';
     this.background = '';
     this.invalidate = 0;
+  }
+
+  getCursor(position) {
+    var COL = parseInt(this.width / WIDTH0);
+    var left = 0;
+    left = Math.min(this.col, COL - 1) * WIDTH0;
+    var top = 0; //todo
+    return [left, top];
   }
 
   toCursor(index, focus) {
@@ -402,7 +410,9 @@ export default {
   },
   data: function() {
     return {
-      source: null
+      source: null,
+      inputLeft: 0,
+      inputTop: 0
     };
   },
   props: {
@@ -421,6 +431,7 @@ export default {
           this.source = new Source(this.$el.clientWidth - 24);
         }
         this.source.readu(oldValue == undefined ? newValue : newValue.substring(oldValue.length));
+        this.updateCursor();
       }
     }
   },
@@ -428,6 +439,18 @@ export default {
     onInput: function(utf8) {
       asmdb.getInstance().writeu(utf8);
       //todo focus cursor
+    },
+    onScroll2: function() {
+      this.updateCursor();
+    },
+    updateCursor: function() {
+      var parent = this.$refs.parent;
+      if (!parent) {
+        return;
+      }
+      var cursor = this.source.getCursor(parent.getPosition());
+      this.inputLeft = 12 + cursor[0] + WIDTH0 + 6;
+      this.inputTop = cursor[1] + 6;
     }
   }
 };
@@ -437,9 +460,14 @@ export default {
 @import '~@/styles/theme';
 
 .terminal-container {
+  position: relative;
   .terminal-parent {
     margin: 0px 12px;
     height: 100%;
+  }
+  .terminal-input {
+    position: absolute;
+    z-index: 4;
   }
 }
 </style>
