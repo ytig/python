@@ -1,7 +1,7 @@
 <template>
   <div class="terminal-container">
     <TerminalParent v-if="source!=null" class="terminal-parent" :source="source" #default="props">
-      <TerminalChild :value="props.item.value" :styles="props.item.styles" :cursor="source.toCursor(props.index,focus)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
+      <TerminalChild :value="props.item._value" :styles="props.item._styles" :cursor="source.toCursor(props.index,focus)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
     </TerminalParent>
   </div>
 </template>
@@ -105,9 +105,9 @@ class Line {
       value += word.value;
       styles.push(word.styles);
     }
-    this.value = value;
-    this.styles = JSON.stringify(styles);
-    this.height = TerminalChild.measureHeight(this.width, this.value);
+    this._value = value;
+    this._styles = JSON.stringify(styles);
+    this._height = TerminalChild.measureHeight(this.width, this._value);
   }
 
   onResize(width) {
@@ -265,7 +265,7 @@ class Source {
   }
 
   lf() {
-    var ROW = this[this.index].height / HEIGHT0;
+    var ROW = this[this.index]._height / HEIGHT0;
     if (this.row + 1 < ROW) {
       this.row++;
       this.col = 0;
@@ -302,7 +302,7 @@ class Source {
 
   escB(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
-    var ROW = this[this.index].height / HEIGHT0;
+    var ROW = this[this.index]._height / HEIGHT0;
     for (var i = 0; i < n; i++) {
       if (this.row + 1 < ROW) {
         this.row++;
