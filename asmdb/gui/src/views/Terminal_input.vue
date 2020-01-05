@@ -114,7 +114,9 @@ export default {
     onCompositionEnd: function() {
       this.composition = false;
       var input = this.$refs.input;
-      this.$emit('input', input.value);
+      if (input.value) {
+        this.$emit('input', input.value);
+      }
       input.value = '';
       this.text = '';
     },
