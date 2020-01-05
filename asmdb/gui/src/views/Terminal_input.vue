@@ -156,11 +156,12 @@ export default {
   position: absolute;
   left: 0px;
   bottom: 0px;
-  background: #fff;
+  background: @color-text;
   pointer-events: none;
   .terminal-input-input {
     font-size: 12px;
     line-height: 14px;
+    color: @color-background;
   }
 }
 </style>
