@@ -125,11 +125,26 @@ class Source {
     this.invalidate = 0;
   }
 
+  getOffset(position, index) {
+    var offset = 0;
+    if (position.index >= index) {
+      for (var i = index; i < position.index; i++) {
+        offset -= this[i].height;
+      }
+    } else {
+      for (var i = position.index; i < index; i++) {
+        offset += this[i].height;
+      }
+    }
+    return offset - position.offset;
+  }
+
   getCursor(position) {
     var COL = parseInt(this.width / WIDTH0);
     var left = 0;
     left = 12 + Math.min(this.col, COL - 1) * WIDTH0;
-    var top = 1 + 0; //todo
+    var offset = this.getOffset(position, this.index);
+    var top = offset + 1 + this.row * HEIGHT0;
     return [left, top];
   }
 
