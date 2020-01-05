@@ -15,6 +15,23 @@ export default {
   props: {
     focus: Boolean
   },
+  watch: {
+    focus: {
+      immediate: true,
+      handler: function callee(newValue, oldValue) {
+        if (this.$el == undefined) {
+          this.$nextTick(callee.bind(this, ...arguments));
+          return;
+        }
+        var input = this.$refs.input;
+        if (newValue) {
+          input.focus();
+        } else {
+          input.blur();
+        }
+      }
+    }
+  },
   computed: {
     inputWidth: function() {
       //todo
@@ -65,6 +82,8 @@ export default {
     },
     onBlur: function() {
       if (this.focus) {
+        //todo requestAnimationFrames
+        //todo !pressed && !selection
         this.$refs.input.focus();
       }
     },
