@@ -148,6 +148,7 @@ export default {
   left: 0px;
   bottom: 0px;
   background: #fff;
+  pointer-events: none;
   .terminal-input-input {
     padding: 0px 12px;
     font-size: 12px;
