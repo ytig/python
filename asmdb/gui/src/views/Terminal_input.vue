@@ -22,6 +22,25 @@ export default {
     window.removeEventListener('keydown', this.onDomKeyDown, true);
   },
   methods: {
+    preInput: function(event) {
+      switch (event.key) {
+        case 'Enter':
+          return '\n';
+        case 'Backspace':
+          return '\x08';
+        case 'Tab':
+          return '\x09';
+        case 'ArrowLeft':
+          return '\x02';
+        case 'ArrowRight':
+          return '\x06';
+        case 'ArrowUp':
+          return '\x10';
+        case 'ArrowDown':
+          return '\x0e';
+      }
+      return null;
+    },
     onInput: function() {
       if (this.focus) {
         this.$emit('input', this.$refs.input.value);
@@ -35,6 +54,13 @@ export default {
     onDomKeyDown: function(event) {
       if (this.focus) {
         event.stopPropagation();
+        var utf8 = this.preInput(event);
+        if (utf8 != null) {
+          event.preventDefault();
+          if (utf8) {
+            this.$emit('input', utf8);
+          }
+        }
         //todo clear selection
       }
     }
