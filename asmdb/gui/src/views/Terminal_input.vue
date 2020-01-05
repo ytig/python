@@ -6,6 +6,12 @@
 
 <script>
 export default {
+  data: function() {
+    return {
+      composition: false,
+      text: ''
+    };
+  },
   props: {
     focus: Boolean
   },
@@ -23,32 +29,39 @@ export default {
   },
   methods: {
     preInput: function(event) {
-      switch (event.key) {
-        case 'Enter':
-          return '\n';
-        case 'Backspace':
-          return '\x08';
-        case 'Tab':
-          return '\x09';
-        case 'ArrowLeft':
-          return '\x02';
-        case 'ArrowRight':
-          return '\x06';
-        case 'ArrowUp':
-          return '\x10';
-        case 'ArrowDown':
-          return '\x0e';
+      if (!this.composition) {
+        switch (event.key) {
+          case 'Enter':
+            return '\n';
+          case 'Backspace':
+            return '\x08';
+          case 'Tab':
+            return '\x09';
+          case 'ArrowLeft':
+            return '\x02';
+          case 'ArrowRight':
+            return '\x06';
+          case 'ArrowUp':
+            return '\x10';
+          case 'ArrowDown':
+            return '\x0e';
+        }
       }
       return null;
     },
     onInput: function() {
-      if (this.focus) {
-        this.$emit('input', this.$refs.input.value);
-        this.$refs.input.value = '';
+      if (!this.composition) {
+        this.onCompositionEnd();
       }
     },
-    onCompositionStart: function() {},
-    onCompositionEnd: function() {},
+    onCompositionStart: function() {
+      this.composition = true;
+    },
+    onCompositionEnd: function() {
+      this.composition = false;
+      this.$emit('input', this.$refs.input.value);
+      this.$refs.input.value = '';
+    },
     onKeyPress: function(event) {},
     onBlur: function() {},
     onDomKeyDown: function(event) {
