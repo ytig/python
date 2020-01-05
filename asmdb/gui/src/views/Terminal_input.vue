@@ -63,7 +63,11 @@ export default {
       this.$emit('input', input.value);
       input.value = '';
     },
-    onBlur: function() {},
+    onBlur: function() {
+      if (this.focus) {
+        this.$refs.input.focus();
+      }
+    },
     onDomKeyDown: function(event) {
       if (this.focus) {
         event.stopPropagation();
@@ -87,9 +91,10 @@ export default {
 .terminal-input-container {
   position: absolute;
   left: 0px;
-  top: 0px;
+  bottom: 0px;
   background: #fff;
   .terminal-input-input {
+    padding: 0px 12px;
     font-size: 12px;
   }
 }
