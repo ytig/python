@@ -107,7 +107,7 @@ class Line {
     }
     this._value = value;
     this._styles = JSON.stringify(styles);
-    this._height = TerminalChild.measureHeight(this.width, this._value);
+    this._height = TerminalChild.measureHeight(this.width, value);
   }
 
   onResize(width) {
