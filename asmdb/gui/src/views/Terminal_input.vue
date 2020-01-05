@@ -83,6 +83,7 @@ export default {
   methods: {
     preInput: function(event) {
       if (!this.composition) {
+        //todo ctrl
         switch (event.key) {
           case 'Enter':
             return '\n';
