@@ -124,7 +124,8 @@ export default {
       }
     },
     onDomKeyDown: function(event) {
-      if (this.focus) {
+      var focus = document.activeElement == this.$refs.input;
+      if (focus) {
         event.stopPropagation();
         var utf8 = this.preInput(event);
         if (utf8 != null) {
@@ -133,7 +134,6 @@ export default {
             this.$emit('input', utf8);
           }
         }
-        //todo clear selection
       }
     }
   }
