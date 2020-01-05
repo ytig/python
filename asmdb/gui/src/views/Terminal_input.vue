@@ -1,5 +1,5 @@
 <template>
-  <div class="terminal-input-container">
+  <div class="terminal-input-container" :style="{opacity:text?1:0}">
     <input ref="input" class="terminal-input-input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @compositionstart="onCompositionStart" @compositionend="onCompositionEnd" @blur="onBlur" />
   </div>
 </template>
@@ -70,8 +70,8 @@ export default {
   },
   computed: {
     inputWidth: function() {
-      //todo
-      return 100;
+      var w = measureText(this.text);
+      return Math.ceil(1 + w);
     }
   },
   created: function() {
@@ -106,6 +106,7 @@ export default {
       if (!this.composition) {
         this.onCompositionEnd();
       }
+      this.text = this.$refs.input.value;
     },
     onCompositionStart: function() {
       this.composition = true;
@@ -115,6 +116,7 @@ export default {
       var input = this.$refs.input;
       this.$emit('input', input.value);
       input.value = '';
+      this.text = '';
     },
     onBlur: function() {
       if (this.focus) {
@@ -157,8 +159,8 @@ export default {
   background: #fff;
   pointer-events: none;
   .terminal-input-input {
-    padding: 0px 12px;
     font-size: 12px;
+    line-height: 14px;
   }
 }
 </style>
