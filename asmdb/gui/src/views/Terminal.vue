@@ -68,41 +68,28 @@ class Line {
     var COL = parseInt(this.width / WIDTH0);
     var index = 0;
     var offset = 0;
-    var eof = this.words.length > 0 ? null : 0;
     var c = 0;
     while (c++ < cursor) {
-      if (eof != null) {
-        eof++;
-      } else {
-        var w = TerminalChild.measureChar(this.words[index].value) / WIDTH0;
-        offset++;
-        if (offset >= w) {
-          if (index + 1 < this.words.length) {
-            index++;
-            w = TerminalChild.measureChar(this.words[index].value) / WIDTH0;
-            if (w == 1) {
-              offset = 0;
-            } else {
-              if (c % COL != COL - 1) {
-                offset = 0;
-              } else {
-                offset = -1;
-              }
-            }
+      var w = TerminalChild.measureChar(this.words[index].value) / WIDTH0;
+      offset++;
+      if (offset >= w) {
+        index++;
+        w = TerminalChild.measureChar(this.words[index].value) / WIDTH0;
+        if (w == 1) {
+          offset = 0;
+        } else {
+          if (c % COL != COL - 1) {
+            offset = 0;
           } else {
-            eof = 0;
+            offset = -1;
           }
         }
       }
     }
-    if (eof != null) {
-      index = null;
-      offset = null;
-    }
     return {
       index: index,
       offset: offset,
-      eof: eof
+      eof: null
     };
   }
 
