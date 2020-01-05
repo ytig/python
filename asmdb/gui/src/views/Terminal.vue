@@ -449,8 +449,8 @@ export default {
         return;
       }
       var cursor = this.source.getCursor(parent.getPosition());
-      this.inputLeft = 12 + cursor[0] + WIDTH0 + 6;
-      this.inputTop = cursor[1] + 6;
+      this.inputLeft = 12 + cursor[0];
+      this.inputTop = cursor[1];
     }
   }
 };
