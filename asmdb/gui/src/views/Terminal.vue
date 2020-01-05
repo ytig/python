@@ -128,8 +128,8 @@ class Source {
   getCursor(position) {
     var COL = parseInt(this.width / WIDTH0);
     var left = 0;
-    left = Math.min(this.col, COL - 1) * WIDTH0;
-    var top = 0; //todo
+    left = 12 + Math.min(this.col, COL - 1) * WIDTH0;
+    var top = 1 + 0; //todo
     return [left, top];
   }
 
@@ -449,7 +449,7 @@ export default {
         return;
       }
       var cursor = this.source.getCursor(parent.getPosition());
-      this.inputLeft = 12 + cursor[0];
+      this.inputLeft = cursor[0];
       this.inputTop = cursor[1];
     }
   }
