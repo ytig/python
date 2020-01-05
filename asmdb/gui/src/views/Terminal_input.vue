@@ -8,7 +8,8 @@
 const MouseMixin = {
   data: function() {
     return {
-      touching: false
+      touchingLeft: false,
+      touchingRight: false
     };
   },
   created: function() {
@@ -22,12 +23,18 @@ const MouseMixin = {
   methods: {
     onDomMouseDown: function(event) {
       if (event.button == 0) {
-        this.touching = true;
+        this.touchingLeft = true;
+      }
+      if (event.button == 2) {
+        this.touchingRight = true;
       }
     },
     onDomMouseUp: function(event) {
       if (event.button == 0) {
-        this.touching = false;
+        this.touchingLeft = false;
+      }
+      if (event.button == 2) {
+        this.touchingRight = false;
       }
     }
   }
@@ -115,7 +122,7 @@ export default {
           if (!this.focus) {
             return true;
           }
-          var autoFocus = !this.touching && getSelection().type != 'Range';
+          var autoFocus = !this.touchingLeft && !this.touchingRight && getSelection().type != 'Range' && !this.$menu.show;
           if (autoFocus) {
             this.$refs.input.focus();
           }
