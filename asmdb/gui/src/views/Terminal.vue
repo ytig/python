@@ -9,6 +9,7 @@
 
 <script>
 import asmdb from '@/scripts/asmdb';
+import resize from '@/scripts/resize';
 import Theme from '@/styles/theme';
 import TerminalParent from './Terminal_parent';
 import TerminalChild from './Terminal_child';
@@ -450,12 +451,21 @@ export default {
       }
     }
   },
+  mounted: function() {
+    resize.registerEvent(this);
+  },
+  destroyed: function() {
+    resize.unregisterEvent(this);
+  },
   methods: {
     onInput: function(utf8) {
       asmdb.getInstance().writeu(utf8);
       //todo focus cursor
     },
     onScroll2: function() {
+      this.updateCursor();
+    },
+    onResize: function() {
       this.updateCursor();
     },
     updateCursor: function() {
