@@ -427,6 +427,7 @@ export default {
   methods: {
     onInput: function(utf8) {
       asmdb.getInstance().writeu(utf8);
+      //todo focus cursor
     }
   }
 };
