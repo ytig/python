@@ -83,7 +83,9 @@ export default {
   methods: {
     preInput: function(event) {
       if (!this.composition) {
-        //todo ctrl
+        if (event.ctrlKey && /^[a-z]$/.test(event.key)) {
+          return String.fromCharCode(event.key.charCodeAt(0) - 96);
+        }
         switch (event.key) {
           case 'Enter':
             return '\n';
