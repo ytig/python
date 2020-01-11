@@ -17,8 +17,8 @@ const HEIGHT0 = 16;
 export default {
   data: function() {
     return {
-      minHeight: 16 * 5 + 6,
-      maxHeight: 16 * 20 + 6,
+      minHeight: HEIGHT0 * 5 + 6,
+      maxHeight: HEIGHT0 * 20 + 6,
       curHeight: 0,
       addHeight: 0,
       focus: false,
