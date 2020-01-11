@@ -3,7 +3,9 @@
     <Navigation2 class="python3-navigation2" :name="'python3'" :focus="focus" @mouseup2="onMouseUp2">
       <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @dragstart2="onDragStart2" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
     </Navigation2>
-    <Terminal class="python3-terminal" :style="{height:windowHeight+'px'}" :focus="focus" :utf8="utf8"></Terminal>
+    <div class="python3-parent" :style="{height:windowHeight+'px',paddingTop:paddingTop+'px',paddingBottom:paddingBottom+'px'}">
+      <Terminal class="python3-terminal" :focus="focus" :utf8="utf8"></Terminal>
+    </div>
   </div>
 </template>
 
@@ -13,12 +15,13 @@ import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
 const WIDTH0 = 7;
 const HEIGHT0 = 16;
+const PADDING = 4;
 
 export default {
   data: function() {
     return {
-      minHeight: HEIGHT0 * 5 + 6,
-      maxHeight: HEIGHT0 * 20 + 6,
+      minHeight: HEIGHT0 * 5 + (2 * PADDING - 2),
+      maxHeight: HEIGHT0 * 20 + (2 * PADDING - 2),
       curHeight: 0,
       addHeight: 0,
       focus: false,
@@ -34,6 +37,12 @@ export default {
   computed: {
     windowHeight: function() {
       return Math.min(Math.max(this.curHeight + this.addHeight, this.minHeight), this.maxHeight);
+    },
+    paddingTop: function() {
+      return PADDING - 2 + ((this.windowHeight - (2 * PADDING - 2)) % HEIGHT0);
+    },
+    paddingBottom: function() {
+      return PADDING;
     }
   },
   created: function() {
@@ -109,7 +118,7 @@ export default {
     },
     setWindowSize() {
       var width = this.$el.clientWidth - 24;
-      var height = loadStorage('python3_height', 0);
+      var height = loadStorage('python3_height', 0) - (2 * PADDING - 2);
       asmdb.getInstance().setwinsize(parseInt(height / HEIGHT0), parseInt(width / WIDTH0));
     }
   }
@@ -124,8 +133,11 @@ export default {
     margin-top: 4px;
     height: 8px;
   }
-  .python3-terminal {
+  .python3-parent {
     background: @color-background;
+    .python3-terminal {
+      height: 100%;
+    }
   }
 }
 </style>
