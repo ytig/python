@@ -11,6 +11,8 @@
 import keyboard from '@/scripts/keyboard';
 import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
+const WIDTH0 = 7;
+const HEIGHT0 = 16;
 
 export default {
   data: function() {
@@ -108,7 +110,7 @@ export default {
     setWindowSize() {
       var width = this.$el.clientWidth - 24;
       var height = loadStorage('python3_height', 0);
-      asmdb.getInstance().setwinsize(parseInt(height / 16), parseInt(width / 7));
+      asmdb.getInstance().setwinsize(parseInt(height / HEIGHT0), parseInt(width / WIDTH0));
     }
   }
 };

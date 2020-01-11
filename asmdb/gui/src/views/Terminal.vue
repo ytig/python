@@ -15,8 +15,8 @@ import TerminalParent from './Terminal_parent';
 import TerminalChild from './Terminal_child';
 import TerminalInput from './Terminal_input';
 const COLORS = [Theme.colorBackground, Theme.colorText2, Theme.colorText5, Theme.colorText4, Theme.colorText3, Theme.colorBackgroundPopup2, Theme.colorBackgroundPopup, Theme.colorText];
-const WIDTH0 = TerminalChild.WIDTH0;
-const HEIGHT0 = TerminalChild.HEIGHT0;
+const WIDTH0 = 7;
+const HEIGHT0 = 16;
 
 function splitu(utf8, ...patterns) {
   var result = [[0, utf8]];

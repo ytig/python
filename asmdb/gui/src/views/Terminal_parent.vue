@@ -9,6 +9,9 @@
 </template>
 
 <script>
+const WIDTH0 = 7;
+const HEIGHT0 = 16;
+
 export default {
   data: function() {
     return {
