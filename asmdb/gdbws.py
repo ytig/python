@@ -2,6 +2,7 @@
 import json
 import base64
 import tempfile
+import traceback
 import asyncio
 import ptyprocess
 from .gdbcli import GdbController, GdbError, binary_search
@@ -74,7 +75,7 @@ class Session:
             try:
                 self._ctrl = await WsGdbController.anew(json.loads(self._token))
             except BaseException as e:
-                print(repr(e))
+                traceback.print_exc()
         self._emits.append(emit)
         if self._ctrl:
             for key in WsGdbController.PUSH:
@@ -94,7 +95,7 @@ class Session:
                 if tag is not None:
                     emit({'type': 'pull', 'tag': tag, 'r': suit_js(r), 'e': None, })
             except BaseException as e:
-                print(repr(e))
+                traceback.print_exc()
                 if tag is not None:
                     emit({'type': 'pull', 'tag': tag, 'r': None, 'e': suit_js(e), })
 
@@ -105,7 +106,7 @@ class Session:
                 try:
                     await self._ctrl.adel()
                 except BaseException as e:
-                    print(repr(e))
+                    traceback.print_exc()
                 self._ctrl = None
 
     def notify(self, key, val, emit=None):
