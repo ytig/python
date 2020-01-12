@@ -58,7 +58,7 @@ export default {
   }
   .progress-content {
     font-size: 12px;
-    color: @color-text-menu;
+    color: @color-text;
   }
 }
 </style>
