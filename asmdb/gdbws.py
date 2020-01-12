@@ -73,7 +73,7 @@ class Session:
     async def onopen(self, emit):
         if not self._emits:
             try:
-                self._ctrl = await WsGdbController.anew(json.loads(self._token))
+                self._ctrl = await WsGdbController.anew(json.loads(self._token), lambda msg: self.notify('anew', msg, emit=emit))
             except BaseException as e:
                 traceback.print_exc()
         self._emits.append(emit)
@@ -200,14 +200,13 @@ class WsGdbController(GdbController):
     lenb = push_prop('lenb', 0)
 
     @classmethod
-    async def anew(cls, config):
-        self = await super().anew(config)
+    async def anew(cls, config, println):
+        self = await super().anew(config, println)
         self.quit = False
         self.suspend = True  # for test
         self.breakpoints = []
         self.watchpoints = []
-        # self.maps = await self._info_maps()
-        self.maps = []
+        self.maps = await self._info_maps()
         self.terminal = await Terminal.anew(['python3', '-q', ], lambda lenb: setattr(self, 'lenb', lenb))
         self.lenb = 0
         return self
@@ -270,8 +269,7 @@ class WsGdbController(GdbController):
         return ret
 
     async def reg(self):
-        # return await self._info_registers()
-        return dict([(k, 1470,) for k in ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr']])
+        return await self._info_registers()
 
     async def mem(self, start, end):
         data = b''

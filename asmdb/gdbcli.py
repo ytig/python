@@ -6,10 +6,10 @@ import asyncio
 from asyncio import subprocess
 
 
-async def gdb_startup(config):
+async def gdb_startup(config, println):
     xs = []
     xs.append('set pagination off')
-    # xs.append('target remote 127.0.0.1:5039')
+    xs.append('target remote 127.0.0.1:5039')
     # todo
     args = []
     args.append('--nx')
@@ -48,9 +48,9 @@ def binary_search(a, x):
 
 class GdbController:
     @classmethod
-    async def anew(cls, config):
+    async def anew(cls, config, println):
         self = cls()
-        self.process = await gdb_startup(config)
+        self.process = await gdb_startup(config, println)
         self.cmdlock = asyncio.Lock()
         self.onelock = asyncio.Lock()
         self.twolock = asyncio.Lock()
@@ -63,11 +63,7 @@ class GdbController:
     async def __command(self, command):
         async with self.cmdlock:
             self.process.stdin.write(command.encode() + b'\n')
-            # return (await gdb_readlines(self.process.stdout)).decode()
-            print(command)
-            text = (await gdb_readlines(self.process.stdout)).decode()
-            print(text, end='')
-            return text
+            return (await gdb_readlines(self.process.stdout)).decode()
 
     async def _command(self, command, wait=False):
         if not wait:
