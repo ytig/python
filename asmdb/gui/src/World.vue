@@ -66,7 +66,7 @@ export default {
         setTimeout(() => {
           this.$progress.close();
           this.$inquiry.alert('error', 'Reload', 'Your process is not available, Do you want to reload?', this.reload.bind(this));
-        }, 2000);
+        }, 2750);
       } else {
         setTimeout(() => {
           this.$progress.close();
