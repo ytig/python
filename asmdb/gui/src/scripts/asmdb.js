@@ -77,6 +77,11 @@ class Debugger {
 
   push(attrName, newValue, oldValue) {
     switch (attrName) {
+      case 'ctrl':
+        this.iterObjects('world', (object) => {
+          object.onCtrl(newValue);
+        });
+        break;
       case 'quit':
         if (newValue) {
           this.iterObjects('world', (object) => {

@@ -36,6 +36,7 @@ export default {
   created: function() {
     asmdb.newInstance();
     asmdb.getInstance().registerEvent('world', this);
+    //todo show loading
   },
   destroyed: function() {
     asmdb.getInstance().unregisterEvent('world', this);
@@ -57,11 +58,17 @@ export default {
           break;
       }
     },
+    onCtrl: function(ctrl) {
+      //todo dismiss loading
+      if (!ctrl) {
+        this.$inquiry.alert('error', 'Quit', 'Your process is not available, Do you want to modify it?', this.quit.bind(this));
+      }
+    },
     onQuit: function() {
       this.$menu.close();
       this.$editor.close();
       keyboard.requestFocus(this);
-      this.$inquiry.alert('error', 'Quit', 'The program is offline, Do you want to quit now?', this.quit.bind(this));
+      this.$inquiry.alert('error', 'Quit', 'Your process is offline, Do you want to quit now?', this.quit.bind(this));
     },
     quit: function() {
       this.$router.replace('/hello');
