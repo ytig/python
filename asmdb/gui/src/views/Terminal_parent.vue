@@ -27,7 +27,7 @@ export default {
   data: function() {
     return {
       position: { index: 0, offset: 0 },
-      remnant: 0,
+      remnant: null,
       attach: true,
       column: 0,
       viewport: [],
@@ -95,6 +95,7 @@ export default {
       };
     },
     attachTo: function() {
+      this.remnant = null;
       if (!this.attach) {
         this.attach = true;
         this.scrollBy(0);
@@ -150,11 +151,13 @@ export default {
       if (event.cancelable) {
         this.remnant = 0;
       }
-      this.remnant += event.deltaY;
-      var delta = parseInt(Math.abs(this.remnant) / this.lineHeight) * (this.remnant > 0 ? 1 : -1);
-      if (delta != 0) {
-        this.remnant -= delta * this.lineHeight;
-        this.scrollBy(delta);
+      if (this.remnant != null) {
+        this.remnant += event.deltaY;
+        var delta = parseInt(Math.abs(this.remnant) / this.lineHeight) * (this.remnant > 0 ? 1 : -1);
+        if (delta != 0) {
+          this.remnant -= delta * this.lineHeight;
+          this.scrollBy(delta);
+        }
       }
     },
     onResize: function() {
