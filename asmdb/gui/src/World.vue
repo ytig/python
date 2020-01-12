@@ -36,7 +36,7 @@ export default {
   created: function() {
     asmdb.newInstance();
     asmdb.getInstance().registerEvent('world', this);
-    //todo show loading
+    this.$progress.alert('');
   },
   destroyed: function() {
     asmdb.getInstance().unregisterEvent('world', this);
@@ -58,8 +58,11 @@ export default {
           break;
       }
     },
+    onNew: function(message) {
+      this.$progress.alert(message);
+    },
     onCtrl: function(ctrl) {
-      //todo dismiss loading
+      this.$progress.close();
       if (!ctrl) {
         this.$inquiry.alert('error', 'Quit', 'Your process is not available, Do you want to modify it?', this.quit.bind(this));
       }

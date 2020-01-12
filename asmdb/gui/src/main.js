@@ -5,12 +5,14 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
-import menu from '@/plugins/menu';
-Vue.use(menu);
-import inquiry from '@/plugins/inquiry';
-Vue.use(inquiry);
 import editor from '@/plugins/editor';
 Vue.use(editor);
+import inquiry from '@/plugins/inquiry';
+Vue.use(inquiry);
+import menu from '@/plugins/menu';
+Vue.use(menu);
+import progress from '@/plugins/progress';
+Vue.use(progress);
 import toast from '@/plugins/toast';
 Vue.use(toast);
 
