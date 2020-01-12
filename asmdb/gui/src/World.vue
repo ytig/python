@@ -62,19 +62,25 @@ export default {
       this.$progress.progress(message);
     },
     onCtrl: function(ctrl) {
-      this.$progress.close();
       if (!ctrl) {
-        this.$inquiry.alert('error', 'Quit', 'Your process is not available, Do you want to modify it?', this.quit.bind(this));
+        setTimeout(() => {
+          this.$progress.close();
+          this.$inquiry.alert('error', 'Reload', 'Your process is not available, Do you want to reload?', this.reload.bind(this));
+        }, 3500);
+      } else {
+        setTimeout(() => {
+          this.$progress.close();
+        }, 0);
       }
     },
     onQuit: function() {
       this.$menu.close();
       this.$editor.close();
       keyboard.requestFocus(this);
-      this.$inquiry.alert('error', 'Quit', 'The process is offline, Do you want to quit now?', this.quit.bind(this));
+      this.$inquiry.alert('error', 'Reload', 'Your process is offline, Do you want to reload?', this.reload.bind(this));
     },
-    quit: function() {
-      this.$router.replace('/hello');
+    reload: function() {
+      this.$router.replace('/reload');
     }
   }
 };
