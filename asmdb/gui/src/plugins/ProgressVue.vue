@@ -57,6 +57,7 @@ export default {
     flex-grow: 1;
   }
   .progress-content {
+    padding: 0px 12px;
     font-size: 12px;
     color: @color-text;
   }
