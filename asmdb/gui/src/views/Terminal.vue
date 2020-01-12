@@ -1,6 +1,6 @@
 <template>
   <div class="terminal-container">
-    <TerminalParent ref="parent" v-if="source!=null" class="terminal-parent" :source="source" @scroll2="onScroll2" #default="props">
+    <TerminalParent ref="parent" v-if="source!=null" class="terminal-parent" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
       <TerminalChild :value="props.item.value" :styles="props.item.styles" :cursor="source.toCursor(props.index,focus)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
     </TerminalParent>
     <TerminalInput class="terminal-input" :style="{left:inputLeft+'px',top:inputTop+'px'}" :focus="focus" @input="onInput"></TerminalInput>
@@ -104,7 +104,7 @@ class Line {
     }
     this.value = value;
     this.styles = JSON.stringify(styles);
-    this.height = TerminalChild.measureHeight(this.width, value);
+    this.lineCount = TerminalChild.measureHeight(this.width, value) / HEIGHT0;
   }
 }
 
@@ -130,11 +130,11 @@ class Source {
     var offset = 0;
     if (position.index >= index) {
       for (var i = index; i < position.index; i++) {
-        offset -= this[i].height;
+        offset -= this[i].lineCount;
       }
     } else {
       for (var i = position.index; i < index; i++) {
-        offset += this[i].height;
+        offset += this[i].lineCount;
       }
     }
     return offset - position.offset;
@@ -142,10 +142,8 @@ class Source {
 
   getCursor(position) {
     var COL = parseInt(this.width / WIDTH0);
-    var left = 0;
-    left = 12 + Math.min(this.col, COL - 1) * WIDTH0;
-    var offset = this.getOffset(position, this.index);
-    var top = offset + 1 + this.row * HEIGHT0;
+    var left = 12 + Math.min(this.col, COL - 1) * WIDTH0;
+    var top = 1 + (this.getOffset(position, this.index) + this.row) * HEIGHT0;
     return [left, top];
   }
 
@@ -271,7 +269,7 @@ class Source {
   }
 
   lf() {
-    var ROW = this[this.index].height / HEIGHT0;
+    var ROW = this[this.index].lineCount;
     if (this.row + 1 < ROW) {
       this.row++;
       this.col = 0;
@@ -308,7 +306,7 @@ class Source {
 
   escB(utf8) {
     var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
-    var ROW = this[this.index].height / HEIGHT0;
+    var ROW = this[this.index].lineCount;
     for (var i = 0; i < n; i++) {
       if (this.row + 1 < ROW) {
         this.row++;
@@ -426,6 +424,7 @@ export default {
   },
   data: function() {
     return {
+      lineHeight: HEIGHT0,
       source: null,
       inputLeft: 0,
       inputTop: 0

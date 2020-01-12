@@ -1,21 +1,34 @@
 <template>
-  <div ref="container" class="scroller-container" @wheel="onWheel">
-    <canvas ref="canvas1" class="scroller-draw"></canvas>
-    <canvas ref="canvas2" class="scroller-draw"></canvas>
-    <div class="scroller-item" v-for="item in viewport" :key="item.id" :style="item.style_">
+  <div ref="container" class="terminal-parent-container" @wheel="onWheel">
+    <canvas ref="canvas1" class="terminal-parent-draw"></canvas>
+    <canvas ref="canvas2" class="terminal-parent-draw"></canvas>
+    <div class="terminal-parent-item" v-for="item in viewport" :key="item.id" :style="item.style_">
       <slot v-if="item.key!=null" :item="item.val" :index="item.key" :offset="item.top" :context="context" :scrolling="scrolling"></slot>
     </div>
   </div>
 </template>
 
 <script>
-const WIDTH0 = 7;
-const HEIGHT0 = 16;
+import resize from '@/scripts/resize';
+
+function comparePosition(p1, p2) {
+  var i = p1.index - p2.index;
+  if (i != 0) {
+    return i > 0 ? 1 : -1;
+  }
+  var o = p1.offset - p2.offset;
+  if (o != 0) {
+    return o > 0 ? 1 : -1;
+  }
+  return 0;
+}
 
 export default {
   data: function() {
     return {
       position: { index: 0, offset: 0 },
+      remnant: 0,
+      attach: true,
       viewport: [],
       unique: 0,
       counter: 0,
@@ -24,19 +37,16 @@ export default {
     };
   },
   props: {
+    lineHeight: Number,
     source: Object
   },
   watch: {
     source: function(newValue, oldValue) {
-      this.position.index = this.position.offset = 0;
+      this.attach = true;
       this.scrollBy(0);
     },
     'source.invalidate': function(newValue, oldValue) {
-      if (this.position.offset >= this.source[this.position.index].height) {
-        this.scrollBy(0);
-      } else {
-        this.invalidate();
-      }
+      this.scrollBy(0);
     }
   },
   mounted: function() {
@@ -45,8 +55,10 @@ export default {
     this.$refs.canvas1.style.width = this.$refs.canvas2.style.width = w + 'px';
     this.$refs.canvas1.style.height = this.$refs.canvas2.style.height = h + 'px';
     this.scrollBy(0);
+    resize.registerEvent(this);
   },
   destroyed: function() {
+    resize.unregisterEvent(this);
     delContext(this.$refs.canvas1);
     delContext(this.$refs.canvas2);
   },
@@ -55,6 +67,30 @@ export default {
       return {
         index: this.position.index,
         offset: this.position.offset
+      };
+    },
+    getMaxPosition: function() {
+      var index = 0;
+      var offset = 0;
+      if (this.source.length > 0) {
+        index = this.source.length - 1;
+        offset = this.source[index].lineCount - 1;
+      }
+      var column = this.$refs.container.clientHeight / this.lineHeight;
+      while (--column > 0) {
+        offset--;
+        if (offset < 0) {
+          index--;
+          if (index < 0) {
+            index = offset = 0;
+            break;
+          }
+          offset = this.source[index].lineCount - 1;
+        }
+      }
+      return {
+        index: index,
+        offset: offset
       };
     },
     scrollBy: function(delta) {
@@ -68,51 +104,61 @@ export default {
         this.scrolling = false;
         this.invalidate();
       }, 147);
-      var index = this.position.index;
-      var offset = this.position.offset;
-      if (index in this.source) {
-        offset += delta;
-        while (offset < 0) {
-          if (index - 1 in this.source) {
-            offset += this.source[index - 1].height;
-            index--;
-          } else {
-            offset = 0;
-            break;
+      if (this.source.length > 0) {
+        var max = this.getMaxPosition();
+        if (this.attach && delta >= 0) {
+          this.position.index = max.index;
+          this.position.offset = max.offset;
+        } else {
+          this.position.offset += delta;
+          while (this.position.offset < 0) {
+            if (this.position.index == 0) {
+              this.position.offset = 0;
+              break;
+            }
+            this.position.offset += this.source[--this.position.index].lineCount;
+          }
+          while (this.position.offset >= this.source[this.position.index].lineCount) {
+            if (this.position.index == this.source.length - 1) {
+              this.position.offset = this.source[this.position.index].lineCount - 1;
+              break;
+            }
+            this.position.offset -= this.source[this.position.index++].lineCount;
           }
         }
-        while (offset >= this.source[index].height) {
-          if (index + 1 in this.source) {
-            offset -= this.source[index].height;
-            index++;
-          } else {
-            offset = this.source[index].height;
-            break;
-          }
+        if (comparePosition(this.position, max) > 0) {
+          this.position.index = max.index;
+          this.position.offset = max.offset;
         }
-        if (!(index + 1 in this.source)) {
-          offset = 0;
-        }
+        this.attach = this.position.index == max.index && this.position.offset == max.offset;
+      } else {
+        this.position.index = 0;
+        this.position.offset = 0;
+        this.attach = true;
       }
-      this.position.index = index;
-      this.position.offset = offset;
       this.$emit('scroll2', this.getPosition());
       this.invalidate();
     },
     onWheel: function(event) {
-      this.scrollBy(event.deltaY);
+      if (event.cancelable) {
+        this.remnant = 0;
+      }
+      this.remnant += event.deltaY;
+      var delta = parseInt(Math.abs(this.remnant) / this.lineHeight) * (this.remnant > 0 ? 1 : -1);
+      if (delta != 0) {
+        this.remnant -= delta * this.lineHeight;
+        this.scrollBy(delta);
+      }
+    },
+    onResize: function() {
+      this.scrollBy(0);
     },
     invalidate: function() {
-      var scrollTop = this.position.offset;
-      if (this.position.index < 0) {
-        for (var i = this.position.index; i < 0; i++) {
-          scrollTop -= this.source[i].height;
-        }
-      } else {
-        for (var i = 0; i < this.position.index; i++) {
-          scrollTop += this.source[i].height;
-        }
+      var scrollTop = 0;
+      for (var i = 0; i < this.position.index; i++) {
+        scrollTop += this.source[i].lineCount * this.lineHeight;
       }
+      scrollTop += this.position.offset * this.lineHeight;
       var canvasHeight = screen.height;
       var index = parseSignedInt(scrollTop / canvasHeight);
       var offset = scrollTop - index * canvasHeight;
@@ -134,7 +180,7 @@ export default {
       this.context = tokens.sort().join();
       var items = [];
       var viewport = new Array(...this.viewport);
-      var sumTop = scrollTop - this.position.offset;
+      var sumTop = scrollTop - this.position.offset * this.lineHeight;
       var i = this.position.index - 1;
       while (++i in this.source) {
         var item = {
@@ -142,7 +188,7 @@ export default {
           val: this.source[i],
           top: sumTop,
           style_: {
-            height: this.source[i].height + 'px',
+            height: this.source[i].lineCount * this.lineHeight + 'px',
             transform: 'translateY(' + (sumTop - scrollTop) + 'px)'
           }
         };
@@ -171,7 +217,7 @@ export default {
         if (item) {
           items.push(item);
         }
-        sumTop += this.source[i].height;
+        sumTop += this.source[i].lineCount * this.lineHeight;
         if (sumTop - scrollTop > canvasHeight) {
           break;
         }
@@ -218,16 +264,16 @@ export default {
 <style lang="less">
 @import '~@/styles/theme';
 
-.scroller-container {
+.terminal-parent-container {
   overflow: hidden;
   position: relative;
   contain: strict;
-  .scroller-draw {
+  .terminal-parent-draw {
     position: absolute;
     contain: strict;
     pointer-events: none;
   }
-  .scroller-item {
+  .terminal-parent-item {
     position: absolute;
     contain: strict;
     width: 100%;
