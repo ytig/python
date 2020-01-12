@@ -78,11 +78,12 @@ class Session:
                 traceback.print_exc()
         self._emits.append(emit)
         if self._ctrl:
+            self.notify('ctrl', True, emit=emit)
             for key in WsGdbController.PUSH:
                 val = getattr(self._ctrl, key)
                 self.notify(key, val, emit=emit)
         else:
-            self.notify('ctrl', None, emit=emit)
+            self.notify('ctrl', False, emit=emit)
 
     async def onmessage(self, emit, data):
         if data.get('type') == 'pull':
