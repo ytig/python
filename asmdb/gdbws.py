@@ -73,7 +73,7 @@ class Session:
     async def onopen(self, emit):
         if not self._emits:
             try:
-                self._ctrl = await WsGdbController.anew(json.loads(self._token), lambda msg: self.notify('anew', msg, emit=emit))
+                self._ctrl = await WsGdbController.anew(json.loads(self._token), lambda *args: self.notify('anew', ' '.join(str(arg) for arg in args), emit=emit))
             except BaseException as e:
                 traceback.print_exc()
         self._emits.append(emit)
