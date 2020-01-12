@@ -28,11 +28,7 @@ export default {
       this.message = '';
     },
     progress: function(message) {
-      this.message += message;
-      this.$nextTick(() => {
-        var container = this.$refs.container;
-        container.scrollTop = container.scrollHeight;
-      });
+      this.message = message;
     },
     close: function() {
       this.anim.$target(0);
@@ -55,7 +51,10 @@ export default {
   top: 0px;
   width: 100%;
   height: 100%;
-  overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   .progress-content {
     padding: 12px;
     font-size: 12px;
