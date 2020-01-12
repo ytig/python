@@ -71,7 +71,7 @@ export default {
   computed: {
     inputWidth: function() {
       var w = measureText(this.text);
-      return Math.ceil(1 + w);
+      return Math.ceil(7 + w);
     }
   },
   created: function() {
