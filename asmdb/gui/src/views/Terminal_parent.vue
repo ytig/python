@@ -94,6 +94,12 @@ export default {
         offset: offset
       };
     },
+    attachTo: function() {
+      if (!this.attach) {
+        this.attach = true;
+        this.scrollBy(0);
+      }
+    },
     scrollBy: function(delta) {
       emptySelection();
       this.scrolling = true;
