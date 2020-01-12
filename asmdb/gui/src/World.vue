@@ -68,7 +68,7 @@ export default {
       this.$menu.close();
       this.$editor.close();
       keyboard.requestFocus(this);
-      this.$inquiry.alert('error', 'Quit', 'Your process is offline, Do you want to quit now?', this.quit.bind(this));
+      this.$inquiry.alert('error', 'Quit', 'The process is offline, Do you want to quit now?', this.quit.bind(this));
     },
     quit: function() {
       this.$router.replace('/hello');
