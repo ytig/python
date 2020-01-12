@@ -29,6 +29,7 @@ export default {
       position: { index: 0, offset: 0 },
       remnant: 0,
       attach: true,
+      column: 0,
       viewport: [],
       unique: 0,
       counter: 0,
@@ -54,8 +55,8 @@ export default {
     var h = screen.height;
     this.$refs.canvas1.style.width = this.$refs.canvas2.style.width = w + 'px';
     this.$refs.canvas1.style.height = this.$refs.canvas2.style.height = h + 'px';
-    this.scrollBy(0);
     resize.registerEvent(this);
+    this.onResize();
   },
   destroyed: function() {
     resize.unregisterEvent(this);
@@ -76,7 +77,7 @@ export default {
         index = this.source.length - 1;
         offset = this.source[index].lineCount - 1;
       }
-      var column = this.$refs.container.clientHeight / this.lineHeight;
+      var column = this.column;
       while (--column > 0) {
         offset--;
         if (offset < 0) {
@@ -151,7 +152,11 @@ export default {
       }
     },
     onResize: function() {
-      this.scrollBy(0);
+      var column = this.$refs.container.clientHeight / this.lineHeight;
+      if (this.column != column) {
+        this.column = column;
+        this.scrollBy(0);
+      }
     },
     invalidate: function() {
       var scrollTop = 0;
