@@ -75,7 +75,7 @@ export default {
         if (s == ' ') {
           items.push(newItem('&nbsp;', 'terminal-child-span1'));
         } else if (s == '\u200b') {
-          items.push(newItem('&nbsp;', 'terminal-child-span1', 'user-select-none'));
+          items.push(newItem('&nbsp;', 'terminal-child-span0', 'user-select-none'));
         } else {
           var w = measureChar(s) / WIDTH0;
           items.push(newItem(s, 'terminal-child-span' + w));
@@ -175,6 +175,10 @@ export default {
     line-height: 16px;
     font-size: 12px;
     color: transparent;
+  }
+  .terminal-child-span0 {
+    width: 7px;
+    pointer-events: none;
   }
   .terminal-child-span1 {
     width: 7px;
