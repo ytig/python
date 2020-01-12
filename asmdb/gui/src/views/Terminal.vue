@@ -458,7 +458,9 @@ export default {
   },
   methods: {
     onInput: function(utf8) {
-      asmdb.getInstance().writeu(utf8);
+      if (utf8) {
+        asmdb.getInstance().writeu(utf8);
+      }
       var parent = this.$refs.parent;
       if (!parent) {
         return;

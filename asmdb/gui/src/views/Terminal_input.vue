@@ -110,6 +110,7 @@ export default {
         this.onCompositionEnd();
       }
       this.text = this.$refs.input.value;
+      this.$emit('input', '');
     },
     onCompositionStart: function() {
       this.composition = true;
@@ -144,9 +145,7 @@ export default {
         var utf8 = this.preInput(event);
         if (utf8 != null) {
           event.preventDefault();
-          if (utf8) {
-            this.$emit('input', utf8);
-          }
+          this.$emit('input', utf8);
         }
       }
     }
