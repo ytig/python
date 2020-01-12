@@ -1,8 +1,6 @@
 <template>
-  <div v-show="anim.value!=0" class="progress-container" :style="{background:background}">
-    <div class="progress-grow"></div>
-    <div class="progress-content" :style="{opacity:opacity}">{{message}}</div>
-    <div class="progress-grow"></div>
+  <div ref="container" v-show="anim.value!=0" class="progress-container" :style="{background:background}">
+    <pre class="progress-content" :style="{opacity:opacity}">{{message}}</pre>
   </div>
 </template>
 
@@ -28,6 +26,10 @@ export default {
     alert: function(message) {
       this.anim.$target(1);
       this.message = message;
+      this.$nextTick(() => {
+        var container = this.$refs.container;
+        container.scrollTop = container.scrollHeight;
+      });
     },
     close: function() {
       this.anim.$target(0);
@@ -50,16 +52,11 @@ export default {
   top: 0px;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  .progress-grow {
-    flex-grow: 1;
-  }
+  overflow: scroll;
   .progress-content {
-    padding: 0px 12px;
+    padding: 12px;
     font-size: 12px;
-    color: @color-text;
+    color: @color-text-dark;
   }
 }
 </style>
