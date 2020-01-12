@@ -18,7 +18,6 @@ class Debugger {
       watchpoints: [],
       maps: []
     };
-    this.anew = '';
     this.lenb = 0;
     this.utf8 = '';
     this.counter = 0;
@@ -79,9 +78,8 @@ class Debugger {
   push(attrName, newValue, oldValue) {
     switch (attrName) {
       case 'anew':
-        this.anew += newValue;
         this.iterObjects('world', (object) => {
-          object.onNew(this.anew);
+          object.onNew(newValue);
         });
         break;
       case 'ctrl':

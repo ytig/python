@@ -23,9 +23,12 @@ export default {
     }
   },
   methods: {
-    alert: function(message) {
+    alert: function() {
       this.anim.$target(1);
-      this.message = message;
+      this.message = '';
+    },
+    progress: function(message) {
+      this.message += message;
       this.$nextTick(() => {
         var container = this.$refs.container;
         container.scrollTop = container.scrollHeight;

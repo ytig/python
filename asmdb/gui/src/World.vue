@@ -36,7 +36,7 @@ export default {
   created: function() {
     asmdb.newInstance();
     asmdb.getInstance().registerEvent('world', this);
-    this.$progress.alert('');
+    this.$progress.alert();
   },
   destroyed: function() {
     asmdb.getInstance().unregisterEvent('world', this);
@@ -59,7 +59,7 @@ export default {
       }
     },
     onNew: function(message) {
-      this.$progress.alert(message);
+      this.$progress.progress(message);
     },
     onCtrl: function(ctrl) {
       this.$progress.close();
