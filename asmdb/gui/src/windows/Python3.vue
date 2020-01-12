@@ -4,7 +4,7 @@
       <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @dragstart2="onDragStart2" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
     </Navigation2>
     <div class="python3-content" :style="{height:windowHeight+'px',paddingTop:paddingTop+'px',paddingBottom:paddingBottom+'px'}">
-      <Terminal class="python3-terminal" :focus="focus" :utf8="utf8"></Terminal>
+      <Terminal ref="terminal" class="python3-terminal" :focus="focus" :utf8="utf8"></Terminal>
     </div>
   </div>
 </template>
@@ -74,7 +74,16 @@ export default {
       }
     },
     onMouseUp2: function(evnet) {
-      this.$menu.alert(event);
+      var items = [];
+      items.push(['Copy all', '', true]);
+      this.$menu.alert(event, items, this.onClickMenu);
+    },
+    onClickMenu: function(index) {
+      switch (index) {
+        case 0:
+          this.$refs.terminal.copyAll();
+          break;
+      }
     },
     onKeyDown: function(event) {
       return false;

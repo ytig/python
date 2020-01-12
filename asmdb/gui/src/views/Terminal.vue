@@ -457,6 +457,14 @@ export default {
     resize.unregisterEvent(this);
   },
   methods: {
+    copyAll: function() {
+      var text = '';
+      for (var i = 0; i < this.source.length; i++) {
+        text += this.source[i].value.replace(/\u200b/g, '') + '\n';
+      }
+      this.$toast.alert('Text Copied');
+      copyText(text);
+    },
     onInput: function(utf8) {
       if (utf8) {
         asmdb.getInstance().writeu(utf8);
