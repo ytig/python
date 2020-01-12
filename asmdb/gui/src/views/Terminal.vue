@@ -457,7 +457,7 @@ export default {
     resize.unregisterEvent(this);
   },
   methods: {
-    copyAll: function() {
+    copyLog: function() {
       var text = '';
       for (var i = 0; i < this.source.length; i++) {
         text += this.source[i].value.replace(/\u200b/g, '') + '\n';
