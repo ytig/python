@@ -65,7 +65,9 @@ export default {
       if (!ctrl) {
         setTimeout(() => {
           this.$progress.close();
-          this.$inquiry.alert('error', 'Unconnected', 'Your process is not available, Do you want to reload?', this.reload.bind(this));
+          this.$inquiry.alert('error', 'Unconnected', 'Your process is not available, Do you want to reload?', () => {
+            this.$root.reload();
+          });
         }, 2750);
       } else {
         setTimeout(() => {
@@ -77,10 +79,9 @@ export default {
       this.$menu.close();
       this.$editor.close();
       keyboard.requestFocus(this);
-      this.$inquiry.alert('error', 'Disconnect', 'Your process is offline, Do you want to reload?', this.reload.bind(this));
-    },
-    reload: function() {
-      this.$router.replace('/reload');
+      this.$inquiry.alert('error', 'Disconnect', 'Your process is offline, Do you want to reload?', () => {
+        this.$root.reload();
+      });
     }
   }
 };

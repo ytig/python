@@ -65,7 +65,6 @@ Vue.component('Watchpoints', Watchpoints);
 
 import Hello from '@/Hello';
 import World from '@/World';
-import Reload from '@/Reload';
 new Vue({
   el: '#app',
   router: new VueRouter({
@@ -78,10 +77,20 @@ new Vue({
     }, {
       path: '/world',
       component: World,
-    }, {
-      path: '/reload',
-      component: Reload,
     }],
   }),
-  template: '<router-view/>',
+  template: '<router-view v-if="!reloading"/>',
+  data: function () {
+    return {
+      reloading: false
+    };
+  },
+  methods: {
+    reload: function () {
+      this.reloading = true;
+      this.$nextTick(() => {
+        this.reloading = false;
+      });
+    }
+  }
 });
