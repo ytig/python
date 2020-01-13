@@ -55,6 +55,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  cursor: wait;
   .progress-content {
     padding: 12px;
     font-size: 12px;
