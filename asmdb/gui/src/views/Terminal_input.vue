@@ -19,6 +19,7 @@ const MouseMixin = {
   destroyed: function() {
     window.removeEventListener('mousedown', this.onDomMouseDown, true);
     window.removeEventListener('mouseup', this.onDomMouseUp, true);
+    this.touchingLeft = this.touchingRight = false;
   },
   methods: {
     onDomMouseDown: function(event) {
