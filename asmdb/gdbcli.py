@@ -56,7 +56,11 @@ class GdbController:
     @classmethod
     async def anew(cls, config, println):
         self = cls()
-        self.process = await gdb_startup(config, println)
+        try:
+            self.process = await gdb_startup(config, println)
+        except BaseException as e:
+            println(str(e))
+            raise
         self.cmdlock = asyncio.Lock()
         self.onelock = asyncio.Lock()
         self.twolock = asyncio.Lock()
