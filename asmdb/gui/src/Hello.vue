@@ -1,47 +1,38 @@
 <template>
   <div class="hello-container">
-    <canvas id="tween"></canvas>
-    <span>Hello World!</span>
+    <div class="hello-grow"></div>
+    <table class="hello-content">
+      <tr>
+        <td align="right">
+          <span>platform</span>
+        </td>
+        <td>
+          <input type="text" />
+        </td>
+      </tr>
+      <tr>
+        <td align="right">
+          <span>process</span>
+        </td>
+        <td>
+          <input type="text" />
+        </td>
+      </tr>
+      <tr>
+        <td align="right">
+          <span>script</span>
+        </td>
+        <td>
+          <input type="file" />
+        </td>
+      </tr>
+    </table>
+    <div class="hello-grow"></div>
   </div>
 </template>
 
 <script>
-var tweenAlive = false;
-
-function initTween() {
-  tweenAlive = true;
-  var width = screen.width;
-  var height = screen.height;
-  var canvas = document.getElementById('tween');
-  canvas.style.width = width + 'px';
-  canvas.style.height = height + 'px';
-  canvas.width = devicePixelRatio * width;
-  canvas.height = devicePixelRatio * height;
-  requestAnimationFrames(() => {
-    if (!initCanvas) {
-      return false;
-    }
-    if (tweenAlive) {
-      initCanvas('tween');
-    }
-    return true;
-  });
-}
-
-function killTween() {
-  kill();
-  TweenLite.ticker.sleep();
-  C = c = undefined;
-  tweenAlive = false;
-}
-
 export default {
-  mounted: function() {
-    initTween();
-  },
-  destroyed: function() {
-    killTween();
-  },
   methods: {
     startDebug: function() {
       document.body.webkitRequestFullScreen();
@@ -55,18 +46,26 @@ export default {
 @import '~@/styles/theme';
 
 .hello-container {
-  position: relative;
   background: @color-background;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  > canvas {
-    position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .hello-grow {
+    flex-grow: 1;
   }
-  > span {
-    align-self: center;
-    font-size: 16px;
-    color: @color-text;
+  .hello-content {
+    span {
+      font-size: 16px;
+      font-family: 'Wawati SC';
+      color: @color-text;
+      margin-right: 12px;
+    }
+    input {
+      background: #fff;
+      font-size: 12px;
+    }
   }
 }
 </style>
