@@ -1,5 +1,5 @@
 <template>
-  <div class="hello-container" @click="startDebug">
+  <div class="hello-container">
     <canvas id="tween"></canvas>
     <span>Hello World!</span>
   </div>
@@ -10,12 +10,13 @@ var tweenAlive = false;
 
 function initTween() {
   tweenAlive = true;
+  var width = screen.width;
+  var height = screen.height;
   var canvas = document.getElementById('tween');
-  var s = devicePixelRatio;
-  canvas.style.width = screen.width + 'px';
-  canvas.style.height = screen.height + 'px';
-  canvas.width = devicePixelRatio * screen.width;
-  canvas.height = devicePixelRatio * screen.height;
+  canvas.style.width = width + 'px';
+  canvas.style.height = height + 'px';
+  canvas.width = devicePixelRatio * width;
+  canvas.height = devicePixelRatio * height;
   requestAnimationFrames(() => {
     if (!initCanvas) {
       return false;
