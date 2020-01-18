@@ -1,32 +1,12 @@
 <template>
   <div class="hello-container">
     <div class="hello-grow"></div>
-    <table class="hello-content">
-      <tr>
-        <td align="right">
-          <span>platform</span>
-        </td>
-        <td>
-          <input type="text" />
-        </td>
-      </tr>
-      <tr>
-        <td align="right">
-          <span>process</span>
-        </td>
-        <td>
-          <input type="text" />
-        </td>
-      </tr>
-      <tr>
-        <td align="right">
-          <span>script</span>
-        </td>
-        <td>
-          <input type="file" />
-        </td>
-      </tr>
-    </table>
+    <div class="hello-content">
+      <div>PL</div>
+      <div>PR</div>
+      <div>SC</div>
+      <div>start debug</div>
+    </div>
     <div class="hello-grow"></div>
   </div>
 </template>
@@ -56,15 +36,25 @@ export default {
     flex-grow: 1;
   }
   .hello-content {
-    span {
-      font-size: 16px;
-      font-family: 'Wawati SC';
-      color: @color-text;
-      margin-right: 12px;
-    }
-    input {
-      background: #fff;
+    div {
+      margin: 8px 0px;
+      width: 250px;
       font-size: 12px;
+      line-height: 32px;
+      padding: 0px 12px;
+
+      border-radius: 4px;
+      background-color: #121212;
+
+      color: @color-text;
+      box-shadow: inset 0 2px 7px 0 rgba(0, 0, 0, 0.8);
+    }
+    div:last-child {
+      text-align: center;
+      color: @color-text-light;
+      margin-top: 24px;
+      background-color: #c24038;
+      box-shadow: 0 2px 7px 0 rgba(0, 0, 0, 0.6);
     }
   }
 }
