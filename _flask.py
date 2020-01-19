@@ -45,7 +45,7 @@ class Server(Flask):
                 data = data.encode()
                 data += b'\xe0'
                 data += (-len(data) % 16) * b'\x00'
-                data = AES.new(key).encrypt(data)
+                data = AES.new(key, AES.MODE_ECB).encrypt(data)
                 data = bytes.hex(data)
             except BaseException:
                 data = ''
@@ -58,7 +58,7 @@ class Server(Flask):
         if key and data:
             try:
                 data = bytes.fromhex(data)
-                data = AES.new(key).decrypt(data)
+                data = AES.new(key, AES.MODE_ECB).decrypt(data)
                 data = data[:data.rindex(b'\xe0')]
                 data = data.decode()
             except BaseException:
