@@ -2,9 +2,15 @@
   <div class="hello-container">
     <div class="hello-grow"></div>
     <div class="hello-title">ASM Debugger</div>
-    <div class="hello-input">PL</div>
-    <div class="hello-input">PR</div>
-    <div class="hello-input">SC</div>
+    <div class="hello-input" css-theme="0">
+      <div></div>
+    </div>
+    <div class="hello-input" css-theme="1">
+      <div></div>
+    </div>
+    <div class="hello-input" css-theme="2">
+      <div></div>
+    </div>
     <div class="hello-button">start debug</div>
     <div class="hello-grow"></div>
     <div class="hello-copyright"></div>
@@ -47,22 +53,51 @@ export default {
     color: @color-background-darker;
   }
   .hello-input {
+    position: relative;
     margin-bottom: 8px;
     width: 294px;
-    font-size: 12px;
+    height: 32px;
     line-height: 32px;
+    font-size: 12px;
     border-radius: 4px;
     padding: 0px 12px;
     color: @color-text;
     background-color: @color-background-darker;
     box-shadow: inset 0px 2px 7px 0 rgba(0, 0, 0, 0.8);
+    > div:first-child {
+      position: absolute;
+      left: 12px;
+      top: 8px;
+      width: 16px;
+      height: 16px;
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+      background-position: center center;
+      pointer-events: none;
+    }
+  }
+  .hello-input[css-theme='0'] {
+    > div:first-child {
+      background-image: url('/static/icons/platform.png');
+    }
+  }
+  .hello-input[css-theme='1'] {
+    > div:first-child {
+      background-image: url('/static/icons/process.png');
+    }
+  }
+  .hello-input[css-theme='2'] {
+    > div:first-child {
+      background-image: url('/static/icons/script.png');
+    }
   }
   .hello-button {
     margin-top: 16px;
     margin-left: 182px;
     width: 112px;
-    font-size: 12px;
+    height: 32px;
     line-height: 32px;
+    font-size: 12px;
     border-radius: 4px;
     text-align: center;
     color: @color-text-light;

@@ -168,7 +168,7 @@ export default {
     background-size: 16px 16px;
     background-repeat: no-repeat;
     background-position: center center;
-    background-image: url('/static/icons/folder.png');
+    background-image: url('/static/icons/process.png');
     cursor: context-menu;
   }
   .bar-grow {
