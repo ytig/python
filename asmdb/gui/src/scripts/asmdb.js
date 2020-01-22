@@ -229,11 +229,15 @@ class Debugger {
       };
     }
     if (this.state != 0) {
-      this.ws.send(JSON.stringify(data));
+      if (this.state == 1) {
+        this.ws.send(JSON.stringify(data));
+      }
     } else {
       var runnable = () => {
         if (this.state != 0) {
-          this.ws.send(JSON.stringify(data));
+          if (this.state == 1) {
+            this.ws.send(JSON.stringify(data));
+          }
         } else {
           setTimeout(runnable);
         }
