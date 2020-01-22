@@ -44,7 +44,7 @@ export default {
     height: 24px;
     font-size: 24px;
     font-family: logo;
-    color: #121212;
+    color: @color-background-darker;
   }
   .hello-input {
     margin-bottom: 8px;
@@ -54,7 +54,7 @@ export default {
     border-radius: 4px;
     padding: 0px 12px;
     color: @color-text;
-    background-color: #121212;
+    background-color: @color-background-darker;
     box-shadow: inset 0px 2px 7px 0 rgba(0, 0, 0, 0.8);
   }
   .hello-button {
@@ -66,7 +66,7 @@ export default {
     border-radius: 4px;
     text-align: center;
     color: @color-text-light;
-    background-color: #c24038;
+    background-color: @color-background-enter;
     box-shadow: 0px 2px 7px 0 rgba(0, 0, 0, 0.6);
     cursor: pointer;
   }
