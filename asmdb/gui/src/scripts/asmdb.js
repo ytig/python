@@ -72,6 +72,12 @@ class Debugger {
   }
 
   onClose() {
+    if (this.state == 0) {
+      this.iterObjects('world', (object) => {
+        object.onNew('WebSocket connection to \'' + this.ws.url + '\' failed');
+        object.onCtrl(false);
+      });
+    }
     this.state = -1;
   }
 
