@@ -25,7 +25,7 @@ export default {
 <style lang="less">
 @import '~@/styles/theme';
 @font-face {
-  font-family: logo;
+  font-family: 'logo font';
   src: url('/static/fonts/Quantum.otf');
 }
 
@@ -43,7 +43,7 @@ export default {
     margin-bottom: 24px;
     height: 24px;
     font-size: 24px;
-    font-family: logo;
+    font-family: 'logo font';
     color: @color-background-darker;
   }
   .hello-input {
