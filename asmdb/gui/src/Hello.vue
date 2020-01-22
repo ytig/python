@@ -1,7 +1,7 @@
 <template>
   <div class="hello-container">
     <div class="hello-grow"></div>
-    <div class="hello-title">ASM Debugger</div>
+    <div class="hello-title user-select-none">ASM Debugger</div>
     <div class="hello-input" css-theme="0">
       <div></div>
       <input type="text" />
@@ -14,7 +14,7 @@
       <div></div>
       <input type="text" />
     </div>
-    <div class="hello-button" @click="startDebug">start debug</div>
+    <div class="hello-button user-select-none" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
     <div class="hello-copyright"></div>
   </div>
