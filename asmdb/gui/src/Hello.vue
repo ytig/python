@@ -11,7 +11,7 @@
     <div class="hello-input" css-theme="2">
       <div></div>
     </div>
-    <div class="hello-button">start debug</div>
+    <div class="hello-button" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
     <div class="hello-copyright"></div>
   </div>
