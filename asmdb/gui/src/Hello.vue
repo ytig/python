@@ -4,12 +4,15 @@
     <div class="hello-title">ASM Debugger</div>
     <div class="hello-input" css-theme="0">
       <div></div>
+      <input type="text" />
     </div>
     <div class="hello-input" css-theme="1">
       <div></div>
+      <input type="text" />
     </div>
     <div class="hello-input" css-theme="2">
       <div></div>
+      <input type="text" />
     </div>
     <div class="hello-button" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
@@ -57,13 +60,11 @@ export default {
     margin-bottom: 8px;
     width: 294px;
     height: 32px;
-    line-height: 32px;
-    font-size: 12px;
     border-radius: 4px;
-    padding: 0px 12px;
-    color: @color-text;
     background-color: @color-background-darker;
     box-shadow: inset 0px 2px 7px rgba(0, 0, 0, 0.8);
+    padding-left: 36px;
+    padding-right: 12px;
     > div:first-child {
       position: absolute;
       left: 12px;
@@ -74,6 +75,12 @@ export default {
       background-repeat: no-repeat;
       background-position: center center;
       pointer-events: none;
+    }
+    > input {
+      width: 100%;
+      line-height: 32px;
+      font-size: 12px;
+      color: @color-text;
     }
   }
   .hello-input[css-theme='0'] {
