@@ -1,12 +1,11 @@
 <template>
   <div class="hello-container">
     <div class="hello-grow"></div>
-    <div class="hello-content">
-      <div>PL</div>
-      <div>PR</div>
-      <div>SC</div>
-      <div>start debug</div>
-    </div>
+    <div class="hello-title">ASM Debugger</div>
+    <div class="hello-input">PL</div>
+    <div class="hello-input">PR</div>
+    <div class="hello-input">SC</div>
+    <div class="hello-button">start debug</div>
     <div class="hello-grow"></div>
   </div>
 </template>
@@ -24,6 +23,10 @@ export default {
 
 <style lang="less">
 @import '~@/styles/theme';
+@font-face {
+  font-family: logo;
+  src: url('/static/fonts/Quantum.otf');
+}
 
 .hello-container {
   background: @color-background;
@@ -35,27 +38,42 @@ export default {
   .hello-grow {
     flex-grow: 1;
   }
-  .hello-content {
-    div {
-      margin: 8px 0px;
-      width: 250px;
-      font-size: 12px;
-      line-height: 32px;
-      padding: 0px 12px;
+  .hello-title {
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-family: logo;
+    color: #121212;
+  }
+  .hello-input {
+    margin-bottom: 8px;
+    width: 250px;
+    font-size: 12px;
+    line-height: 32px;
+    padding: 0px 12px;
 
-      border-radius: 4px;
-      background-color: #121212;
+    border-radius: 4px;
+    background-color: #121212;
 
-      color: @color-text;
-      box-shadow: inset 0 2px 7px 0 rgba(0, 0, 0, 0.8);
-    }
-    div:last-child {
-      text-align: center;
-      color: @color-text-light;
-      margin-top: 24px;
-      background-color: #c24038;
-      box-shadow: 0 2px 7px 0 rgba(0, 0, 0, 0.6);
-    }
+    color: @color-text;
+    box-shadow: inset 0 2px 7px 0 rgba(0, 0, 0, 0.8);
+  }
+  .hello-button {
+    margin-top: 16px;
+    margin-bottom: 70px;
+
+    width: 250px;
+    font-size: 12px;
+    line-height: 32px;
+    padding: 0px 12px;
+
+    border-radius: 4px;
+    background-color: #121212;
+
+    text-align: center;
+    color: @color-text-light;
+
+    background-color: #c24038;
+    box-shadow: 0 2px 7px 0 rgba(0, 0, 0, 0.6);
   }
 }
 </style>
