@@ -78,7 +78,7 @@ export default {
   }
   .hello-input[css-theme='0'] {
     > div:first-child {
-      background-image: url('/static/icons/platform.png');
+      background-image: url('/static/icons/device.png');
     }
   }
   .hello-input[css-theme='1'] {
