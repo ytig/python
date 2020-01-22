@@ -7,6 +7,7 @@
     <div class="hello-input">SC</div>
     <div class="hello-button">start debug</div>
     <div class="hello-grow"></div>
+    <div class="hello-copyright"></div>
   </div>
 </template>
 
@@ -40,40 +41,40 @@ export default {
   }
   .hello-title {
     margin-bottom: 24px;
+    height: 24px;
     font-size: 24px;
     font-family: logo;
     color: #121212;
   }
   .hello-input {
     margin-bottom: 8px;
-    width: 250px;
+    width: 294px;
     font-size: 12px;
     line-height: 32px;
-    padding: 0px 12px;
-
     border-radius: 4px;
-    background-color: #121212;
-
+    padding: 0px 12px;
     color: @color-text;
-    box-shadow: inset 0 2px 7px 0 rgba(0, 0, 0, 0.8);
+    background-color: #121212;
+    box-shadow: inset 0px 2px 7px 0 rgba(0, 0, 0, 0.8);
   }
   .hello-button {
     margin-top: 16px;
-    margin-bottom: 70px;
-
-    width: 250px;
+    margin-left: 182px;
+    width: 112px;
     font-size: 12px;
     line-height: 32px;
-    padding: 0px 12px;
-
     border-radius: 4px;
-    background-color: #121212;
-
     text-align: center;
     color: @color-text-light;
-
     background-color: #c24038;
-    box-shadow: 0 2px 7px 0 rgba(0, 0, 0, 0.6);
+    box-shadow: 0px 2px 7px 0 rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+  }
+  .hello-button:hover {
+    filter: brightness(128%);
+  }
+  .hello-copyright {
+    height: 111px;
   }
 }
 </style>
