@@ -60,6 +60,7 @@ export default {
     padding: 12px;
     font-size: 12px;
     color: @color-text-dark;
+    cursor: wait;
   }
 }
 </style>
