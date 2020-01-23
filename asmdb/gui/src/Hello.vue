@@ -16,7 +16,9 @@
     </div>
     <div class="hello-button user-select-none" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
-    <div class="hello-copyright"></div>
+    <div class="hello-copyright">
+      <a class="user-select-none" href="https://github.com/ytig" target="_blank">power by YTIG</a>
+    </div>
   </div>
 </template>
 
@@ -116,7 +118,21 @@ export default {
     filter: brightness(128%);
   }
   .hello-copyright {
+    width: 100%;
     height: 111px;
+    padding-right: 12px;
+    padding-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    > a {
+      font-size: 16px;
+      font-family: 'logo font';
+      color: @color-background-darker;
+      cursor: pointer;
+      text-decoration: none;
+    }
   }
 }
 </style>
