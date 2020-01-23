@@ -457,6 +457,9 @@ export default {
     resize.unregisterEvent(this);
   },
   methods: {
+    isEmpty: function() {
+      return this.source.length == 1 && this.source[0].value.length == 0;
+    },
     copyLog: function() {
       var text = '';
       for (var i = 0; i < this.source.length; i++) {

@@ -75,13 +75,15 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items.push(['Copy log', '', true]);
+      items.push(['Copy log', '', !this.$refs.terminal.isEmpty()]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
       switch (index) {
         case 0:
-          this.$refs.terminal.copyLog();
+          if (!this.$refs.terminal.isEmpty()) {
+            this.$refs.terminal.copyLog();
+          }
           break;
       }
     },
