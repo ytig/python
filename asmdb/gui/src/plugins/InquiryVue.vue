@@ -89,15 +89,15 @@ export default {
     flex-grow: 1;
   }
   .inquiry-content {
-    width: 264px;
+    width: 348px;
     background: @color-background-dark;
     box-shadow: 6px 12px 12px @color-border-shadow;
     .inquiry-title {
-      margin-top: 12px;
+      margin-top: 18px;
       display: flex;
       align-items: center;
       .inquiry-icon {
-        margin-left: 12px;
+        margin-left: 18px;
         width: 16px;
         height: 16px;
         background-size: 16px 16px;
@@ -112,11 +112,11 @@ export default {
       }
     }
     .inquiry-message {
-      margin-left: 12px;
-      margin-top: 8px;
+      margin-left: 18px;
+      margin-top: 12px;
       margin-right: 20px;
-      margin-bottom: 12px;
-      line-height: 18px;
+      margin-bottom: 18px;
+      line-height: 22px;
       font-size: 12px;
       color: @color-text-menu;
     }
@@ -126,7 +126,7 @@ export default {
       .inquiry-button {
         width: 0px;
         flex-grow: 1;
-        line-height: 28px;
+        line-height: 32px;
         text-align: center;
         font-size: 12px;
         color: @color-text-menu;
