@@ -17,7 +17,10 @@
     <div class="hello-button user-select-none" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
     <div class="hello-copyright">
-      <a class="user-select-none" href="https://github.com/ytig" target="_blank">power by YTIG</a>
+      <a class="user-select-none" href="https://github.com/ytig" target="_blank">
+        <span>power&nbsp;by&nbsp;</span>
+        <span>ytig</span>
+      </a>
     </div>
   </div>
 </template>
@@ -127,11 +130,17 @@ export default {
     justify-content: flex-end;
     align-items: flex-end;
     > a {
-      font-size: 16px;
-      font-family: 'logo font';
-      color: @color-background-darker;
-      cursor: pointer;
       text-decoration: none;
+      > span {
+        font-size: 12px;
+        cursor: pointer;
+      }
+      > span:first-child {
+        color: @color-text-dark;
+      }
+      > span:last-child {
+        color: @color-text-light;
+      }
     }
   }
 }
