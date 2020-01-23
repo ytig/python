@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 import json
+import urllib
 import base64
 import tempfile
 import traceback
@@ -52,6 +53,10 @@ async def _onclose(token, emit):
         await session.onclose(emit)
 
 
+def parse_token(token):
+    return json.loads(urllib.parse.unquote(token))
+
+
 def suit_js(obj):
     if isinstance(obj, (tuple, list,)):
         return list(suit_js(i) for i in obj)
@@ -73,7 +78,7 @@ class Session:
     async def onopen(self, emit):
         if not self._emits:
             try:
-                self._ctrl = await WsGdbController.anew(json.loads(self._token), lambda msg: self.notify('anew', msg + '\n', emit=emit))
+                self._ctrl = await WsGdbController.anew(parse_token(self._token), lambda msg: self.notify('anew', msg + '\n', emit=emit))
             except BaseException as e:
                 traceback.print_exc()
         self._emits.append(emit)
