@@ -28,14 +28,23 @@
 <script>
 export default {
   data: function() {
+    var token = this.$cookies.get('token');
+    if (typeof token != 'object') {
+      token = {};
+    }
     return {
-      device: '',
-      process: '',
-      script: ''
+      device: token.device || '',
+      process: token.process || '',
+      script: token.script || ''
     };
   },
   methods: {
     startDebug: function() {
+      this.$cookies.set('token', {
+        device: this.device,
+        process: this.process,
+        script: this.script
+      });
       document.body.webkitRequestFullScreen();
       this.$router.replace('/world');
     }

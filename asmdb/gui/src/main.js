@@ -2,6 +2,8 @@ import '@/styles/global.less';
 import '@/scripts/window';
 
 import Vue from 'vue';
+import VueCookies from 'vue-cookies';
+Vue.use(VueCookies);
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 

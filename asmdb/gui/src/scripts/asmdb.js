@@ -1,6 +1,5 @@
 class Debugger {
   constructor() {
-    document.cookie = 'token={}; path=/'; //for test
     this.TYPE = 'arm32';
     switch (this.TYPE) {
       case 'arm32':
