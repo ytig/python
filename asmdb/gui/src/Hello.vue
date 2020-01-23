@@ -130,7 +130,6 @@ export default {
     justify-content: flex-end;
     align-items: flex-end;
     > a {
-      text-decoration: none;
       > span {
         cursor: pointer;
       }
