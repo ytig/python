@@ -162,7 +162,7 @@ export default {
     cursor: pointer;
   }
   .hello-button:hover {
-    filter: brightness(128%);
+    filter: brightness(144%);
   }
   .hello-copyright {
     width: 100%;
