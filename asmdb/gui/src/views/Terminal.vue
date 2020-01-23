@@ -124,6 +124,7 @@ class Source {
     this.color = '';
     this.background = '';
     this.invalidate = 0;
+    this.playable = false;
   }
 
   getOffset(position, index) {
@@ -288,7 +289,9 @@ class Source {
   }
 
   bel() {
-    playSound('/static/sounds/bel.m4a');
+    if (this.playable) {
+      playSound('/static/sounds/bel.m4a');
+    }
   }
 
   bs() {
@@ -413,6 +416,9 @@ class Source {
       this[keys[item[0]]](item[1]);
     }
     this.invalidate++;
+    if (utf8) {
+      this.playable = true;
+    }
   }
 }
 
