@@ -132,14 +132,15 @@ export default {
     > a {
       text-decoration: none;
       > span {
-        font-size: 12px;
         cursor: pointer;
       }
       > span:first-child {
+        font-size: 12px;
         color: @color-text-dark;
       }
       > span:last-child {
-        color: @color-text-light;
+        font-size: 14px;
+        color: @color-text4;
       }
     }
   }
