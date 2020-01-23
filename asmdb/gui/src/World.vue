@@ -39,6 +39,10 @@ export default {
     this.$progress.alert();
   },
   destroyed: function() {
+    this.$menu.close();
+    this.$editor.close();
+    this.$inquiry.close();
+    this.$progress.close();
     asmdb.getInstance().unregisterEvent('world', this);
     asmdb.oldInstance();
   },
