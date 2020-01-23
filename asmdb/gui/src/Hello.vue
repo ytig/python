@@ -29,7 +29,7 @@
 export default {
   data: function() {
     var token = this.$cookies.get('token');
-    if (typeof token != 'object') {
+    if (!token || typeof token != 'object') {
       token = {};
     }
     return {
