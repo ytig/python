@@ -4,15 +4,15 @@
     <div class="hello-title user-select-none">ASM Debugger</div>
     <div class="hello-input" css-theme="0">
       <div></div>
-      <input type="text" />
+      <input type="text" v-model="device" />
     </div>
     <div class="hello-input" css-theme="1">
       <div></div>
-      <input type="text" />
+      <input type="text" v-model="process" />
     </div>
     <div class="hello-input" css-theme="2">
       <div></div>
-      <input type="text" />
+      <input type="text" v-model="script" />
     </div>
     <div class="hello-button user-select-none" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
@@ -27,6 +27,13 @@
 
 <script>
 export default {
+  data: function() {
+    return {
+      device: '',
+      process: '',
+      script: ''
+    };
+  },
   methods: {
     startDebug: function() {
       document.body.webkitRequestFullScreen();
@@ -86,6 +93,7 @@ export default {
       line-height: 32px;
       font-size: 12px;
       color: @color-text;
+      text-overflow: ellipsis;
     }
   }
   .hello-input[css-theme='0'] {
