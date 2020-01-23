@@ -61,9 +61,10 @@ export default {
   pointer-events: none;
   > span {
     padding: 8px 12px;
-    background: @color-background-dark;
-    box-shadow: 2px 4px 8px @color-border-shadow;
-    color: @color-text-menu;
+    border-radius: 4px;
+    background: @color-background-darker;
+    box-shadow: 0px 2px 4px @color-border-shadow;
+    color: @color-text;
     font-size: 12px;
     word-break: break-word;
   }
