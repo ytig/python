@@ -63,8 +63,6 @@ export default {
     border-radius: 4px;
     background-color: @color-background-darker;
     box-shadow: inset 0px 2px 7px rgba(0, 0, 0, 0.8);
-    padding-left: 36px;
-    padding-right: 12px;
     > div:first-child {
       position: absolute;
       left: 12px;
@@ -78,6 +76,8 @@ export default {
     }
     > input {
       width: 100%;
+      padding-left: 36px;
+      padding-right: 12px;
       line-height: 32px;
       font-size: 12px;
       color: @color-text;
