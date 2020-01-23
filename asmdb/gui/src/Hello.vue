@@ -26,25 +26,52 @@
 </template>
 
 <script>
+function getToken(obj, key) {
+  var token = obj.get('token');
+  if (!token || typeof token != 'object') {
+    token = {};
+  }
+  var val = token[key];
+  if (typeof val != 'string') {
+    val = '';
+  }
+  return val;
+}
+
+function setToken(obj, key, val) {
+  var token = obj.get('token');
+  if (!token || typeof token != 'object') {
+    token = {};
+  }
+  token[key] = val;
+  obj.set('token', token);
+}
+
+function delToken(obj, key) {
+  var token = obj.get('token');
+  if (!token || typeof token != 'object') {
+    token = {};
+  }
+  delete token[key];
+  obj.set('token', token);
+}
+
 export default {
+  getToken: getToken,
+  setToken: setToken,
+  delToken: delToken,
   data: function() {
-    var token = this.$cookies.get('token');
-    if (!token || typeof token != 'object') {
-      token = {};
-    }
     return {
-      device: token.device || '',
-      process: token.process || '',
-      script: token.script || ''
+      device: getToken(this.$cookies, 'device'),
+      process: getToken(this.$cookies, 'process'),
+      script: getToken(this.$cookies, 'script')
     };
   },
   methods: {
     startDebug: function() {
-      this.$cookies.set('token', {
-        device: this.device,
-        process: this.process,
-        script: this.script
-      });
+      setToken(this.$cookies, 'device', this.device);
+      setToken(this.$cookies, 'process', this.process);
+      setToken(this.$cookies, 'script', this.script);
       document.body.webkitRequestFullScreen();
       this.$router.replace('/world');
     }

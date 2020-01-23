@@ -2,7 +2,7 @@
   <div class="bar-container" @wheel.passive="requestFocus" @mousedown="requestFocus" @mouseup="onMouseUp">
     <div class="bar-icon" @click="onMouseUp2"></div>
     <div class="bar-grow">
-      <span class="bar-text user-select-none" @click="onMouseUp2">{{title}}</span>
+      <span class="bar-text user-select-none" @click="onMouseUp2">{{process}}</span>
     </div>
     <div class="bar-item" v-for="(item, index) in items" :key="index" :title="item.title" :style="item.style" @click="onClickItem(index)" :css-enable="enable.bool_f"></div>
   </div>
@@ -12,12 +12,13 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 import sloth from '@/scripts/sloth';
+import Hello from '@/Hello';
 
 export default {
   data: function() {
     return {
       enable: new sloth(999),
-      title: 'com.example.app'
+      process: Hello.getToken(this.$cookies, 'process')
     };
   },
   computed: {
