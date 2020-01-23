@@ -68,6 +68,9 @@ export default {
     onCtrl: function(ctrl) {
       if (!ctrl) {
         setTimeout(() => {
+          if (this._isDestroyed) {
+            return;
+          }
           this.$progress.close();
           this.$inquiry.alert('error', 'Unconnected', 'Your process is not available, Do you want to reload?', () => {
             this.$root.reload();
@@ -75,6 +78,9 @@ export default {
         }, 2750);
       } else {
         setTimeout(() => {
+          if (this._isDestroyed) {
+            return;
+          }
           this.$progress.close();
         }, 0);
       }
