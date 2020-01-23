@@ -64,7 +64,7 @@ export default {
     border-radius: 4px;
     background: @color-background-darker;
     box-shadow: 0px 2px 4px @color-border-shadow;
-    color: @color-text;
+    color: @color-text-menu;
     font-size: 12px;
     word-break: break-word;
   }
