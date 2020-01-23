@@ -89,7 +89,7 @@ export default {
     flex-grow: 1;
   }
   .inquiry-content {
-    width: 348px;
+    width: 294px;
     background: @color-background-dark;
     box-shadow: 6px 12px 12px @color-border-shadow;
     .inquiry-title {
@@ -113,9 +113,9 @@ export default {
     }
     .inquiry-message {
       margin-left: 18px;
-      margin-top: 12px;
-      margin-right: 20px;
-      margin-bottom: 18px;
+      margin-top: 8px;
+      margin-right: 22px;
+      margin-bottom: 22px;
       line-height: 22px;
       font-size: 12px;
       color: @color-text-menu;
