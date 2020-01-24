@@ -26,6 +26,10 @@
 <script>
 import resize from '@/scripts/resize';
 
+function getBarHeight() {
+  return window.outerHeight - window.innerHeight;
+}
+
 function getToken(obj, key) {
   var token = obj.get('token');
   if (!token || typeof token != 'object') {
@@ -62,15 +66,14 @@ export default {
   delToken: delToken,
   data: function() {
     return {
+      barHeight: getBarHeight(),
       device: getToken(this.$cookies, 'device'),
       process: getToken(this.$cookies, 'process'),
-      script: getToken(this.$cookies, 'script'),
-      barHeight: 0
+      script: getToken(this.$cookies, 'script')
     };
   },
   mounted: function() {
     resize.registerEvent(this);
-    this.onResize();
   },
   destroyed: function() {
     resize.unregisterEvent(this);
@@ -78,7 +81,7 @@ export default {
   methods: {
     onResize: function() {
       requestAnimationFrames(i => {
-        this.barHeight = window.outerHeight - window.innerHeight;
+        this.barHeight = getBarHeight();
         return !(i < 60);
       });
     },
