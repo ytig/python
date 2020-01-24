@@ -130,7 +130,7 @@ export default {
     border: 1px solid @color-border;
     overflow-y: scroll;
     .assist-input-loading {
-      padding-left: 36px;
+      padding-left: 12px;
       padding-right: 12px;
       font-size: 12px;
       line-height: 24px;
