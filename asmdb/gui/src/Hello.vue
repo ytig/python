@@ -103,14 +103,20 @@ export default {
     updateDeviceAssist: function() {
       this.deviceAssist = null; //todo
       setTimeout(() => {
-        this.deviceAssist = ['android://123', 'mac://0'];
+        this.deviceAssist = ['android://123', 'mac://0', 'mac://1', 'mac://2', 'mac://3', 'mac://4', 'mac://5'];
       }, 200);
     },
     updateProcessAssist: function() {
       this.processAssist = null; //todo
+      setTimeout(() => {
+        this.processAssist = [];
+      }, 200);
     },
     updateScriptAssist: function() {
       this.scriptAssist = null; //todo
+      setTimeout(() => {
+        this.scriptAssist = [];
+      }, 200);
     },
     startDebug: function() {
       setToken(this.$cookies, 'device', this.device);
