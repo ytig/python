@@ -2,18 +2,9 @@
   <div class="hello-container">
     <div class="hello-grow"></div>
     <div class="hello-title user-select-none">ASM Debugger</div>
-    <div class="hello-input" css-theme="0">
-      <div></div>
-      <input type="text" v-model="device" />
-    </div>
-    <div class="hello-input" css-theme="1">
-      <div></div>
-      <input type="text" v-model="process" />
-    </div>
-    <div class="hello-input" css-theme="2">
-      <div></div>
-      <input type="text" v-model="script" />
-    </div>
+    <AssistInput class="hello-input" :icon="'device'" :assist="deviceAssist" v-model="device"></AssistInput>
+    <AssistInput class="hello-input" :icon="'process'" :assist="processAssist" v-model="process"></AssistInput>
+    <AssistInput class="hello-input" :icon="'script'" :assist="scriptAssist" v-model="script"></AssistInput>
     <div class="hello-button user-select-none" :style="{marginBottom:barHeight+'px'}" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
     <a class="hello-copyright user-select-none" href="https://github.com/ytig" target="_blank">
@@ -69,8 +60,32 @@ export default {
       barHeight: getBarHeight(),
       device: getToken(this.$cookies, 'device'),
       process: getToken(this.$cookies, 'process'),
-      script: getToken(this.$cookies, 'script')
+      script: getToken(this.$cookies, 'script'),
+      deviceAssist: null,
+      processAssist: null,
+      scriptAssist: null
     };
+  },
+  watch: {
+    device: {
+      immediate: true,
+      handler: function() {
+        this.updateDeviceAssist();
+        this.updateProcessAssist();
+      }
+    },
+    process: {
+      immediate: true,
+      handler: function() {
+        this.updateProcessAssist();
+      }
+    },
+    script: {
+      immediate: true,
+      handler: function() {
+        this.updateScriptAssist();
+      }
+    }
   },
   mounted: function() {
     resize.registerEvent(this);
@@ -84,6 +99,15 @@ export default {
         this.barHeight = getBarHeight();
         return !(i < 60);
       });
+    },
+    updateDeviceAssist: function() {
+      this.deviceAssist = null; //todo
+    },
+    updateProcessAssist: function() {
+      this.processAssist = null; //todo
+    },
+    updateScriptAssist: function() {
+      this.scriptAssist = null; //todo
     },
     startDebug: function() {
       setToken(this.$cookies, 'device', this.device);
@@ -121,48 +145,8 @@ export default {
     color: @color-background-darker;
   }
   .hello-input {
-    position: relative;
     margin-bottom: 8px;
     width: 294px;
-    height: 32px;
-    border-radius: 4px;
-    background-color: @color-background-darker;
-    box-shadow: inset 0px 2px 7px rgba(0, 0, 0, 0.8);
-    > div:first-child {
-      position: absolute;
-      left: 12px;
-      top: 8px;
-      width: 16px;
-      height: 16px;
-      background-size: 16px 16px;
-      background-repeat: no-repeat;
-      background-position: center center;
-      pointer-events: none;
-    }
-    > input {
-      width: 100%;
-      padding-left: 36px;
-      padding-right: 12px;
-      line-height: 32px;
-      font-size: 12px;
-      color: @color-text;
-      text-overflow: ellipsis;
-    }
-  }
-  .hello-input[css-theme='0'] {
-    > div:first-child {
-      background-image: url('/static/icons/device.png');
-    }
-  }
-  .hello-input[css-theme='1'] {
-    > div:first-child {
-      background-image: url('/static/icons/process.png');
-    }
-  }
-  .hello-input[css-theme='2'] {
-    > div:first-child {
-      background-image: url('/static/icons/script.png');
-    }
   }
   .hello-button {
     margin-top: 16px;
@@ -175,7 +159,7 @@ export default {
     text-align: center;
     color: @color-text-light;
     background-color: @color-background-enter;
-    box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.6);
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.6);
     cursor: pointer;
   }
   .hello-button:hover {

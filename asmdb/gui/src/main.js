@@ -18,6 +18,7 @@ Vue.use(progress);
 import toast from '@/plugins/toast';
 Vue.use(toast);
 
+import AssistInput from '@/views/AssistInput';
 import Byte from '@/views/Byte';
 import Bytes from '@/views/Bytes';
 import Comment from '@/views/Comment';
@@ -41,6 +42,7 @@ import Python3 from '@/windows/Python3';
 import Registers from '@/windows/Registers';
 import Stack from '@/windows/Stack';
 import Watchpoints from '@/windows/Watchpoints';
+Vue.component('AssistInput', AssistInput);
 Vue.component('Byte', Byte);
 Vue.component('Bytes', Bytes);
 Vue.component('Comment', Comment);
