@@ -93,11 +93,11 @@ export default {
     background: @color-background-dark;
     box-shadow: 6px 12px 12px @color-border-shadow;
     .inquiry-title {
-      margin-top: 18px;
+      margin-top: 16px;
       display: flex;
       align-items: center;
       .inquiry-icon {
-        margin-left: 18px;
+        margin-left: 16px;
         width: 16px;
         height: 16px;
         background-size: 16px 16px;
@@ -112,11 +112,11 @@ export default {
       }
     }
     .inquiry-message {
-      margin-left: 18px;
+      margin-left: 16px;
       margin-top: 8px;
-      margin-right: 22px;
-      margin-bottom: 22px;
-      line-height: 22px;
+      margin-right: 20px;
+      margin-bottom: 16px;
+      line-height: 20px;
       font-size: 12px;
       color: @color-text-menu;
     }
