@@ -145,7 +145,7 @@ export default {
       cursor: pointer;
     }
     .assist-input-item:hover {
-      background: @color-text-dark;
+      background: @color-background-selection;
     }
   }
 }
