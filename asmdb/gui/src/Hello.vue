@@ -14,7 +14,7 @@
       <div></div>
       <input type="text" v-model="script" />
     </div>
-    <div class="hello-button user-select-none" :style="{marginBottom:margin+'px'}" @click="startDebug">start debug</div>
+    <div class="hello-button user-select-none" :style="{marginBottom:barHeight+'px'}" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
     <a class="hello-copyright user-select-none" href="https://github.com/ytig" target="_blank">
       <span>power&nbsp;by&nbsp;</span>
@@ -65,7 +65,7 @@ export default {
       device: getToken(this.$cookies, 'device'),
       process: getToken(this.$cookies, 'process'),
       script: getToken(this.$cookies, 'script'),
-      margin: 0
+      barHeight: 0
     };
   },
   mounted: function() {
@@ -78,7 +78,7 @@ export default {
   methods: {
     onResize: function() {
       requestAnimationFrames(i => {
-        this.margin = window.outerHeight - window.innerHeight;
+        this.barHeight = window.outerHeight - window.innerHeight;
         return !(i < 60);
       });
     },
