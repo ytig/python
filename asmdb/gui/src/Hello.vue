@@ -14,18 +14,18 @@
       <div></div>
       <input type="text" v-model="script" />
     </div>
-    <div class="hello-button user-select-none" @click="startDebug">start debug</div>
+    <div class="hello-button user-select-none" :style="{marginBottom:margin+'px'}" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
-    <div class="hello-copyright">
-      <a class="user-select-none" href="https://github.com/ytig" target="_blank">
-        <span>power&nbsp;by&nbsp;</span>
-        <span>ytig</span>
-      </a>
-    </div>
+    <a class="hello-copyright user-select-none" href="https://github.com/ytig" target="_blank">
+      <span>power&nbsp;by&nbsp;</span>
+      <span>ytig</span>
+    </a>
   </div>
 </template>
 
 <script>
+import resize from '@/scripts/resize';
+
 function getToken(obj, key) {
   var token = obj.get('token');
   if (!token || typeof token != 'object') {
@@ -64,10 +64,24 @@ export default {
     return {
       device: getToken(this.$cookies, 'device'),
       process: getToken(this.$cookies, 'process'),
-      script: getToken(this.$cookies, 'script')
+      script: getToken(this.$cookies, 'script'),
+      margin: 0
     };
   },
+  mounted: function() {
+    resize.registerEvent(this);
+    this.onResize();
+  },
+  destroyed: function() {
+    resize.unregisterEvent(this);
+  },
   methods: {
+    onResize: function() {
+      requestAnimationFrames(i => {
+        this.margin = window.outerHeight - window.innerHeight;
+        return !(i < 60);
+      });
+    },
     startDebug: function() {
       setToken(this.$cookies, 'device', this.device);
       setToken(this.$cookies, 'process', this.process);
@@ -165,26 +179,19 @@ export default {
     filter: brightness(144%);
   }
   .hello-copyright {
-    width: 100%;
-    height: 111px;
-    padding-right: 12px;
-    padding-bottom: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-end;
-    > a {
-      > span {
-        cursor: pointer;
-      }
-      > span:first-child {
-        font-size: 12px;
-        color: @color-text-dark;
-      }
-      > span:last-child {
-        font-size: 14px;
-        color: @color-text4;
-      }
+    position: fixed;
+    right: 12px;
+    bottom: 8px;
+    > span {
+      cursor: pointer;
+    }
+    > span:first-child {
+      font-size: 12px;
+      color: @color-text-dark;
+    }
+    > span:last-child {
+      font-size: 14px;
+      color: @color-text4;
     }
   }
 }
