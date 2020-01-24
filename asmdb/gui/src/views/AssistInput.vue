@@ -125,21 +125,19 @@ export default {
   .assist-input-assist {
     position: absolute;
     z-index: 1;
-    width: 270px;
-    margin-left: 24px;
-    // padding-right: 24px;
+    width: 100%;
     background: @color-text;
     border: 1px solid @color-border;
     overflow-y: scroll;
     .assist-input-loading {
-      padding-left: 12px;
+      padding-left: 36px;
       padding-right: 12px;
       font-size: 12px;
       line-height: 24px;
       color: @color-text-darker;
     }
     .assist-input-item {
-      padding-left: 12px;
+      padding-left: 36px;
       padding-right: 12px;
       font-size: 12px;
       line-height: 24px;
