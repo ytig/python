@@ -128,7 +128,7 @@ export default {
     onBlur: function() {
       if (this.focus) {
         requestAnimationFrames(i => {
-          if (!this.focus) {
+          if (!this.focus || this._isDestroyed) {
             return true;
           }
           var autoFocus = !this.touchingLeft && !this.touchingRight && getSelection().type != 'Range' && !this.$menu.show;
