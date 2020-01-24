@@ -102,6 +102,9 @@ export default {
     },
     updateDeviceAssist: function() {
       this.deviceAssist = null; //todo
+      setTimeout(() => {
+        this.deviceAssist = ['android://123', 'mac://0'];
+      }, 200);
     },
     updateProcessAssist: function() {
       this.processAssist = null; //todo
