@@ -2,9 +2,9 @@
   <div class="hello-container">
     <div class="hello-grow"></div>
     <div class="hello-title user-select-none">ASM Debugger</div>
-    <AssistInput class="hello-input" :icon="'device'" :assist="deviceAssist" v-model="device"></AssistInput>
-    <AssistInput class="hello-input" :icon="'process'" :assist="processAssist" v-model="process"></AssistInput>
-    <AssistInput class="hello-input" :icon="'script'" :assist="scriptAssist" v-model="script"></AssistInput>
+    <AssistInput class="hello-input" style="z-index:3" :icon="'device'" :assist="deviceAssist" v-model="device"></AssistInput>
+    <AssistInput class="hello-input" style="z-index:2" :icon="'process'" :assist="processAssist" v-model="process"></AssistInput>
+    <AssistInput class="hello-input" style="z-index:1" :icon="'script'" :assist="scriptAssist" v-model="script"></AssistInput>
     <div class="hello-button user-select-none" :style="{marginBottom:barHeight+'px'}" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
     <a class="hello-copyright user-select-none" href="https://github.com/ytig" target="_blank">
@@ -104,18 +104,18 @@ export default {
       this.deviceAssist = null; //todo
       setTimeout(() => {
         this.deviceAssist = ['android://123', 'mac://0', 'mac://1', 'mac://2', 'mac://3', 'mac://4', 'mac://5'];
-      }, 200);
+      }, 3000);
     },
     updateProcessAssist: function() {
       this.processAssist = null; //todo
       setTimeout(() => {
-        this.processAssist = [];
+        this.processAssist = ['test'];
       }, 200);
     },
     updateScriptAssist: function() {
       this.scriptAssist = null; //todo
       setTimeout(() => {
-        this.scriptAssist = [];
+        this.scriptAssist = ['test'];
       }, 200);
     },
     startDebug: function() {
