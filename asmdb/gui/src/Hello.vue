@@ -101,22 +101,77 @@ export default {
       });
     },
     updateDeviceAssist: function() {
-      this.deviceAssist = null; //todo
-      setTimeout(() => {
-        this.deviceAssist = ['android://123', 'mac://0', 'mac://1', 'mac://2', 'mac://3', 'mac://4', 'mac://5', 'mac://6', 'mac://7', 'mac://8', 'mac://9'];
-      }, 3000);
+      this.deviceAssist = null;
+      var device = this.device;
+      this.$http
+        .get('/assist', {
+          type: 'device',
+          value: device
+        })
+        .then(
+          resp => {
+            if (device != this.device) {
+              return;
+            }
+            this.deviceAssist = resp.data;
+          },
+          resp => {
+            if (device != this.device) {
+              return;
+            }
+            this.deviceAssist = [];
+          }
+        );
     },
     updateProcessAssist: function() {
-      this.processAssist = null; //todo
-      setTimeout(() => {
-        this.processAssist = ['test'];
-      }, 200);
+      this.processAssist = null;
+      var device = this.device;
+      var process = this.process;
+      this.$http
+        .get('/assist', {
+          type: 'process',
+          value: process,
+          context: {
+            device: device
+          }
+        })
+        .then(
+          resp => {
+            if (device != this.device || process != this.process) {
+              return;
+            }
+            this.processAssist = resp.data;
+          },
+          resp => {
+            if (device != this.device || process != this.process) {
+              return;
+            }
+            this.processAssist = [];
+          }
+        );
     },
     updateScriptAssist: function() {
-      this.scriptAssist = null; //todo
-      setTimeout(() => {
-        this.scriptAssist = ['test0', 'test1', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9'];
-      }, 200);
+      this.scriptAssist = null;
+      var script = this.script;
+      this.$http
+        .get('/assist', {
+          type: 'script',
+          value: script
+        })
+        .then(
+          resp => {
+            if (script != this.script) {
+              return;
+            }
+            this.scriptAssist = resp.data;
+          },
+          resp => {
+            if (script != this.script) {
+              return;
+            }
+            this.scriptAssist = [];
+          }
+        );
     },
     startDebug: function() {
       setToken(this.$cookies, 'device', this.device);
