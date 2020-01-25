@@ -6,6 +6,8 @@ import VueCookies from 'vue-cookies';
 Vue.use(VueCookies);
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
+import VueResource from 'vue-resource';
+Vue.use(VueResource);
 
 import editor from '@/plugins/editor';
 Vue.use(editor);
