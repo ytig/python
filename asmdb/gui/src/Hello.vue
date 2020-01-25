@@ -101,7 +101,6 @@ export default {
       });
     },
     updateDeviceAssist: function() {
-      this.deviceAssist = null;
       var device = this.device;
       this.$http
         .get('/assist', {
@@ -124,7 +123,6 @@ export default {
         );
     },
     updateProcessAssist: function() {
-      this.processAssist = null;
       var device = this.device;
       var process = this.process;
       this.$http
@@ -151,7 +149,6 @@ export default {
         );
     },
     updateScriptAssist: function() {
-      this.scriptAssist = null;
       var script = this.script;
       this.$http
         .get('/assist', {
