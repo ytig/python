@@ -14,8 +14,6 @@
 import Animation from '@/scripts/animation';
 import sloth from '@/scripts/sloth';
 
-//close图标替换
-//z-index重叠问题
 //文本过长显示问题
 //loading优化
 
