@@ -1,7 +1,7 @@
 <template>
   <div class="assist-input-container">
     <div :style="{backgroundImage:backgroundImage}"></div>
-    <div v-show="focus.bool_f&&value.length>0" @mousedown="requestFocus" @click="onClose"></div>
+    <div v-show="focus&&value.length>0" @mousedown="requestFocus" @click="onClose"></div>
     <input ref="input" type="text" :value="value" @input="onInput" @focus="onFocus" @blur="onBlur" />
     <div v-if="height>0" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
       <div class="assist-input-loading" v-if="assist==null">loading</div>
@@ -12,12 +12,12 @@
 
 <script>
 import Animation from '@/scripts/animation';
-import sloth from '@/scripts/sloth';
 
 export default {
   data: function() {
     return {
-      focus: new sloth(0),
+      focus: false,
+      counter: 0,
       anim: new Animation((value, target) => {
         const power = 0.75;
         const duration = 180;
@@ -32,6 +32,9 @@ export default {
     assist: Array
   },
   watch: {
+    focus: function() {
+      this.onAnim();
+    },
     assist: function() {
       this.onAnim();
     }
@@ -47,12 +50,17 @@ export default {
   },
   methods: {
     onFocus: function() {
-      this.focus.set(true);
-      this.onAnim();
+      this.counter++;
+      this.focus = true;
     },
     onBlur: function() {
-      this.focus.set(false);
-      this.onAnim();
+      var counter = ++this.counter;
+      setTimeout(() => {
+        if (counter != this.counter) {
+          return;
+        }
+        this.focus = false;
+      });
     },
     requestFocus: function() {
       setTimeout(() => {
@@ -60,7 +68,7 @@ export default {
       });
     },
     onAnim: function() {
-      if (this.focus.bool_t) {
+      if (this.focus) {
         var row = this.assist == null ? 1 : this.assist.length;
         var target = Math.min(row / 7.5, 1);
         this.anim.$target(target);
