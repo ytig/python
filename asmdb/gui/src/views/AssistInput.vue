@@ -3,7 +3,7 @@
     <div :style="{backgroundImage:backgroundImage}"></div>
     <div v-show="focus.bool_f&&value.length>0" @mousedown="requestFocus" @click="onClose"></div>
     <input ref="input" type="text" :value="value" @input="onInput" @focus="onFocus" @blur="onBlur" />
-    <div v-show="height>0" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
+    <div v-if="height>0" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
       <div class="assist-input-loading" v-if="assist==null">loading</div>
       <div class="assist-input-item" v-for="item in assist" :key="item" @click="onClickItem(item)">{{item}}</div>
     </div>
