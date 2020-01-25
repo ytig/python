@@ -14,9 +14,6 @@
 import Animation from '@/scripts/animation';
 import sloth from '@/scripts/sloth';
 
-//文本过长显示问题
-//loading优化
-
 export default {
   data: function() {
     return {
@@ -147,6 +144,11 @@ export default {
       font-size: 12px;
       line-height: 22px;
       color: @color-text-menu;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      direction: rtl;
+      text-align: left;
       cursor: pointer;
     }
     .assist-input-item:hover {
