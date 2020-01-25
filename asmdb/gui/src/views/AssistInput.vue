@@ -106,10 +106,10 @@ export default {
   }
   > div:nth-child(2) {
     position: absolute;
-    right: -32px;
-    top: 0px;
-    width: 32px;
-    height: 32px;
+    right: -28px;
+    top: 4px;
+    width: 24px;
+    height: 24px;
     background-size: 16px 16px;
     background-repeat: no-repeat;
     background-position: center center;
@@ -122,33 +122,35 @@ export default {
     padding-right: 12px;
     line-height: 32px;
     font-size: 12px;
-    color: @color-text;
+    color: @color-text-menu;
     text-overflow: ellipsis;
   }
   .assist-input-assist {
     position: absolute;
     z-index: 1;
     width: 100%;
-    background: @color-text;
-    border: 1px solid @color-border;
+    left: 0px;
+    top: 36px;
+    background: @color-background-dark;
+    border: 1px solid @color-border-light;
+    box-shadow: 0px 4px 6px @color-border-shadow;
     overflow-y: scroll;
     .assist-input-loading {
-      padding-left: 12px;
-      padding-right: 12px;
+      text-align: center;
       font-size: 12px;
       line-height: 22px;
-      color: @color-text-darker;
+      color: @color-text-menu-dark;
     }
     .assist-input-item {
       padding-left: 36px;
       padding-right: 12px;
       font-size: 12px;
       line-height: 22px;
-      color: @color-background-darker;
+      color: @color-text-menu;
       cursor: pointer;
     }
     .assist-input-item:hover {
-      background: @color-background-selection;
+      background: @color-background-hover;
     }
   }
 }
