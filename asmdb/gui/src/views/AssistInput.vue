@@ -45,7 +45,7 @@ export default {
       return "url('" + url + "')";
     },
     height: function() {
-      return 5.5 * 24 * this.anim.value;
+      return 5.5 * 22 * this.anim.value;
     }
   },
   methods: {
@@ -136,14 +136,14 @@ export default {
       padding-left: 12px;
       padding-right: 12px;
       font-size: 12px;
-      line-height: 24px;
+      line-height: 22px;
       color: @color-text-darker;
     }
     .assist-input-item {
       padding-left: 36px;
       padding-right: 12px;
       font-size: 12px;
-      line-height: 24px;
+      line-height: 22px;
       color: @color-background-darker;
       cursor: pointer;
     }
