@@ -45,7 +45,7 @@ export default {
       return "url('" + url + "')";
     },
     height: function() {
-      return 5.5 * 22 * this.anim.value;
+      return 7.5 * 22 * this.anim.value;
     }
   },
   methods: {
@@ -65,7 +65,7 @@ export default {
     onAnim: function() {
       if (this.focus.bool_t) {
         var row = this.assist == null ? 1 : this.assist.length;
-        var target = Math.min(row / 5.5, 1);
+        var target = Math.min(row / 7.5, 1);
         this.anim.$target(target);
       } else {
         this.anim.$target(0);

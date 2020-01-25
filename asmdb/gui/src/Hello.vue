@@ -115,7 +115,7 @@ export default {
     updateScriptAssist: function() {
       this.scriptAssist = null; //todo
       setTimeout(() => {
-        this.scriptAssist = ['test'];
+        this.scriptAssist = ['test0', 'test1', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9'];
       }, 200);
     },
     startDebug: function() {
@@ -143,6 +143,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-y: scroll;
   .hello-grow {
     flex-grow: 1;
   }
