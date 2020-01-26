@@ -110,9 +110,7 @@ export default {
     },
     onClickItem: function(item) {
       this.$emit('input', item);
-      this.$nextTick(() => {
-        this.selectEnd();
-      });
+      this.$nextTick(this.selectEnd);
     }
   }
 };

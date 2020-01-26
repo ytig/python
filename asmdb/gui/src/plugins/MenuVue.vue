@@ -35,7 +35,7 @@ export default {
       this.show = true;
       this.items = items || [['nothing', '', false]];
       this.listener = listener || null;
-      this.$nextTick(function() {
+      this.$nextTick(() => {
         var view = this.$refs.container;
         this.left = event.clientX - (event.clientX + view.clientWidth <= window.innerWidth ? 0 : view.clientWidth);
         this.top = event.clientY - (event.clientY + view.clientHeight <= window.innerHeight ? 0 : view.clientHeight);

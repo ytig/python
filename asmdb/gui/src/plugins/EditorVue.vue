@@ -68,7 +68,7 @@ export default {
       this.composition = false;
       this.text = '';
       this.$refs.input.value = '';
-      this.$nextTick(function() {
+      this.$nextTick(() => {
         this.$refs.input.focus();
       });
       this.anim.$value(0);
