@@ -2,10 +2,10 @@
   <div class="assist-input-container">
     <div :style="{backgroundImage:backgroundImage}"></div>
     <div v-show="focus&&value.length>0" @mousedown="requestFocus" @click="onClose"></div>
-    <input ref="input" type="text" :value="value" @input="onInput" @keypress="onKeyPress" @focus="onFocus" @blur="onBlur" />
+    <input ref="input" type="text" :value="value" @input="onInput" @keydown="onKeyDown" @focus="onFocus" @blur="onBlur" />
     <div v-if="height>0" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
       <div class="assist-input-loading" v-if="assist==null">loading</div>
-      <pre class="assist-input-item" v-for="item in assist" :key="item" @click="onClickItem(item)">{{getSimpleItem(type,item)}}</pre>
+      <pre class="assist-input-item" v-for="(item, index) in assist" :key="item" @click="onClickItem(item)" :css-selected="index==selected">{{getSimpleItem(type,item)}}</pre>
     </div>
   </div>
 </template>
@@ -38,6 +38,7 @@ export default {
       this.onAnim();
     },
     assist: function() {
+      this.selected = -1;
       this.onAnim();
     }
   },
@@ -109,7 +110,7 @@ export default {
     onInput: function() {
       this.$emit('input', this.$refs.input.value);
     },
-    onKeyPress: function() {
+    onKeyDown: function(event) {
       if (event.keyCode == 13) {
         if (this.assist != null && this.assist.length > 0) {
           var selected = this.selected;
@@ -118,7 +119,30 @@ export default {
           }
           this.onClickItem(this.assist[selected]);
         }
+      } else if (event.keyCode == 38) {
+        if (this.assist != null && this.assist.length > 0) {
+          var selected = this.selected;
+          if (!(selected >= 0 && selected < this.assist.length)) {
+            selected = this.assist.length - 1;
+          } else {
+            selected--;
+          }
+          this.selected = selected;
+        }
+      } else if (event.keyCode == 40) {
+        if (this.assist != null && this.assist.length > 0) {
+          var selected = this.selected;
+          if (!(selected >= 0 && selected < this.assist.length)) {
+            selected = 0;
+          } else {
+            selected++;
+          }
+          this.selected = selected;
+        }
+      } else {
+        return;
       }
+      event.preventDefault();
     },
     onClickItem: function(item) {
       this.$emit('input', item);
@@ -195,7 +219,7 @@ export default {
       text-overflow: ellipsis;
       cursor: pointer;
     }
-    .assist-input-item:hover {
+    .assist-input-item[css-selected] {
       background: @color-background-hover;
     }
   }
