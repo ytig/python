@@ -41,10 +41,6 @@ export default {
     this.maxWidth = this.$refs.container.clientWidth;
   },
   methods: {
-    selectEnd: function() {
-      var input = this.$refs.input;
-      input.selectionStart = input.selectionEnd = input.value.length;
-    },
     onShow: function() {
       this.$refs.input.focus();
     },
@@ -79,7 +75,6 @@ export default {
     font-size: 12px;
     color: @color-text-dark;
     border: 1px solid transparent;
-    text-overflow: ellipsis;
     cursor: pointer;
   }
   .comment-input:hover {
