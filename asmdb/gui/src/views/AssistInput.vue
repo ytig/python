@@ -35,6 +35,7 @@ export default {
   },
   watch: {
     focus: function() {
+      this.selected = -1;
       this.onAnim();
     },
     assist: function() {
