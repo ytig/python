@@ -55,7 +55,9 @@ async def assist(request):
         _assist.extend(assist_filter(await assist_process(_device), _value))
     elif _type == 'script':
         _assist.extend(assist_filter(await assist_script(_value), _value))
-    return web.json_response(_assist)
+    return web.json_response(_assist, headers={
+        'Access-Control-Allow-Origin': '*'
+    })
 app.router.add_get('/assist', assist)
 
 
