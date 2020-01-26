@@ -28,13 +28,14 @@ async def assist_script(script):
     r = []
     try:
         driname = os.path.dirname(script) or '/'
-        for filename in os.listdir(driname):
-            if filename.startswith('.'):
-                continue
-            filepath = os.path.join(driname, filename)
-            if os.path.isdir(filepath):
-                filepath += '/'
-            r.append(filepath)
+        if os.path.isabs(driname):
+            for filename in os.listdir(driname):
+                if filename.startswith('.'):
+                    continue
+                filepath = os.path.join(driname, filename)
+                if os.path.isdir(filepath):
+                    filepath += '/'
+                r.append(filepath)
     except OSError:
         pass
     return r
