@@ -132,9 +132,7 @@ export default {
           params: {
             type: 'process',
             value: process,
-            context: {
-              device: device
-            }
+            context: JSON.stringify([device])
           }
         })
         .then(
