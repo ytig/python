@@ -124,25 +124,17 @@ export default {
           }
           this.onClickItem(this.assist[selected]);
         }
-      } else if (event.keyCode == 38) {
+      } else if (event.keyCode == 38 || event.keyCode == 40) {
+        var down = event.keyCode == 40;
         if (this.assist != null && this.assist.length > 0) {
           var selected = this.selected;
           if (!(selected >= 0 && selected < this.assist.length)) {
-            selected = this.assist.length - 1;
+            selected = down ? 0 : this.assist.length - 1;
           } else {
-            selected--;
+            selected += down ? 1 : -1;
           }
           this.selected = selected;
-        }
-      } else if (event.keyCode == 40) {
-        if (this.assist != null && this.assist.length > 0) {
-          var selected = this.selected;
-          if (!(selected >= 0 && selected < this.assist.length)) {
-            selected = 0;
-          } else {
-            selected++;
-          }
-          this.selected = selected;
+          //todo focus scrollTop
         }
       } else {
         return;
