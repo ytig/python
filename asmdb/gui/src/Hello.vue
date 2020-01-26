@@ -104,8 +104,10 @@ export default {
       var device = this.device;
       this.$http
         .get('/assist', {
-          type: 'device',
-          value: device
+          params: {
+            type: 'device',
+            value: device
+          }
         })
         .then(
           resp => {
@@ -127,10 +129,12 @@ export default {
       var process = this.process;
       this.$http
         .get('/assist', {
-          type: 'process',
-          value: process,
-          context: {
-            device: device
+          params: {
+            type: 'process',
+            value: process,
+            context: {
+              device: device
+            }
           }
         })
         .then(
@@ -152,8 +156,10 @@ export default {
       var script = this.script;
       this.$http
         .get('/assist', {
-          type: 'script',
-          value: script
+          params: {
+            type: 'script',
+            value: script
+          }
         })
         .then(
           resp => {
