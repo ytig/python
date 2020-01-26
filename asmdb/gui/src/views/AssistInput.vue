@@ -5,7 +5,7 @@
     <input ref="input" type="text" :value="value" @input="onInput" @keydown="onKeyDown" @focus="onFocus" @blur="onBlur" />
     <div v-if="height>0" ref="assist" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
       <div class="assist-input-loading" v-if="assist==null">loading</div>
-      <pre class="assist-input-item" v-for="(item, index) in assist" :key="item" @click="onClickItem(item)" :css-selected="index==selected">{{getSimpleItem(type,item)}}</pre>
+      <pre class="assist-input-item" v-for="(item, index) in assist" :key="item" @mouseenter="onMouseEnterItem(index)" @mousemove="onMouseEnterItem(index)" @mouseleave="onMouseLeaveItem(index)" @click="onClickItem(item)" :css-selected="index==selected">{{getSimpleItem(type,item)}}</pre>
     </div>
   </div>
 </template>
@@ -148,6 +148,12 @@ export default {
         return;
       }
       event.preventDefault();
+    },
+    onMouseEnterItem: function(index) {
+      this.selected = index;
+    },
+    onMouseLeaveItem: function(index) {
+      this.selected = -1;
     },
     onClickItem: function(item) {
       this.$emit('input', item);
