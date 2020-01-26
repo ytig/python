@@ -41,6 +41,10 @@ export default {
     this.maxWidth = this.$refs.container.clientWidth;
   },
   methods: {
+    selectEnd: function() {
+      var input = this.$refs.input;
+      input.selectionStart = input.selectionEnd = input.value.length;
+    },
     onShow: function() {
       this.$refs.input.focus();
     },

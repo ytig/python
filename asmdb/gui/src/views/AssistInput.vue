@@ -149,7 +149,6 @@ export default {
     line-height: 32px;
     font-size: 12px;
     color: @color-text-menu;
-    text-overflow: ellipsis;
   }
   .assist-input-assist {
     position: absolute;
