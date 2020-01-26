@@ -70,6 +70,11 @@ export default {
           return item;
       }
     },
+    selectEnd: function() {
+      var input = this.$refs.input;
+      input.selectionStart = input.selectionEnd = input.value.length;
+      input.scrollLeft = input.scrollWidth - input.clientWidth;
+    },
     onFocus: function() {
       this.counter++;
       this.focus = true;
@@ -105,6 +110,9 @@ export default {
     },
     onClickItem: function(item) {
       this.$emit('input', item);
+      this.$nextTick(() => {
+        this.selectEnd();
+      });
     }
   }
 };

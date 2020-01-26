@@ -44,6 +44,7 @@ export default {
     selectEnd: function() {
       var input = this.$refs.input;
       input.selectionStart = input.selectionEnd = input.value.length;
+      input.scrollLeft = input.scrollWidth - input.clientWidth;
     },
     onShow: function() {
       this.$refs.input.focus();
