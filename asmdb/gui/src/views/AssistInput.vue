@@ -173,6 +173,9 @@ export default {
       font-size: 12px;
       line-height: 22px;
       color: @color-text-menu;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
       cursor: pointer;
     }
     .assist-input-item:hover {
