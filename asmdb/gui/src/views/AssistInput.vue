@@ -5,7 +5,7 @@
     <input ref="input" type="text" :value="value" @input="onInput" @focus="onFocus" @blur="onBlur" />
     <div v-if="height>0" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
       <div class="assist-input-loading" v-if="assist==null">loading</div>
-      <div class="assist-input-item" v-for="item in assist" :key="item" @click="onClickItem(item)">{{item}}</div>
+      <pre class="assist-input-item" v-for="item in assist" :key="item" @click="onClickItem(item)">{{item}}</pre>
     </div>
   </div>
 </template>
@@ -152,11 +152,6 @@ export default {
       font-size: 12px;
       line-height: 22px;
       color: @color-text-menu;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      direction: rtl;
-      text-align: left;
       cursor: pointer;
     }
     .assist-input-item:hover {
