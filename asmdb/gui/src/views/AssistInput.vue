@@ -3,7 +3,7 @@
     <div :style="{backgroundImage:backgroundImage}"></div>
     <div v-show="focus&&value.length>0" @mousedown="requestFocus" @click="onClose"></div>
     <input ref="input" type="text" :value="value" @input="onInput" @keydown="onKeyDown" @focus="onFocus" @blur="onBlur" />
-    <div v-if="height>0" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
+    <div v-if="height>0" ref="assist" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
       <div class="assist-input-loading" v-if="assist==null">loading</div>
       <pre class="assist-input-item" v-for="(item, index) in assist" :key="item" @click="onClickItem(item)" :css-selected="index==selected">{{getSimpleItem(type,item)}}</pre>
     </div>
@@ -41,6 +41,10 @@ export default {
     assist: function() {
       this.selected = -1;
       this.onAnim();
+      var assist = this.$refs.assist;
+      if (assist) {
+        assist.scrollTop = 0;
+      }
     }
   },
   computed: {
