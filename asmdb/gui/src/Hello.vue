@@ -2,9 +2,9 @@
   <div class="hello-container">
     <div class="hello-grow"></div>
     <div class="hello-title user-select-none">ASM Debugger</div>
-    <AssistInput class="hello-input" style="z-index:3" :icon="'device'" :assist="deviceAssist" v-model="device"></AssistInput>
-    <AssistInput class="hello-input" style="z-index:2" :icon="'process'" :assist="processAssist" v-model="process"></AssistInput>
-    <AssistInput class="hello-input" style="z-index:1" :icon="'script'" :assist="scriptAssist" v-model="script"></AssistInput>
+    <AssistInput class="hello-input" style="z-index:3" :icon="'device'" :type="'text'" :assist="deviceAssist" v-model="device"></AssistInput>
+    <AssistInput class="hello-input" style="z-index:2" :icon="'process'" :type="'text'" :assist="processAssist" v-model="process"></AssistInput>
+    <AssistInput class="hello-input" style="z-index:1" :icon="'script'" :type="'file'" :assist="scriptAssist" v-model="script"></AssistInput>
     <div class="hello-button user-select-none" :style="{marginBottom:barHeight+'px'}" @click="startDebug">start debug</div>
     <div class="hello-grow"></div>
     <a class="hello-copyright user-select-none" href="https://github.com/ytig" target="_blank">

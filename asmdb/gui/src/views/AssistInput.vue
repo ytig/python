@@ -5,7 +5,7 @@
     <input ref="input" type="text" :value="value" @input="onInput" @focus="onFocus" @blur="onBlur" />
     <div v-if="height>0" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
       <div class="assist-input-loading" v-if="assist==null">loading</div>
-      <pre class="assist-input-item" v-for="item in assist" :key="item" @click="onClickItem(item)">{{item}}</pre>
+      <pre class="assist-input-item" v-for="item in assist" :key="item" @click="onClickItem(item)">{{getSimpleItem(type,item)}}</pre>
     </div>
   </div>
 </template>
@@ -28,6 +28,7 @@ export default {
   },
   props: {
     icon: String,
+    type: String,
     value: String,
     assist: Array
   },
@@ -49,6 +50,26 @@ export default {
     }
   },
   methods: {
+    getSimpleItem: function(type, item) {
+      switch (type) {
+        case 'file':
+          var isdir = false;
+          var count = 0;
+          var simpleItem = null;
+          for (var i of item.split('/').reverse()) {
+            if (i) {
+              count += 1;
+              if (simpleItem == null) {
+                simpleItem = './' + i + (isdir ? '/' : '');
+              }
+            }
+            isdir = true;
+          }
+          return count <= 1 ? item : simpleItem;
+        default:
+          return item;
+      }
+    },
     onFocus: function() {
       this.counter++;
       this.focus = true;
