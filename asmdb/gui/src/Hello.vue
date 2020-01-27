@@ -5,7 +5,7 @@
     <AssistInput class="hello-input" style="z-index:3" :icon="'device'" :type="'text'" :assist="deviceAssist" v-model="device"></AssistInput>
     <AssistInput class="hello-input" style="z-index:2" :icon="'process'" :type="'text'" :assist="processAssist" v-model="process"></AssistInput>
     <AssistInput class="hello-input" style="z-index:1" :icon="'script'" :type="'file'" :assist="scriptAssist" v-model="script"></AssistInput>
-    <div class="hello-button user-select-none" :style="{marginBottom:barHeight+'px'}" @click="startDebug" @keypress="onKeyPress" tabindex="0">start debug</div>
+    <AnimateButton class="hello-button" :style="{marginBottom:barHeight+'px'}" :text="'start debug'" @enter="startDebug"></AnimateButton>
     <div class="hello-grow"></div>
     <a class="hello-copyright user-select-none" href="https://github.com/ytig" target="_blank">
       <span>power&nbsp;by&nbsp;</span>
@@ -67,27 +67,21 @@ export default {
     };
   },
   watch: {
-    device: {
-      immediate: true,
-      handler: function() {
-        this.updateDeviceAssist();
-        this.updateProcessAssist();
-      }
+    device: function() {
+      this.updateDeviceAssist();
+      this.updateProcessAssist();
     },
-    process: {
-      immediate: true,
-      handler: function() {
-        this.updateProcessAssist();
-      }
+    process: function() {
+      this.updateProcessAssist();
     },
-    script: {
-      immediate: true,
-      handler: function() {
-        this.updateScriptAssist();
-      }
+    script: function() {
+      this.updateScriptAssist();
     }
   },
-  mounted: function() {
+  created: function() {
+    this.updateDeviceAssist();
+    this.updateProcessAssist();
+    this.updateScriptAssist();
     resize.registerEvent(this);
   },
   destroyed: function() {
@@ -174,11 +168,6 @@ export default {
           }
         );
     },
-    onKeyPress: function(event) {
-      if (event.keyCode == 13) {
-        this.startDebug();
-      }
-    },
     startDebug: function() {
       setToken(this.$cookies, 'device', this.device);
       setToken(this.$cookies, 'process', this.process);
@@ -223,21 +212,6 @@ export default {
     margin-top: 16px;
     margin-left: 182px;
     width: 112px;
-    height: 32px;
-    line-height: 32px;
-    font-size: 12px;
-    border-radius: 4px;
-    text-align: center;
-    color: @color-text-light;
-    background-color: @color-background-enter;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.6);
-    cursor: pointer;
-    outline: none;
-  }
-  .hello-button:hover,
-  .hello-button:focus {
-    //todo anim
-    filter: brightness(144%);
   }
   .hello-copyright {
     position: fixed;

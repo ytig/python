@@ -20,6 +20,7 @@ Vue.use(progress);
 import toast from '@/plugins/toast';
 Vue.use(toast);
 
+import AnimateButton from '@/views/AnimateButton';
 import AssistInput from '@/views/AssistInput';
 import Byte from '@/views/Byte';
 import Bytes from '@/views/Bytes';
@@ -44,6 +45,7 @@ import Python3 from '@/windows/Python3';
 import Registers from '@/windows/Registers';
 import Stack from '@/windows/Stack';
 import Watchpoints from '@/windows/Watchpoints';
+Vue.component('AnimateButton', AnimateButton);
 Vue.component('AssistInput', AssistInput);
 Vue.component('Byte', Byte);
 Vue.component('Bytes', Bytes);
