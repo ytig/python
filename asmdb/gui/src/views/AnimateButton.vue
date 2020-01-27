@@ -21,7 +21,7 @@ export default {
       hover: false,
       focus: false,
       width: 0,
-      anim: new Animation(1 / 147)
+      anim: new Animation(Animation.ease_out(224))
     };
   },
   props: {
