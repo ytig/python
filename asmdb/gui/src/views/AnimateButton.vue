@@ -1,9 +1,14 @@
 <template>
   <div class="animate-button-container user-select-none" @focus="onFocus" @blur="onBlur" @mouseenter="onMouseEnter" @mousemove="onMouseMove" @mouseleave="onMouseLeave" @click="onClick" @keypress="onKeyPress" tabindex="0">
-    <div :style="{opacity:alpha1,transform:'scale('+scale1+','+scale1+')'}"></div>
-    <div :style="{opacity:alpha2,transform:'scale('+scale2+','+scale2+')'}"></div>
-    <div :style="{opacity:alpha3}">{{text}}</div>
-    <div :style="{opacity:alpha4}">{{text}}</div>
+    <div>
+      <div>{{text}}</div>
+    </div>
+    <div>
+      <div :style="{right:(16-radius)+'px',bottom:(16-radius)+'px',width:(2*radius)+'px',height:(2*radius)+'px'}"></div>
+      <div :style="{right:(16-radius)+'px',width:(2*radius)+'px'}">
+        <div :style="{left:left+'px'}">{{text}}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -15,7 +20,8 @@ export default {
     return {
       hover: false,
       focus: false,
-      anim: new Animation(1 / 128)
+      width: 0,
+      anim: new Animation(1 / 147)
     };
   },
   props: {
@@ -30,24 +36,15 @@ export default {
     }
   },
   computed: {
-    alpha1: function() {
-      return 1 - this.anim.value;
+    radius: function() {
+      return parseInt((this.width / 2) * this.anim.value);
     },
-    scale1: function() {
-      return 1 * (1 - this.anim.value) + 0.8 * this.anim.value;
-    },
-    alpha2: function() {
-      return this.anim.value;
-    },
-    scale2: function() {
-      return 1.2 * (1 - this.anim.value) + 1 * this.anim.value;
-    },
-    alpha3: function() {
-      return 1 - this.anim.value;
-    },
-    alpha4: function() {
-      return this.anim.value;
+    left: function() {
+      return 16 - this.width / 2;
     }
+  },
+  mounted: function() {
+    this.width = this.$el.clientWidth;
   },
   methods: {
     onMouseEnter: function() {
@@ -94,31 +91,46 @@ export default {
   cursor: pointer;
   > div {
     position: absolute;
+    left: 0px;
+    top: 0px;
     width: 100%;
     height: 100%;
     pointer-events: none;
   }
-  > div:nth-of-type(1) {
+  > div:first-child {
     border-radius: 4px;
     background-color: @color-background-enter;
     box-shadow: 0px 2px 6px @color-text-shadow;
+    display: flex;
+    justify-content: center;
+    > div {
+      line-height: 32px;
+      font-size: 12px;
+      color: @color-text-light;
+    }
   }
-  > div:nth-of-type(2) {
-    border-radius: 4px;
-    border: 2px solid @color-background-enter;
-    box-shadow: 0px 2px 6px @color-text-shadow;
-  }
-  > div:nth-of-type(3) {
-    line-height: 32px;
-    font-size: 12px;
-    color: @color-text-light;
-    text-align: center;
-  }
-  > div:nth-of-type(4) {
-    line-height: 32px;
-    font-size: 12px;
-    color: @color-background-enter;
-    text-align: center;
+  > div:last-child {
+    overflow: hidden;
+    > div:first-child {
+      position: absolute;
+      border-radius: 999px;
+      background-color: @color-background;
+    }
+    > div:last-child {
+      position: absolute;
+      top: 0px;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      > div {
+        position: relative;
+        line-height: 32px;
+        font-size: 12px;
+        color: @color-background-enter;
+        white-space: nowrap;
+      }
+    }
   }
 }
 </style>
