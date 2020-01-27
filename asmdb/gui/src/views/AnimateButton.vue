@@ -5,9 +5,9 @@
     </div>
     <div>
       <div :style="{right:(16-radius)+'px',bottom:(16-radius)+'px',width:(2*radius)+'px',height:(2*radius)+'px'}"></div>
-      <div :style="{right:(16-radius)+'px',width:(2*radius)+'px'}">
-        <div :style="{left:align+'px'}">{{text}}</div>
-      </div>
+    </div>
+    <div :style="{left:(width-radius-16)+'px',width:(2*radius)+'px'}">
+      <div :style="{left:align+'px'}">{{text}}</div>
     </div>
   </div>
 </template>
@@ -95,9 +95,10 @@ export default {
     top: 0px;
     width: 100%;
     height: 100%;
+    overflow: hidden;
     pointer-events: none;
   }
-  > div:first-child {
+  > div:nth-child(1) {
     border-radius: 4px;
     background-color: @color-background-enter;
     box-shadow: 0px 2px 6px @color-text-shadow;
@@ -109,27 +110,22 @@ export default {
       color: @color-text-light;
     }
   }
-  > div:last-child {
-    overflow: hidden;
-    > div:first-child {
+  > div:nth-child(2) {
+    > div {
       position: absolute;
       border-radius: 999px;
       background-color: @color-background;
     }
-    > div:last-child {
-      position: absolute;
-      top: 0px;
-      height: 100%;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      > div {
-        position: relative;
-        line-height: 32px;
-        font-size: 12px;
-        color: @color-background-enter;
-        white-space: nowrap;
-      }
+  }
+  > div:nth-child(3) {
+    display: flex;
+    justify-content: center;
+    > div {
+      position: relative;
+      line-height: 32px;
+      font-size: 12px;
+      color: @color-background-enter;
+      white-space: nowrap;
     }
   }
 }
