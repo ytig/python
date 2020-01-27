@@ -5,7 +5,7 @@
     <AssistInput class="hello-input" style="z-index:3" :icon="'device'" :type="'text'" :assist="deviceAssist" v-model="device"></AssistInput>
     <AssistInput class="hello-input" style="z-index:2" :icon="'process'" :type="'text'" :assist="processAssist" v-model="process"></AssistInput>
     <AssistInput class="hello-input" style="z-index:1" :icon="'script'" :type="'file'" :assist="scriptAssist" v-model="script"></AssistInput>
-    <div class="hello-button user-select-none" :style="{marginBottom:barHeight+'px'}" @click="startDebug">start debug</div>
+    <div class="hello-button user-select-none" :style="{marginBottom:barHeight+'px'}" @click="startDebug" @keypress="onKeyPress" tabindex="0">start debug</div>
     <div class="hello-grow"></div>
     <a class="hello-copyright user-select-none" href="https://github.com/ytig" target="_blank">
       <span>power&nbsp;by&nbsp;</span>
@@ -174,6 +174,11 @@ export default {
           }
         );
     },
+    onKeyPress: function(event) {
+      if (event.keyCode == 13) {
+        this.startDebug();
+      }
+    },
     startDebug: function() {
       setToken(this.$cookies, 'device', this.device);
       setToken(this.$cookies, 'process', this.process);
@@ -227,8 +232,10 @@ export default {
     background-color: @color-background-enter;
     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.6);
     cursor: pointer;
+    outline: none;
   }
-  .hello-button:hover {
+  .hello-button:hover,
+  .hello-button:focus {
     filter: brightness(144%);
   }
   .hello-copyright {
