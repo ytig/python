@@ -6,7 +6,7 @@
     <div>
       <div :style="{right:(16-radius)+'px',bottom:(16-radius)+'px',width:(2*radius)+'px',height:(2*radius)+'px'}"></div>
       <div :style="{right:(16-radius)+'px',width:(2*radius)+'px'}">
-        <div :style="{left:left+'px'}">{{text}}</div>
+        <div :style="{left:align+'px'}">{{text}}</div>
       </div>
     </div>
   </div>
@@ -39,7 +39,7 @@ export default {
     radius: function() {
       return parseInt((this.width / 2) * this.anim.value);
     },
-    left: function() {
+    align: function() {
       return 16 - this.width / 2;
     }
   },
