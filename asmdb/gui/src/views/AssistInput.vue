@@ -197,7 +197,7 @@ export default {
   height: 32px;
   border-radius: 4px;
   background-color: @color-background-darker;
-  box-shadow: inset 0px 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0px 2px 8px @color-border-shadow;
   > div:nth-child(1) {
     position: absolute;
     left: 12px;

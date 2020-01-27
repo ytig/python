@@ -101,11 +101,12 @@ export default {
   > div:nth-of-type(1) {
     border-radius: 4px;
     background-color: @color-background-enter;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.6);
+    box-shadow: 0px 2px 6px @color-text-shadow;
   }
   > div:nth-of-type(2) {
     border-radius: 4px;
     border: 2px solid @color-background-enter;
+    box-shadow: 0px 2px 6px @color-text-shadow;
   }
   > div:nth-of-type(3) {
     line-height: 32px;
