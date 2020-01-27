@@ -227,7 +227,7 @@ export default {
     padding-right: 12px;
     line-height: 32px;
     font-size: 12px;
-    color: @color-text-menu;
+    color: @color-text;
   }
   .assist-input-assist {
     position: absolute;
