@@ -15,7 +15,7 @@ export default {
     return {
       hover: false,
       focus: false,
-      anim: new Animation(1 / 147)
+      anim: new Animation(1 / 128)
     };
   },
   props: {
@@ -34,7 +34,7 @@ export default {
       return 1 - this.anim.value;
     },
     scale1: function() {
-      return 1 * (1 - this.anim.value) + 0.618 * this.anim.value;
+      return 1 * (1 - this.anim.value) + 0.8 * this.anim.value;
     },
     alpha2: function() {
       return this.anim.value;
@@ -101,6 +101,7 @@ export default {
   > div:nth-of-type(1) {
     border-radius: 4px;
     background-color: @color-background-enter;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.6);
   }
   > div:nth-of-type(2) {
     border-radius: 4px;
@@ -109,7 +110,7 @@ export default {
   > div:nth-of-type(3) {
     line-height: 32px;
     font-size: 12px;
-    color: @color-background;
+    color: @color-text-light;
     text-align: center;
   }
   > div:nth-of-type(4) {
