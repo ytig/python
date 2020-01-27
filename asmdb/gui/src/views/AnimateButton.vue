@@ -107,7 +107,8 @@ export default {
     > div {
       line-height: 32px;
       font-size: 12px;
-      color: @color-text-light;
+      color: @color-background;
+      font-weight: bold;
     }
   }
   > div:nth-child(2) {
