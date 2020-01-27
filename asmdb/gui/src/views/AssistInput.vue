@@ -38,9 +38,11 @@ export default {
   },
   watch: {
     focus: function() {
+      this.selected = -1;
       this.onAnim();
     },
     assist: function() {
+      this.selected = -1;
       this.onAnim();
       var assist = this.$refs.assist;
       if (assist) {
