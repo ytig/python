@@ -254,5 +254,11 @@ export default {
       color: @color-text4;
     }
   }
+  .hello-copyright:hover,
+  .hello-copyright:focus {
+    > span {
+      text-decoration: underline;
+    }
+  }
 }
 </style>
