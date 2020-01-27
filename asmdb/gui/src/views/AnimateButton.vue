@@ -1,5 +1,10 @@
 <template>
-  <div class="animate-button-container user-select-none" @mouseenter="onMouseEnter" @mousemove="onMouseMove" @mouseleave="onMouseLeave" @click="onClick" @keypress="onKeyPress" tabindex="0">{{text}}</div>
+  <div class="animate-button-container user-select-none" @focus="onFocus" @blur="onBlur" @mouseenter="onMouseEnter" @mousemove="onMouseMove" @mouseleave="onMouseLeave" @click="onClick" @keypress="onKeyPress" tabindex="0">
+    <div :style="{opacity:alpha1,transform:'scale('+scale1+','+scale1+')'}"></div>
+    <div :style="{opacity:alpha2,transform:'scale('+scale2+','+scale2+')'}"></div>
+    <div :style="{opacity:alpha3}">{{text}}</div>
+    <div :style="{opacity:alpha4}">{{text}}</div>
+  </div>
 </template>
 
 <script>
@@ -10,7 +15,7 @@ export default {
     return {
       hover: false,
       focus: false,
-      anim: new Animation(1 / 224)
+      anim: new Animation(1 / 147)
     };
   },
   props: {
@@ -24,7 +29,26 @@ export default {
       this.onAnim();
     }
   },
-  computed: {},
+  computed: {
+    alpha1: function() {
+      return 1 - this.anim.value;
+    },
+    scale1: function() {
+      return 1 * (1 - this.anim.value) + 0.618 * this.anim.value;
+    },
+    alpha2: function() {
+      return this.anim.value;
+    },
+    scale2: function() {
+      return 1.2 * (1 - this.anim.value) + 1 * this.anim.value;
+    },
+    alpha3: function() {
+      return 1 - this.anim.value;
+    },
+    alpha4: function() {
+      return this.anim.value;
+    }
+  },
   methods: {
     onMouseEnter: function() {
       this.hover = true;
@@ -64,15 +88,35 @@ export default {
 @import '~@/styles/theme';
 
 .animate-button-container {
+  position: relative;
   height: 32px;
-  line-height: 32px;
-  font-size: 12px;
-  border-radius: 4px;
-  text-align: center;
-  color: @color-text-light;
-  background-color: @color-background-enter;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.6);
-  cursor: pointer;
   outline: none;
+  cursor: pointer;
+  > div {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  > div:nth-of-type(1) {
+    border-radius: 4px;
+    background-color: @color-background-enter;
+  }
+  > div:nth-of-type(2) {
+    border-radius: 4px;
+    border: 2px solid @color-background-enter;
+  }
+  > div:nth-of-type(3) {
+    line-height: 32px;
+    font-size: 12px;
+    color: @color-background;
+    text-align: center;
+  }
+  > div:nth-of-type(4) {
+    line-height: 32px;
+    font-size: 12px;
+    color: @color-background-enter;
+    text-align: center;
+  }
 }
 </style>
