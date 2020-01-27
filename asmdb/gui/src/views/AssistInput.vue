@@ -20,8 +20,8 @@ export default {
     return {
       focus: false,
       counter: 0,
-      hovered: false,
       selected: -1,
+      selecting: false,
       anim: new Animation((value, target) => {
         const power = 0.75;
         const duration = 180;
@@ -38,13 +38,9 @@ export default {
   },
   watch: {
     focus: function() {
-      this.hovered = false;
-      this.selected = -1;
       this.onAnim();
     },
     assist: function() {
-      this.hovered = false;
-      this.selected = -1;
       this.onAnim();
       var assist = this.$refs.assist;
       if (assist) {
@@ -60,6 +56,12 @@ export default {
     height: function() {
       return LINE_COUNT * LINE_HEIGHT * this.anim.value;
     }
+  },
+  created: function() {
+    window.addEventListener('mousemove', this.onDomMouseMove, true);
+  },
+  destroyed: function() {
+    window.removeEventListener('mousemove', this.onDomMouseMove, true);
   },
   methods: {
     getSimpleItem: function(type, item) {
@@ -138,8 +140,8 @@ export default {
           } else {
             selected += down ? 1 : -1;
           }
-          this.hovered = false;
           this.selected = selected;
+          this.selecting = true;
           if (selected >= 0 && selected < this.assist.length) {
             var assist = this.$refs.assist;
             if (assist) {
@@ -159,19 +161,27 @@ export default {
       }
       event.preventDefault();
     },
-    onMouseEnterItem: function(index) {},
+    onMouseEnterItem: function(index) {
+      if (!this.selecting) {
+        this.selected = index;
+      }
+    },
     onMouseMoveItem: function(index) {
-      this.hovered = true;
-      this.selected = index;
+      if (!this.selecting) {
+        this.selected = index;
+      }
     },
     onMouseLeaveItem: function(index) {
-      if (this.hovered) {
+      if (!this.selecting) {
         this.selected = -1;
       }
     },
     onClickItem: function(item) {
       this.$emit('input', item);
       this.$nextTick(this.selectEnd);
+    },
+    onDomMouseMove: function() {
+      this.selecting = false;
     }
   }
 };
