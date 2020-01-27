@@ -236,6 +236,7 @@ export default {
   }
   .hello-button:hover,
   .hello-button:focus {
+    //todo anim
     filter: brightness(144%);
   }
   .hello-copyright {
