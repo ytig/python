@@ -83,8 +83,10 @@ export default {
     this.updateProcessAssist();
     this.updateScriptAssist();
     resize.registerEvent(this);
+    window.addEventListener('keydown', this.onDomKeyDown);
   },
   destroyed: function() {
+    window.removeEventListener('keydown', this.onDomKeyDown);
     resize.unregisterEvent(this);
   },
   methods: {
@@ -93,6 +95,19 @@ export default {
         this.barHeight = getBarHeight();
         return !(i < 60);
       });
+    },
+    onDomKeyDown: function(event) {
+      if (event.key == 'f' && !event.altKey && event.ctrlKey && !event.metaKey && !event.shiftKey) {
+        this.requestFullScreen();
+      } else {
+        return;
+      }
+      event.preventDefault();
+    },
+    requestFullScreen: function() {
+      if (document.fullscreenElement == null) {
+        document.body.webkitRequestFullScreen();
+      }
     },
     updateDeviceAssist: function() {
       var device = this.device;
@@ -172,7 +187,7 @@ export default {
       setToken(this.$cookies, 'device', this.device);
       setToken(this.$cookies, 'process', this.process);
       setToken(this.$cookies, 'script', this.script);
-      document.body.webkitRequestFullScreen();
+      this.requestFullScreen();
       this.$router.replace('/world');
     }
   }
