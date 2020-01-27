@@ -5,7 +5,7 @@
     <input ref="input" type="text" :value="value" @input="onInput" @keydown="onKeyDown" @focus="onFocus" @blur="onBlur" />
     <div v-if="height>0" ref="assist" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
       <div class="assist-input-loading" v-if="assist==null">loading</div>
-      <pre class="assist-input-item" v-for="(item, index) in assist" :key="item" @mouseenter="onMouseEnterItem(index)" @mousemove="onMouseEnterItem(index)" @mouseleave="onMouseLeaveItem(index)" @click="onClickItem(item)" :css-selected="index==selected">{{getSimpleItem(type,item)}}</pre>
+      <pre class="assist-input-item" v-for="(item, index) in assist" :key="item" @mouseenter="onMouseEnterItem(index)" @mousemove="onMouseMoveItem(index)" @mouseleave="onMouseLeaveItem(index)" @click="onClickItem(item)" :css-selected="index==selected">{{getSimpleItem(type,item)}}</pre>
     </div>
   </div>
 </template>
@@ -20,6 +20,7 @@ export default {
     return {
       focus: false,
       counter: 0,
+      hovered: false,
       selected: -1,
       anim: new Animation((value, target) => {
         const power = 0.75;
@@ -37,10 +38,12 @@ export default {
   },
   watch: {
     focus: function() {
+      this.hovered = false;
       this.selected = -1;
       this.onAnim();
     },
     assist: function() {
+      this.hovered = false;
       this.selected = -1;
       this.onAnim();
       var assist = this.$refs.assist;
@@ -135,6 +138,7 @@ export default {
           } else {
             selected += down ? 1 : -1;
           }
+          this.hovered = false;
           this.selected = selected;
           if (selected >= 0 && selected < this.assist.length) {
             var assist = this.$refs.assist;
@@ -155,11 +159,15 @@ export default {
       }
       event.preventDefault();
     },
-    onMouseEnterItem: function(index) {
+    onMouseEnterItem: function(index) {},
+    onMouseMoveItem: function(index) {
+      this.hovered = true;
       this.selected = index;
     },
     onMouseLeaveItem: function(index) {
-      this.selected = -1;
+      if (this.hovered) {
+        this.selected = -1;
+      }
     },
     onClickItem: function(item) {
       this.$emit('input', item);
