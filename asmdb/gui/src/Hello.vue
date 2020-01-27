@@ -221,12 +221,12 @@ export default {
   }
   .hello-input {
     margin-bottom: 8px;
-    width: 294px;
+    width: 333px;
   }
   .hello-button {
     margin-top: 16px;
-    margin-left: 182px;
-    width: 112px;
+    margin-left: 222px;
+    width: 111px;
   }
   .hello-copyright {
     position: fixed;
