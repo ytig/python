@@ -174,6 +174,7 @@ class Source {
     escB: /\x1b\[\d{0,}B/,
     escC: /\x1b\[\d{0,}C/,
     escD: /\x1b\[\d{0,}D/,
+    escG: /\x1b\[\d{0,}G/,
     escK: /\x1b\[K/,
     escP: /\x1b\[\d{0,}P/,
     escm: /\x1b\[[\d;]{0,}m/
@@ -334,6 +335,12 @@ class Source {
         this.col--;
       }
     }
+  }
+
+  escG(utf8) {
+    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
+    var COL = parseInt(this.width / WIDTH0);
+    this.col = Math.min(n - 1, COL);
   }
 
   escK() {
