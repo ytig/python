@@ -103,6 +103,7 @@ export default {
     },
     onDragStart2: function() {
       this.counter++;
+      this.setWindowSize();
     },
     onDrag2: function(delta) {
       this.addHeight = delta;
