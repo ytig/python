@@ -1,446 +1,19 @@
 <template>
-  <div class="terminal-container">
-    <TerminalParent ref="parent" v-if="source!=null" class="terminal-parent" :lineHeight="lineHeight" :source="source" @scroll2="onScroll2" #default="props">
-      <TerminalChild :value="props.item.value" :styles="props.item.styles" :cursor="source.toCursor(props.index,focus)" :canvasContext="props.offset+';'+props.context" :lazyLayout="props.scrolling"></TerminalChild>
-    </TerminalParent>
-    <TerminalInput class="terminal-input" :style="{left:inputLeft+'px',top:inputTop+'px'}" :focus="focus" @input="onInput"></TerminalInput>
-  </div>
+  <div ref="container" class="terminal-container"></div>
 </template>
 
 <script>
+import 'xterm/css/xterm.css';
+import { Terminal } from 'xterm';
 import asmdb from '@/scripts/asmdb';
-import resize from '@/scripts/resize';
 import Theme from '@/styles/theme';
-import TerminalParent from './Terminal_parent';
-import TerminalChild from './Terminal_child';
-import TerminalInput from './Terminal_input';
-const COLORS = [Theme.colorBackground, Theme.colorText2, Theme.colorText5, Theme.colorText4, Theme.colorText3, Theme.colorBackgroundPopup2, Theme.colorBackgroundPopup, Theme.colorText];
 const WIDTH0 = 7;
 const HEIGHT0 = 16;
 
-function splitu(utf8, ...patterns) {
-  var result = [[0, utf8]];
-  var type = 0;
-  for (var pattern of patterns) {
-    type++;
-    var i = -1;
-    while (++i < result.length) {
-      if (result[i][0] != 0) {
-        continue;
-      }
-      var text = result[i][1];
-      var matcher = pattern.exec(text);
-      if (!matcher) {
-        continue;
-      }
-      result.splice(i, 1, [0, text.substring(0, matcher.index)], [type, matcher[0]], [0, text.substring(matcher.index + matcher[0].length)]);
-    }
-  }
-  for (var i = result.length - 1; i >= 0; i--) {
-    if (!result[i][1]) {
-      result.splice(i, 1);
-    }
-  }
-  return result;
-}
-
-class Word {
-  constructor(value, ...styles) {
-    this.value = value;
-    this.styles = styles;
-  }
-}
-
-class Line {
-  constructor(width) {
-    this.width = width;
-    this.words = [];
-    this.limit = 0;
-    this.invalidate();
-  }
-
-  position(cursor) {
-    if (cursor >= this.limit) {
-      return {
-        index: null,
-        offset: null,
-        eof: cursor - this.limit
-      };
-    }
-    var COL = parseInt(this.width / WIDTH0);
-    var index = 0;
-    var offset = 0;
-    var c = 0;
-    while (c++ < cursor) {
-      var w = TerminalChild.measureChar(this.words[index].value) / WIDTH0;
-      offset++;
-      if (offset >= w) {
-        index++;
-        w = TerminalChild.measureChar(this.words[index].value) / WIDTH0;
-        if (w == 1) {
-          offset = 0;
-        } else {
-          if (c % COL != COL - 1) {
-            offset = 0;
-          } else {
-            offset = -1;
-          }
-        }
-      }
-    }
-    return {
-      index: index,
-      offset: offset,
-      eof: null
-    };
-  }
-
-  invalidate() {
-    var value = '';
-    var styles = [];
-    for (var word of this.words) {
-      value += word.value;
-      styles.push(word.styles);
-    }
-    this.value = value;
-    this.styles = JSON.stringify(styles);
-    this.lineCount = TerminalChild.measureHeight(this.width, value) / HEIGHT0;
-  }
-}
-
-class Source {
-  constructor(width) {
-    this.width = width;
-    this.length = 0;
-    this[this.length++] = new Line(this.width);
-    this.index = 0;
-    this.row = 0;
-    this.col = 0;
-    this.bright = false;
-    this.underline = false;
-    this.flash = false;
-    this.inverse = false;
-    this.invisable = false;
-    this.color = '';
-    this.background = '';
-    this.invalidate = 0;
-    this.playable = false;
-  }
-
-  getOffset(position, index) {
-    var offset = 0;
-    if (position.index >= index) {
-      for (var i = index; i < position.index; i++) {
-        offset -= this[i].lineCount;
-      }
-    } else {
-      for (var i = position.index; i < index; i++) {
-        offset += this[i].lineCount;
-      }
-    }
-    return offset - position.offset;
-  }
-
-  getCursor(position) {
-    var COL = parseInt(this.width / WIDTH0);
-    var left = 12 + Math.min(this.col, COL - 1) * WIDTH0;
-    var top = 1 + (this.getOffset(position, this.index) + this.row) * HEIGHT0;
-    return [left, top];
-  }
-
-  toCursor(index, focus) {
-    var COL = parseInt(this.width / WIDTH0);
-    if (index == this.index) {
-      return JSON.stringify([this.row, Math.min(this.col, COL - 1), focus]);
-    } else {
-      return null;
-    }
-  }
-
-  word(char = '\u200b') {
-    if (char == '\u200b') {
-      return new Word(char, false, false, false, false, false, '', '');
-    } else {
-      return new Word(char, this.bright, this.underline, this.flash, this.inverse, this.invisable, this.color, this.background);
-    }
-  }
-
-  router = {
-    lf: /\x0a/,
-    cr: /\x0d/,
-    bel: /\x07/,
-    bs: /\x08/,
-    escA: /\x1b\[\d{0,}A/,
-    escB: /\x1b\[\d{0,}B/,
-    escC: /\x1b\[\d{0,}C/,
-    escD: /\x1b\[\d{0,}D/,
-    escG: /\x1b\[\d{0,}G/,
-    escK: /\x1b\[K/,
-    escP: /\x1b\[\d{0,}P/,
-    escm: /\x1b\[[\d;]{0,}m/
-  };
-
-  position(cursor) {
-    return this[this.index].position(cursor);
-  }
-
-  input(utf8) {
-    var COL = parseInt(this.width / WIDTH0);
-    var line = this[this.index];
-    for (var char of utf8) {
-      var cursor = this.row * COL + this.col;
-      var width = TerminalChild.measureChar(char) / WIDTH0;
-      if (width == 1) {
-        var p = this.position(cursor);
-        if (p.eof != null) {
-          for (var i = 0; i < p.eof; i++) {
-            line.words.push(this.word());
-          }
-          line.words.push(this.word(char));
-        } else {
-          var w = TerminalChild.measureChar(line.words[p.index].value) / WIDTH0;
-          if (p.offset >= 0) {
-            if (w == 1) {
-              line.words.splice(p.index, 1, this.word(char));
-            } else {
-              if (p.offset == 0) {
-                line.words.splice(p.index, 1, this.word(char), this.word());
-              } else {
-                line.words.splice(p.index, 1, this.word(), this.word(char));
-              }
-            }
-          } else {
-            line.words.splice(p.index, 0, this.word(char));
-          }
-        }
-      } else {
-        var p = this.position(cursor);
-        if (p.eof == null) {
-          if (this.col == COL - 1) {
-            cursor++;
-            p = this.position(cursor);
-          }
-        }
-        if (p.eof != null) {
-          for (var i = 0; i < p.eof; i++) {
-            line.words.push(this.word());
-          }
-          line.words.push(this.word(char));
-        } else {
-          var w = TerminalChild.measureChar(line.words[p.index].value) / WIDTH0;
-          if (w == 1) {
-            var p2 = this.position(cursor + 1);
-            if (p2.eof != null || p2.offset < 0) {
-              line.words.splice(p.index, 1, this.word(char));
-            } else {
-              var w2 = TerminalChild.measureChar(line.words[p2.index].value) / WIDTH0;
-              if (w2 == 1) {
-                line.words.splice(p.index, 2, this.word(char));
-              } else {
-                line.words.splice(p.index, 2, this.word(char), this.word());
-              }
-            }
-          } else {
-            if (p.offset == 0) {
-              line.words.splice(p.index, 1, this.word(char));
-            } else {
-              var p2 = this.position(cursor + 1);
-              if (p2.eof != null || p2.offset < 0) {
-                line.words.splice(p.index, 1, this.word(), this.word(char));
-              } else {
-                var w2 = TerminalChild.measureChar(line.words[p2.index].value) / WIDTH0;
-                if (w2 == 1) {
-                  line.words.splice(p.index, 2, this.word(), this.word(char));
-                } else {
-                  line.words.splice(p.index, 2, this.word(), this.word(char), this.word());
-                }
-              }
-            }
-          }
-        }
-      }
-      if (this.col + width <= COL) {
-        this.col += width;
-      } else {
-        this.row++;
-        this.col = width;
-      }
-      line.limit = Math.max(line.limit, this.row * COL + this.col);
-    }
-    line.invalidate();
-  }
-
-  lf() {
-    var ROW = this[this.index].lineCount;
-    if (this.row + 1 < ROW) {
-      this.row++;
-      this.col = 0;
-    } else {
-      if (this.index == this.length - 1) {
-        this[this.length++] = new Line(this.width);
-      }
-      this.index++;
-      this.row = 0;
-      this.col = 0;
-    }
-  }
-
-  cr() {
-    this.col = 0;
-  }
-
-  bel() {
-    if (this.playable) {
-      playSound('/static/sounds/bel.m4a');
-    }
-  }
-
-  bs() {
-    this.escD('\x1b[D');
-  }
-
-  escA(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
-    for (var i = 0; i < n; i++) {
-      if (this.row - 1 >= 0) {
-        this.row--;
-      }
-    }
-  }
-
-  escB(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
-    var ROW = this[this.index].lineCount;
-    for (var i = 0; i < n; i++) {
-      if (this.row + 1 < ROW) {
-        this.row++;
-      }
-    }
-  }
-
-  escC(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
-    var COL = parseInt(this.width / WIDTH0);
-    for (var i = 0; i < n; i++) {
-      if (this.col + 1 <= COL) {
-        this.col++;
-      }
-    }
-  }
-
-  escD(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
-    for (var i = 0; i < n; i++) {
-      if (this.col - 1 >= 0) {
-        this.col--;
-      }
-    }
-  }
-
-  escG(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
-    var COL = parseInt(this.width / WIDTH0);
-    this.col = Math.min(n - 1, COL);
-  }
-
-  escK() {
-    this.escP('\x1b[999P');
-  }
-
-  escP(utf8) {
-    var n = parseInt(utf8.substring(2, utf8.length - 1) || '1');
-    var COL = parseInt(this.width / WIDTH0);
-    var cursor = this.row * COL + this.col;
-    var col = this.col;
-    if (COL - col <= 0) {
-      return;
-    }
-    var line = this[this.index];
-    var words = [];
-    for (var c = cursor + n; c < (this.row + 1) * COL; c++) {
-      var p = this.position(c);
-      if (p.eof != null || p.offset < 0) {
-        break;
-      }
-      if (p.offset == 0) {
-        words.push(line.words[p.index]);
-      } else {
-        if (c == cursor + n) {
-          words.push(this.word());
-        }
-      }
-    }
-    var width = 0;
-    for (var word of words) {
-      width += TerminalChild.measureChar(word.value) / WIDTH0;
-    }
-    for (var i = 0; i < COL - col; i++) {
-      this.input('\u200b');
-    }
-    this.col = col;
-    line.words.splice(this.position(cursor).index, width, ...words);
-    line.invalidate();
-  }
-
-  escm(utf8) {
-    for (var m of utf8.substring(2, utf8.length - 1).split(';')) {
-      m = parseInt(m);
-      if (m == 0) {
-        this.bright = false;
-        this.underline = false;
-        this.flash = false;
-        this.inverse = false;
-        this.invisable = false;
-        this.color = '';
-        this.background = '';
-      } else if (m == 1) {
-        this.bright = true;
-      } else if (m == 4) {
-        this.underline = true;
-      } else if (m == 5) {
-        this.flash = true;
-      } else if (m == 7) {
-        this.inverse = true;
-      } else if (m == 8) {
-        this.invisable = true;
-      } else if (m >= 30 && m <= 37) {
-        this.color = COLORS[m - 30];
-      } else if (m >= 40 && m <= 47) {
-        this.background = COLORS[m - 40];
-      }
-    }
-  }
-
-  readu(utf8) {
-    var keys = [];
-    var values = [];
-    for (var key in this.router) {
-      keys.push(key);
-      values.push(this.router[key]);
-    }
-    keys.splice(0, 0, 'input');
-    for (var item of splitu(utf8, ...values)) {
-      this[keys[item[0]]](item[1]);
-    }
-    this.invalidate++;
-    if (utf8) {
-      this.playable = true;
-    }
-  }
-}
-
 export default {
-  components: {
-    TerminalParent: TerminalParent,
-    TerminalChild: TerminalChild,
-    TerminalInput: TerminalInput
-  },
   data: function() {
     return {
-      lineHeight: HEIGHT0,
-      source: null,
-      inputLeft: 0,
-      inputTop: 0
+      terminal: null
     };
   },
   props: {
@@ -448,71 +21,76 @@ export default {
     utf8: String
   },
   watch: {
-    utf8: {
-      immediate: true,
-      handler: function callee(newValue, oldValue) {
-        if (this.$el == undefined) {
-          this.$nextTick(callee.bind(this, ...arguments));
-          return;
-        }
-        if (this.source == null) {
-          this.source = new Source(this.$el.clientWidth - 24);
-        }
-        this.source.readu(oldValue == undefined ? newValue : newValue.substring(oldValue.length));
-        this.updateCursor();
+    focus: function(newValue) {
+      if (newValue) {
+        this.terminal.focus();
+      } else {
+        this.terminal.blur();
       }
+    },
+    utf8: function(newValue, oldValue) {
+      this.terminal.write(newValue.substring(oldValue.length));
     }
   },
   mounted: function() {
-    resize.registerEvent(this);
+    this.terminal = new Terminal({
+      allowTransparency: true,
+      fontSize: 12,
+      fontFamily: 'Menlo',
+      lineHeight: HEIGHT0 / 14,
+      theme: {
+        foreground: Theme.colorText,
+        background: 'transparent',
+        cursor: Theme.colorText,
+        selection: Theme.colorBackgroundSelection,
+        black: Theme.colorBackground,
+        red: Theme.colorText2,
+        green: Theme.colorText5,
+        yellow: Theme.colorText4,
+        blue: Theme.colorText3,
+        magenta: Theme.colorBackgroundPopup2,
+        cyan: Theme.colorBackgroundPopup,
+        white: Theme.colorText,
+        brightBlack: Theme.colorBackground,
+        brightRed: Theme.colorText2,
+        brightGreen: Theme.colorText5,
+        brightYellow: Theme.colorText4,
+        brightBlue: Theme.colorText3,
+        brightMagenta: Theme.colorBackgroundPopup2,
+        cybrightCyanan: Theme.colorBackgroundPopup,
+        brightWhite: Theme.colorText
+      }
+    });
+    this.terminal.open(this.$refs.container);
+    this.terminal.onData(this.onData);
+    this.terminal.textarea.addEventListener('blur', this.onBlur);
+    this.terminal.write(this.utf8);
+    this.terminal.focus();
+    if (!this.focus) {
+      this.terminal.blur();
+    }
+    setTimeout(() => {
+      this.terminal.setOption('bellStyle', 'sound');
+      this.terminal.setOption('bellSound', 'data:audio/mp3;base64,AAAAHGZ0eXBNNEEgAAAAAE00QSBtcDQyaXNvbQAAAAh3aWRlAAAE3W1kYXQhAANAaBwhDFSAfkuVNaWfeIekw/IcIQxUWH5CTD8hwCEMU/2hDQEQh8TjiXzxhjHHa32V7//4iIAIEchzj1jj0mlcrkyYQgQEY8X3N9QxRwQfMDGZGo2PWPQRnoQSYfkt9Ve//iICLiEMU83IPgfhRt3G64IW+yBv7+AREREeEcCx92gh+gf9ZxGX+1kn/Aj/RqT/gD/0ZSX8Jf9y5D/Fw/5FUj/LC/Y6T/pD/yHif5YvjUS650qXeJEtthSHOONENFpSFctTo85ysS6YNnQ6kd9q5l8W64h+u+SusEV1jsYFmEdmx8sfiNHbJi1MyFTNVTzIUVi0Ng0Nd0mH5LfZA39/AIiIuCEMU62ujkMOP/rlGuPpwp1OJsW+yBRAvDwHxEPiZ5DJ+qvy4EomAIzuaE+ISSF6aQvcKJycERxjv2LOQ5js45f5olFlZgIAP57g48GX+92H0H8rE7ORv1nssJnVTjaD+lvuUrTzLqo1Cu3K0PzttC1e6FrZ+zHnTLB+S32QKIF4eA+LgCEMVAWSnB8D/t36v97vzx1a+Kst9cCiAEA+HiWC1Mn8g7wunMVkZ93UrNht091ReEnUa9ZaXavV/fd+G9Tv8VxDTRbGnesoCcfu58qUuAXSjcp+WlAlrSgZ0PyW+uBRACAfD3AhDFQVlpofA/p6h+8l+y7dZwt9UDEIiAD4kuWRZgbeXb/JyE1ZECydTCVLd00/SgePYnQst0bhs88V1n3LG69x1ttu1UmG+3j8RpXr8FB2Kd41xnrXVbFYcVZerdB61xnKtpoQ/Jb6oGIREAH3IQxULZqLY6IHwP09x+I/D4kQW+WBiIRI6CK1enET8IrDLdSEQab4OFKLI2CSphRhd+zHDUL1I9res7+yjs6mfw3tvTlG4Vin5Vt4LI51nOdZzksjZrLZrLZpGSkaIPyW+WBiIXAhDFP1lpofA/4+a+PL241a/MjFvlgYhFk1mVK2UyIi2LZj6hDcK7er6tMMtKpX641rG1q01qs2q0am81q0rtVu7z37sIPC47G47bcqynFYmenY5SqUqlKqbD8lvlgYhFwhDFQVkpjCD4H5916vji/bV1qd2t8sDEQiIT52h8dBkDLEbKvsBIecwKTiWSWYlGSpnllAwXKcl6HctppvNeVftcVv/xVls07PZzisTisTirDYsMcMcMcMcMZwPyW+WBiIXCEMU/21Ch8D87vp9ai+HiMLfNevkPMmhJAZ4KSsDJDSTeAlEw1ZWyKC+ub2mm5+LOc5E7tzBmLHXuvKPwXr0oosRKf7FVbtiGXgz6Z+WNqSFh0rvMh+S3zXr5DzgCEMU+WhiB8znnU/FsZ2uVn2GgPyO4bKCP05GpqCNc5Fb5ljkkgukNyfb8Q4n1RzXinfg2nK90DAQkw/JcrPsNAfkdwhDFQNlQYfU++jNlyp0sTz+BB++Ikpkc5WtwxJJ7GDD2yFEj0mH5LlXp0jkclwIQxT2ow+9YEfX7cyYfkOIQxUgH5CTD8hwCEMVIB+Qkw/IcAhDFSAfkJAPyHAIQxUgH5CQD8hwCEMVIB+QkA/IcAhDFSAfkJIPyHAIQxUgH5CQD8hwCEMVIB+QkA/IcAhDFSAfkJAPyHAIQxUgH5CQD8hwCEMVIB+S5VQOBBwCHpMPyHAAAADmm1vb3YAAABsbXZoZAAAAADaNf5J2jX+SQAAu4AAAF8YAAEAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAIsdHJhawAAAFx0a2hkAAAAAdo1/knaNf5JAAAAAQAAAAAAAF8YAAAAAAAAAAAAAAAAAQAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAByG1kaWEAAAAgbWRoZAAAAADaNf5J2jX+SQAAu4AAAGgAVcQAAAAAADFoZGxyAAAAAAAAAABzb3VuAAAAAAAAAAAAAAAAQ29yZSBNZWRpYSBBdWRpbwAAAAFvbWluZgAAABBzbWhkAAAAAAAAAAAAAAAkZGluZgAAABxkcmVmAAAAAAAAAAEAAAAMdXJsIAAAAAEAAAEzc3RibAAAAGdzdHNkAAAAAAAAAAEAAABXbXA0YQAAAAAAAAABAAAAAAAAAAAAAgAQAAAAALuAAAAAAAAzZXNkcwAAAAADgICAIgAAAASAgIAUQBUAGAAAA+gAAAPoAAWAgIACEZAGgICAAQIAAAAYc3R0cwAAAAAAAAABAAAAGgAABAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAABoAAAABAAAAfHN0c3oAAAAAAAAAAAAAABoAAAAGAAAAEAAAAAoAAABIAAAAnwAAAIQAAABkAAAAbQAAAGUAAABgAAAAYgAAAF0AAABDAAAALgAAAA8AAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAAEQAAABRzdGNvAAAAAAAAAAEAAAAsAAAA+nVkdGEAAADybWV0YQAAAAAAAAAiaGRscgAAAAAAAAAAbWRpcgAAAAAAAAAAAAAAAAAAAAAAxGlsc3QAAAC8LS0tLQAAABxtZWFuAAAAAGNvbS5hcHBsZS5pVHVuZXMAAAAUbmFtZQAAAABpVHVuU01QQgAAAIRkYXRhAAAAAQAAAAAgMDAwMDAwMDAgMDAwMDA4NDAgMDAwMDAwQTggMDAwMDAwMDAwMDAwNUYxOCAwMDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAwMCAwMDAwMDAwMA==');
+    });
   },
   destroyed: function() {
-    resize.unregisterEvent(this);
+    this.terminal.textarea.removeEventListener('blur', this.onBlur);
+    this.terminal.dispose();
   },
   methods: {
-    isEmpty: function() {
-      return this.source.length == 1 && this.source[0].value.length == 0;
+    clearBy: function(sep) {
+      this.terminal.write('\x1bc' + this.utf8.substring(this.utf8.lastIndexOf(sep)).replace(/\x07/g, ''));
     },
-    copyLog: function() {
-      var text = '';
-      for (var i = 0; i < this.source.length; i++) {
-        if (i != 0) {
-          text += '\n';
-        }
-        text += this.source[i].value.replace(/\u200b/g, '');
-      }
-      this.$toast.alert('Text Copied');
-      copyText(text);
+    setWindowSize: function(rows, cols) {
+      this.terminal.resize(cols, rows);
     },
-    onInput: function(utf8) {
-      if (utf8) {
-        asmdb.getInstance().writeu(utf8);
-      }
-      var parent = this.$refs.parent;
-      if (!parent) {
-        return;
-      }
-      parent.attachTo();
+    onData: function(utf8) {
+      asmdb.getInstance().writeu(utf8);
     },
-    onScroll2: function() {
-      this.updateCursor();
-    },
-    onResize: function() {
-      this.updateCursor();
-    },
-    updateCursor: function() {
-      var parent = this.$refs.parent;
-      if (!parent) {
-        return;
-      }
-      var cursor = this.source.getCursor(parent.getPosition());
-      var h = 14;
-      if (cursor[1] <= -h || cursor[1] >= this.$el.clientHeight) {
-        this.inputLeft = 0;
-        this.inputTop = this.$el.clientHeight - h;
-      } else {
-        this.inputLeft = cursor[0];
-        this.inputTop = cursor[1];
+    onBlur: function() {
+      if (this.focus) {
+        this.terminal.focus();
       }
     }
   }
@@ -523,14 +101,10 @@ export default {
 @import '~@/styles/theme';
 
 .terminal-container {
-  position: relative;
-  .terminal-parent {
-    margin: 0px 12px;
-    height: 100%;
-  }
-  .terminal-input {
-    position: absolute;
-    z-index: 4;
-  }
+  padding: 0px 12px;
+  overflow: hidden;
+}
+.xterm-helper-textarea {
+  font-size: 12px;
 }
 </style>

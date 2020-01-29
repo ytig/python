@@ -10,11 +10,11 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "eastasianwidth": "^0.2.0",
     "vue": "^2.5.2",
     "vue-cookies": "^1.6.1",
     "vue-resource": "^1.5.1",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "xterm": "^4.3.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

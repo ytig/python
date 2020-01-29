@@ -4,7 +4,7 @@
       <Resize class="python3-resize" :direction="'row'" :lowest="windowHeight==maxHeight" :uppest="windowHeight==minHeight" @dragstart2="onDragStart2" @drag2="onDrag2(-arguments[0])" @dragend2="onDragEnd2"></Resize>
     </Navigation2>
     <div class="python3-content" :style="{height:windowHeight+'px',paddingTop:paddingTop+'px',paddingBottom:paddingBottom+'px'}">
-      <Terminal ref="terminal" class="python3-terminal" :focus="focus" :utf8="utf8"></Terminal>
+      <Terminal ref="terminal" class="python3-terminal" :focus="focus&&!$menu.show" :utf8="utf8"></Terminal>
     </div>
   </div>
 </template>
@@ -75,15 +75,13 @@ export default {
     },
     onMouseUp2: function(evnet) {
       var items = [];
-      items.push(['Copy log', '', !this.$refs.terminal.isEmpty()]);
+      items.push(['Clear all', '', true]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
       switch (index) {
         case 0:
-          if (!this.$refs.terminal.isEmpty()) {
-            this.$refs.terminal.copyLog();
-          }
+          this.$refs.terminal.clearBy('>>> ');
           break;
       }
     },
@@ -130,7 +128,10 @@ export default {
     setWindowSize() {
       var width = this.$el.clientWidth - 24;
       var height = loadStorage('python3_height', 0) - (2 * PADDING - 2);
-      asmdb.getInstance().setwinsize(parseInt(height / HEIGHT0), parseInt(width / WIDTH0));
+      var rows = parseInt(height / HEIGHT0);
+      var cols = parseInt(width / WIDTH0);
+      asmdb.getInstance().setwinsize(rows, cols);
+      this.$refs.terminal.setWindowSize(rows, cols);
     }
   }
 };
