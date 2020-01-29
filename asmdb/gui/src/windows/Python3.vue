@@ -11,7 +11,6 @@
 
 <script>
 import keyboard from '@/scripts/keyboard';
-import resize from '@/scripts/resize';
 import asmdb from '@/scripts/asmdb';
 const WIDTH0 = 7;
 const HEIGHT0 = 16;
@@ -26,13 +25,9 @@ export default {
       addHeight: 0,
       focus: false,
       utf8: '',
-      counter: 0
+      counter: 0,
+      size: null
     };
-  },
-  watch: {
-    windowHeight: function() {
-      this.$nextTick(resize.dispatchEvent);
-    }
   },
   computed: {
     windowHeight: function() {
@@ -111,27 +106,34 @@ export default {
     },
     onDrag2: function(delta) {
       this.addHeight = delta;
+      this.setWindowSize();
     },
     onDragEnd2: function(moved) {
       if (moved) {
         this.curHeight = this.windowHeight;
         this.addHeight = 0;
         saveStorage('python3_height', this.curHeight);
-        this.setWindowSize();
       } else {
         var newHeight = this.curHeight != this.minHeight ? this.minHeight : this.maxHeight;
         this.smoothDragTo(newHeight);
+        this.setWindowSize(newHeight);
         saveStorage('python3_height', newHeight);
-        this.setWindowSize();
       }
     },
-    setWindowSize() {
+    setWindowSize(windowHeight) {
+      if (windowHeight == undefined) {
+        windowHeight = this.windowHeight;
+      }
       var width = this.$el.clientWidth - 24;
-      var height = loadStorage('python3_height', 0) - (2 * PADDING - 2);
+      var height = windowHeight - (2 * PADDING - 2);
       var rows = parseInt(height / HEIGHT0);
       var cols = parseInt(width / WIDTH0);
-      asmdb.getInstance().setwinsize(rows, cols);
-      this.$refs.terminal.setWindowSize(rows, cols);
+      var size = rows + '*' + cols;
+      if (this.size != size) {
+        this.size = size;
+        asmdb.getInstance().setwinsize(rows, cols);
+        this.$refs.terminal.setWindowSize(rows, cols);
+      }
     }
   }
 };
