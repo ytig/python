@@ -127,9 +127,9 @@ export default {
       }
       var width = this.$el.clientWidth - 24;
       var height = windowHeight - (2 * PADDING - 2);
-      var rows = parseInt(height / HEIGHT0);
       var cols = parseInt(width / WIDTH0);
-      var size = rows + '*' + cols;
+      var rows = parseInt(height / HEIGHT0);
+      var size = cols + '*' + rows;
       if (this.size != size) {
         this.size = size;
         asmdb.getInstance().setwinsize(rows, cols);
