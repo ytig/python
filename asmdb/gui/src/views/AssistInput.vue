@@ -2,7 +2,7 @@
   <div class="assist-input-container">
     <div :style="{backgroundImage:backgroundImage}"></div>
     <div v-show="focus&&value.length>0" @mousedown="requestFocus" @click="onClose"></div>
-    <input ref="input" type="text" :value="value" @input="onInput" @keydown="onKeyDown" @focus="onFocus" @blur="onBlur" />
+    <input ref="input" type="text" :value="value" @input="onInput" @keydown="onKeyDown" @focus="onFocus" @blur="onBlur" spellcheck="false" />
     <div v-if="height>0" ref="assist" class="assist-input-assist" @mousedown="requestFocus" :style="{height:(height+2)+'px'}">
       <div class="assist-input-loading" v-if="assist==null">loading</div>
       <pre class="assist-input-item" v-for="(item, index) in assist" :key="item" @mouseenter="onMouseEnterItem(index)" @mousemove="onMouseMoveItem(index)" @mouseleave="onMouseLeaveItem(index)" @click="onClickItem(item)" :css-selected="index==selected">{{getSimpleItem(type,item)}}</pre>

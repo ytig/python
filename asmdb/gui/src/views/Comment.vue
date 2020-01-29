@@ -1,6 +1,6 @@
 <template>
   <div ref="container" class="comment-container">
-    <input ref="input" class="comment-input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @keypress="onKeyPress" @focus="show" @blur="dismiss" />
+    <input ref="input" class="comment-input" type="text" :style="{width:inputWidth+'px'}" @input="onInput" @keypress="onKeyPress" @focus="show" @blur="dismiss" spellcheck="false" />
   </div>
 </template>
 

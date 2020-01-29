@@ -1,7 +1,7 @@
 <template>
   <div ref="container" v-show="show" class="editor-container" :style="{left:left+'px',top:top+'px',transform:'scale('+scale+','+scale+')'}">
     <span>0x</span>
-    <input ref="input" type="text" :style="{width:inputWidth+'px'}" :placeholder="placeholder" @input="onInput" @compositionstart="onCompositionStart" @compositionend="onCompositionEnd" @keypress="onKeyPress" @blur="onBlur" />
+    <input ref="input" type="text" :style="{width:inputWidth+'px'}" :placeholder="placeholder" @input="onInput" @compositionstart="onCompositionStart" @compositionend="onCompositionEnd" @keypress="onKeyPress" @blur="onBlur" spellcheck="false" />
   </div>
 </template>
 
