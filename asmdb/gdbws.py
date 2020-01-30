@@ -78,7 +78,7 @@ class Session:
     async def onopen(self, emit):
         if not self._emits:
             try:
-                self._ctrl = await WsGdbController.anew(parse_token(self._token), lambda msg: self.notify('anew', msg + '\n', emit=emit))
+                self._ctrl = await WsGdbController.anew(self._token, lambda msg: self.notify('anew', msg + '\n', emit=emit))
             except BaseException as e:
                 traceback.print_exc()
         self._emits.append(emit)
@@ -205,18 +205,24 @@ class WsGdbController(GdbController):
     lenb = push_prop('lenb', 0)
 
     @classmethod
-    async def anew(cls, config, println):
+    async def anew(cls, token, println):
+        config = parse_token(token)
         self = await super().anew(config, println)
         self.quit = False
         self.suspend = True  # for test
         self.breakpoints = []
         self.watchpoints = []
         self.maps = await self._info_maps()
-        argv = ['python3', '-q', ]
+        argv = ['python3', ]
+        argv.append('-q')
         script = config.get('script')
         if script:
             argv.append('-i')
             argv.append(script)
+            argv.append(token)
+        else:
+            argv.append('-')
+            argv.append(token)
         self.terminal = await Terminal.anew(argv, lambda lenb: setattr(self, 'lenb', lenb))
         self.lenb = 0
         return self
