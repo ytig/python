@@ -6,11 +6,28 @@ import asyncio
 from asyncio import subprocess
 
 
+async def adb_startup(serial, process):
+    # todo
+    return '127.0.0.1:5039'
+
+
 async def gdb_startup(config, println):
+    device = config.get('device')
+    process = config.get('process')
+    assert device, 'no device selected'
+    assert process, 'no process selected'
+    remote = None
+    scheme = serial = None
+    if '://' in device:
+        scheme, serial, = device.split('://', 1)
+    if scheme == 'adb':
+        remote = await adb_startup(serial, process)
+    else:
+        raise TypeError('unknown device type')
     xs = []
     xs.append('set pagination off')
-    xs.append('target remote 127.0.0.1:5039')
-    # todo
+    if remote:
+        xs.append(f'target remote {remote}')
     args = []
     args.append('--nx')
     args.append('-q')
