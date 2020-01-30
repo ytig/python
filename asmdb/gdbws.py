@@ -212,7 +212,12 @@ class WsGdbController(GdbController):
         self.breakpoints = []
         self.watchpoints = []
         self.maps = await self._info_maps()
-        self.terminal = await Terminal.anew(['python3', '-q', ], lambda lenb: setattr(self, 'lenb', lenb))
+        argv = ['python3', '-q', ]
+        script = config.get('script')
+        if script:
+            argv.append('-i')
+            argv.append(script)
+        self.terminal = await Terminal.anew(argv, lambda lenb: setattr(self, 'lenb', lenb))
         self.lenb = 0
         return self
 
