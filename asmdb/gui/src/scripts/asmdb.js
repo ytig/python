@@ -24,8 +24,7 @@ class Debugger {
     this.tag = 0;
     this.callbacks = {};
     this.objects = {};
-    this.ws = new WebSocket('ws://localhost:8080/ws');
-    // this.ws = new WebSocket('ws://' + location.host + '/ws');
+    this.ws = new WebSocket('ws://' + location.host + '/ws');
     this.state = 0;
     this.ws.onopen = this.onOpen.bind(this);
     this.ws.onmessage = this.onMessage.bind(this);
