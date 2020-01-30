@@ -6,9 +6,38 @@ import asyncio
 from asyncio import subprocess
 
 
+async def adb_shell(serial, cmd, su=False, daemon=False):
+    if not su:
+        command = f'adb -s {serial} shell {cmd}'
+    else:
+        command = f'adb -s {serial} shell "su -c \'{cmd}\'"'
+    if not daemon:
+        proc = await asyncio.create_subprocess_shell(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        async for line in proc.stderr:
+            assert not re.search(r'error: device .* not found', line.decode()), 'device not found'
+        return (await proc.stdout.read()).decode()
+    else:
+        return await asyncio.create_subprocess_shell(command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
 async def adb_startup(serial, process):
-    # todo
-    return '127.0.0.1:5039'
+    pid = None
+    pids_need_kill = []
+    for line in (await adb_shell(serial, 'ps')).split('\n'):
+        line = line.strip()
+        if line.endswith(process):
+            pid = line.split()[1]
+        elif re.search(r'/data/.+server', line):
+            pids_need_kill.append(line.split()[1])
+    assert pid, 'process not found'
+    if 'Permissive' not in (await adb_shell(serial, 'getenforce')):
+        await adb_shell(serial, 'setenforce 0', su=True)
+    for p in pids_need_kill:
+        await adb_shell(serial, f'kill {p}', su=True)
+    await adb_shell(serial, f'/data/gdbserver :5039 --attach {pid}', su=True, daemon=True)
+    cmd = f'adb -s {serial} forward tcp:5039 tcp:5039'
+    await (await asyncio.create_subprocess_shell(cmd, stdout=subprocess.PIPE)).stdout.read()
+    return '0.0.0.0:5039'
 
 
 async def gdb_startup(config, println):
@@ -24,25 +53,25 @@ async def gdb_startup(config, println):
         remote = await adb_startup(serial, process)
     else:
         raise TypeError('unknown device type')
-    xs = []
-    xs.append('set pagination off')
+    exs = []
+    exs.append('set pagination off')
     if remote:
-        xs.append(f'target remote {remote}')
+        exs.append(f'target remote {remote}')
     args = []
     args.append('--nx')
     args.append('-q')
-    for x in xs:
+    for ex in exs:
         args.append('-ex')
-        args.append(x)
-    process = await asyncio.create_subprocess_exec('gdb', *args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, limit=2**20)
+        args.append(ex)
+    proc = await asyncio.create_subprocess_exec('gdb', *args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, limit=2**20)
     buffer = b''
     while not buffer.endswith(b'(gdb) '):
-        buffer += await process.stdout.read(n=1)
+        buffer += await proc.stdout.read(n=1)
         lines = buffer.split(b'\n')
         for line in lines[:-1]:
             println(line.decode())
         buffer = lines[-1]
-    return process
+    return proc
 
 
 async def gdb_readlines(stream):
