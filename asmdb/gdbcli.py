@@ -34,10 +34,10 @@ async def adb_startup(serial, process):
         await adb_shell(serial, 'setenforce 0', su=True)
     for p in pids_need_kill:
         await adb_shell(serial, f'kill {p}', su=True)
-    await adb_shell(serial, f'/data/gdbserver :8519 --attach {pid}', su=True, daemon=True)
-    cmd = f'adb -s {serial} forward tcp:8519 tcp:8519'
+    await adb_shell(serial, f'/data/gdbserver :29714 --attach {pid}', su=True, daemon=True)
+    cmd = f'adb -s {serial} forward tcp:29714 tcp:29714'
     await (await asyncio.create_subprocess_shell(cmd, stdout=subprocess.PIPE)).stdout.read()
-    return '0.0.0.0:8519'
+    return '0.0.0.0:29714'
 
 
 async def gdb_startup(config, println):

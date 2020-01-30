@@ -90,4 +90,4 @@ async def websocket(request):
 app.router.add_get('/ws', websocket)
 
 
-web.run_app(app)
+web.run_app(app, port=8519)
