@@ -26,10 +26,22 @@ class WsError(RuntimeError):
 
 class Library:
     def __init__(self, ctrl, name, base, size):
-        self.ctrl = ctrl
-        self.name = name
-        self.base = base
-        self.size = size
+        self._ctrl = ctrl
+        self._name = name
+        self._base = base
+        self._size = size
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def base(self):
+        return self._base
+
+    @property
+    def size(self):
+        return self._size
 
 
 class WsController:
