@@ -21,16 +21,16 @@ class WsError(RuntimeError):
 
 class WsController:
     def __init__(self, url, token, daemon=True):
-        self.ws = websocket.create_connection(url, header={
+        self._ws = websocket.create_connection(url, header={
             'cookie': f'token={token}' + (';daemon=true' if daemon else '')
         })
-        self.closed = False
-        self.struct = {
+        self._closed = False
+        self._struct = {
             'suspend': False,
             'breakpoints': [],
             'watchpoints': []
         }
-        self.events = {}
+        self._events = {}
         threading.Thread(target=self._run).start()
 
     @property
@@ -39,11 +39,11 @@ class WsController:
 
     @property
     def breakpoints(self):
-        return copy.deepcopy(self.struct['breakpoints'])
+        return copy.deepcopy(self._struct['breakpoints'])
 
     @property
     def watchpoints(self):
-        return copy.deepcopy(self.struct['watchpoints'])
+        return copy.deepcopy(self._struct['watchpoints'])
 
     def nexti(self):
         return self._pull('next')
@@ -91,8 +91,8 @@ class WsController:
             'params': params
         }
         event = threading.Event()
-        self.events[tag] = event
-        self.ws.send(json.dumps(data))
+        self._events[tag] = event
+        self._ws.send(json.dumps(data))
         if not event.wait(timeout=timeout):
             raise TimeoutError
         if event.e is not None:
@@ -102,32 +102,32 @@ class WsController:
     def _run(self):
         while True:
             try:
-                data = self.ws.recv()
+                data = self._ws.recv()
             except websocket.WebSocketException:
                 data = None
             if not data:
                 break
             self._on_message(json.loads(data))
             del data
-        self.closed = True
+        self._closed = True
 
     def _on_message(self, data):
         if data['type'] == 'push':
             if data['key'] == 'emit':
                 if data['val'] == 0:
-                    self.ws.close()
-            elif data['key'] in self.struct:
-                self.struct[data['key']] = data['val']
+                    self._ws.close()
+            elif data['key'] in self._struct:
+                self._struct[data['key']] = data['val']
         elif data['type'] == 'pull':
-            event = self.events.pop(data['tag'], None)
+            event = self._events.pop(data['tag'], None)
             if event is not None:
                 event.r = data['r']
                 event.e = data['e']
                 event.set()
 
     def close(self):
-        self.ws.close()
-        while not self.closed:
+        self._ws.close()
+        while not self._closed:
             pass
 
 
