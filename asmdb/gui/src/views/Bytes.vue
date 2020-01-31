@@ -320,6 +320,7 @@ export default {
         } else {
           asmdb.getInstance().wpt([{ address: addr }], []);
         }
+        emptySelection();
       };
       var el = this.$el.getElementsByClassName('bytes-padding')[index];
       var rect = el.getBoundingClientRect();
