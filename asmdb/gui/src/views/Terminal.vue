@@ -25,6 +25,7 @@ export default {
       if (newValue) {
         this.terminal.focus();
       } else {
+        this.terminal.clearSelection();
         this.terminal.blur();
       }
     },
