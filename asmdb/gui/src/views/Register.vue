@@ -94,11 +94,13 @@ export default {
       var placeholder = text.slice(2);
       items.push(['Copy', '', true]);
       items[items.length - 1].event = () => {
+        emptySelection();
         this.$toast.alert('Text Copied');
         copyText(text);
       };
       items.push(['Modify register', '', asmdb.getInstance().isSuspend() && inRange]);
       items[items.length - 1].event = () => {
+        emptySelection();
         this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onAssign.bind(this, this.value.lineName));
       };
       return items;
