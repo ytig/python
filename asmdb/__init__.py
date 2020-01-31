@@ -40,9 +40,9 @@ class WsController:
         self._closed = False
         self._struct = {
             'suspend': False,
-            'breakpoints': [],
-            'watchpoints': [],
-            'maps': []
+            'breakpoints': None,
+            'watchpoints': None,
+            'maps': None
         }
         self._events = {}
         threading.Thread(target=self._run).start()
@@ -53,10 +53,14 @@ class WsController:
 
     @property
     def breakpoints(self):
+        while self._struct['breakpoints'] is None:
+            pass
         return copy.deepcopy(self._struct['breakpoints'])
 
     @property
     def watchpoints(self):
+        while self._struct['watchpoints'] is None:
+            pass
         return copy.deepcopy(self._struct['watchpoints'])
 
     def nexti(self):
@@ -72,6 +76,8 @@ class WsController:
             return False
 
     def get_library(self, pattern):
+        while self._struct['maps'] is None:
+            pass
         name = None
         start = None
         end = None
