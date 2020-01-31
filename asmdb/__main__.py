@@ -77,9 +77,11 @@ app.router.add_get('/assist', assist)
 
 async def websocket(request):
     token = request.cookies.get('token')
+    daemon = request.cookies.get('daemon') == 'true'
     response = web.WebSocketResponse()
     await response.prepare(request)
     emit = lambda data: asyncio.ensure_future(response.send_json(data))
+    emit.daemon = daemon
     onopen(token, emit)
     try:
         async for msg in response:
