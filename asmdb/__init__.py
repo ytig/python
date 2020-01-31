@@ -10,6 +10,10 @@ _LOCK = threading.RLock()
 _COUNT = itertools.count(1)
 
 
+def new_default_controller():
+    return WsController('ws://0.0.0.0:8519/ws', sys.argv[1])
+
+
 def unique():
     with _LOCK:
         return next(_COUNT)
@@ -129,13 +133,3 @@ class WsController:
         self._ws.close()
         while not self._closed:
             pass
-
-
-_ctrl = None
-
-
-def ctrl():
-    global _ctrl
-    if _ctrl is None:
-        _ctrl = WsController('ws://0.0.0.0:8519/ws', sys.argv[1])
-    return _ctrl
