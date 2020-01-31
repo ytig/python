@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+import re
 import sys
 import json
 import copy
@@ -23,6 +24,14 @@ class WsError(RuntimeError):
     pass
 
 
+class Library:
+    def __init__(self, ctrl, name, base, size):
+        self.ctrl = ctrl
+        self.name = name
+        self.base = base
+        self.size = size
+
+
 class WsController:
     def __init__(self, url, token, daemon=True):
         self._ws = websocket.create_connection(url, header={
@@ -32,7 +41,8 @@ class WsController:
         self._struct = {
             'suspend': False,
             'breakpoints': [],
-            'watchpoints': []
+            'watchpoints': [],
+            'maps': []
         }
         self._events = {}
         threading.Thread(target=self._run).start()
@@ -60,6 +70,24 @@ class WsController:
             return self._pull('cont', timeout=timeout)
         except TimeoutError:
             return False
+
+    def get_library(self, pattern):
+        name = None
+        start = None
+        end = None
+        for m in self._struct['maps']:
+            if name is None:
+                if re.search(pattern, m['target']):
+                    name = m['target']
+                    start = m['start']
+                    end = m['end']
+            else:
+                if name == m['target']:
+                    end = m['end']
+        if name is not None:
+            return Library(self, name, start, end - start)
+        else:
+            return None
 
     def get_bytes(self, start, length):
         return base64.b64decode(self._pull('mem', start, start + length))
