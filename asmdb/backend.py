@@ -1,9 +1,9 @@
 #!/usr/local/bin/python3
 import re
-import tempfile
 import signal
 import asyncio
-from asyncio import subprocess
+import tempfile
+from asyncio.subprocess import PIPE, STDOUT, DEVNULL
 
 
 async def adb_shell(serial, cmd, su=False, daemon=False):
@@ -12,12 +12,12 @@ async def adb_shell(serial, cmd, su=False, daemon=False):
     else:
         command = f'adb -s {serial} shell "su -c \'{cmd}\'"'
     if not daemon:
-        proc = await asyncio.create_subprocess_shell(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc = await asyncio.create_subprocess_shell(command, stdout=PIPE, stderr=PIPE)
         async for line in proc.stderr:
             assert not re.search(r'error: device .* not found', line.decode()), 'device not found'
         return (await proc.stdout.read()).decode()
     else:
-        return await asyncio.create_subprocess_shell(command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return await asyncio.create_subprocess_shell(command, stdin=DEVNULL, stdout=DEVNULL, stderr=DEVNULL)
 
 
 async def adb_startup(serial, process):
@@ -36,7 +36,7 @@ async def adb_startup(serial, process):
         await adb_shell(serial, f'kill {p}', su=True)
     await adb_shell(serial, f'/data/gdbserver :29714 --attach {pid}', su=True, daemon=True)
     cmd = f'adb -s {serial} forward tcp:29714 tcp:29714'
-    await (await asyncio.create_subprocess_shell(cmd, stdout=subprocess.PIPE)).stdout.read()
+    await (await asyncio.create_subprocess_shell(cmd, stdout=PIPE)).stdout.read()
     return '0.0.0.0:29714'
 
 
@@ -63,7 +63,7 @@ async def gdb_startup(config, println):
     for ex in exs:
         args.append('-ex')
         args.append(ex)
-    proc = await asyncio.create_subprocess_exec('gdb', *args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, limit=2**20)
+    proc = await asyncio.create_subprocess_exec('gdb', *args, stdin=PIPE, stdout=PIPE, stderr=STDOUT, limit=2**20)
     buffer = b''
     while not buffer.endswith(b'(gdb) '):
         buffer += await proc.stdout.read(n=1)
