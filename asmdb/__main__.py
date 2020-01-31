@@ -3,7 +3,7 @@ import os
 import json
 import asyncio
 from aiohttp import web
-from .gdbws import onopen, onmessage, onclose
+from .wsserver import onopen, onmessage, onclose
 VUE_DIST = os.path.dirname(__file__) + '/gui/dist'
 app = web.Application()
 app.router.add_static('/static', VUE_DIST + '/static')

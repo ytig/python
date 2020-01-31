@@ -2,11 +2,11 @@
 import json
 import urllib
 import base64
+import asyncio
 import tempfile
 import traceback
-import asyncio
 import ptyprocess
-from .gdbcli import GdbController, GdbError, binary_search
+from .backend import GdbController, GdbError, binary_search
 SESSIONS = {}
 
 
