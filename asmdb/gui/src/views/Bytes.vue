@@ -307,6 +307,7 @@ export default {
       }
       items.push(['Copy', '', true]);
       items[items.length - 1].event = () => {
+        emptySelection();
         this.$toast.alert('Text Copied');
         copyText('0x' + intValue.toString(16));
       };
@@ -314,19 +315,20 @@ export default {
       var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN && inRange;
       items.push([!watching ? 'Watching' : 'Watching done', '', watching || canWatch]);
       items[items.length - 1].event = () => {
+        emptySelection();
         var addr = address - (address % asmdb.getInstance().UNIT);
         if (!watching) {
           asmdb.getInstance().wpt([], [{ address: addr }]);
         } else {
           asmdb.getInstance().wpt([{ address: addr }], []);
         }
-        emptySelection();
       };
       var el = this.$el.getElementsByClassName('bytes-padding')[index];
       var rect = el.getBoundingClientRect();
       var placeholder = el.innerHTML;
       items.push(['Modify memory', '', asmdb.getInstance().isSuspend() && inRange]);
       items[items.length - 1].event = () => {
+        emptySelection();
         this.$editor.alert(parseInt(rect.x + 1 - measureLength(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
       };
       return items;
