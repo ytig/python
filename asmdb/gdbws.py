@@ -254,23 +254,31 @@ class WsGdbController(GdbController):
 
     async def next(self):
         if not self.suspend:
-            return
+            return False
         self.suspend = False
         await self._nexti()
         self.suspend = True
+        return True
 
     async def step(self):
-        pass
+        if not self.suspend:
+            return False
+        # todo
+        return True
 
     async def cont(self):
         if not self.suspend:
-            return
+            return False
         self.suspend = False
         await self._continue()
         self.suspend = True
+        return True
 
     async def rlse(self):
-        self.quit = True
+        if not self.suspend:
+            return False
+        # todo
+        return True
 
     async def asm(self, start, end):  # todo
         mem = await self.mem(start, end)
