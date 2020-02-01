@@ -70,8 +70,8 @@ export default {
       items.push(['Release suspend', 'r', this.enable.bool_t]);
       items.push(['Fullscreen', '⌃F', !fullscreen]);
       items.push(['Exit fullscreen', '⎋', fullscreen]);
-      items.push(['Reload', '⌘R', true]);
-      items.push(['Quit', '⌘[', true]);
+      items.push(['Refresh', '⌘R', true]);
+      items.push(['Quit', '⌘H', true]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
@@ -120,7 +120,7 @@ export default {
             return true;
           } else {
             d += 1;
-            index = ['r', '['].indexOf(event.key);
+            index = ['r', 'h'].indexOf(event.key);
             if (index >= 0 && !event.altKey && !event.ctrlKey && event.metaKey && !event.shiftKey) {
               this.onClickMenu(index + d);
               return true;
