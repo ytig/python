@@ -82,7 +82,7 @@ class WsController:
         except TimeoutError:
             return False
 
-    def get_library(self, pattern):
+    def find_library(self, pattern):
         while self._struct['maps'] is None:
             pass
         name = None
