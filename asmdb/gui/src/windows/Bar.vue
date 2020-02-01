@@ -70,7 +70,8 @@ export default {
       items.push(['Release suspend', 'r', this.enable.bool_t]);
       items.push(['Fullscreen', '⌃F', !fullscreen]);
       items.push(['Exit fullscreen', '⎋', fullscreen]);
-      items.push(['Quit', '', true]);
+      items.push(['Reload', '⌘R', true]);
+      items.push(['Quit', '⌘[', true]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
@@ -92,6 +93,9 @@ export default {
           }
           break;
         case 6:
+          this.$root.reload();
+          break;
+        case 7:
           this.$router.replace('/hello');
           break;
       }
@@ -99,19 +103,13 @@ export default {
     onKeyDown: function(event) {
       var d = 0;
       var index = ['n', 's', 'c', 'r'].indexOf(event.key);
-      if (index >= 0) {
-        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
-          return false;
-        }
+      if (index >= 0 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
         this.onClickMenu(index + d);
         return true;
       } else {
         d += 4;
-        var index = ['f'].indexOf(event.key);
-        if (index >= 0) {
-          if (event.altKey || !event.ctrlKey || event.metaKey || event.shiftKey) {
-            return false;
-          }
+        index = ['f'].indexOf(event.key);
+        if (index >= 0 && !event.altKey && event.ctrlKey && !event.metaKey && !event.shiftKey) {
           this.onClickMenu(index + d);
           return true;
         } else {
@@ -121,7 +119,14 @@ export default {
             this.onClickMenu(index + d);
             return true;
           } else {
-            return event.keyCode == 9;
+            d += 1;
+            index = ['r', '['].indexOf(event.key);
+            if (index >= 0 && !event.altKey && !event.ctrlKey && event.metaKey && !event.shiftKey) {
+              this.onClickMenu(index + d);
+              return true;
+            } else {
+              return event.keyCode == 9;
+            }
           }
         }
       }

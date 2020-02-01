@@ -85,10 +85,7 @@ export default {
     onKeyDown: function(event) {
       var d = 0;
       var index = [8].indexOf(event.keyCode);
-      if (index >= 0) {
-        if (!event.shiftKey) {
-          return false;
-        }
+      if (index >= 0 && !event.altKey && !event.ctrlKey && !event.metaKey && event.shiftKey) {
         this.onClickMenu(index + d);
         return true;
       } else {
