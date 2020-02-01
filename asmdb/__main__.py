@@ -19,7 +19,7 @@ async def assist_device():
     for line in os.popen('adb devices').read().split('\n'):
         if not line.endswith('device'):
             continue
-        r.append('adb://' + line.split('\t')[0])
+        r.append('adb://' + line.split()[0])
     r.sort()
     return r
 
@@ -32,7 +32,7 @@ async def assist_process(device):
             for line in os.popen(f'adb -s {serial} shell ps').read().split('\n'):
                 if not line.startswith('u0_a'):
                     continue
-                r.append(line.split(' ')[-1])
+                r.append(line.split()[-1])
     r.sort()
     return r
 

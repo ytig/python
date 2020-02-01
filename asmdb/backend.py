@@ -72,7 +72,9 @@ async def gdb_startup(config, println):
         buffer += b
         lines = buffer.split(b'\n')
         for line in lines[:-1]:
-            println(line.decode())
+            line = line.strip().decode()
+            if line:
+                println(line)
         buffer = lines[-1]
     return proc
 
