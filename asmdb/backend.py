@@ -54,6 +54,7 @@ async def gdb_startup(config, println):
     else:
         raise TypeError('unknown device type')
     commands = []
+    commands.append('set confirm off')
     commands.append('set pagination off')
     if remote:
         commands.append(f'target remote {remote}')
