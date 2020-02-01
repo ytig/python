@@ -172,7 +172,7 @@ class GdbController:
         if re.search(r'Remote connection closed|The program is not being run.', text):
             raise GdbError(text.strip())
 
-    async def _info_maps(self):
+    async def _info_maps(self):  # todo speed up
         maps = []
         base = {}
         text = await self._command('info proc mappings')
