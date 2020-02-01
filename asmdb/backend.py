@@ -53,16 +53,16 @@ async def gdb_startup(config, println):
         remote = await adb_startup(serial, process)
     else:
         raise TypeError('unknown device type')
-    exs = []
-    exs.append('set pagination off')
+    commands = []
+    commands.append('set pagination off')
     if remote:
-        exs.append(f'target remote {remote}')
+        commands.append(f'target remote {remote}')
     args = []
     args.append('--nx')
     args.append('-q')
-    for ex in exs:
+    for cmd in commands:
         args.append('-ex')
-        args.append(ex)
+        args.append(cmd)
     proc = await asyncio.create_subprocess_exec('gdb', *args, stdin=PIPE, stdout=PIPE, stderr=STDOUT, limit=2**20)
     buffer = b''
     while not buffer.endswith(b'(gdb) '):
