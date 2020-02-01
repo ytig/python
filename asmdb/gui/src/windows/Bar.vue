@@ -71,7 +71,7 @@ export default {
       items.push(['Fullscreen', '⌃F', !fullscreen]);
       items.push(['Exit fullscreen', '⎋', fullscreen]);
       items.push(['Refresh', '⌘R', true]);
-      items.push(['Quit', '⌘H', true]);
+      items.push(['Quit', '⌘E', true]);
       this.$menu.alert(event, items, this.onClickMenu);
     },
     onClickMenu: function(index) {
@@ -120,7 +120,7 @@ export default {
             return true;
           } else {
             d += 1;
-            index = ['r', 'h'].indexOf(event.key);
+            index = ['r', 'e'].indexOf(event.key);
             if (index >= 0 && !event.altKey && !event.ctrlKey && event.metaKey && !event.shiftKey) {
               this.onClickMenu(index + d);
               return true;
