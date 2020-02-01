@@ -141,7 +141,7 @@ class GdbController:
 
     async def _continue(self):
         text = await self._command('continue', wait=True)
-        if re.search(r'Remote connection closed|he program is not being run.', text):
+        if re.search(r'Remote connection closed|The program is not being run.', text):
             raise GdbError(text.strip())
 
     async def _info_maps(self):
@@ -212,7 +212,7 @@ class GdbController:
     async def _info_registers(self):
         registers = {}
         text = await self._command('info registers')
-        if re.search(r'The program has no registers now.', text):
+        if re.search(r'Remote connection closed|The program has no registers now.', text):
             raise GdbError(text.strip())
         for line in text.strip().split('\n'):
             words = line.split()
@@ -223,7 +223,7 @@ class GdbController:
         temp = tempfile.NamedTemporaryFile()
         try:
             text = await self._command(f'dump binary memory {temp.name} {start} {end}')
-            if re.search(r'Cannot access memory at address', text):
+            if re.search(r'Remote connection closed|Cannot access memory at address', text):
                 raise GdbError(text.strip())
             temp.seek(0)
             return temp.read()
