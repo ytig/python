@@ -334,28 +334,63 @@ class WsGdbController(GdbController):
         for point in self.breakpoints:
             breakpoints[point['address']] = point
         for point in del_points:
-            if point['address'] in breakpoints:
-                del breakpoints[point['address']]
+            p = breakpoints.get(point['address'])
+            if p is None:
+                continue
+            if not p['disable']:
+                await self.sub_bpt(p['address'])
+            del breakpoints[p['address']]
         for point in set_points:
-            breakpoints[point['address']] = point
+            p = {
+                'address': await self.add_bpt(point['address']),
+                'disable': point.get('disable') or False,
+                'comment': point.get('comment') or ''
+            }
+            if p['disable']:
+                await self.sub_bpt(p['address'])
+            breakpoints[p['address']] = p
         self.breakpoints.clear()
         for address in sorted(breakpoints.keys()):
             self.breakpoints.append(breakpoints[address])
         self.breakpoints = self.breakpoints
+
+    async def add_bpt(self, address):
+        # todo
+        return address
+
+    async def sub_bpt(self, address):
+        # todo
+        pass
 
     async def wpt(self, del_points, set_points):
         watchpoints = {}
         for point in self.watchpoints:
             watchpoints[point['address']] = point
         for point in del_points:
-            if point['address'] in watchpoints:
-                del watchpoints[point['address']]
+            p = watchpoints.get(point['address'])
+            if p is None:
+                continue
+            await self.sub_wpt(p['address'])
+            del watchpoints[p['address']]
         for point in set_points:
-            watchpoints[point['address']] = point
+            p = {
+                'address': await self.add_wpt(point['address']),
+            }
+            if p['address'] is None:
+                continue
+            watchpoints[p['address']] = p
         self.watchpoints.clear()
         for address in sorted(watchpoints.keys()):
             self.watchpoints.append(watchpoints[address])
         self.watchpoints = self.watchpoints
+
+    async def add_wpt(self, address):
+        # todo
+        return address
+
+    async def sub_wpt(self, address):
+        # todo
+        pass
 
     async def asgn(self, express):
         notify_all(self, 'assigned', express)
