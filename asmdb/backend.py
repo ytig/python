@@ -1,9 +1,18 @@
 #!/usr/local/bin/python3
 import re
+import socket
 import signal
 import asyncio
 import tempfile
 from asyncio.subprocess import PIPE, STDOUT, DEVNULL
+
+
+def dest_pair(address):
+    try:
+        host, port, = address.split(':')
+        return (host, int(port),)
+    except BaseException:
+        raise TypeError
 
 
 async def adb_shell(serial, cmd, su=False, daemon=False):
@@ -76,6 +85,17 @@ async def gdb_startup(config, println):
             if line:
                 println(line)
         buffer = lines[-1]
+    if remote:
+        _socket = socket.create_connection(dest_pair(remote))
+
+        async def is_remote_alive():
+            try:
+                return bool(_socket.recv(1024, socket.MSG_DONTWAIT))
+            except BlockingIOError:
+                return True
+            except ConnectionError:
+                return False
+        proc.is_remote_alive = is_remote_alive
     return proc
 
 
@@ -140,10 +160,7 @@ class GdbController:
                         return text
 
     async def _is_alive(self):
-        text = await self._command('info proc')
-        if re.search(r'Remote connection closed|No current process: you must name one.', text):
-            return False
-        return True
+        return not hasattr(self.process, 'is_remote_alive') or (await self.process.is_remote_alive())
 
     async def _nexti(self):
         text = await self._command('nexti')
