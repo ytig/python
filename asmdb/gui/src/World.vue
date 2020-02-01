@@ -89,7 +89,7 @@ export default {
       this.$menu.close();
       this.$editor.close();
       keyboard.requestFocus(this);
-      this.$inquiry.alert('error', 'Disconnect', 'Your process is offline, Do you want to reload?', () => {
+      this.$inquiry.alert('error', 'Disconnect', 'Your process is offline, Do you want to reload now?', () => {
         this.$root.reload();
       });
     }
