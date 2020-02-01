@@ -67,7 +67,9 @@ async def gdb_startup(config, println):
     proc = await asyncio.create_subprocess_exec('gdb', *args, stdin=PIPE, stdout=PIPE, stderr=STDOUT, limit=2**20)
     buffer = b''
     while not buffer.endswith(b'(gdb) '):
-        buffer += await proc.stdout.read(n=1)
+        b = await proc.stdout.read(n=1)
+        assert b, 'Remote connection closed'
+        buffer += b
         lines = buffer.split(b'\n')
         for line in lines[:-1]:
             println(line.decode())
