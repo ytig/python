@@ -10,7 +10,9 @@ export default {
     window.addEventListener('keydown', function (event) {
       if (vm.onKeyDown(event)) {
         event.stopPropagation();
-        event.preventDefault();
+        if (['x', 'c', 'v', 'a'].indexOf(event.key) < 0 || !event.metaKey) {
+          event.preventDefault();
+        }
       }
     }, true);
     Vue.prototype.$inquiry = vm;
