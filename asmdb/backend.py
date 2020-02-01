@@ -134,6 +134,12 @@ class GdbController:
                     if 'SIGINT' not in text:
                         return text
 
+    async def _is_alive(self):
+        text = await self._command('info proc')
+        if re.search(r'Remote connection closed|No current process: you must name one.', text):
+            return False
+        return True
+
     async def _nexti(self):
         text = await self._command('nexti')
         if re.search(r'Remote connection closed|The program is not being run.', text):

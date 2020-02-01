@@ -234,11 +234,20 @@ class WsGdbController(GdbController):
             argv.append(token)
         self.terminal = await Terminal.anew(argv, lambda lenb: setattr(self, 'lenb', lenb))
         self.lenb = 0
+        asyncio.ensure_future(self._beat(1))
         return self
 
     async def adel(self):
+        self.quit = True
         await self.terminal.adel()
         await super().adel()
+
+    async def _beat(self, interval):
+        while not self.quit:
+            if not await self._is_alive():
+                self.quit = True
+            else:
+                await asyncio.sleep(interval)
 
     async def setwinsize(self, rows, cols):
         return await self.terminal.setwinsize(rows, cols)
