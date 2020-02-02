@@ -22,7 +22,6 @@ function unregisterWindow(object) {
   list.splice(i, 1);
   if (i == cur) {
     cur = -1;
-    object.onFocusChanged(false);
   }
 }
 
