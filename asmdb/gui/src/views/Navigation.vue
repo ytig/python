@@ -1,6 +1,6 @@
 <template>
   <div class="navigation-container" :css-gradient="gradient" @mouseup="onMouseUp">
-    <span class="user-select-none" :css-focus="focus" :css-disable="!disable2.bool_f" @click="onClick">{{name}}</span>
+    <span class="user-select-none" :css-focus="focus" :css-disable="disable" @click="onClick">{{name}}</span>
     <div class="navigation-grow">
       <span v-for="(item, index) in labels" :key="index">{{item}}</span>
     </div>
@@ -9,12 +9,9 @@
 </template>
 
 <script>
-import sloth from '@/scripts/sloth';
-
 export default {
   data: function() {
     return {
-      disable2: new sloth(999),
       backgroundColor: 'transparent'
     };
   },
@@ -24,14 +21,6 @@ export default {
     focus: Boolean,
     disable: Boolean,
     gradient: Boolean
-  },
-  watch: {
-    disable: {
-      immediate: true,
-      handler: function(newValue) {
-        this.disable2.set(!newValue);
-      }
-    }
   },
   computed: {
     labels: function() {

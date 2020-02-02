@@ -4,19 +4,21 @@
     <div class="bar-grow">
       <span class="bar-text user-select-none" @click="onMouseUp2">{{process}}</span>
     </div>
-    <div class="bar-item" v-for="(item, index) in items" :key="index" :title="item.title" :style="item.style" @click="onClickItem(index)" :css-enable="enable.bool_f"></div>
+    <div class="bar-item" v-for="(item, index) in items" :key="index" @click="onClickItem(index)" :css-enable="enable">
+      <div :style="{opacity:enable?1:0,backgroundImage:item.image}"></div>
+      <div :style="{opacity:enable?0:1,maskImage:item.image}"></div>
+    </div>
   </div>
 </template>
 
 <script>
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
-import sloth from '@/scripts/sloth';
 
 export default {
   data: function() {
     return {
-      enable: new sloth(999),
+      enable: false,
       process: asmdb.getToken(this.$cookies, 'process')
     };
   },
@@ -28,17 +30,10 @@ export default {
       for (var i = 0; i < 4; i++) {
         var title = titles[i];
         var image = "url('/static/icons/" + icons[i] + ".png'";
-        if (this.enable.bool_f) {
-          items.push({
-            title: title,
-            style: { backgroundImage: image }
-          });
-        } else {
-          items.push({
-            title: '',
-            style: { maskImage: image }
-          });
-        }
+        items.push({
+          title: title,
+          image: image
+        });
       }
       return items;
     }
@@ -63,10 +58,10 @@ export default {
     onMouseUp2: function(event) {
       var items = [];
       var fullscreen = document.fullscreenElement != null;
-      items.push(['Nexti', 'n', this.enable.bool_t]);
-      items.push(['Stepi', 's', this.enable.bool_t]);
-      items.push(['Continue', 'c', this.enable.bool_t]);
-      items.push(['Release suspend', 'r', this.enable.bool_t]);
+      items.push(['Nexti', 'n', this.enable]);
+      items.push(['Stepi', 's', this.enable]);
+      items.push(['Continue', 'c', this.enable]);
+      items.push(['Release suspend', 'r', this.enable]);
       items.push(['Fullscreen', '⌃F', !fullscreen]);
       items.push(['Exit fullscreen', '⎋', fullscreen]);
       items.push(['Refresh', '⌘R', true]);
@@ -131,13 +126,13 @@ export default {
       }
     },
     onBreak: function() {
-      this.enable.set(true);
+      this.enable = true;
     },
     onContinue: function() {
-      this.enable.set(false);
+      this.enable = false;
     },
     onClickItem: function(index) {
-      if (!this.enable.bool_t) {
+      if (!this.enable) {
         return;
       }
       switch (index) {
@@ -190,19 +185,29 @@ export default {
     }
   }
   .bar-item {
+    position: relative;
     width: 32px;
     height: 32px;
-    background-size: 16px 16px;
-    background-repeat: no-repeat;
-    background-position: center center;
-    mask-size: 16px 16px;
-    mask-repeat: no-repeat;
-    mask-position: center center;
-    background-color: @color-text-dark;
     cursor: not-allowed;
+    > div {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    > div:first-child {
+      background-size: 16px 16px;
+      background-repeat: no-repeat;
+      background-position: center center;
+    }
+    > div:last-child {
+      mask-size: 16px 16px;
+      mask-repeat: no-repeat;
+      mask-position: center center;
+      background-color: @color-text-dark;
+    }
   }
   .bar-item[css-enable] {
-    background-color: transparent;
     cursor: pointer;
   }
   .bar-item[css-enable]:hover {
