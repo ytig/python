@@ -12,13 +12,12 @@
 import keyboard from '@/scripts/keyboard';
 import asmdb from '@/scripts/asmdb';
 import sloth from '@/scripts/sloth';
-import Hello from '@/Hello';
 
 export default {
   data: function() {
     return {
       enable: new sloth(999),
-      process: Hello.getToken(this.$cookies, 'process')
+      process: asmdb.getToken(this.$cookies, 'process')
     };
   },
   computed: {

@@ -34,7 +34,13 @@ export default {
     }
   },
   created: function() {
-    asmdb.newInstance();
+    var device = asmdb.getToken(this.$cookies, 'device');
+    var index = device.lastIndexOf('#');
+    var kernel = undefined;
+    if (index >= 0) {
+      kernel = device.substring(index + 1);
+    }
+    asmdb.newInstance(kernel);
     asmdb.getInstance().registerEvent('world', this);
     this.$progress.alert();
   },

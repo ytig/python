@@ -16,51 +16,19 @@
 
 <script>
 import resize from '@/scripts/resize';
+import asmdb from '@/scripts/asmdb';
 
 function getBarHeight() {
   return window.outerHeight - window.innerHeight;
 }
 
-function getToken(obj, key) {
-  var token = obj.get('token');
-  if (!token || typeof token != 'object') {
-    token = {};
-  }
-  var val = token[key];
-  if (typeof val != 'string') {
-    val = '';
-  }
-  return val;
-}
-
-function setToken(obj, key, val) {
-  var token = obj.get('token');
-  if (!token || typeof token != 'object') {
-    token = {};
-  }
-  token[key] = val;
-  obj.set('token', token);
-}
-
-function delToken(obj, key) {
-  var token = obj.get('token');
-  if (!token || typeof token != 'object') {
-    token = {};
-  }
-  delete token[key];
-  obj.set('token', token);
-}
-
 export default {
-  getToken: getToken,
-  setToken: setToken,
-  delToken: delToken,
   data: function() {
     return {
       barHeight: getBarHeight(),
-      device: getToken(this.$cookies, 'device'),
-      process: getToken(this.$cookies, 'process'),
-      script: getToken(this.$cookies, 'script'),
+      device: asmdb.getToken(this.$cookies, 'device'),
+      process: asmdb.getToken(this.$cookies, 'process'),
+      script: asmdb.getToken(this.$cookies, 'script'),
       deviceAssist: null,
       processAssist: null,
       scriptAssist: null
@@ -184,9 +152,9 @@ export default {
         );
     },
     startDebug: function() {
-      setToken(this.$cookies, 'device', this.device);
-      setToken(this.$cookies, 'process', this.process);
-      setToken(this.$cookies, 'script', this.script);
+      asmdb.setToken(this.$cookies, 'device', this.device);
+      asmdb.setToken(this.$cookies, 'process', this.process);
+      asmdb.setToken(this.$cookies, 'script', this.script);
       this.requestFullScreen();
       this.$router.replace('/world');
     }

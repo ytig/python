@@ -1,7 +1,6 @@
 class Debugger {
-  constructor() {
-    this.TYPE = 'arm32';
-    switch (this.TYPE) {
+  constructor(kernel) {
+    switch (kernel) {
       case 'arm32':
         this.UNIT = 4;
         this.REGS = ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr'];
@@ -9,6 +8,14 @@ class Debugger {
         this.LRNM = 'lr';
         this.PCNM = 'pc';
         this.WLEN = 4;
+        break;
+      default:
+        this.UNIT = 4;
+        this.REGS = [];
+        this.SPNM = '';
+        this.LRNM = '';
+        this.PCNM = '';
+        this.WLEN = 0;
         break;
     }
     this.struct = {
@@ -609,8 +616,8 @@ class Union {
 
 var instance = null;
 
-function newInstance() {
-  instance = new Debugger();
+function newInstance(kernel) {
+  instance = new Debugger(kernel);
 }
 
 function getInstance() {
@@ -622,8 +629,41 @@ function oldInstance() {
   instance = null;
 }
 
+function getToken(obj, key) {
+  var token = obj.get('token');
+  if (!token || typeof token != 'object') {
+    token = {};
+  }
+  var val = token[key];
+  if (typeof val != 'string') {
+    val = '';
+  }
+  return val;
+}
+
+function setToken(obj, key, val) {
+  var token = obj.get('token');
+  if (!token || typeof token != 'object') {
+    token = {};
+  }
+  token[key] = val;
+  obj.set('token', token);
+}
+
+function delToken(obj, key) {
+  var token = obj.get('token');
+  if (!token || typeof token != 'object') {
+    token = {};
+  }
+  delete token[key];
+  obj.set('token', token);
+}
+
 export default {
   newInstance: newInstance,
   getInstance: getInstance,
-  oldInstance: oldInstance
+  oldInstance: oldInstance,
+  getToken: getToken,
+  setToken: setToken,
+  delToken: delToken
 };
