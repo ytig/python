@@ -5,7 +5,7 @@ export default {
   colorBackgroundDarker: '#121212',
   colorBackgroundSelection: '#67769660',
   colorBackgroundSelection2: '#d7dae0',
-  colorBackgroundEnter: '#c24038',
+  colorBackgroundEnter: '#1e73be',
   colorBackgroundHover: '#383e4a',
   colorBackgroundPopup: '#4d78cc',
   colorBackgroundPopup2: '#7e0097',
