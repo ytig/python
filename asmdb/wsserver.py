@@ -355,12 +355,16 @@ class WsGdbController(GdbController):
         self.breakpoints = self.breakpoints
 
     async def add_bpt(self, address):
-        # todo
+        # break *address
         return address
 
     async def sub_bpt(self, address):
-        # todo
-        pass
+        points = await self._info_breakpoints()
+        for point in points:
+            if point['type'] != 'breakpoint':
+                continue
+            if point['address'] == address:
+                await self._delete_breakpoints(point['num'])
 
     async def wpt(self, del_points, set_points):
         watchpoints = {}
@@ -385,12 +389,16 @@ class WsGdbController(GdbController):
         self.watchpoints = self.watchpoints
 
     async def add_wpt(self, address):
-        # todo
+        # watch *address
         return address
 
     async def sub_wpt(self, address):
-        # todo
-        pass
+        points = await self._info_breakpoints()
+        for point in points:
+            if point['type'] != 'watchpoint':
+                continue
+            if point['address'] == address:
+                await self._delete_breakpoints(point['num'])
 
     async def asgn(self, express):
         notify_all(self, 'assigned', express)

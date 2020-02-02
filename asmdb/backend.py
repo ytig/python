@@ -257,3 +257,29 @@ class GdbController:
             return temp.read()
         finally:
             temp.close()
+
+    async def _info_breakpoints(self):
+        points = []
+        text = await self._command('info breakpoints')
+        if not re.search(r'No breakpoints or watchpoints.', text):
+            for line in text.split('\n'):
+                if 'breakpoint' in line:
+                    words = line.split()
+                    points.append({
+                        'num': int(words[0]),
+                        'type': 'breakpoint',
+                        'address': int(words[-1], 16)
+                    })
+                elif 'hw watchpoint' in line:
+                    words = line.split()
+                    points.append({
+                        'num': int(words[0]),
+                        'type': 'watchpoint',
+                        'address': int(words[-1][1:], 16)
+                    })
+        return points
+
+    async def _delete_breakpoints(self, num):
+        text = await self._command(f'delete breakpoints {num}')
+        if re.search(r'No breakpoint number', text):
+            raise GdbError(text.strip())
