@@ -6,7 +6,7 @@
       <div></div>
       <div class="breakpoints-item" v-for="point in breakpoints" :key="point.address" :css-disable="point.disable">
         <span></span>
-        <span @click="onClickItem(point)">{{toHex(point.address)}}</span>
+        <span @click="onClickItem(point)" @mouseup="onMouseUpItem(point, ...arguments)">{{toHex(point.address)}}</span>
         <Comment ref="comments" class="breakpoints-grow" :point="point" :value="point.comment" @input="onCommentPoint(point, arguments[0])"></Comment>
         <div class="breakpoints-icon" @click="commentPoint"></div>
         <div class="breakpoints-icon" @click="onTogglePoint(point)"></div>
@@ -135,6 +135,26 @@ export default {
     },
     onAddPoint: function(address) {
       asmdb.getInstance().bpt([], [{ address: address, disable: false, comment: '' }]);
+    },
+    onMouseUpItem: function(point, event) {
+      if (event.button == 2) {
+        var menu = this.onCreateMenu(point);
+        this.$menu.alert(event, menu, i => {
+          menu[i].event();
+        });
+        event.stopPropagation();
+      }
+    },
+    onCreateMenu: function(point) {
+      var items = [];
+      var intValue = point.address;
+      items.push(['Copy', '', true]);
+      items[items.length - 1].event = () => {
+        emptySelection();
+        this.$toast.alert('Text Copied');
+        copyText('0x' + intValue.toString(16));
+      };
+      return items;
     }
   }
 };

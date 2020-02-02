@@ -6,7 +6,7 @@
       <div></div>
       <div class="watchpoints-item" v-for="point in watchpoints" :key="point.address">
         <span></span>
-        <span @click="onClickItem(point)">{{toHex(point.address)}}</span>
+        <span @click="onClickItem(point)" @mouseup="onMouseUpItem(point, ...arguments)">{{toHex(point.address)}}</span>
         <span class="watchpoints-grow"></span>
         <div class="watchpoints-icon" @click="onSubPoint(point)"></div>
       </div>
@@ -117,6 +117,26 @@ export default {
     onAddPoint: function(address) {
       address -= address % asmdb.getInstance().UNIT;
       asmdb.getInstance().wpt([], [{ address: address }]);
+    },
+    onMouseUpItem: function(point, event) {
+      if (event.button == 2) {
+        var menu = this.onCreateMenu(point);
+        this.$menu.alert(event, menu, i => {
+          menu[i].event();
+        });
+        event.stopPropagation();
+      }
+    },
+    onCreateMenu: function(point) {
+      var items = [];
+      var intValue = point.address;
+      items.push(['Copy', '', true]);
+      items[items.length - 1].event = () => {
+        emptySelection();
+        this.$toast.alert('Text Copied');
+        copyText('0x' + intValue.toString(16));
+      };
+      return items;
     }
   }
 };
