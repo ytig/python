@@ -79,7 +79,7 @@ async def gdb_startup(config, println):
     if d and d.scheme == 'adb':
         remote = await adb_startup(d.serial, process)
     else:
-        raise TypeError('unknown device type')
+        raise TypeError('unkown device submitted')
     commands = []
     commands.append('set confirm off')
     commands.append('set pagination off')
