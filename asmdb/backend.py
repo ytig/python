@@ -7,6 +7,26 @@ import tempfile
 from asyncio.subprocess import PIPE, STDOUT, DEVNULL
 
 
+class Device:
+    @classmethod
+    def from_string(cls, string):
+        try:
+            scheme, string, = string.split('://', 1)
+            serial, kernel, = string.rsplit('#', 1)
+        except BaseException:
+            return None
+        else:
+            return cls(scheme, serial, kernel)
+
+    def __init__(self, scheme, serial, kernel):
+        self.scheme = scheme
+        self.serial = serial
+        self.kernel = kernel
+
+    def __str__(self):
+        return f'{self.scheme}://{self.serial}#{self.kernel}'
+
+
 def dest_pair(address):
     try:
         host, port, = address.split(':')
@@ -55,11 +75,9 @@ async def gdb_startup(config, println):
     assert device, 'no device selected'
     assert process, 'no process selected'
     remote = None
-    scheme = serial = None
-    if '://' in device:
-        scheme, serial, = device.split('://', 1)
-    if scheme == 'adb':
-        remote = await adb_startup(serial, process)
+    d = Device.from_string(device)
+    if d and d.scheme == 'adb':
+        remote = await adb_startup(d.serial, process)
     else:
         raise TypeError('unknown device type')
     commands = []

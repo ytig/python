@@ -3,6 +3,7 @@ import os
 import json
 import asyncio
 from aiohttp import web
+from .backend import Device
 from .wsserver import onopen, onmessage, onclose
 VUE_DIST = os.path.dirname(__file__) + '/gui/dist'
 app = web.Application()
@@ -19,20 +20,19 @@ async def assist_device():
     for line in os.popen('adb devices').read().split('\n'):
         if not line.endswith('device'):
             continue
-        r.append('adb://' + line.split()[0])
+        r.append(str(Device('adb', line.split()[0], 'arm32')))
     r.sort()
     return r
 
 
 async def assist_process(device):
     r = []
-    if '://' in device:
-        scheme, serial, = device.split('://', 1)
-        if scheme == 'adb':
-            for line in os.popen(f'adb -s {serial} shell ps').read().split('\n'):
-                if not line.startswith('u0_a'):
-                    continue
-                r.append(line.split()[-1])
+    d = Device.from_string(device)
+    if d and d.scheme == 'adb':
+        for line in os.popen(f'adb -s {d.serial} shell ps').read().split('\n'):
+            if not line.startswith('u0_a'):
+                continue
+            r.append(line.split()[-1])
     r.sort()
     return r
 
