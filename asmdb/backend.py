@@ -296,14 +296,14 @@ class GdbController:
                     points.append({
                         'num': int(words[0]),
                         'type': 'breakpoint',
-                        'address': int(words[-1])
+                        'address': int(words[-1], 16)
                     })
                 elif 'hw watchpoint' in line:
                     words = line.split()
                     points.append({
                         'num': int(words[0]),
                         'type': 'watchpoint',
-                        'address': int(words[-1][1:])
+                        'address': int(words[-1][1:], 16)
                     })
         return points
 
@@ -313,11 +313,11 @@ class GdbController:
             raise GdbError(text.strip())
 
     async def _break(self, address):
-        text = await self._command(f'break *{address}')
+        text = await self._command(f'break *{hex(address)}')
         if re.search(r'Remote connection closed', text):
             raise GdbError(text.strip())
 
     async def _watch(self, address):
-        text = await self._command(f'watch *{address}')
+        text = await self._command(f'watch *{hex(address)}')
         if re.search(r'Remote connection closed', text):
             raise GdbError(text.strip())
