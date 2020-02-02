@@ -17,26 +17,22 @@ import asmdb from '@/scripts/asmdb';
 
 export default {
   data: function() {
+    var titles = ['nexti', 'stepi', 'continue', 'release'];
+    var icons = ['next', 'step', 'cont', 'rlse'];
+    var items = [];
+    for (var i = 0; i < 4; i++) {
+      var title = titles[i];
+      var image = "url('/static/icons/" + icons[i] + ".png'";
+      items.push({
+        title: title,
+        image: image
+      });
+    }
     return {
       enable: false,
-      process: asmdb.getToken(this.$cookies, 'process')
+      process: asmdb.getToken(this.$cookies, 'process'),
+      items: items
     };
-  },
-  computed: {
-    items: function() {
-      var titles = ['nexti', 'stepi', 'continue', 'release'];
-      var icons = ['next', 'step', 'cont', 'rlse'];
-      var items = [];
-      for (var i = 0; i < 4; i++) {
-        var title = titles[i];
-        var image = "url('/static/icons/" + icons[i] + ".png'";
-        items.push({
-          title: title,
-          image: image
-        });
-      }
-      return items;
-    }
   },
   mounted: function() {
     keyboard.setDefaultWindow(this);
