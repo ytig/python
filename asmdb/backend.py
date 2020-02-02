@@ -296,14 +296,14 @@ class GdbController:
                     points.append({
                         'num': int(words[0]),
                         'type': 'breakpoint',
-                        'address': int(words[-1], 16)
+                        'address': int(words[4], 16)
                     })
                 elif 'hw watchpoint' in line:
                     words = line.split()
                     points.append({
                         'num': int(words[0]),
                         'type': 'watchpoint',
-                        'address': int(words[-1][1:], 16)
+                        'address': int(words[5][1:], 16)
                     })
         return points
 
