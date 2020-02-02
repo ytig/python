@@ -60,6 +60,9 @@ export default {
   methods: {
     onResize: function() {
       requestAnimationFrames(i => {
+        if (this._isDestroyed) {
+          return true;
+        }
         this.barHeight = getBarHeight();
         return !(i < 60);
       });

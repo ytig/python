@@ -92,7 +92,7 @@ export default {
       var maxi = Math.ceil((duration * 3) / 50);
       var counter = this.counter;
       requestAnimationFrames(i => {
-        if (counter != this.counter) {
+        if (counter != this.counter || this._isDestroyed) {
           return true;
         }
         var t = ++i / maxi;

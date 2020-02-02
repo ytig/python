@@ -75,7 +75,7 @@ export default {
       this.scrolling = true;
       var counter = ++this.counter;
       setTimeout(() => {
-        if (counter != this.counter) {
+        if (counter != this.counter || this._isDestroyed) {
           return;
         }
         this.scrolling = false;

@@ -245,6 +245,9 @@ export default {
         this.source.onScroll(index);
       }
       requestAnimationFrames(i => {
+        if (this._isDestroyed) {
+          return true;
+        }
         if (!(disable || index in this.source || i >= 2)) {
           return false;
         }
