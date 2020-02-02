@@ -101,7 +101,7 @@ export default {
   > div:nth-child(1) {
     border-radius: 4px;
     background-color: @color-background-enter;
-    box-shadow: 1px 2px 6px @color-border-shadow;
+    box-shadow: 0px 2px 7px fade(@color-border-shadow, 60%);
     display: flex;
     justify-content: center;
     > div {
