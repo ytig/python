@@ -114,15 +114,24 @@ export default {
       this.wheeling.onWheel(event);
     },
     onWheelDown: function() {
+      if (this._isDestroyed) {
+        return;
+      }
       this.anim.$value(this.anim.value);
       this.lazySub = false;
       this.lazyAdd = false;
     },
     onWheelMove: function(dx) {
+      if (this._isDestroyed) {
+        return;
+      }
       var d = dx / 117;
       this.anim.$value(Math.min(Math.max(this.anim.value + d, 0), 1));
     },
     onWheelUp: function() {
+      if (this._isDestroyed) {
+        return;
+      }
       if (this.anim.value == 0 && this.canSub) {
         this.$emit('delta', -1);
         this.lazySub = true;
