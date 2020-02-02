@@ -397,7 +397,7 @@ class WsGdbController(GdbController):
 
     async def add_wpt(self, address):
         address = min(max(address, 0), 256**self._unit)
-        address %= self._unit
+        address -= address % self._unit
         wnum = 0
         points = await self._info_breakpoints()
         for point in points:
