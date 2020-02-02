@@ -355,7 +355,7 @@ class WsGdbController(GdbController):
         self.breakpoints = self.breakpoints
 
     async def add_bpt(self, address):
-        address = min(max(address, 0), 2**self._unit)
+        address = min(max(address, 0), 256**self._unit)
         points = await self._info_breakpoints()
         for point in points:
             if point['type'] != 'breakpoint':
@@ -396,7 +396,7 @@ class WsGdbController(GdbController):
         self.watchpoints = self.watchpoints
 
     async def add_wpt(self, address):
-        address = min(max(address, 0), 2**self._unit)
+        address = min(max(address, 0), 256**self._unit)
         address %= self._unit
         wnum = 0
         points = await self._info_breakpoints()

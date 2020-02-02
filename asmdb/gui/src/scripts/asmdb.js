@@ -497,7 +497,7 @@ class Debugger {
   }
 
   getAssemblyRange() {
-    return [0, Math.pow(16, 2 * this.UNIT)];
+    return [0, Math.pow(256, this.UNIT)];
   }
 
   getRegistersRange() {
@@ -512,7 +512,7 @@ class Debugger {
   }
 
   getMemoryRange() {
-    return [0, Math.pow(16, 2 * this.UNIT)];
+    return [0, Math.pow(256, this.UNIT)];
   }
 
   getAddressUsage(int) {
