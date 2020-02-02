@@ -74,12 +74,11 @@ async def gdb_startup(config, println):
     process = config.get('process')
     assert device, 'no device selected'
     assert process, 'no process selected'
-    remote = None
     d = Device.from_string(device)
-    if d and d.scheme == 'adb':
+    assert d and d.scheme in ('adb',) and d.kernel in ('arm32',), 'unkown device submitted'
+    remote = None
+    if d.scheme == 'adb':
         remote = await adb_startup(d.serial, process)
-    else:
-        raise TypeError('unkown device submitted')
     commands = []
     commands.append('set confirm off')
     commands.append('set pagination off')
@@ -103,6 +102,7 @@ async def gdb_startup(config, println):
             if line:
                 println(line)
         buffer = lines[-1]
+    proc.kernel = d.kernel
     if remote:
         _socket = socket.create_connection(dest_pair(remote))
 
