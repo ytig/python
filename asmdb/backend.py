@@ -82,7 +82,7 @@ async def gdb_startup(config, println):
     commands = []
     commands.append('set confirm off')
     commands.append('set pagination off')
-    commands.append('set arm fallback-mode thumb')
+    commands.append('set arm force-mode thumb')
     if remote:
         commands.append(f'target remote {remote}')
     args = []
