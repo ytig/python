@@ -273,7 +273,7 @@ export default {
         var range = getRange(posn.address);
         var counter2 = ++this.counter2;
         asmdb.getInstance().asm(range, assembly => {
-          if (counter2 != this.counter2) {
+          if (counter2 != this.counter2 || this._isDestroyed) {
             return;
           }
           this.counter++;
@@ -291,7 +291,7 @@ export default {
       var range = getRange(address);
       var counter2 = ++this.counter2;
       asmdb.getInstance().asm(range, assembly => {
-        if (counter2 != this.counter2) {
+        if (counter2 != this.counter2 || this._isDestroyed) {
           return;
         }
         var old_posn = this.source != null ? this.source.getPosn(this.$refs.scroller.getPosition()) : null;
@@ -337,7 +337,7 @@ export default {
         var range = getRange(address);
         var counter2 = ++this.counter2;
         asmdb.getInstance().asm(range, assembly => {
-          if (counter2 != this.counter2) {
+          if (counter2 != this.counter2 || this._isDestroyed) {
             return;
           }
           this.counter++;
@@ -356,7 +356,7 @@ export default {
       var counter = this.counter;
       this.incomplete = deltaY;
       requestAnimationFrames(i => {
-        if (counter != this.counter) {
+        if (counter != this.counter || this._isDestroyed) {
           return true;
         }
         var value = ++i / maxi;
