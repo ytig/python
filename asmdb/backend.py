@@ -159,6 +159,16 @@ class GdbController:
         self.process.send_signal(signal.SIGINT)
         self.process.stdin.write(b'quit\n')
 
+    @property
+    def _unit(self):
+        if self.process.kernel == 'arm32':
+            return 4
+
+    @property
+    def _wlen(self):
+        if self.process.kernel == 'arm32':
+            return 4
+
     async def __command(self, command):
         async with self.cmdlock:
             self.process.stdin.write(command.encode() + b'\n')
@@ -286,18 +296,28 @@ class GdbController:
                     points.append({
                         'num': int(words[0]),
                         'type': 'breakpoint',
-                        'address': int(words[-1], 16)
+                        'address': int(words[-1])
                     })
                 elif 'hw watchpoint' in line:
                     words = line.split()
                     points.append({
                         'num': int(words[0]),
                         'type': 'watchpoint',
-                        'address': int(words[-1][1:], 16)
+                        'address': int(words[-1][1:])
                     })
         return points
 
     async def _delete_breakpoints(self, num):
         text = await self._command(f'delete breakpoints {num}')
         if re.search(r'No breakpoint number', text):
+            raise GdbError(text.strip())
+
+    async def _break(self, address):
+        text = await self._command(f'break *{address}')
+        if re.search(r'Remote connection closed', text):
+            raise GdbError(text.strip())
+
+    async def _watch(self, address):
+        text = await self._command(f'watch *{address}')
+        if re.search(r'Remote connection closed', text):
             raise GdbError(text.strip())
