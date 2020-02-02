@@ -4,7 +4,7 @@
     <div class="bar-grow">
       <span class="bar-text user-select-none" @click="onMouseUp2">{{process}}</span>
     </div>
-    <div class="bar-item" v-for="(item, index) in items" :key="index" @click="onClickItem(index)" :css-enable="enable">
+    <div class="bar-item" v-for="(item, index) in items" :key="index" :title="item.title" @click="onClickItem(index)" :css-enable="enable">
       <div :style="{opacity:enable?1:0,backgroundImage:item.image}"></div>
       <div :style="{opacity:enable?0:1,maskImage:item.image}"></div>
     </div>
