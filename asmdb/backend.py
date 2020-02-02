@@ -292,6 +292,8 @@ class GdbController:
         text = await self._command('info breakpoints')
         if not re.search(r'No breakpoints or watchpoints.', text):
             for line in text.split('\n'):
+                if 'keep' not in line:
+                    continue
                 if 'breakpoint' in line:
                     words = line.split()
                     points.append({
