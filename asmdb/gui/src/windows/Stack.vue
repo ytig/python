@@ -61,11 +61,13 @@ export default {
     resize.registerEvent(this);
     asmdb.getInstance().registerEvent('stack', this);
   },
+  beforeDestroy: function() {
+    delContext(this.$refs.canvas);
+  },
   destroyed: function() {
     asmdb.getInstance().unregisterEvent('stack', this);
     resize.unregisterEvent(this);
     keyboard.unregisterWindow(this);
-    delContext(this.$refs.canvas);
   },
   methods: {
     requestFocus: function() {

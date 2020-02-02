@@ -43,7 +43,7 @@ export default {
     this.$refs.canvas1.style.height = this.$refs.canvas2.style.height = h + 'px';
     this.scrollBy(0);
   },
-  destroyed: function() {
+  beforeDestroy: function() {
     delContext(this.$refs.canvas1);
     delContext(this.$refs.canvas2);
   },

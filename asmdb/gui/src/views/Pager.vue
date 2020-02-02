@@ -103,12 +103,10 @@ export default {
     canAdd: Boolean
   },
   mounted: function() {
-    this._parent = this.$refs.container.parentNode;
-    this._parent.addEventListener('wheel', this.onWheel);
+    this.$refs.container.parentNode.addEventListener('wheel', this.onWheel);
   },
-  destroyed: function() {
-    this._parent.removeEventListener('wheel', this.onWheel);
-    this._parent = null;
+  beforeDestroy: function() {
+    this.$refs.container.parentNode.removeEventListener('wheel', this.onWheel);
   },
   methods: {
     onWheel: function(event) {

@@ -56,10 +56,12 @@ export default {
     this.scrollTo(this.position);
     resize.registerEvent(this);
   },
-  destroyed: function() {
-    resize.unregisterEvent(this);
+  beforeDestroy: function() {
     delContext(this.$refs.canvas1);
     delContext(this.$refs.canvas2);
+  },
+  destroyed: function() {
+    resize.unregisterEvent(this);
   },
   methods: {
     getPosition: function() {
