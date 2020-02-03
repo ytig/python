@@ -2,6 +2,7 @@
 import json
 import urllib
 import base64
+import signal
 import asyncio
 import tempfile
 import traceback
@@ -160,18 +161,22 @@ def push_prop(name, default):
 
 class Terminal(asyncio.Protocol):
     @classmethod
-    async def anew(cls, argv, notify_len):
+    async def anew(cls, argv, notify_len, exit):
         self = cls()
         self.logfile = tempfile.NamedTemporaryFile()
         self.process = ptyprocess.PtyProcess.spawn(argv)
         self.notify_len = notify_len
+        self.exit = exit
         await asyncio.get_event_loop().connect_read_pipe(self, self.process)
         return self
 
     async def adel(self):
         if not self.process.fileobj.closed:
-            self.process.sendcontrol('c')
-            self.process.write(b'exit()\n')
+            if self.exit:
+                self.process.sendcontrol('c')
+                self.process.write(self.exit)
+            else:
+                self.process.kill(signal.SIGKILL)
         self.logfile.close()
 
     def data_received(self, data):
@@ -233,7 +238,7 @@ class WsGdbController(GdbController):
             else:
                 argv.append('-')
                 argv.append(token)
-            self.terminal = await Terminal.anew(argv, lambda lenb: setattr(self, 'lenb', lenb))
+            self.terminal = await Terminal.anew(argv, lambda lenb: setattr(self, 'lenb', lenb), b'exit()\n')
             try:
                 self.lenb = 0
                 asyncio.ensure_future(self._beat(1))
