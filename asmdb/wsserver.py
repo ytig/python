@@ -217,25 +217,29 @@ class WsGdbController(GdbController):
     async def anew(cls, token, println):
         config = parse_token(token)
         self = await super().anew(config, println)
-        self.quit = False
-        self.suspend = True  # for test
-        self.breakpoints = []
-        self.watchpoints = []
-        self.maps = await self._info_maps()
-        argv = ['python3', ]
-        argv.append('-q')
-        script = config.get('script')
-        if script:
-            argv.append('-i')
-            argv.append(script)
-            argv.append(token)
-        else:
-            argv.append('-')
-            argv.append(token)
-        self.terminal = await Terminal.anew(argv, lambda lenb: setattr(self, 'lenb', lenb))
-        self.lenb = 0
-        asyncio.ensure_future(self._beat(1))
-        return self
+        try:
+            self.quit = False
+            self.suspend = True  # for test
+            self.breakpoints = []
+            self.watchpoints = []
+            self.maps = await self._info_maps()
+            argv = ['python3', ]
+            argv.append('-q')
+            script = config.get('script')
+            if script:
+                argv.append('-i')
+                argv.append(script)
+                argv.append(token)
+            else:
+                argv.append('-')
+                argv.append(token)
+            self.terminal = await Terminal.anew(argv, lambda lenb: setattr(self, 'lenb', lenb))
+            self.lenb = 0
+            asyncio.ensure_future(self._beat(1))
+            return self
+        except BaseException:
+            await super(__class__, self).adel()
+            raise
 
     async def adel(self):
         self.quit = True
