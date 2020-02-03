@@ -234,17 +234,23 @@ class WsGdbController(GdbController):
                 argv.append('-')
                 argv.append(token)
             self.terminal = await Terminal.anew(argv, lambda lenb: setattr(self, 'lenb', lenb))
-            self.lenb = 0
-            asyncio.ensure_future(self._beat(1))
+            try:
+                self.lenb = 0
+                asyncio.ensure_future(self._beat(1))
+            except BaseException:
+                await self.terminal.adel()
+                raise
             return self
         except BaseException:
             await super(__class__, self).adel()
             raise
 
     async def adel(self):
-        self.quit = True
-        await self.terminal.adel()
-        await super().adel()
+        try:
+            self.quit = True
+            await self.terminal.adel()
+        finally:
+            await super().adel()
 
     async def _beat(self, interval):
         while not self.quit:
