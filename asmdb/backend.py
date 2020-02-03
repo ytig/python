@@ -115,6 +115,10 @@ async def gdb_startup(config, println):
             except ConnectionError:
                 return False
         proc.is_remote_alive = is_remote_alive
+
+        async def atexit():
+            _socket.close()
+        proc.atexit = atexit
     return proc
 
 
@@ -157,6 +161,8 @@ class GdbController:
         return self
 
     async def adel(self):
+        if hasattr(self.process, 'atexit'):
+            await self.process.atexit()
         self.process.send_signal(signal.SIGINT)
         self.process.stdin.write(b'quit\n')
 
