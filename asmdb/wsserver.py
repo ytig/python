@@ -246,8 +246,8 @@ class WsGdbController(GdbController):
             raise
 
     async def adel(self):
+        self.quit = True
         try:
-            self.quit = True
             await self.terminal.adel()
         finally:
             await super().adel()
