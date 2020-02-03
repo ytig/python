@@ -246,11 +246,13 @@ class WsGdbController(GdbController):
             raise
 
     async def adel(self):
-        self.quit = True
         try:
-            await self.terminal.adel()
+            self.quit = True
         finally:
-            await super().adel()
+            try:
+                await self.terminal.adel()
+            finally:
+                await super().adel()
 
     async def _beat(self, interval):
         while not self.quit:
