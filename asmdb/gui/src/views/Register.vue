@@ -109,7 +109,7 @@ export default {
       if (!asmdb.getInstance().isSuspend()) {
         return;
       }
-      asmdb.getInstance().asgn(name + '=' + value);
+      asmdb.getInstance().asgn('$' + name + '=' + value);
     }
   }
 };
