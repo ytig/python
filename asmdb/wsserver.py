@@ -437,5 +437,10 @@ class WsGdbController(GdbController):
                 await self._delete_breakpoints(point['num'])
 
     async def asgn(self, express):
-        await self._set(express)
+        if express.startswith('$'):
+            await self._set(express)
+        elif express.startswith('*'):
+            await self._set('*(unsigned char*)' + express[1:])
+        else:
+            return
         notify_all(self, 'assigned', express)
