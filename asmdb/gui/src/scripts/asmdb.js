@@ -197,14 +197,18 @@ class Debugger {
       case 'assigned':
         var where = newValue.split('=')[0];
         var value = newValue.split('=')[1];
-        if (where.startsWith('*')) {
-          this.iterObjects('stack|memory', (object) => {
-            object.onAssigned(parseInt(where.slice(1)), parseInt(value));
-          });
-        } else {
-          this.registers[where] = parseInt(value);
+        if (where.startsWith('$')) {
+          where = where.substring(1);
+          value = parseInt(value);
+          this.registers[where] = value;
           this.iterObjects('registers', (object) => {
-            object.onAssigned(where, parseInt(value));
+            object.onAssigned(where, value);
+          });
+        } else if (where.startsWith('*')) {
+          where = parseInt(where.substring(1));
+          value = parseInt(value);
+          this.iterObjects('stack|memory', (object) => {
+            object.onAssigned(where, value);
           });
         }
         break;

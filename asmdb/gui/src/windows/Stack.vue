@@ -210,7 +210,7 @@ export default {
         if (this.assigned.indexOf(address) < 0) {
           this.assigned.push(address);
         }
-        this.newData = this.newData.slice(0, offset) + String.fromCharCode(value) + this.newData.slice(offset + 1);
+        this.newData = this.newData.substring(0, offset) + String.fromCharCode(value) + this.newData.substring(offset + 1);
         this.invalidate();
       }
     },
@@ -231,14 +231,14 @@ export default {
       var row = Math.floor(this.$refs.stackLayout.clientHeight / Bytes.measureHeight());
       var start = page * column * row;
       var end = (page + 1) * column * row;
-      var oldData = this.oldData.slice(start, end);
-      oldData = oldData.slice(0, oldData.length - (oldData.length % column));
-      var newData = this.newData.slice(start, end);
-      newData = newData.slice(0, newData.length - (newData.length % column));
+      var oldData = this.oldData.substring(start, end);
+      oldData = oldData.substring(0, oldData.length - (oldData.length % column));
+      var newData = this.newData.substring(start, end);
+      newData = newData.substring(0, newData.length - (newData.length % column));
       var items = [];
       for (var i = 0; i < newData.length / column; i++) {
-        var newBytes = newData.slice(i * column, (i + 1) * column);
-        var oldBytes = oldData.slice(i * column, (i + 1) * column);
+        var newBytes = newData.substring(i * column, (i + 1) * column);
+        var oldBytes = oldData.substring(i * column, (i + 1) * column);
         var lineNumber = start + i * column;
         var startAddress = this.sp + lineNumber;
         var highlightNumber = this.itemSelection != null ? this.itemSelection - lineNumber : -1;

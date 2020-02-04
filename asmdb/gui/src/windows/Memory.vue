@@ -105,7 +105,7 @@ class Source {
   onLoad(address, memory) {
     if (memory.length > this.pieceOf) {
       for (var i = 0; i < Math.ceil(memory.length / this.pieceOf); i++) {
-        this.onLoad(address + i * this.pieceOf, memory.slice(i * this.pieceOf, (i + 1) * this.pieceOf));
+        this.onLoad(address + i * this.pieceOf, memory.substring(i * this.pieceOf, (i + 1) * this.pieceOf));
       }
       return;
     }
@@ -114,7 +114,7 @@ class Source {
     }
     for (var i = 0; i < Math.ceil(memory.length / this.group); i++) {
       var index = (address - this.start) / this.group + i;
-      var newBytes = memory.slice(i * this.group, (i + 1) * this.group);
+      var newBytes = memory.substring(i * this.group, (i + 1) * this.group);
       var oldBytes = null;
       if (this.history != null && index in this.history) {
         oldBytes = this.history[index].newBytes;
@@ -131,7 +131,7 @@ class Source {
     var index = parseInt((address - this.start) / this.group);
     var offset = address - index * this.group;
     if (index in this) {
-      this[index].newBytes = this[index].newBytes.slice(0, offset) + String.fromCharCode(value) + this[index].newBytes.slice(offset + 1);
+      this[index].newBytes = this[index].newBytes.substring(0, offset) + String.fromCharCode(value) + this[index].newBytes.substring(offset + 1);
       this.invalidate++;
     }
   }

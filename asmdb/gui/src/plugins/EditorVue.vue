@@ -24,9 +24,9 @@ function correctInput(value, length) {
     if (i < 0) {
       break;
     }
-    value = value.slice(i + 2);
+    value = value.substring(i + 2);
   }
-  return value.replace(/[^0-9a-f]/g, '').slice(0, length);
+  return value.replace(/[^0-9a-f]/g, '').substring(0, length);
 }
 
 export default {
