@@ -103,13 +103,15 @@ class WsController:
             return None
 
     def set_register(self, name, value):
-        return self._pull('asgn', f'${name}={value}')
+        self._pull('asgn', f'${name}={value}')
 
     def get_bytes(self, start, length):
         return base64.b64decode(self._pull('mem', start, start + length))
 
-    def set_byte(self, address, value):
-        return self._pull('asgn', f'*{address}={value}')
+    def set_bytes(self, start, bytes):
+        for byte in bytes:
+            self._pull('asgn', f'*{start}={byte}')
+            start += 1
 
     def set_breakpoint(self, address, disable=False, comment=''):
         return self._pull('bpt', [], [{
