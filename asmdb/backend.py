@@ -1,10 +1,26 @@
 #!/usr/local/bin/python3
+import os
 import re
 import socket
 import signal
 import asyncio
 import tempfile
 from asyncio.subprocess import PIPE, STDOUT, DEVNULL
+
+
+def list_subprocess(pid):
+    sub_pids = []
+    for line in os.popen(f'ps -l|grep {pid}').read().strip().split('\n'):
+        words = line.split()
+        if int(words[2]) == pid:
+            sub_pids.append(int(words[1]))
+    return sub_pids
+
+
+def kill_them(pid, sig):
+    os.kill(pid, sig)
+    for sub_pid in list_subprocess(pid):
+        kill_them(sub_pid, sig)
 
 
 class Device:
@@ -163,7 +179,7 @@ class GdbController:
     async def adel(self):
         if hasattr(self.process, 'atexit'):
             await self.process.atexit()
-        self.process.send_signal(signal.SIGINT)
+        kill_them(self.process.pid, signal.SIGINT)
         self.process.stdin.write(b'quit\n')
 
     @property
@@ -185,7 +201,7 @@ class GdbController:
         if not wait:
             async with self.onelock:
                 if self.cmdlock.locked():
-                    self.process.send_signal(signal.SIGINT)
+                    kill_them(self.process.pid, signal.SIGINT)
                 return await self.__command(command)
         else:
             async with self.twolock:
@@ -213,7 +229,7 @@ class GdbController:
         text = await self._command('info proc mappings')
         if re.search(r'Remote connection closed|No current process: you must name one.', text):
             raise GdbError(text.strip())
-        for line in text.strip().split('\n'):
+        for line in text.split('\n'):
             if '0x' not in line:
                 continue
             words = line.split(maxsplit=4)
@@ -229,7 +245,7 @@ class GdbController:
                 base[m['target']] = m['start']
         text = await self._command('info target')
         proc = re.search(r'Symbols from "target:(.*)"\.', text).group(1)
-        for line in text.strip().split('\n'):
+        for line in text.split('\n'):
             if ' is .' not in line:
                 continue
             if ' in target:' not in line:
