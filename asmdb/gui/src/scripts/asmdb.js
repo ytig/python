@@ -8,6 +8,7 @@ class Debugger {
         this.LRNM = 'lr';
         this.PCNM = 'pc';
         this.WLEN = 4;
+        this.BEND = false;
         break;
       default:
         this.UNIT = 4;
@@ -16,6 +17,7 @@ class Debugger {
         this.LRNM = '';
         this.PCNM = '';
         this.WLEN = 0;
+        this.BEND = false;
         break;
     }
     this.struct = {

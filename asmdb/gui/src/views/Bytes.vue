@@ -301,9 +301,16 @@ export default {
       var items = [];
       var intValue = 0;
       var i = index - (index % asmdb.getInstance().UNIT);
-      for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
-        intValue *= 256;
-        intValue += (this.newBytes || '').charCodeAt(i + j) || 0;
+      if (!asmdb.getInstance().BEND) {
+        for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
+          intValue *= 256;
+          intValue += (this.newBytes || '').charCodeAt(i + j) || 0;
+        }
+      } else {
+        for (var j = 0; j < asmdb.getInstance().UNIT; j++) {
+          intValue *= 256;
+          intValue += (this.newBytes || '').charCodeAt(i + j) || 0;
+        }
       }
       items.push(['Copy', '', true]);
       items[items.length - 1].event = () => {
