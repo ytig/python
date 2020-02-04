@@ -192,6 +192,11 @@ class GdbController:
         if self.process.kernel == 'arm32':
             return 4
 
+    @property
+    def _bend(self):
+        if self.process.kernel == 'arm32':
+            return False
+
     async def __command(self, command):
         async with self.cmdlock:
             self.process.stdin.write(command.encode() + b'\n')

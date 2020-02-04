@@ -3,21 +3,21 @@ class Debugger {
     switch (kernel) {
       case 'arm32':
         this.UNIT = 4;
+        this.WLEN = 4;
+        this.BEND = false;
         this.REGS = ['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 'r11', 'r12', 'sp', 'lr', 'pc', 'cpsr'];
         this.SPNM = 'sp';
         this.LRNM = 'lr';
         this.PCNM = 'pc';
-        this.WLEN = 4;
-        this.BEND = false;
         break;
       default:
         this.UNIT = 4;
+        this.WLEN = 0;
+        this.BEND = false;
         this.REGS = [];
         this.SPNM = '';
         this.LRNM = '';
         this.PCNM = '';
-        this.WLEN = 0;
-        this.BEND = false;
         break;
     }
     this.struct = {
