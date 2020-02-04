@@ -348,3 +348,8 @@ class GdbController:
         text = await self._command(f'watch *{hex(address)}')
         if re.search(r'Remote connection closed', text):
             raise GdbError(text.strip())
+
+    async def _set(self, express):
+        text = await self._command(f'set {express}')
+        if re.search(r'Remote connection closed|Cannot access memory at address', text):
+            raise GdbError(text.strip())

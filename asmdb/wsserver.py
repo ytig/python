@@ -437,4 +437,5 @@ class WsGdbController(GdbController):
                 await self._delete_breakpoints(point['num'])
 
     async def asgn(self, express):
+        await self._set(express)
         notify_all(self, 'assigned', express)
