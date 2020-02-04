@@ -200,12 +200,14 @@ class GdbController:
     async def _command(self, command, wait=False):
         if not wait:
             async with self.onelock:
-                if self.cmdlock.locked():
+                if self.twolock.locked():
                     kill_them(self.process.pid, signal.SIGINT)
                 return await self.__command(command)
         else:
             async with self.twolock:
                 while True:
+                    async with self.onelock:
+                        pass
                     text = await self.__command(command)
                     if 'SIGINT' not in text:
                         return text
