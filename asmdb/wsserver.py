@@ -224,7 +224,7 @@ class WsGdbController(GdbController):
         self = await super().anew(config, println)
         try:
             self.quit = False
-            self.suspend = True  # for test
+            self.suspend = True
             self.breakpoints = []
             self.watchpoints = []
             self.maps = await self._info_maps()
@@ -363,6 +363,8 @@ class WsGdbController(GdbController):
                 'disable': point.get('disable') or False,
                 'comment': point.get('comment') or ''
             }
+            if p['address'] is None:
+                continue
             if p['disable']:
                 await self.sub_bpt(p['address'])
             breakpoints[p['address']] = p
@@ -372,7 +374,9 @@ class WsGdbController(GdbController):
         self.breakpoints = self.breakpoints
 
     async def add_bpt(self, address):
-        address = min(max(address, 0), 256**self._unit)
+        if address < 0 or address >= 256**self._unit:
+            return
+        # todo adjust address
         points = await self._info_breakpoints()
         for point in points:
             if point['type'] != 'breakpoint':
@@ -413,8 +417,11 @@ class WsGdbController(GdbController):
         self.watchpoints = self.watchpoints
 
     async def add_wpt(self, address):
-        address = min(max(address, 0), 256**self._unit)
+        if address < 0 or address >= 256**self._unit:
+            return
         address -= address % self._unit
+        if not self.maps_at(address, address + self._unit):
+            return
         wnum = 0
         points = await self._info_breakpoints()
         for point in points:
@@ -424,7 +431,7 @@ class WsGdbController(GdbController):
                 return address
             wnum += 1
         if wnum >= self._wlen:
-            return None
+            return
         await self._watch(address)
         return address
 
