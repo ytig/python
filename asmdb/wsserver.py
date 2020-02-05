@@ -347,12 +347,14 @@ class WsGdbController(GdbController):
         return data
 
     async def bpt(self, del_points, set_points):
+        throw = 0
         breakpoints = {}
         for point in self.breakpoints:
             breakpoints[point['address']] = point
         for point in del_points:
             p = breakpoints.get(point['address'])
             if p is None:
+                throw += 1
                 continue
             if not p['disable']:
                 await self.sub_bpt(p['address'])
@@ -364,6 +366,7 @@ class WsGdbController(GdbController):
                 'comment': point.get('comment') or ''
             }
             if p['address'] is None:
+                throw += 1
                 continue
             if p['disable']:
                 await self.sub_bpt(p['address'])
@@ -372,6 +375,7 @@ class WsGdbController(GdbController):
         for address in sorted(breakpoints.keys()):
             self.breakpoints.append(breakpoints[address])
         self.breakpoints = self.breakpoints
+        return throw
 
     async def add_bpt(self, address):
         if address < 0 or address >= 256**self._unit:
@@ -395,12 +399,14 @@ class WsGdbController(GdbController):
                 await self._delete_breakpoints(point['num'])
 
     async def wpt(self, del_points, set_points):
+        throw = 0
         watchpoints = {}
         for point in self.watchpoints:
             watchpoints[point['address']] = point
         for point in del_points:
             p = watchpoints.get(point['address'])
             if p is None:
+                throw += 1
                 continue
             await self.sub_wpt(p['address'])
             del watchpoints[p['address']]
@@ -409,12 +415,14 @@ class WsGdbController(GdbController):
                 'address': await self.add_wpt(point['address']),
             }
             if p['address'] is None:
+                throw += 1
                 continue
             watchpoints[p['address']] = p
         self.watchpoints.clear()
         for address in sorted(watchpoints.keys()):
             self.watchpoints.append(watchpoints[address])
         self.watchpoints = self.watchpoints
+        return throw
 
     async def add_wpt(self, address):
         if address < 0 or address >= 256**self._unit:
