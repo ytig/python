@@ -230,70 +230,85 @@ class GdbController:
         if re.search(r'Remote connection closed|The program is not being run.', text):
             raise GdbError(text.strip())
 
-    async def _info_maps(self):  # todo speed up
+    async def _info_maps(self):
         maps = []
         base = {}
         text = await self._command('info proc mappings')
         if re.search(r'Remote connection closed|No current process: you must name one.', text):
             raise GdbError(text.strip())
-        for line in text.split('\n'):
-            if '0x' not in line:
-                continue
+        lines = text.strip().split('\n')
+        while 'objfile' not in lines.pop(0):
+            pass
+        for line in lines:
             words = line.split(maxsplit=4)
+            start_addr = int(words[0], 16)
+            end_addr = int(words[1], 16)
+            objfile = words[-1] if len(words) == 5 else ''
+            if start_addr >= end_addr:
+                continue
             maps.append({
-                'start': int(words[0], 16),
-                'end': int(words[1], 16),
+                'start': start_addr,
+                'end': end_addr,
                 'offset': 0,
-                'target': words[-1] if len(words) == 5 else '',
+                'target': objfile,
                 'section': '',
             })
-            m = maps[-1]
-            if m['target'] and m['target'] not in base:
-                base[m['target']] = m['start']
+            if objfile and objfile not in base:
+                base[objfile] = start_addr
         text = await self._command('info target')
-        proc = re.search(r'Symbols from "target:(.*)"\.', text).group(1)
-        for line in text.split('\n'):
-            if ' is .' not in line:
-                continue
-            if ' in target:' not in line:
-                line += ' in target:' + proc
+        proc_file = re.search(r'Symbols from "target:(.*)"\.', text).group(1)
+        lines = text.strip().split('\n')
+        while 'Entry point:' not in lines.pop(0):
+            pass
+        for line in lines:
             words = line.split(maxsplit=3)
             start = int(words[0], 16)
             end = int(words[2], 16)
-            section, target, = words[3][3:].split(' in target:', maxsplit=1)
-            c = 0
-            while c < len(maps):
-                m = maps[c]
-                if not (end <= m['start'] or start >= m['end']):
-                    maps.pop(c)
-                    c -= 1
-                    if start > m['start']:
-                        maps.insert(c, {
-                            'start': m['start'],
-                            'end': start,
-                            'offset': 0,
-                            'target': m['target'],
-                            'section': m['section'],
-                        })
-                        c += 1
-                    if m['end'] > end:
-                        maps.insert(c, {
-                            'start': end,
-                            'end': m['end'],
-                            'offset': 0,
-                            'target': m['target'],
-                            'section': m['section'],
-                        })
-                        c += 1
-                c += 1
-            maps.append({
+            words = words[3][3:].split(' in target:', maxsplit=1)
+            if len(words) == 1:
+                section = words[0]
+                target = proc_file
+            else:
+                section, target, = words
+            if start >= end:
+                continue
+            lo = binary_search(maps, lambda i: -1 if start < i['start'] else (1 if start >= i['end'] else 0))
+            if lo < 0:
+                lo = -1 - lo
+            hi = binary_search(maps, lambda i: -1 if (end - 1) < i['start'] else (1 if (end - 1) >= i['end'] else 0))
+            if hi < 0:
+                hi = -1 - hi
+            else:
+                hi += 1
+            sliced = []
+            for i in range(lo, hi):
+                sliced.append(maps.pop(lo))
+            if sliced and sliced[-1]['end'] > end:
+                m = sliced[-1]
+                maps.insert(lo, {
+                    'start': end,
+                    'end': m['end'],
+                    'offset': 0,
+                    'target': m['target'],
+                    'section': m['section'],
+                })
+            maps.insert(lo, {
                 'start': start,
                 'end': end,
                 'offset': start - base.get(target, start),
                 'target': target,
                 'section': section,
             })
-        return sorted(filter(lambda i: i['end'] > i['start'], maps), key=lambda i: i['start'])
+            if sliced and start > sliced[0]['start']:
+                m = sliced[0]
+                maps.insert(lo, {
+                    'start': m['start'],
+                    'end': start,
+                    'offset': 0,
+                    'target': m['target'],
+                    'section': m['section'],
+                })
+        return maps
 
     async def _info_registers(self):
         registers = {}
