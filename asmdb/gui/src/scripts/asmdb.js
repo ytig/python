@@ -483,7 +483,7 @@ class Debugger {
   getAddressLabel(address) {
     var info = this.getAddressInfo(address);
     if (info) {
-      return info.section + '|' + info.target.substring(Math.max(info.target.lastIndexOf('/'), info.target.lastIndexOf('@')) + 1);
+      return info.section + '|' + getSimpleTarget(info.target);
     }
     return null;
   }
@@ -566,7 +566,7 @@ class Debugger {
             var delta = int - info.start + info.offset;
             str = '~0x' + delta.toString(16);
           } else {
-            str = info.target.substring(Math.max(info.target.lastIndexOf('/'), info.target.lastIndexOf('@')) + 1);
+            str = getSimpleTarget(info.target);
           }
         }
         break;
@@ -618,6 +618,10 @@ class Union {
       this._events.splice(0, this._events.length);
     }
   }
+}
+
+function getSimpleTarget(target) {
+  return target.substring(Math.max(target.lastIndexOf('/'), target.lastIndexOf('@')) + 1);
 }
 
 var instance = null;
