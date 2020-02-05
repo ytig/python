@@ -262,7 +262,7 @@ export default {
       if (this.items[index] && this.items[index].event) {
         return;
       }
-      if (this.items[index] && this.items[index].index != undefined && this.items[index].index != -1) {
+      if (this.items[index] && this.items[index].index != undefined) {
         if (this.items[index].index == -1) {
         } else {
           var address = this.startAddress + this.items[index].index;
