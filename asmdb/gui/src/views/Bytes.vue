@@ -52,6 +52,7 @@ export default {
     onLayout: function() {
       var items = [];
       items.push(newItem(this.lineNumber));
+      items[items.length - 1].index = -1;
       var event;
       for (var i = 0; i < this.group; i++) {
         if (i % 8 == 0) {
@@ -277,13 +278,19 @@ export default {
     onMouseUpItem: function(index, event) {
       if (event.button == 2) {
         if (this.items[index] && this.items[index].index != undefined) {
-          var selection = getSelection();
-          var floor = this.items[index].index - (this.items[index].index % asmdb.getInstance().UNIT);
-          var anchor = 0;
-          while (this.items[anchor].index == undefined || this.items[anchor].index < floor) {
-            anchor++;
+          var anchor, focus;
+          if (this.items[index].index == -1) {
+            anchor = 0;
+            focus = 1;
+          } else {
+            var floor = this.items[index].index - (this.items[index].index % asmdb.getInstance().UNIT);
+            anchor = 0;
+            while (this.items[anchor].index == undefined || this.items[anchor].index < floor) {
+              anchor++;
+            }
+            focus = anchor + 2 * asmdb.getInstance().UNIT;
           }
-          var focus = anchor + 2 * asmdb.getInstance().UNIT;
+          var selection = getSelection();
           selection.collapse(this.$el, anchor);
           selection.extend(this.$el, focus);
           var menu = this.onCreateMenu(this.items[index].index);
@@ -295,49 +302,59 @@ export default {
       }
     },
     onCreateMenu: function(index) {
-      var address = this.startAddress + index;
-      var range = asmdb.getInstance().getMemoryRange();
-      var inRange = address >= range[0] && address < range[1];
       var items = [];
-      var intValue = 0;
-      var i = index - (index % asmdb.getInstance().UNIT);
-      if (!asmdb.getInstance().BEND) {
-        for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
-          intValue *= 256;
-          intValue += (this.newBytes || '').charCodeAt(i + j) || 0;
-        }
+      if (index == -1) {
+        var text = this.lineNumber;
+        items.push(['Copy', '', true]);
+        items[items.length - 1].event = () => {
+          emptySelection();
+          this.$toast.alert('Text Copied');
+          copyText(text);
+        };
       } else {
-        for (var j = 0; j < asmdb.getInstance().UNIT; j++) {
-          intValue *= 256;
-          intValue += (this.newBytes || '').charCodeAt(i + j) || 0;
-        }
-      }
-      items.push(['Copy', '', true]);
-      items[items.length - 1].event = () => {
-        emptySelection();
-        this.$toast.alert('Text Copied');
-        copyText('0x' + intValue.toString(16));
-      };
-      var watching = JSON.parse(this.watchingNumbers).indexOf(index) >= 0;
-      var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN && inRange;
-      items.push([!watching ? 'Watching' : 'Watching done', '', watching || canWatch]);
-      items[items.length - 1].event = () => {
-        emptySelection();
-        var addr = address - (address % asmdb.getInstance().UNIT);
-        if (!watching) {
-          asmdb.getInstance().wpt([], [{ address: addr }]);
+        var address = this.startAddress + index;
+        var range = asmdb.getInstance().getMemoryRange();
+        var inRange = address >= range[0] && address < range[1];
+        var intValue = 0;
+        var i = index - (index % asmdb.getInstance().UNIT);
+        if (!asmdb.getInstance().BEND) {
+          for (var j = asmdb.getInstance().UNIT - 1; j >= 0; j--) {
+            intValue *= 256;
+            intValue += (this.newBytes || '').charCodeAt(i + j) || 0;
+          }
         } else {
-          asmdb.getInstance().wpt([{ address: addr }], []);
+          for (var j = 0; j < asmdb.getInstance().UNIT; j++) {
+            intValue *= 256;
+            intValue += (this.newBytes || '').charCodeAt(i + j) || 0;
+          }
         }
-      };
-      var el = this.$el.getElementsByClassName('bytes-padding')[index];
-      var rect = el.getBoundingClientRect();
-      var placeholder = el.innerHTML;
-      items.push(['Modify memory', '', asmdb.getInstance().isSuspend() && inRange]);
-      items[items.length - 1].event = () => {
-        emptySelection();
-        this.$editor.alert(parseInt(rect.x + 1 - measureLength(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
-      };
+        items.push(['Copy', '', true]);
+        items[items.length - 1].event = () => {
+          emptySelection();
+          this.$toast.alert('Text Copied');
+          copyText('0x' + intValue.toString(16));
+        };
+        var watching = JSON.parse(this.watchingNumbers).indexOf(index) >= 0;
+        var canWatch = asmdb.getInstance().getWatchpointsLength() < asmdb.getInstance().WLEN && inRange;
+        items.push([!watching ? 'Watching' : 'Watching done', '', watching || canWatch]);
+        items[items.length - 1].event = () => {
+          emptySelection();
+          var addr = address - (address % asmdb.getInstance().UNIT);
+          if (!watching) {
+            asmdb.getInstance().wpt([], [{ address: addr }]);
+          } else {
+            asmdb.getInstance().wpt([{ address: addr }], []);
+          }
+        };
+        var el = this.$el.getElementsByClassName('bytes-padding')[index];
+        var rect = el.getBoundingClientRect();
+        var placeholder = el.innerHTML;
+        items.push(['Modify memory', '', asmdb.getInstance().isSuspend() && inRange]);
+        items[items.length - 1].event = () => {
+          emptySelection();
+          this.$editor.alert(parseInt(rect.x + 1 - measureLength(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
+        };
+      }
       return items;
     },
     onAssign: function(address, value) {
