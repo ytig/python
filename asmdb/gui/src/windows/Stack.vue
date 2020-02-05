@@ -221,6 +221,7 @@ export default {
       this.onClickIndex(this.page + delta);
     },
     onClickIndex: function(newPage) {
+      emptySelection();
       this.page = newPage;
       this.itemSelection = null;
       this.invalidate();
