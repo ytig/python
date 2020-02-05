@@ -11,6 +11,11 @@ export default {
     value: Number,
     disable: Boolean
   },
+  watch: {
+    value: function() {
+      emptySelection();
+    }
+  },
   methods: {
     onClickItem: function(index) {
       if (this.value == index) {
