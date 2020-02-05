@@ -1,8 +1,8 @@
 <template>
   <div class="register-container">
-    <span>{{value.lineName}}</span>
+    <span @mouseup="onMouseUpItem(-1, ...arguments)">{{value.lineName}}</span>
     <span v-for="i in (value.lineFill+1-value.lineName.length)" :key="i" class="user-select-none">&nbsp;</span>
-    <span ref="bytes" :css-usage="cssUsage" :css-changed="cssChanged" :css-assigned="cssAssigned" @click="onClick" @dblclick="onDoubleClick" @mouseup="onMouseUp">{{hexValue}}</span>
+    <span ref="bytes" :css-usage="cssUsage" :css-changed="cssChanged" :css-assigned="cssAssigned" @click="onClickItem(0)" @dblclick="onDoubleClickItem(0)" @mouseup="onMouseUpItem(0, ...arguments)">{{hexValue}}</span>
     <span class="user-select-none">&nbsp;</span>
     <span>{{strValue}}</span>
   </div>
@@ -55,13 +55,13 @@ export default {
     }
   },
   methods: {
-    onClick: function() {
+    onClickItem: function(index) {
       var usage = parseInt(this.cssUsage) - 2;
       if (usage >= 0) {
         this.$emit('clickitem', usage, this.value.newValue);
       }
     },
-    onDoubleClick: function() {
+    onDoubleClickItem: function(index) {
       var usage = parseInt(this.cssUsage) - 2;
       if (usage >= 0) {
         return;
@@ -75,34 +75,44 @@ export default {
         this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onAssign.bind(this, this.value.lineName));
       }
     },
-    onMouseUp: function(event) {
+    onMouseUpItem: function(index, event) {
       if (event.button == 2) {
-        var menu = this.onCreateMenu();
+        var menu = this.onCreateMenu(index);
         this.$menu.alert(event, menu, i => {
           menu[i].event();
         });
         event.stopPropagation();
       }
     },
-    onCreateMenu: function() {
-      var range = asmdb.getInstance().getRegistersRange();
-      var inRange = range.indexOf(this.value.lineName) >= 0;
+    onCreateMenu: function(index) {
       var items = [];
-      var el = this.$refs.bytes;
-      var rect = el.getBoundingClientRect();
-      var text = el.innerHTML;
-      var placeholder = text.substring(2);
-      items.push(['Copy', '', true]);
-      items[items.length - 1].event = () => {
-        emptySelection();
-        this.$toast.alert('Text Copied');
-        copyText(text);
-      };
-      items.push(['Modify register', '', asmdb.getInstance().isSuspend() && inRange]);
-      items[items.length - 1].event = () => {
-        emptySelection();
-        this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onAssign.bind(this, this.value.lineName));
-      };
+      if (index == -1) {
+        var text = this.value.lineName;
+        items.push(['Copy', '', true]);
+        items[items.length - 1].event = () => {
+          emptySelection();
+          this.$toast.alert('Text Copied');
+          copyText(text);
+        };
+      } else {
+        var range = asmdb.getInstance().getRegistersRange();
+        var inRange = range.indexOf(this.value.lineName) >= 0;
+        var el = this.$refs.bytes;
+        var rect = el.getBoundingClientRect();
+        var text = el.innerHTML;
+        var placeholder = text.substring(2);
+        items.push(['Copy', '', true]);
+        items[items.length - 1].event = () => {
+          emptySelection();
+          this.$toast.alert('Text Copied');
+          copyText(text);
+        };
+        items.push(['Modify register', '', asmdb.getInstance().isSuspend() && inRange]);
+        items[items.length - 1].event = () => {
+          emptySelection();
+          this.$editor.alert(parseInt(rect.x + 2), parseInt(rect.y), 2 * asmdb.getInstance().UNIT, placeholder, this.onAssign.bind(this, this.value.lineName));
+        };
+      }
       return items;
     },
     onAssign: function(name, value) {
