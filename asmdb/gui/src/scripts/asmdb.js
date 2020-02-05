@@ -564,7 +564,7 @@ class Debugger {
         if (info) {
           if (info.target == target) {
             var delta = int - info.start + info.offset;
-            str = '~0x' + delta.toString(16);
+            str = '/0x' + delta.toString(16);
           } else {
             str = getSimpleTarget(info.target);
           }
