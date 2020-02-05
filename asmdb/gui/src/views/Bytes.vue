@@ -262,16 +262,18 @@ export default {
       if (this.items[index] && this.items[index].event) {
         return;
       }
-      if (this.items[index] && this.items[index].index != undefined) {
-        index = this.items[index].index;
-        var address = this.startAddress + index;
-        var range = asmdb.getInstance().getMemoryRange();
-        var inRange = address >= range[0] && address < range[1];
-        if (asmdb.getInstance().isSuspend() && inRange) {
-          var el = this.$el.getElementsByClassName('bytes-padding')[index];
-          var rect = el.getBoundingClientRect();
-          var placeholder = el.innerHTML;
-          this.$editor.alert(parseInt(rect.x + 1 - measureLength(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
+      if (this.items[index] && this.items[index].index != undefined && this.items[index].index != -1) {
+        if (this.items[index].index == -1) {
+        } else {
+          var address = this.startAddress + this.items[index].index;
+          var range = asmdb.getInstance().getMemoryRange();
+          var inRange = address >= range[0] && address < range[1];
+          if (asmdb.getInstance().isSuspend() && inRange) {
+            var el = this.$el.getElementsByClassName('bytes-padding')[this.items[index].index];
+            var rect = el.getBoundingClientRect();
+            var placeholder = el.innerHTML;
+            this.$editor.alert(parseInt(rect.x + 1 - measureLength(2)), parseInt(rect.y), 2, placeholder, this.onAssign.bind(this, address));
+          }
         }
       }
     },
