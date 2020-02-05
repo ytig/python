@@ -316,14 +316,16 @@ class WsGdbController(GdbController):
         return True
 
     async def asm(self, start, end):  # todo
+        import capstone
         mem = await self.mem(start, end)
         ret = []
-        for i in range((end - start)):
+        for i in capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_THUMB).disasm(mem, start):
             ret.append({
-                'type': 'byte',
-                'address': start + i,
-                'size': 1,
-                'value': mem[i],
+                'type': 'instruction',
+                'address': i.address,
+                'size': i.size,
+                'mnemonic': i.mnemonic,
+                'op_str': i.op_str,
             })
         return ret
 
