@@ -97,6 +97,8 @@ class WsController:
             else:
                 if name == m['target']:
                     end = m['end']
+                else:
+                    break
         if name is not None:
             return Library(self, name, start, end - start)
         else:
