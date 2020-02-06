@@ -98,7 +98,6 @@ async def gdb_startup(config, println):
     commands = []
     commands.append('set confirm off')
     commands.append('set pagination off')
-    commands.append('set arm force-mode thumb')
     if remote:
         commands.append(f'target remote {remote}')
     args = []
@@ -231,9 +230,13 @@ class GdbController:
             raise GdbError(text.strip())
 
     async def _continue(self):
-        text = await self._command('continue', wait=True)
-        if re.search(r'Remote connection closed|The program is not being run.', text):
-            raise GdbError(text.strip())
+        await self._command('set arm force-mode thumb')
+        try:
+            text = await self._command('continue', wait=True)
+            if re.search(r'Remote connection closed|The program is not being run.', text):
+                raise GdbError(text.strip())
+        finally:
+            await self._command('set arm force-mode auto')
 
     async def _info_maps(self):
         maps = []
