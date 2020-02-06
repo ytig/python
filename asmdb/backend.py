@@ -225,6 +225,11 @@ class GdbController:
         if re.search(r'Remote connection closed|The program is not being run.', text):
             raise GdbError(text.strip())
 
+    async def _stepi(self):
+        text = await self._command('stepi')
+        if re.search(r'Remote connection closed|The program is not being run.', text):
+            raise GdbError(text.strip())
+
     async def _continue(self):
         text = await self._command('continue', wait=True)
         if re.search(r'Remote connection closed|The program is not being run.', text):

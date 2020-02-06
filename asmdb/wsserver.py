@@ -298,7 +298,9 @@ class WsGdbController(GdbController):
     async def step(self):
         if not self.suspend:
             return False
-        # todo
+        self.suspend = False
+        await self._stepi()
+        self.suspend = True
         return True
 
     async def cont(self):
