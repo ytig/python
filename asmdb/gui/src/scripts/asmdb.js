@@ -586,7 +586,8 @@ class Debugger {
     var z = (int & 0x40000000) == 0 ? '' : 'Z';
     var c = (int & 0x20000000) == 0 ? '' : 'C';
     var v = (int & 0x10000000) == 0 ? '' : 'V';
-    return n + z + c + v;
+    var t = (int & 0x20) == 0 ? '' : 'T';
+    return n + z + c + v + t;
   }
 
   getWatchpointsLength() {
