@@ -7,7 +7,7 @@
       <div class="breakpoints-item" v-for="point in breakpoints" :key="point.address" :css-disable="point.disable">
         <span></span>
         <span @click="onClickItem(point)" @mouseup="onMouseUpItem(point, ...arguments)">{{toHex(point.address)}}</span>
-        <Comment ref="comments" class="breakpoints-grow" :point="point" :value="point.comment" @input="onCommentPoint(point, arguments[0])"></Comment>
+        <Comment ref="comments" class="breakpoints-grow" :value="point.comment" @input="onCommentPoint(point, arguments[0])"></Comment>
         <div class="breakpoints-icon" @click="commentPoint"></div>
         <div class="breakpoints-icon" @click="onTogglePoint(point)"></div>
         <div class="breakpoints-icon" @click="onSubPoint(point)"></div>
