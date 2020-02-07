@@ -225,11 +225,13 @@ class GdbController:
             raise GdbError(text.strip())
 
     async def _stepi(self):
+        # gdb bug: stepi not worked?
         text = await self._command('stepi')
         if re.search(r'Remote connection closed|The program is not being run.', text):
             raise GdbError(text.strip())
 
     async def _continue(self):
+        # gdb bug: Cannot set arm force-mode based on address?
         await self._command('set arm force-mode thumb')
         try:
             text = await self._command('continue', wait=True)
