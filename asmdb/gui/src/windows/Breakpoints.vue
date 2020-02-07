@@ -102,9 +102,6 @@ export default {
     onBreakpoints: function(breakpoints) {
       this.breakpoints.splice(0, this.breakpoints.length, ...breakpoints);
       this.breakpoints.sort((p1, p2) => {
-        if (p1.disable != p2.disable) {
-          return p1.disable ? 1 : -1;
-        }
         return p1.address - p2.address;
       });
     },
@@ -217,6 +214,9 @@ export default {
     .breakpoints-item[css-disable] {
       > span:nth-of-type(1) {
         background: @color-icon-breakpoint2;
+      }
+      > span:nth-of-type(2) {
+        color: @color-text-dark;
       }
     }
     .breakpoints-func {
