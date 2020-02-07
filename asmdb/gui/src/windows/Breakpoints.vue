@@ -182,8 +182,8 @@ export default {
       display: flex;
       align-items: center;
       > span:nth-of-type(1) {
-        width: 8px;
-        height: 8px;
+        width: 5px;
+        height: 5px;
         border-radius: 999px;
         background: @color-icon-breakpoint;
         margin-right: 8px;
@@ -217,6 +217,7 @@ export default {
       }
       > span:nth-of-type(2) {
         color: @color-text-dark;
+        text-decoration: line-through;
       }
     }
     .breakpoints-func {
