@@ -522,27 +522,29 @@ class Debugger {
   }
 
   getAddressUsage(int) {
+    var usage = '1';
     var delta = int - this.registers[this.SPNM];
     if (delta >= 0 && delta < 400 * 10) {
-      return '3';
-    }
-    var info = this.getAddressInfo(int);
-    var target = this.getAddressInfo(this.registers[this.PCNM]);
-    target = target != null ? target.target : null;
-    if (info) {
-      if (/^\/data\/app\/.*\.so$/.test(info.target) || info.target == target) {
-        if (/^\.text$|^\.plt$|^\.init|^\.fini/.test(info.section)) {
-          return '2';
-        }
-        if (/^\.data$|^\.bss$/.test(info.section)) {
-          return '4';
+      usage = '3';
+    } else {
+      var info = this.getAddressInfo(int);
+      var target = this.getAddressInfo(this.registers[this.PCNM]);
+      target = target != null ? target.target : null;
+      if (info) {
+        if (/^\/data\/app\/.*\.so$/.test(info.target) || info.target == target) {
+          if (/^\.text$|^\.plt$|^\.init|^\.fini/.test(info.section)) {
+            usage = '2';
+          } else if (/^\.data$|^\.bss$/.test(info.section)) {
+            usage = '4';
+          }
+        } else if (/malloc/.test(info.target)) {
+          if (int % (4 * this.UNIT) == 0) {
+            usage = '4';
+          }
         }
       }
-      if (/malloc/.test(info.target)) { //todo
-        return '4';
-      }
     }
-    return '1';
+    return usage;
   }
 
   getRegsString(int) {
