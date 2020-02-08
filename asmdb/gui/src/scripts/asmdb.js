@@ -538,7 +538,7 @@ class Debugger {
             usage = '4';
           }
         } else if (/malloc/.test(info.target)) {
-          if (int % (4 * this.UNIT) == 0) {
+          if (int % (2 * this.UNIT) == 0) {
             usage = '4';
           }
         }
