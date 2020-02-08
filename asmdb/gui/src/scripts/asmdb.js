@@ -539,7 +539,7 @@ class Debugger {
               usage = '4';
             }
           }
-        } else if (/malloc/.test(info.target)) {
+        } else if (/libc_malloc/.test(info.target)) {
           if (int % (2 * this.UNIT) == 0) {
             usage = '4';
           }
