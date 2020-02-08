@@ -535,7 +535,9 @@ class Debugger {
           if (/^\.text$|^\.plt$|^\.init|^\.fini/.test(info.section)) {
             usage = '2';
           } else if (/^\.data$|^\.bss$/.test(info.section)) {
-            usage = '4';
+            if (int % (1 * this.UNIT) == 0) {
+              usage = '4';
+            }
           }
         } else if (/malloc/.test(info.target)) {
           if (int % (2 * this.UNIT) == 0) {
