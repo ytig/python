@@ -56,16 +56,25 @@ class WsController:
 
     @property
     def registers(self):
+        """
+        Dict of registers.
+        """
         return self._pull('reg')
 
     @property
     def breakpoints(self):
+        """
+        List of specified breakpoints.
+        """
         while self._struct['breakpoints'] is None:
             pass
         return copy.deepcopy(self._struct['breakpoints'])
 
     @property
     def watchpoints(self):
+        """
+        List of specified watchpoints.
+        """
         while self._struct['watchpoints'] is None:
             pass
         return copy.deepcopy(self._struct['watchpoints'])
@@ -170,13 +179,15 @@ class WsController:
             'address': address
         }], [])
 
-    def ex(self, command, handler=lambda text: print(text.strip())):
+    def ex(self, command, r=False):
         """
         Execute a single GDB command. (for developing)
         """
         text = self._pull('ex', command)
-        if callable(handler):
-            handler(text)
+        if not r:
+            print(text.strip())
+        else:
+            return text
 
     def _pull(self, method, *params, timeout=None):
         tag = unique()
