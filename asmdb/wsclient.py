@@ -71,18 +71,30 @@ class WsController:
         return copy.deepcopy(self._struct['watchpoints'])
 
     def nexti(self):
+        """
+        Step one instruction, but proceed through subroutine calls.
+        """
         return self._pull('next')
 
     def stepi(self):
+        """
+        Step one instruction exactly.
+        """
         return self._pull('step')
 
     def conti(self, timeout=None):
+        """
+        Continue program being debugged, after signal or breakpoint.
+        """
         try:
             return self._pull('cont', timeout=timeout)
         except TimeoutError:
             return False
 
     def find_library(self, pattern):
+        """
+        Find a library by name, based on "/proc/$pid/maps" file.
+        """
         while self._struct['maps'] is None:
             pass
         name = None
@@ -105,17 +117,29 @@ class WsController:
             return None
 
     def set_register(self, name, value):
+        """
+        Assign register by name.
+        """
         self._pull('asgn', f'${name}={value}')
 
     def get_bytes(self, start, length):
+        """
+        Read memory within a range.
+        """
         return base64.b64decode(self._pull('mem', start, start + length))
 
     def set_bytes(self, start, bytes):
+        """
+        Write a range of memory.
+        """
         for byte in bytes:
             self._pull('asgn', f'*{start}={byte}')
             start += 1
 
     def set_breakpoint(self, address, disable=False, comment=''):
+        """
+        Set breakpoint at specified location.
+        """
         return self._pull('bpt', [], [{
             'address': address,
             'disable': disable,
@@ -123,21 +147,33 @@ class WsController:
         }])
 
     def del_breakpoint(self, address):
+        """
+        Delete breakpoint at specified location.
+        """
         return self._pull('bpt', [{
             'address': address
         }], [])
 
     def set_watchpoint(self, address):
+        """
+        Set watchpoint at specified location.
+        """
         return self._pull('wpt', [], [{
             'address': address
         }])
 
     def del_watchpoint(self, address):
+        """
+        Delete watchpoint at specified location.
+        """
         return self._pull('wpt', [{
             'address': address
         }], [])
 
     def ex(self, command, handler=lambda text: print(text.strip())):
+        """
+        Execute a single GDB command. (for developing)
+        """
         text = self._pull('ex', command)
         if callable(handler):
             handler(text)
