@@ -137,6 +137,11 @@ class WsController:
             'address': address
         }], [])
 
+    def ex(self, command, handler=lambda text: print(text.strip())):
+        text = self._pull('ex', command)
+        if callable(handler):
+            handler(text)
+
     def _pull(self, method, *params, timeout=None):
         tag = unique()
         data = {

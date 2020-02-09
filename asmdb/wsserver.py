@@ -209,7 +209,7 @@ class Terminal(asyncio.Protocol):
 
 
 class WsGdbController(GdbController):
-    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'asgn', 'setwinsize', 'readb', 'writeb',)
+    PULL = ('next', 'step', 'cont', 'rlse', 'asm', 'reg', 'mem', 'bpt', 'wpt', 'asgn', 'setwinsize', 'readb', 'writeb', 'ex',)
     PUSH = ('quit', 'suspend', 'breakpoints', 'watchpoints', 'maps', 'lenb',)
     quit = push_prop('quit', False)
     suspend = push_prop('suspend', False)
@@ -265,6 +265,9 @@ class WsGdbController(GdbController):
                 self.quit = True
             else:
                 await asyncio.sleep(interval)
+
+    async def ex(self, command):
+        return await self._command(command)
 
     async def setwinsize(self, rows, cols):
         return await self.terminal.setwinsize(rows, cols)
