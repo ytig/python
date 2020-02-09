@@ -534,7 +534,7 @@ class Debugger {
         if (/^\/data\/app\/.*\.so$/.test(info.target) || info.target == target) {
           if (/^\.init$|^\.plt$|^\.text$|^\.fini$/.test(info.section)) {
             usage = '2';
-          } else if (/^\.data$|^\.bss$|^\.rodata$/.test(info.section)) {
+          } else if (/^\.rodata$|^\.data$|^\.bss$/.test(info.section)) {
             if (int % (1 * this.UNIT) == 0) {
               usage = '4';
             }
