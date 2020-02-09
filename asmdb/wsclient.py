@@ -220,9 +220,8 @@ class WsController:
 
     def _on_message(self, data):
         if data['type'] == 'push':
-            if data['key'] == 'emit':
-                if data['val'] == 0:
-                    self._ws.close()
+            if data['key'] == 'exit':
+                self._ws.close()
             elif data['key'] in self._struct:
                 self._struct[data['key']] = data['val']
         elif data['type'] == 'pull':

@@ -83,7 +83,6 @@ class Session:
             except BaseException as e:
                 traceback.print_exc()
         self._emits.append(emit)
-        self.notify('emit', len(self))
         if self._ctrl:
             self.notify('ctrl', True, emit=emit)
             for key in WsGdbController.PUSH:
@@ -93,6 +92,8 @@ class Session:
             self.notify('ctrl', False, emit=emit)
 
     async def onmessage(self, emit, data):
+        if emit not in self._emits:
+            return
         if data.get('type') == 'pull':
             method = data.get('method')
             params = data.get('params', ())
@@ -108,9 +109,12 @@ class Session:
                     emit({'type': 'pull', 'tag': tag, 'r': None, 'e': suit_js(e), })
 
     async def onclose(self, emit):
+        if emit not in self._emits:
+            return
         self._emits.remove(emit)
-        self.notify('emit', len(self))
-        if not self._emits:
+        if not list(filter(lambda i: not i.daemon, self._emits)):
+            self.notify('exit', None)
+            self._emits.clear()
             if self._ctrl:
                 try:
                     await self._ctrl.adel()
@@ -124,13 +128,6 @@ class Session:
                 self.notify(key, val, emit=emit)
         else:
             emit({'type': 'push', 'key': key, 'val': suit_js(val), })
-
-    def __len__(self):
-        count = 0
-        for emit in self._emits:
-            if not emit.daemon:
-                count += 1
-        return count
 
 
 def notify_all(ctrl, key, val):
