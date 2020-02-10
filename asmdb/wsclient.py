@@ -190,15 +190,15 @@ class WsController:
             return text
 
     def _pull(self, method, *params, timeout=None):
-        tag = unique()
+        xid = unique()
         data = {
             'type': 'pull',
-            'tag': tag,
+            'xid': xid,
             'method': method,
             'params': params
         }
         event = threading.Event()
-        self._events[tag] = event
+        self._events[xid] = event
         self._ws.send(json.dumps(data))
         if not event.wait(timeout=timeout):
             raise TimeoutError
@@ -225,7 +225,7 @@ class WsController:
             elif data['key'] in self._struct:
                 self._struct[data['key']] = data['val']
         elif data['type'] == 'pull':
-            event = self._events.pop(data['tag'], None)
+            event = self._events.pop(data['xid'], None)
             if event is not None:
                 event.r = data['r']
                 event.e = data['e']

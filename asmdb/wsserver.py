@@ -97,16 +97,16 @@ class Session:
         if data.get('type') == 'pull':
             method = data.get('method')
             params = data.get('params', ())
-            tag = data.get('tag')
+            xid = data.get('xid')
             try:
                 assert method in WsGdbController.PULL, 'no method'
                 r = await getattr(self._ctrl, method)(*params)
-                if tag is not None:
-                    emit({'type': 'pull', 'tag': tag, 'r': suit_js(r), 'e': None, })
+                if xid is not None:
+                    emit({'type': 'pull', 'xid': xid, 'r': suit_js(r), 'e': None, })
             except BaseException as e:
                 traceback.print_exc()
-                if tag is not None:
-                    emit({'type': 'pull', 'tag': tag, 'r': None, 'e': suit_js(e), })
+                if xid is not None:
+                    emit({'type': 'pull', 'xid': xid, 'r': None, 'e': suit_js(e), })
 
     async def onclose(self, emit):
         if emit not in self._emits:

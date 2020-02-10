@@ -30,7 +30,7 @@ class Debugger {
     this.utf8 = '';
     this.counter = 0;
     this.registers = null;
-    this.tag = 0;
+    this.unique = 0;
     this.callbacks = {};
     this.objects = {};
     this.ws = new WebSocket('ws://' + location.host + '/ws');
@@ -61,9 +61,9 @@ class Debugger {
         }
         break;
       case 'pull':
-        if (data.tag in this.callbacks) {
-          var callback = this.callbacks[data.tag];
-          delete this.callbacks[data.tag];
+        if (data.xid in this.callbacks) {
+          var callback = this.callbacks[data.xid];
+          delete this.callbacks[data.xid];
           if (data.e == null) {
             if (callback.success) {
               callback.success(data.r);
@@ -235,12 +235,12 @@ class Debugger {
   pull(method, params, success, failure) {
     var data = {
       type: 'pull',
-      tag: ++this.tag,
+      xid: ++this.unique,
       method: method,
       params: params || []
     };
     if (success || failure) {
-      this.callbacks[data.tag] = {
+      this.callbacks[data.xid] = {
         success: success,
         failure: failure
       };
