@@ -6,13 +6,6 @@ import base64
 import itertools
 import threading
 import websocket
-_LOCK = threading.RLock()
-_COUNT = itertools.count(1)
-
-
-def unique():
-    with _LOCK:
-        return next(_COUNT)
 
 
 class WsError(RuntimeError):
@@ -51,6 +44,7 @@ class WsController:
             'watchpoints': None,
             'maps': None
         }
+        self._unique = itertools.count(1)
         self._events = {}
         threading.Thread(target=self._run).start()
 
@@ -190,7 +184,7 @@ class WsController:
             return text
 
     def _pull(self, method, *params, timeout=None):
-        xid = unique()
+        xid = next(self._unique)
         data = {
             'type': 'pull',
             'xid': xid,
